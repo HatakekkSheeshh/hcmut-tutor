@@ -77,7 +77,7 @@ const Table: React.FC<TableProps> = ({
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
-          onPageChange={onPageChange}
+          onPageChange={onPageChange || (() => {})}
           onRowsPerPageChange={onRowsPerPageChange}
         />
       )}

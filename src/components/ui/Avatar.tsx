@@ -16,8 +16,8 @@ const Avatar: React.FC<AvatarProps> = ({
   alt,
   name,
   size = 'medium',
-  showBadge = false,
-  badgeColor = 'green',
+  showBadge: _showBadge = false,
+  badgeColor: _badgeColor = 'green',
   children
 }) => {
   const muiSize = size === 'small' ? 32 : size === 'large' ? 56 : size === 'xl' ? 80 : 40

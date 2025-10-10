@@ -1,5 +1,5 @@
 import React from 'react'
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Toolbar, Box, Typography, Card, CardContent, Button } from '@mui/material'
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Box, Typography, Card, CardContent, Button } from '@mui/material'
 import { 
   Dashboard, 
   School, 
@@ -10,7 +10,7 @@ import {
   Folder,
   Download,
   Lock,
-  Person
+  Person as _Person
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 
