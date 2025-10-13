@@ -4,24 +4,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Production build
+dist/
+build/
+
 # Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Next.js
-.next/
-out/
-
-# Vite
-dist/
-.vite/
-
-# Build outputs
-build/
-*.tsbuildinfo
 
 # IDE
 .vscode/
@@ -34,18 +26,17 @@ build/
 Thumbs.db
 
 # Logs
-logs/
+logs
 *.log
 
 # Runtime data
-pids/
+pids
 *.pid
 *.seed
 *.pid.lock
 
 # Coverage directory used by tools like istanbul
 coverage/
-*.lcov
 
 # nyc test coverage
 .nyc_output
@@ -78,24 +69,23 @@ jspm_packages/
 .cache
 .parcel-cache
 
-# Next.js build output
+# next.js build output
 .next
 
-# Nuxt.js build / generate output
+# nuxt.js build output
 .nuxt
-dist
 
-# Gatsby files
-.cache/
-public
+# vuepress build output
+.vuepress/dist
 
-# Storybook build outputs
-.out
-.storybook-out
+# Serverless directories
+.serverless
 
-# Temporary folders
-tmp/
-temp/
+# FuseBox cache
+.fusebox/
 
-# Vercel
-.vercel
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
