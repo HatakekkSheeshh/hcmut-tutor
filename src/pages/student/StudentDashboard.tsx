@@ -22,7 +22,7 @@ import {
   List as ListIcon,
   BarChart as BarChartIcon,
   WorkspacePremium as WorkspacePremiumIcon,
-  Download as DownloadIcon
+  SmartToy as SmartToyIcon
 } from '@mui/icons-material'
 
 const StudentDashboard: React.FC = () => {
@@ -96,7 +96,7 @@ const StudentDashboard: React.FC = () => {
     { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
     { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
     { id: 'session-detail', label: 'Session Details', icon: <WorkspacePremiumIcon />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <DownloadIcon />, path: '/student/chatbot' }
+    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' }
   ]
 
   return (

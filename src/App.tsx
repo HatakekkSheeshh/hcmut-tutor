@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { AuthProvider } from './contexts/AuthContext'
 import StudentDashboard from './pages/student/StudentDashboard.tsx'
 import SearchTutors from './pages/student/SearchTutors.tsx'
 import BookSession from './pages/student/BookSession.tsx'
@@ -25,7 +26,8 @@ import NotificationsCenter from './pages/common/NotificationsCenter.tsx'
 function App() {
   return (
     <ThemeProvider>
-      <Routes>
+      <AuthProvider>
+        <Routes>
         {/* Student Routes */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/search" element={<SearchTutors />} />
@@ -59,7 +61,8 @@ function App() {
         
         {/* Default redirect to login */}
         <Route path="/" element={<Login />} />
-      </Routes>
+        </Routes>
+      </AuthProvider>
     </ThemeProvider>
   )
 }

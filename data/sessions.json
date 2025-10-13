@@ -1,0 +1,36 @@
+{
+  "sessions": [
+    {
+      "id": "1",
+      "studentId": "1",
+      "tutorId": "2",
+      "subjectId": "1",
+      "title": "Calculus Fundamentals",
+      "description": "Basic calculus concepts and applications",
+      "scheduledAt": "2024-01-15T10:00:00Z",
+      "duration": 60,
+      "type": "online",
+      "meetingLink": "https://meet.google.com/abc-defg-hij",
+      "status": "scheduled",
+      "price": 50,
+      "paymentStatus": "pending",
+      "createdAt": "2024-01-10T00:00:00Z"
+    },
+    {
+      "id": "2",
+      "studentId": "4",
+      "tutorId": "1",
+      "subjectId": "2",
+      "title": "Linear Algebra Review",
+      "description": "Review of linear algebra concepts",
+      "scheduledAt": "2024-01-16T14:00:00Z",
+      "duration": 90,
+      "type": "offline",
+      "location": "HCMUT Campus",
+      "status": "scheduled",
+      "price": 50,
+      "paymentStatus": "paid",
+      "createdAt": "2024-01-11T00:00:00Z"
+    }
+  ]
+}

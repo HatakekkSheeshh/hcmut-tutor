@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -18,6 +18,7 @@ import {
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Avatar from '../../components/ui/Avatar'
+import { api } from '../../lib/api'
 
 const SearchTutors: React.FC = () => {
   const { theme } = useTheme()
@@ -27,71 +28,70 @@ const SearchTutors: React.FC = () => {
   const [rating, setRating] = useState('')
   const [availability, setAvailability] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  
+  // New state for API integration
+  const [tutors, setTutors] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
+  const [subjects, setSubjects] = useState([])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  const tutors = [
-    {
-      id: 1,
-      name: 'Dr. Sarah Johnson',
-      subject: 'Mathematics',
-      rating: 4.9,
-      reviews: 127,
-      price: 50,
-      experience: '8 years',
-      location: 'New York, NY',
-      availability: 'Available',
-      image: '/api/placeholder/100/100',
-      specialties: ['Calculus', 'Algebra', 'Statistics'],
-      nextAvailable: 'Today at 2:00 PM'
-    },
-    {
-      id: 2,
-      name: 'Prof. Michael Chen',
-      subject: 'Physics',
-      rating: 4.8,
-      reviews: 89,
-      price: 45,
-      experience: '12 years',
-      location: 'San Francisco, CA',
-      availability: 'Available',
-      image: '/api/placeholder/100/100',
-      specialties: ['Quantum Physics', 'Mechanics', 'Thermodynamics'],
-      nextAvailable: 'Tomorrow at 10:00 AM'
-    },
-    {
-      id: 3,
-      name: 'Dr. Emily Davis',
-      subject: 'Chemistry',
-      rating: 4.7,
-      reviews: 156,
-      price: 55,
-      experience: '6 years',
-      location: 'Boston, MA',
-      availability: 'Busy',
-      image: '/api/placeholder/100/100',
-      specialties: ['Organic Chemistry', 'Biochemistry', 'Analytical Chemistry'],
-      nextAvailable: 'Next week'
-    },
-    {
-      id: 4,
-      name: 'Dr. James Wilson',
-      subject: 'Biology',
-      rating: 4.9,
-      reviews: 203,
-      price: 48,
-      experience: '10 years',
-      location: 'Chicago, IL',
-      availability: 'Available',
-      image: '/api/placeholder/100/100',
-      specialties: ['Cell Biology', 'Genetics', 'Ecology'],
-      nextAvailable: 'Today at 4:00 PM'
+  // Fetch tutors from API
+  const fetchTutors = async () => {
+    setLoading(true)
+    try {
+      const filters = {
+        q: searchTerm,
+        subject,
+        rating,
+        availability,
+        page: pagination.page,
+        limit: 12
+      }
+      
+      const data = await api.searchTutors(filters)
+      setTutors(data.tutors || [])
+      setPagination({
+        page: data.pagination?.page || 1,
+        totalPages: data.pagination?.totalPages || 1,
+        total: data.pagination?.total || 0
+      })
+    } catch (error) {
+      console.error('Failed to fetch tutors:', error)
+      setTutors([])
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
-  const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'English']
+  // Fetch subjects from API
+  const fetchSubjects = async () => {
+    try {
+      const data = await api.getSubjects()
+      setSubjects(data || [])
+    } catch (error) {
+      console.error('Failed to fetch subjects:', error)
+      setSubjects([])
+    }
+  }
+
+  // Load data on component mount
+  useEffect(() => {
+    fetchSubjects()
+    fetchTutors()
+  }, [])
+
+  // Refetch when filters change
+  useEffect(() => {
+    fetchTutors()
+  }, [searchTerm, subject, rating, availability, pagination.page])
+
+  const handleSearch = () => {
+    setPagination(prev => ({ ...prev, page: 1 }))
+  }
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -130,7 +130,7 @@ const SearchTutors: React.FC = () => {
               >
                     <option value="">All Subjects</option>
                 {subjects.map((sub) => (
-                      <option key={sub} value={sub}>{sub}</option>
+                      <option key={sub.id} value={sub.name}>{sub.name}</option>
                     ))}
                   </select>
                 </div>
@@ -257,128 +257,186 @@ const SearchTutors: React.FC = () => {
           {/* Results Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Available Tutors ({tutors.length})
+              Available Tutors ({pagination.total})
             </h2>
             <div className="flex space-x-2">
-              <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              <button 
+                onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                disabled={pagination.page <= 1}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
                 <ArrowBackIcon className="w-4 h-4" />
               </button>
-              <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              <button 
+                onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.totalPages, prev.page + 1) }))}
+                disabled={pagination.page >= pagination.totalPages}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
                 <ArrowForwardIcon className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-      {/* Tutors Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tutors.map((tutor) => (
-              <Card key={tutor.id} className={`overflow-hidden ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-                <div className="p-6">
-                  {/* Tutor Header */}
-                  <div className="flex items-center mb-4">
-                    <Avatar 
-                      src={tutor.image} 
-                      name={tutor.name}
-                      size="large"
-                    />
-                    <div className="ml-3 flex-1">
-                      <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {tutor.name}
-                      </h3>
-                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {tutor.subject} • {tutor.experience} experience
-                      </p>
-                    </div>
-                  </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      )}
 
-                  {/* Rating & Price */}
+      {/* Tutors Grid */}
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {tutors.map((tutor) => (
+            <Card key={tutor.tutor.id} className={`overflow-hidden ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className="p-6">
+                {/* AI Match Score */}
+                {tutor.score && (
                   <div className="mb-4">
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`w-4 h-4 ${i < Math.floor(tutor.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
-                          />
-                        ))}
-                      </div>
-                      <span className={`text-sm ml-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {tutor.rating} ({tutor.reviews} reviews)
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Match Score:
+                      </span>
+                      <span className="text-sm font-bold text-blue-600">
+                        {Math.round(tutor.score * 100)}%
                       </span>
                     </div>
-                    <p className={`text-lg font-semibold text-blue-600`}>
-                      ${tutor.price}/hour
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full" 
+                        style={{ width: `${tutor.score * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tutor Header */}
+                <div className="flex items-center mb-4">
+                  <Avatar 
+                    src={tutor.tutor.user?.avatar || '/api/placeholder/100/100'} 
+                    name={`${tutor.tutor.user?.firstName} ${tutor.tutor.user?.lastName}`}
+                    size="large"
+                  />
+                  <div className="ml-3 flex-1">
+                    <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {tutor.tutor.user?.firstName} {tutor.tutor.user?.lastName}
+                    </h3>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {tutor.tutor.user?.major} • {tutor.tutor.experienceYears} years experience
                     </p>
                   </div>
+                </div>
 
-                  {/* Location & Availability */}
-                  <div className="mb-4 space-y-2">
+                {/* Rating & Price */}
+                <div className="mb-4">
+                  <div className="flex items-center mb-2">
                     <div className="flex items-center">
-                      <LocationOn className="w-4 h-4 text-gray-400 mr-2" />
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {tutor.location}
-                      </span>
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`w-4 h-4 ${i < Math.floor(tutor.tutor.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                        />
+                      ))}
                     </div>
-                    <div className="flex items-center">
-                      <Schedule className="w-4 h-4 text-gray-400 mr-2" />
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Next: {tutor.nextAvailable}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Status:
-                      </span>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        tutor.availability === 'Available' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {tutor.availability}
-                      </span>
-                    </div>
+                    <span className={`text-sm ml-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {tutor.tutor.rating} ({tutor.tutor.totalReviews} reviews)
+                    </span>
                   </div>
+                  <p className={`text-lg font-semibold text-blue-600`}>
+                    ${tutor.tutor.pricePerHour}/hour
+                  </p>
+                </div>
 
-                  {/* Specialties */}
+                {/* Location & Availability */}
+                <div className="mb-4 space-y-2">
+                  <div className="flex items-center">
+                    <LocationOn className="w-4 h-4 text-gray-400 mr-2" />
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {tutor.tutor.location}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Schedule className="w-4 h-4 text-gray-400 mr-2" />
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Next: {new Date(tutor.tutor.nextAvailable).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Status:
+                    </span>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      tutor.tutor.status === 'available' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {tutor.tutor.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Specialties */}
+                <div className="mb-4">
+                  <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Specialties:
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {tutor.tutor.specialties.map((specialty, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                      >
+                        {specialty}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* AI Match Reasons */}
+                {tutor.reasons && tutor.reasons.length > 0 && (
                   <div className="mb-4">
                     <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Specialties:
+                      Why this match:
                     </p>
-                    <div className="flex flex-wrap gap-1">
-                      {tutor.specialties.map((specialty, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                        >
-                          {specialty}
-                        </span>
+                    <div className="space-y-1">
+                      {tutor.reasons.map((reason, index) => (
+                        <div key={index} className="flex items-center">
+                          <CheckCircleIcon className="w-3 h-3 text-green-500 mr-2" />
+                          <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {reason}
+                          </span>
+                        </div>
                       ))}
                     </div>
                   </div>
+                )}
 
-                  {/* Actions */}
-                  <div className="flex space-x-2">
-                    <Button 
-                      size="small" 
-                      variant="outlined"
-                      className="flex-1"
-                    >
+                {/* Actions */}
+                <div className="flex space-x-2">
+                  <Button 
+                    size="small" 
+                    variant="outlined"
+                    className="flex-1"
+                    onClick={() => navigate(`/student/tutor/${tutor.tutor.id}`)}
+                  >
                     View Profile
                   </Button>
                   <Button 
                     size="small" 
                     variant="contained"
-                    disabled={tutor.availability === 'Busy'}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled={tutor.tutor.status !== 'available'}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => navigate(`/student/book?tutorId=${tutor.tutor.id}`)}
                   >
                     Book Session
                   </Button>
-                  </div>
+                </div>
                 </div>
               </Card>
             ))}
           </div>
-        </div>
+        )}
+      </div>
 
         {/* Right Sidebar */}
         <div className={`w-full lg:w-80 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-l ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} mt-6 lg:mt-0`}>
@@ -431,17 +489,17 @@ const SearchTutors: React.FC = () => {
                 Popular Subjects
               </h3>
               <div className="flex flex-wrap gap-2">
-                {subjects.slice(0, 6).map((subject, index) => (
+                {subjects.slice(0, 6).map((sub) => (
                   <button
-                    key={index}
-                    onClick={() => setSubject(subject)}
+                    key={sub.id}
+                    onClick={() => setSubject(sub.name)}
                     className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                      subject === subject
+                      subject === sub.name
                         ? 'bg-blue-100 text-blue-800'
                         : `${theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                     }`}
                   >
-                    {subject}
+                    {sub.name}
                   </button>
                 ))}
               </div>
@@ -512,7 +570,7 @@ const SearchTutors: React.FC = () => {
                   >
                     <option value="">All Subjects</option>
                     {subjects.map((sub) => (
-                      <option key={sub} value={sub}>{sub}</option>
+                      <option key={sub.id} value={sub.name}>{sub.name}</option>
                     ))}
                   </select>
                 </div>

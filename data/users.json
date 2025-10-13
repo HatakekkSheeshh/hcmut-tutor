@@ -1,0 +1,68 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "hcmutId": "20123456",
+      "email": "student@hcmut.edu.vn",
+      "password": "hcmut123",
+      "firstName": "Nguyễn",
+      "lastName": "Văn A",
+      "role": "student",
+      "university": "HCMUT",
+      "major": "Computer Science",
+      "year": "2024",
+      "avatar": "/uploads/student1.jpg",
+      "isActive": true,
+      "isVerified": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "2",
+      "hcmutId": "T001",
+      "email": "tutor1@hcmut.edu.vn",
+      "password": "$2a$10$hashed_password_here",
+      "firstName": "Trần",
+      "lastName": "Thị B",
+      "role": "tutor",
+      "university": "HCMUT",
+      "major": "Mathematics",
+      "year": "2020",
+      "avatar": "/uploads/tutor1.jpg",
+      "isActive": true,
+      "isVerified": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "3",
+      "hcmutId": "T002",
+      "email": "tutor2@hcmut.edu.vn",
+      "password": "$2a$10$hashed_password_here",
+      "firstName": "Lê",
+      "lastName": "Văn C",
+      "role": "tutor",
+      "university": "HCMUT",
+      "major": "Physics",
+      "year": "2018",
+      "avatar": "/uploads/tutor2.jpg",
+      "isActive": true,
+      "isVerified": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "4",
+      "hcmutId": "20123457",
+      "email": "student2@hcmut.edu.vn",
+      "password": "$2a$10$hashed_password_here",
+      "firstName": "Phạm",
+      "lastName": "Thị D",
+      "role": "student",
+      "university": "HCMUT",
+      "major": "Mathematics",
+      "year": "2024",
+      "avatar": "/uploads/student2.jpg",
+      "isActive": true,
+      "isVerified": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
