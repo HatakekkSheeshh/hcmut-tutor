@@ -24,7 +24,6 @@ import {
   Assignment as AssignmentIcon,
   TrendingUp as TrendingUpIcon,
   People as PeopleIcon,
-  Assessment as AssessmentIcon,
   Security as SecurityIcon,
   Settings as SettingsIcon,
   LocationOn as LocationOnIcon,

@@ -21,7 +21,6 @@ import {
   ArrowForward as ArrowForwardIcon,
   Menu as MenuIcon,
   BarChart as BarChartIcon,
-  Folder as FolderIcon,
   Schedule as ScheduleIcon,
   TrendingUp as TrendingUpIcon,
   People as PeopleIcon,

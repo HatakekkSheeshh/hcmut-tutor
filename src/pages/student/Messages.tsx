@@ -9,7 +9,6 @@ import {
   Search as SearchIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
-  Autorenew as AutorenewIcon,
   Star as StarIcon,
   Facebook as FacebookIcon,
   Twitter as TwitterIcon,
@@ -34,8 +33,7 @@ import {
   AttachFile as AttachFileIcon,
   EmojiEmotions as EmojiEmotionsIcon,
   MoreHoriz as MoreHorizIcon,
-  OnlinePrediction as OnlinePredictionIcon,
-  School as SchoolIcon
+  OnlinePrediction as OnlinePredictionIcon
 } from '@mui/icons-material'
 
 const Messages: React.FC = () => {

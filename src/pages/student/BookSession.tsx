@@ -7,7 +7,6 @@ import {
   Schedule, 
   Person, 
   Payment,
-  Search as SearchIcon,
   Menu as MenuIcon,
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,

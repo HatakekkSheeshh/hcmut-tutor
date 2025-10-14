@@ -14,7 +14,6 @@ import {
   VideoCall as VideoCallIcon,
   Chat as ChatIcon,
   Person as PersonIcon,
-  TrendingUp as TrendingUpIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
