@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
-  Rating
+  Rating,
+  Avatar
 } from '@mui/material'
 import { 
   School, 
@@ -34,6 +35,28 @@ const EvaluateSession: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   // Mock session data
@@ -87,7 +110,14 @@ const EvaluateSession: React.FC = () => {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="flex items-center justify-center min-h-screen">
-          <Card className={`p-8 text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+          <Card 
+            className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-8 text-center`}
+            style={{
+              borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+              boxShadow: 'none !important'
+            }}
+          >
             <div className="mb-6">
               <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -164,26 +194,12 @@ const EvaluateSession: React.FC = () => {
                 QUICK ACTIONS
               </h3>
               <div className="space-y-2">
-                <button 
+              <button 
                   onClick={() => navigate('/student')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
-                </button>
-                <button 
-                  onClick={() => navigate('/student/progress')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <BarChartIcon className="mr-3 w-4 h-4" />
-                  View Progress
-                </button>
-                <button 
-                  onClick={() => navigate('/student/book')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  Book Another Session
                 </button>
               </div>
             </div>
@@ -228,13 +244,30 @@ const EvaluateSession: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Session Summary */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Session Summary
                 </h3>
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gray-300 rounded-full mr-3"></div>
-                  <div>
+                  <Avatar
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      bgcolor: getAvatarColor(session.tutor.name),
+                      fontSize: '1.125rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {getInitials(session.tutor.name)}
+                  </Avatar>
+                  <div className="ml-3">
                     <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {session.tutor.name}
                     </h4>
@@ -267,7 +300,14 @@ const EvaluateSession: React.FC = () => {
 
         {/* Evaluation Form */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     Session Evaluation
@@ -275,11 +315,23 @@ const EvaluateSession: React.FC = () => {
               <Button 
                 onClick={handleSubmit}
                 disabled={overallRating === 0}
-                    className={`px-6 py-2 rounded-lg ${
-                      overallRating > 0
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    } transition-colors`}
+                style={{
+                  backgroundColor: overallRating > 0 ? '#2563eb' : (theme === 'dark' ? '#374151' : '#d1d5db'),
+                  color: overallRating > 0 ? '#ffffff' : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                  borderColor: overallRating > 0 ? '#2563eb' : (theme === 'dark' ? '#374151' : '#d1d5db'),
+                  textTransform: 'none',
+                  fontWeight: '500'
+                }}
+                onMouseEnter={(e) => {
+                  if (overallRating > 0) {
+                    e.currentTarget.style.backgroundColor = '#1d4ed8'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (overallRating > 0) {
+                    e.currentTarget.style.backgroundColor = '#2563eb'
+                  }
+                }}
               >
                 Submit Evaluation
               </Button>
@@ -296,7 +348,17 @@ const EvaluateSession: React.FC = () => {
                     value={overallRating}
                         onChange={(_, newValue) => setOverallRating(newValue || 0)}
                     size="large"
-                        className="text-yellow-400"
+                        sx={{
+                          '& .MuiRating-iconEmpty': {
+                            color: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                          },
+                          '& .MuiRating-iconFilled': {
+                            color: '#fbbf24',
+                          },
+                          '& .MuiRating-iconHover': {
+                            color: '#f59e0b',
+                          }
+                        }}
                   />
                       <span className={`ml-3 text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {overallRating > 0 ? `${overallRating}/5` : 'Rate this session'}
@@ -316,7 +378,17 @@ const EvaluateSession: React.FC = () => {
                 <Rating
                   value={tutorRating}
                         onChange={(_, newValue) => setTutorRating(newValue || 0)}
-                        className="text-yellow-400"
+                        sx={{
+                          '& .MuiRating-iconEmpty': {
+                            color: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                          },
+                          '& .MuiRating-iconFilled': {
+                            color: '#fbbf24',
+                          },
+                          '& .MuiRating-iconHover': {
+                            color: '#f59e0b',
+                          }
+                        }}
                       />
                     </div>
 
@@ -330,7 +402,17 @@ const EvaluateSession: React.FC = () => {
                 <Rating
                   value={contentRating}
                         onChange={(_, newValue) => setContentRating(newValue || 0)}
-                        className="text-yellow-400"
+                        sx={{
+                          '& .MuiRating-iconEmpty': {
+                            color: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                          },
+                          '& .MuiRating-iconFilled': {
+                            color: '#fbbf24',
+                          },
+                          '& .MuiRating-iconHover': {
+                            color: '#f59e0b',
+                          }
+                        }}
                       />
                     </div>
 
@@ -344,7 +426,17 @@ const EvaluateSession: React.FC = () => {
                 <Rating
                   value={communicationRating}
                         onChange={(_, newValue) => setCommunicationRating(newValue || 0)}
-                        className="text-yellow-400"
+                        sx={{
+                          '& .MuiRating-iconEmpty': {
+                            color: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                          },
+                          '& .MuiRating-iconFilled': {
+                            color: '#fbbf24',
+                          },
+                          '& .MuiRating-iconHover': {
+                            color: '#f59e0b',
+                          }
+                        }}
                       />
                     </div>
 

@@ -289,7 +289,14 @@ const OnlineCommunityForum: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search Posts
                 </h3>
@@ -339,7 +346,14 @@ const OnlineCommunityForum: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Actions
                 </h3>
@@ -376,7 +390,15 @@ const OnlineCommunityForum: React.FC = () => {
           {/* Posts List */}
           <div className="space-y-6">
             {filteredPosts.map((post) => (
-              <Card key={post.id} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}>
+              <Card 
+                key={post.id} 
+                className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   {/* Post Header */}
                   <div className="flex items-start justify-between mb-4">
@@ -484,7 +506,23 @@ const OnlineCommunityForum: React.FC = () => {
                         <span className="text-sm">{post.shares}</span>
                       </button>
                     </div>
-                    <Button size="small" variant="outlined">
+                    <Button 
+                      size="small" 
+                      variant="outlined"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                      }}
+                    >
                       Read More
                     </Button>
                   </div>

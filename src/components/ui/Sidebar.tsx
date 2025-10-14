@@ -115,7 +115,6 @@ const Sidebar: React.FC = () => {
         
         <Box sx={{ p: 2, mt: 'auto' }}>
           <Card sx={{ 
-            backgroundColor: '#f8f9fa', 
             border: '1px solid #f0f0f0',
             borderRadius: '12px'
           }}>

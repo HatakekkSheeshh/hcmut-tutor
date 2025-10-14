@@ -13,13 +13,15 @@ import {
   Email,
   School,
   Menu as MenuIcon,
-  Notifications
+  Notifications,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 
 const Login: React.FC = () => {
-  const { theme } = useTheme()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [loginMethod, setLoginMethod] = useState('email') // 'email' or 'sso'
@@ -149,29 +151,58 @@ const Login: React.FC = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-4 lg:p-6">
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden mb-4">
+          {/* Mobile Menu Button & Theme Toggle */}
+          <div className="lg:hidden mb-4 flex items-center justify-between">
             <button
               onClick={handleDrawerToggle}
               className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
             >
               <MenuIcon className="w-6 h-6" />
             </button>
+            
+            {/* Mobile Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} transition-colors`}
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            >
+              {theme === 'dark' ? <LightModeIcon className="w-6 h-6 text-yellow-400" /> : <DarkModeIcon className="w-6 h-6" />}
+            </button>
           </div>
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Welcome Back
-            </h1>
-            <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Sign in to your account to continue learning
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Welcome Back
+                </h1>
+                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Sign in to your account to continue learning
+                </p>
+              </div>
+              
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} transition-colors`}
+                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+              >
+                {theme === 'dark' ? <LightModeIcon className="w-5 h-5 text-yellow-400" /> : <DarkModeIcon className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
           {/* Login Form */}
           <div className="max-w-md mx-auto">
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-8`}>
+            <Card 
+              className={`p-8 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               {loginMethod === 'email' ? (
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div>

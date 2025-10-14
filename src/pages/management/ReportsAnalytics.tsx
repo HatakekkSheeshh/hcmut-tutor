@@ -13,6 +13,7 @@ import {
   FilterList as FilterListIcon,
   DateRange as DateRangeIcon
 } from '@mui/icons-material'
+import { Avatar } from '@mui/material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 
@@ -25,6 +26,28 @@ const ReportsAnalytics: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   const analyticsData = {
@@ -121,25 +144,11 @@ const ReportsAnalytics: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/management/approval')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <AssignmentIcon className="mr-3 w-4 h-4" />
-                  Approval Requests
-                </button>
-                <button 
-                  onClick={() => navigate('/management/awards')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Star className="mr-3 w-4 h-4" />
-                  Award Credits
-                </button>
-                <button 
                   onClick={() => navigate('/management')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Dashboard
+                  Back to Dashboard
                 </button>
               </div>
             </div>
@@ -182,7 +191,14 @@ const ReportsAnalytics: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search and Filters */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Report Filters
                 </h3>
@@ -225,7 +241,14 @@ const ReportsAnalytics: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Actions
                 </h3>
@@ -261,7 +284,14 @@ const ReportsAnalytics: React.FC = () => {
 
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -277,7 +307,14 @@ const ReportsAnalytics: React.FC = () => {
               </div>
             </Card>
 
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -293,7 +330,14 @@ const ReportsAnalytics: React.FC = () => {
               </div>
             </Card>
 
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -309,7 +353,14 @@ const ReportsAnalytics: React.FC = () => {
               </div>
             </Card>
 
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -329,7 +380,14 @@ const ReportsAnalytics: React.FC = () => {
           {/* Session Statistics */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Subject Performance */}
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Subject Performance
               </h3>
@@ -345,7 +403,7 @@ const ReportsAnalytics: React.FC = () => {
                           {stat.sessions} sessions
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className={`w-full rounded-full h-2 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}`}>
                         <div
                           className="bg-blue-600 h-2 rounded-full"
                           style={{ width: `${stat.completion}%` }}
@@ -366,7 +424,14 @@ const ReportsAnalytics: React.FC = () => {
             </Card>
 
             {/* Top Performers */}
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Top Performers
               </h3>
@@ -374,7 +439,18 @@ const ReportsAnalytics: React.FC = () => {
                 {analyticsData.topPerformers.map((performer, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                      <Avatar
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          bgcolor: getAvatarColor(performer.name),
+                          fontSize: '1rem',
+                          fontWeight: 'bold',
+                          mr: 3
+                        }}
+                      >
+                        {getInitials(performer.name)}
+                      </Avatar>
                       <div>
                         <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {performer.name}
@@ -399,7 +475,14 @@ const ReportsAnalytics: React.FC = () => {
           </div>
 
           {/* Growth Chart */}
-          <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card 
+            className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+            style={{
+              borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+              boxShadow: 'none !important'
+            }}
+          >
             <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               User Growth Trend
             </h3>

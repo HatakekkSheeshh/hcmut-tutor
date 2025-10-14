@@ -8,7 +8,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Avatar
 } from '@mui/material'
 import { 
   Cancel, 
@@ -38,6 +39,28 @@ const HandleCancelReschedule: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   const requests = [
@@ -192,22 +215,8 @@ const HandleCancelReschedule: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/tutor/sessions')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <AssignmentIcon className="mr-3 w-4 h-4" />
-                  Manage Sessions
-                </button>
-                <button 
-                  onClick={() => navigate('/tutor/track-progress')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <BarChartIcon className="mr-3 w-4 h-4" />
-                  Track Progress
-                </button>
-                <button 
                   onClick={() => navigate('/tutor')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
@@ -234,7 +243,7 @@ const HandleCancelReschedule: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Handle Cancel/Reschedule Requests
+        Handle Cancel/Reschedule Requests
                 </h1>
                 <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                   Manage student cancellation and reschedule requests
@@ -249,19 +258,26 @@ const HandleCancelReschedule: React.FC = () => {
             </div>
           </div>
 
-          {/* Filters */}
+      {/* Filters */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search and Filters */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search & Filters
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <select
-                      value={filterType}
-                      onChange={(e) => setFilterType(e.target.value)}
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
                       className={`w-full px-3 py-3 border rounded-lg ${
                         theme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white'
@@ -293,7 +309,14 @@ const HandleCancelReschedule: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Actions
                 </h3>
@@ -323,19 +346,38 @@ const HandleCancelReschedule: React.FC = () => {
                     View All Details
                   </button>
                 </div>
-              </Card>
+      </Card>
             </div>
           </div>
 
-          {/* Requests List */}
+      {/* Requests List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredRequests.map((request) => (
-              <Card key={request.id} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}>
+        {filteredRequests.map((request) => (
+              <Card 
+                key={request.id} 
+                className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   {/* Request Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                      <Avatar
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          bgcolor: getAvatarColor(request.student),
+                          fontSize: '1rem',
+                          fontWeight: 'bold',
+                          mr: 3
+                        }}
+                      >
+                        {getInitials(request.student)}
+                      </Avatar>
                       <div>
                         <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {request.student}
@@ -411,33 +453,59 @@ const HandleCancelReschedule: React.FC = () => {
                   <div className="flex space-x-2">
                     {request.status === 'pending' ? (
                       <>
-                        <Button 
-                          size="small" 
+                    <Button 
+                      size="small" 
                           className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                          onClick={() => handleAction(request, 'approve')}
-                        >
+                      onClick={() => handleAction(request, 'approve')}
+                    >
                           <CheckCircle className="w-4 h-4 mr-1" />
-                          Approve
-                        </Button>
-                        <Button 
-                          size="small" 
-                          variant="outlined"
-                          className="flex-1 border-red-500 text-red-500 hover:bg-red-50"
-                          onClick={() => handleAction(request, 'reject')}
-                        >
+                      Approve
+                    </Button>
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      className="flex-1"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#dc2626',
+                        borderColor: theme === 'dark' ? '#000000' : '#dc2626',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#fef2f2'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                      }}
+                      onClick={() => handleAction(request, 'reject')}
+                    >
                           <Cancel className="w-4 h-4 mr-1" />
-                          Reject
-                        </Button>
+                      Reject
+                    </Button>
                       </>
                     ) : (
                       <Button 
                         size="small" 
                         variant="outlined"
                         className="flex-1"
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                          color: theme === 'dark' ? '#ffffff' : '#000000',
+                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                          textTransform: 'none',
+                          fontWeight: '500'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                        }}
                       >
                         <Info className="w-4 h-4 mr-1" />
-                        View Details
-                      </Button>
+                      View Details
+                    </Button>
                     )}
                   </div>
                 </div>

@@ -8,7 +8,8 @@ import {
   DialogActions,
   TextField,
   Button as MuiButton,
-  Typography
+  Typography,
+  Avatar
 } from '@mui/material'
 import { 
   Search, 
@@ -127,6 +128,28 @@ const ApprovalRequests: React.FC = () => {
     }
   }
 
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
+  }
+
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -184,25 +207,11 @@ const ApprovalRequests: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/management/reports')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <BarChartIcon className="mr-3 w-4 h-4" />
-                  Reports
-                </button>
-                <button 
-                  onClick={() => navigate('/management/awards')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <StarIcon className="mr-3 w-4 h-4" />
-                  Award Credits
-                </button>
-                <button 
                   onClick={() => navigate('/management')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Dashboard
+                  Back to Dashboard
                 </button>
               </div>
             </div>
@@ -245,7 +254,14 @@ const ApprovalRequests: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search and Filters */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search & Filters
                 </h3>
@@ -291,7 +307,14 @@ const ApprovalRequests: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Actions
                 </h3>
@@ -328,12 +351,31 @@ const ApprovalRequests: React.FC = () => {
           {/* Requests List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredRequests.map((request) => (
-              <Card key={request.id} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}>
+              <Card 
+                key={request.id} 
+                className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   {/* Request Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                      <Avatar
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          bgcolor: getAvatarColor(request.user),
+                          fontSize: '1rem',
+                          fontWeight: 'bold',
+                          mr: 3
+                        }}
+                      >
+                        {getInitials(request.user)}
+                      </Avatar>
                       <div>
                         <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {request.user}
@@ -401,7 +443,20 @@ const ApprovalRequests: React.FC = () => {
                         <Button 
                           size="small" 
                           variant="outlined"
-                          className="flex-1 border-red-500 text-red-500 hover:bg-red-50"
+                          className="flex-1"
+                          style={{
+                            backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                            color: theme === 'dark' ? '#ffffff' : '#dc2626',
+                            borderColor: theme === 'dark' ? '#000000' : '#dc2626',
+                            textTransform: 'none',
+                            fontWeight: '500'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#fef2f2'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                          }}
                           onClick={() => handleAction(request, 'reject')}
                         >
                           <Cancel className="w-4 h-4 mr-1" />
@@ -413,6 +468,19 @@ const ApprovalRequests: React.FC = () => {
                         size="small" 
                         variant="outlined"
                         className="flex-1"
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                          color: theme === 'dark' ? '#ffffff' : '#000000',
+                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                          textTransform: 'none',
+                          fontWeight: '500'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                        }}
                       >
                         <Info className="w-4 h-4 mr-1" />
                         View Details
@@ -514,17 +582,50 @@ const ApprovalRequests: React.FC = () => {
       )}
 
       {/* Action Dialog */}
-      <Dialog open={isActionDialogOpen} onClose={() => setIsActionDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
+      <Dialog 
+        open={isActionDialogOpen} 
+        onClose={() => setIsActionDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb'
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            color: theme === 'dark' ? '#ffffff' : '#111827',
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
+          }}
+        >
           {actionType === 'approve' ? 'Approve Request' : 'Reject Request'}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
+          }}
+        >
           <div className="space-y-4 mt-4">
             <div>
-              <Typography variant="body1" gutterBottom>
+              <Typography 
+                variant="body1" 
+                gutterBottom
+                sx={{ 
+                  color: theme === 'dark' ? '#ffffff' : '#111827',
+                  fontWeight: '500'
+                }}
+              >
                 User: {selectedRequest?.user}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: theme === 'dark' ? '#d1d5db' : '#6b7280',
+                  fontWeight: '400'
+                }}
+              >
                 Type: {selectedRequest?.type}
               </Typography>
             </div>
@@ -542,16 +643,58 @@ const ApprovalRequests: React.FC = () => {
                     ? 'Message to send to user about approval...'
                     : 'Reason for rejection...'
                 }
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#111827',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                  },
+                }}
               />
             </div>
           </div>
         </DialogContent>
-        <DialogActions>
-          <MuiButton onClick={() => setIsActionDialogOpen(false)}>Cancel</MuiButton>
+        <DialogActions 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            padding: '16px 24px'
+          }}
+        >
+          <MuiButton 
+            onClick={() => setIsActionDialogOpen(false)}
+            sx={{
+              color: theme === 'dark' ? '#ffffff' : '#111827',
+              '&:hover': {
+                backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6'
+              }
+            }}
+          >
+            Cancel
+          </MuiButton>
           <MuiButton 
             onClick={handleSubmitAction} 
             variant="contained"
             color={actionType === 'approve' ? 'success' : 'error'}
+            sx={{
+              backgroundColor: actionType === 'approve' ? '#10b981' : '#ef4444',
+              '&:hover': {
+                backgroundColor: actionType === 'approve' ? '#059669' : '#dc2626'
+              }
+            }}
           >
             {actionType === 'approve' ? 'Approve' : 'Reject'}
           </MuiButton>

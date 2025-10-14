@@ -7,11 +7,13 @@ import SessionDetail from './pages/student/SessionDetail.tsx'
 import EvaluateSession from './pages/student/EvaluateSession.tsx'
 import ViewProgress from './pages/student/ViewProgress.tsx'
 import ChatbotSupport from './pages/student/ChatbotSupport.tsx'
+import StudentMessages from './pages/student/Messages.tsx'
 import TutorDashboard from './pages/tutor/TutorDashboard.tsx'
 import SetAvailability from './pages/tutor/SetAvailability.tsx'
 import ManageSessions from './pages/tutor/ManageSessions.tsx'
 import HandleCancelReschedule from './pages/tutor/HandleCancelReschedule.tsx'
 import TrackStudentProgress from './pages/tutor/TrackStudentProgress.tsx'
+import Messages from './pages/tutor/Messages.tsx'
 import ManagementDashboard from './pages/management/ManagementDashboard.tsx'
 import ApprovalRequests from './pages/management/ApprovalRequests.tsx'
 import ReportsAnalytics from './pages/management/ReportsAnalytics.tsx'
@@ -36,6 +38,7 @@ function App() {
         <Route path="/student/evaluate/:id" element={<EvaluateSession />} />
         <Route path="/student/progress" element={<ViewProgress />} />
         <Route path="/student/chatbot" element={<ChatbotSupport />} />
+        <Route path="/student/messages" element={<StudentMessages />} />
         
         {/* Tutor Routes */}
         <Route path="/tutor" element={<TutorDashboard />} />
@@ -43,6 +46,7 @@ function App() {
         <Route path="/tutor/sessions" element={<ManageSessions />} />
         <Route path="/tutor/cancel-reschedule" element={<HandleCancelReschedule />} />
         <Route path="/tutor/track-progress" element={<TrackStudentProgress />} />
+        <Route path="/tutor/messages" element={<Messages />} />
         
         {/* Management Routes */}
         <Route path="/management" element={<ManagementDashboard />} />

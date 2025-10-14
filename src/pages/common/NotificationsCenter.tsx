@@ -231,6 +231,13 @@ const NotificationsCenter: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
+                  onClick={() => navigate('/student')}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
+                >
+                  <ArrowBackIcon className="mr-3 w-4 h-4" />
+                  Back to Dashboard
+                </button>
+                <button 
                   onClick={() => navigate('/common')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
@@ -290,7 +297,20 @@ const NotificationsCenter: React.FC = () => {
                 <Button 
                   onClick={handleMarkAllAsRead}
                   variant="outlined"
-                  className="border-blue-500 text-blue-500 hover:bg-blue-50"
+                  className=""
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#3b82f6',
+                    borderColor: theme === 'dark' ? '#000000' : '#3b82f6',
+                    textTransform: 'none',
+                    fontWeight: '500'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#eff6ff'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                  }}
                 >
                   <MarkAsUnread className="w-4 h-4 mr-2" />
                   Mark All Read
@@ -310,7 +330,14 @@ const NotificationsCenter: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search & Filter Notifications
                 </h3>
@@ -371,7 +398,14 @@ const NotificationsCenter: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Actions
                 </h3>
@@ -408,9 +442,17 @@ const NotificationsCenter: React.FC = () => {
           {/* Notifications List */}
           <div className="space-y-4">
             {filteredNotifications.map((notification) => (
-              <Card key={notification.id} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} overflow-hidden ${
-                !notification.isRead ? 'border-l-4 border-blue-500' : ''
-              }`}>
+              <Card 
+                key={notification.id} 
+                className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${
+                  !notification.isRead ? 'border-l-4 border-blue-500' : ''
+                }`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     {/* Notification Icon */}
@@ -473,7 +515,20 @@ const NotificationsCenter: React.FC = () => {
                             size="small" 
                             variant="outlined"
                             onClick={() => handleMarkAsRead(notification.id)}
-                            className="border-green-500 text-green-500 hover:bg-green-50"
+                            className=""
+                            style={{
+                              backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                              color: theme === 'dark' ? '#ffffff' : '#10b981',
+                              borderColor: theme === 'dark' ? '#000000' : '#10b981',
+                              textTransform: 'none',
+                              fontWeight: '500'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#ecfdf5'
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                            }}
                           >
                             <MarkAsUnread className="w-4 h-4 mr-1" />
                             Mark Read
@@ -483,7 +538,20 @@ const NotificationsCenter: React.FC = () => {
                           size="small" 
                           variant="outlined"
                           onClick={() => handleDelete(notification.id)}
-                          className="border-red-500 text-red-500 hover:bg-red-50"
+                          className=""
+                          style={{
+                            backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                            color: theme === 'dark' ? '#ffffff' : '#dc2626',
+                            borderColor: theme === 'dark' ? '#000000' : '#dc2626',
+                            textTransform: 'none',
+                            fontWeight: '500'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#fef2f2'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                          }}
                         >
                           <Delete className="w-4 h-4 mr-1" />
                           Delete
@@ -549,6 +617,16 @@ const NotificationsCenter: React.FC = () => {
 
               {/* Mobile Quick Actions */}
               <div className="space-y-2">
+                <button 
+                  onClick={() => {
+                    navigate('/student')
+                    setMobileOpen(false)
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
+                >
+                  <ArrowBackIcon className="mr-3 w-4 h-4" />
+                  Back to Dashboard
+                </button>
                 <button 
                   onClick={() => {
                     navigate('/common')

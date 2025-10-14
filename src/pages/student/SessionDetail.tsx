@@ -9,7 +9,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Rating
+  Rating,
+  Avatar
 } from '@mui/material'
 import { 
   VideoCall, 
@@ -26,7 +27,6 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import Avatar from '../../components/ui/Avatar'
 
 const SessionDetail: React.FC = () => {
   const { id } = useParams()
@@ -40,6 +40,28 @@ const SessionDetail: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   // Mock session data
@@ -127,22 +149,8 @@ const SessionDetail: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/student/book')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  Book Another Session
-                </button>
-                <button 
-                  onClick={() => navigate('/student/progress')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <TrendingUpIcon className="mr-3 w-4 h-4" />
-                  View Progress
-                </button>
-                <button 
                   onClick={() => navigate('/student')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
@@ -178,7 +186,14 @@ const SessionDetail: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 mb-6`}>
+          <Card
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 mb-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     Session Information
@@ -195,12 +210,38 @@ const SessionDetail: React.FC = () => {
                 <Button 
                   variant="outlined" 
                   startIcon={<Chat />}
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                    textTransform: 'none',
+                    fontWeight: '500'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                  }}
                 >
                   Chat
                 </Button>
                 <Button 
                   variant="outlined" 
                   startIcon={<Share />}
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                    textTransform: 'none',
+                    fontWeight: '500'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                  }}
                 >
                   Share
                 </Button>
@@ -209,7 +250,17 @@ const SessionDetail: React.FC = () => {
 
                 {/* Tutor Info */}
                 <div className="flex items-center mb-6">
-                  <Avatar src={session.tutor.image} name={session.tutor.name} size="large" />
+                  <Avatar
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      bgcolor: getAvatarColor(session.tutor.name),
+                      fontSize: '1.5rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {getInitials(session.tutor.name)}
+                  </Avatar>
                   <div className="ml-4">
                     <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {session.tutor.name}
@@ -291,7 +342,14 @@ const SessionDetail: React.FC = () => {
             {/* Sidebar Content */}
             <div className="space-y-6">
         {/* Session Actions */}
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Session Actions
                 </h3>
@@ -309,6 +367,19 @@ const SessionDetail: React.FC = () => {
                 fullWidth 
                 variant="outlined" 
                 startIcon={<Chat />}
+                style={{
+                  backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                  color: theme === 'dark' ? '#ffffff' : '#000000',
+                  borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                  textTransform: 'none',
+                  fontWeight: '500'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                }}
               >
                 Send Message
               </Button>
@@ -316,6 +387,19 @@ const SessionDetail: React.FC = () => {
                 fullWidth 
                 variant="outlined" 
                 startIcon={<Download />}
+                style={{
+                  backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                  color: theme === 'dark' ? '#ffffff' : '#000000',
+                  borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                  textTransform: 'none',
+                  fontWeight: '500'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                }}
               >
                 Download Materials
               </Button>
@@ -324,6 +408,19 @@ const SessionDetail: React.FC = () => {
                 variant="outlined" 
                 startIcon={<Star />}
                 onClick={handleEndSession}
+                style={{
+                  backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                  color: theme === 'dark' ? '#ffffff' : '#000000',
+                  borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                  textTransform: 'none',
+                  fontWeight: '500'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                }}
               >
                 End Session & Rate
               </Button>
@@ -331,7 +428,14 @@ const SessionDetail: React.FC = () => {
           </Card>
 
               {/* Session Materials */}
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Session Materials
                 </h3>
@@ -346,7 +450,23 @@ const SessionDetail: React.FC = () => {
                     {material.type} • {material.size}
                         </p>
                       </div>
-                <Button size="small" variant="outlined">
+                <Button 
+                  size="small" 
+                  variant="outlined"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                    textTransform: 'none',
+                    fontWeight: '500'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                  }}
+                >
                   Download
                 </Button>
                     </div>
@@ -355,7 +475,14 @@ const SessionDetail: React.FC = () => {
               </Card>
 
               {/* Session Info */}
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Session Details
                 </h3>
@@ -485,8 +612,27 @@ const SessionDetail: React.FC = () => {
           </div>
         </DialogContent>
         <DialogActions>
-          <MuiButton onClick={() => setIsJoinDialogOpen(false)}>Cancel</MuiButton>
-          <MuiButton onClick={handleStartSession} variant="contained">
+          <MuiButton 
+            onClick={() => setIsJoinDialogOpen(false)}
+            style={{
+              backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
+              color: theme === 'dark' ? '#ffffff' : '#000000',
+              textTransform: 'none',
+              fontWeight: '500'
+            }}
+          >
+            Cancel
+          </MuiButton>
+          <MuiButton 
+            onClick={handleStartSession} 
+            variant="contained"
+            style={{
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              textTransform: 'none',
+              fontWeight: '500'
+            }}
+          >
             Join Now
           </MuiButton>
         </DialogActions>
@@ -519,8 +665,27 @@ const SessionDetail: React.FC = () => {
           </div>
         </DialogContent>
         <DialogActions>
-          <MuiButton onClick={() => setIsFeedbackDialogOpen(false)}>Cancel</MuiButton>
-          <MuiButton onClick={handleSubmitFeedback} variant="contained">
+          <MuiButton 
+            onClick={() => setIsFeedbackDialogOpen(false)}
+            style={{
+              backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
+              color: theme === 'dark' ? '#ffffff' : '#000000',
+              textTransform: 'none',
+              fontWeight: '500'
+            }}
+          >
+            Cancel
+          </MuiButton>
+          <MuiButton 
+            onClick={handleSubmitFeedback} 
+            variant="contained"
+            style={{
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              textTransform: 'none',
+              fontWeight: '500'
+            }}
+          >
             Submit Feedback
           </MuiButton>
         </DialogActions>

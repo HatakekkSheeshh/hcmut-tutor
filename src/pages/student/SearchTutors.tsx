@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { Avatar } from '@mui/material'
 import { 
   Search, 
   Star, 
@@ -17,7 +18,6 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import Avatar from '../../components/ui/Avatar'
 
 const SearchTutors: React.FC = () => {
   const { theme } = useTheme()
@@ -30,6 +30,28 @@ const SearchTutors: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   const tutors = [
@@ -182,22 +204,8 @@ const SearchTutors: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/student/book')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  Book Session
-                </button>
-                <button 
-                  onClick={() => navigate('/student/progress')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <TrendingUpIcon className="mr-3 w-4 h-4" />
-                  View Progress
-                </button>
-                <button 
                   onClick={() => navigate('/student')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
@@ -272,15 +280,29 @@ const SearchTutors: React.FC = () => {
       {/* Tutors Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tutors.map((tutor) => (
-              <Card key={tutor.id} className={`overflow-hidden ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <Card
+                key={tutor.id} 
+                className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   {/* Tutor Header */}
                   <div className="flex items-center mb-4">
-                    <Avatar 
-                      src={tutor.image} 
-                      name={tutor.name}
-                      size="large"
-                    />
+                    <Avatar
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        bgcolor: getAvatarColor(tutor.name),
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {getInitials(tutor.name)}
+                    </Avatar>
                     <div className="ml-3 flex-1">
                       <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {tutor.name}
@@ -362,6 +384,19 @@ const SearchTutors: React.FC = () => {
                       size="small" 
                       variant="outlined"
                       className="flex-1"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                      }}
                     >
                     View Profile
                   </Button>

@@ -13,6 +13,7 @@ import {
   ArrowBack as ArrowBackIcon,
   BarChart as BarChartIcon
 } from '@mui/icons-material'
+import { Avatar } from '@mui/material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 
@@ -26,6 +27,28 @@ const TrackStudentProgress: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   const students = [
@@ -172,22 +195,8 @@ const TrackStudentProgress: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/tutor/sessions')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Assignment className="mr-3 w-4 h-4" />
-                  Manage Sessions
-                </button>
-                <button 
-                  onClick={() => navigate('/tutor/availability')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Schedule className="mr-3 w-4 h-4" />
-                  Set Availability
-                </button>
-                <button 
                   onClick={() => navigate('/tutor')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
@@ -214,7 +223,7 @@ const TrackStudentProgress: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Track Student Progress
+        Track Student Progress
                 </h1>
                 <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                   Monitor and analyze student learning progress
@@ -229,13 +238,20 @@ const TrackStudentProgress: React.FC = () => {
             </div>
           </div>
 
-          {/* Overall Stats */}
+      {/* Overall Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {overallStats.totalStudents}
+              {overallStats.totalStudents}
                   </p>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     Total Students
@@ -245,13 +261,20 @@ const TrackStudentProgress: React.FC = () => {
                   <Person />
                 </div>
               </div>
-            </Card>
+          </Card>
 
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {overallStats.averageProgress}%
+              {overallStats.averageProgress}%
                   </p>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     Avg Progress
@@ -261,13 +284,20 @@ const TrackStudentProgress: React.FC = () => {
                   <TrendingUp />
                 </div>
               </div>
-            </Card>
+          </Card>
 
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {overallStats.totalSessions}
+              {overallStats.totalSessions}
                   </p>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     Total Sessions
@@ -277,13 +307,20 @@ const TrackStudentProgress: React.FC = () => {
                   <Schedule />
                 </div>
               </div>
-            </Card>
+          </Card>
 
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+            <Card 
+              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {overallStats.averageRating}
+              {overallStats.averageRating}
                   </p>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     Avg Rating
@@ -293,14 +330,21 @@ const TrackStudentProgress: React.FC = () => {
                   <Star />
                 </div>
               </div>
-            </Card>
+          </Card>
           </div>
 
-          {/* Filters */}
+      {/* Filters */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search and Filters */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search & Filters
                 </h3>
@@ -310,8 +354,8 @@ const TrackStudentProgress: React.FC = () => {
                       <input
                         type="text"
                         placeholder="Search students..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
                         className={`w-full px-4 py-3 pl-10 rounded-lg border ${
                           theme === 'dark' 
                             ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -325,26 +369,26 @@ const TrackStudentProgress: React.FC = () => {
                   </div>
                   <div>
                     <select
-                      value={selectedStudent}
-                      onChange={(e) => setSelectedStudent(e.target.value)}
+                value={selectedStudent}
+                onChange={(e) => setSelectedStudent(e.target.value)}
                       className={`w-full px-3 py-3 border rounded-lg ${
                         theme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
                       } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
+              >
                       <option value="all">All Students</option>
-                      {students.map((student) => (
+                {students.map((student) => (
                         <option key={student.id} value={student.id.toString()}>
-                          {student.name}
+                    {student.name}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div>
                     <select
-                      value={selectedSubject}
-                      onChange={(e) => setSelectedSubject(e.target.value)}
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
                       className={`w-full px-3 py-3 border rounded-lg ${
                         theme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white'
@@ -363,7 +407,14 @@ const TrackStudentProgress: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Actions
                 </h3>
@@ -393,24 +444,43 @@ const TrackStudentProgress: React.FC = () => {
                     View Analytics
                   </button>
                 </div>
-              </Card>
+      </Card>
             </div>
           </div>
 
-          {/* Student Progress Cards */}
+      {/* Student Progress Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredStudents.map((student) => (
-              <Card key={student.id} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}>
+        {filteredStudents.map((student) => (
+              <Card 
+                key={student.id} 
+                className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   {/* Student Header */}
                   <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gray-300 rounded-full mr-3"></div>
+                    <Avatar
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        bgcolor: getAvatarColor(student.name),
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold',
+                        mr: 3
+                      }}
+                    >
+                      {getInitials(student.name)}
+                    </Avatar>
                     <div className="flex-1">
                       <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {student.name}
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {student.subject}
+                    {student.subject}
                       </p>
                       <div className="flex items-center">
                         <Star className="w-4 h-4 text-yellow-400 mr-1" />
@@ -428,7 +498,7 @@ const TrackStudentProgress: React.FC = () => {
                         Overall Progress
                       </span>
                       <span className={`text-sm font-medium text-blue-600`}>
-                        {student.progress}%
+                    {student.progress}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -438,24 +508,24 @@ const TrackStudentProgress: React.FC = () => {
                       ></div>
                     </div>
                     <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {student.sessionsCompleted} sessions • Last: {student.lastSession}
+                  {student.sessionsCompleted} sessions • Last: {student.lastSession}
                     </p>
                   </div>
 
                   {/* Learning Goals */}
                   <div className="mb-4">
                     <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Learning Goals:
+                  Learning Goals:
                     </h4>
                     <div className="space-y-2">
-                      {student.goals.map((goal, index) => (
+                {student.goals.map((goal, index) => (
                         <div key={index}>
                           <div className="flex justify-between items-center mb-1">
                             <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                               {goal.topic}
                             </span>
                             <span className={`text-xs font-medium text-blue-600`}>
-                              {goal.current}/{goal.target}%
+                        {goal.current}/{goal.target}%
                             </span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-1">
@@ -472,10 +542,10 @@ const TrackStudentProgress: React.FC = () => {
                   {/* Strengths */}
                   <div className="mb-4">
                     <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Strengths:
+                  Strengths:
                     </h4>
                     <div className="flex flex-wrap gap-1">
-                      {student.strengths.map((strength, index) => (
+                  {student.strengths.map((strength, index) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
@@ -489,10 +559,10 @@ const TrackStudentProgress: React.FC = () => {
                   {/* Areas for Improvement */}
                   <div className="mb-4">
                     <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Areas for Improvement:
+                  Areas for Improvement:
                     </h4>
                     <div className="flex flex-wrap gap-1">
-                      {student.weaknesses.map((weakness, index) => (
+                  {student.weaknesses.map((weakness, index) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full"
@@ -516,13 +586,26 @@ const TrackStudentProgress: React.FC = () => {
                       size="small" 
                       variant="outlined"
                       className="flex-1"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                      }}
                     >
                       <Quiz className="w-4 h-4 mr-1" />
                       Quiz
                     </Button>
                   </div>
                 </div>
-              </Card>
+            </Card>
             ))}
           </div>
         </div>

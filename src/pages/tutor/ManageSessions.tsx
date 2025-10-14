@@ -11,7 +11,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Avatar
 } from '@mui/material'
 import { 
   Search, 
@@ -39,6 +40,28 @@ const ManageSessions: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   const sessions = [
@@ -171,22 +194,8 @@ const ManageSessions: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/tutor/availability')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Schedule className="mr-3 w-4 h-4" />
-                  Set Availability
-                </button>
-                <button 
-                  onClick={() => navigate('/tutor/track-progress')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <BarChartIcon className="mr-3 w-4 h-4" />
-                  Track Progress
-                </button>
-                <button 
                   onClick={() => navigate('/tutor')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
@@ -232,7 +241,14 @@ const ManageSessions: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search and Filters */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search & Filters
                 </h3>
@@ -278,7 +294,14 @@ const ManageSessions: React.FC = () => {
 
             {/* Quick Stats */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Stats
                 </h3>
@@ -309,13 +332,31 @@ const ManageSessions: React.FC = () => {
       {/* Sessions List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredSessions.map((session) => (
-              <Card key={session.id} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}>
+            <Card
+                key={session.id} 
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} overflow-hidden`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   {/* Session Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
-                      <div>
+                      <Avatar
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          bgcolor: getAvatarColor(session.student),
+                          fontSize: '1rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {getInitials(session.student)}
+                      </Avatar>
+                      <div className="ml-3">
                         <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {session.student}
                         </h3>
@@ -387,6 +428,19 @@ const ManageSessions: React.FC = () => {
                       size="small" 
                       variant="outlined"
                       className="flex-1"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                      }}
                     >
                       <Chat className="w-4 h-4 mr-1" />
                     Chat
@@ -395,6 +449,19 @@ const ManageSessions: React.FC = () => {
                     size="small" 
                     variant="outlined"
                     onClick={() => handleEditSession(session)}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#000000',
+                      borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                      textTransform: 'none',
+                      fontWeight: '500'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                    }}
                   >
                       <Edit className="w-4 h-4" />
                   </Button>
@@ -494,8 +561,21 @@ const ManageSessions: React.FC = () => {
       )}
 
       {/* Edit Session Dialog */}
-      <Dialog open={isEditDialogOpen} onClose={() => setIsEditDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Session</DialogTitle>
+      <Dialog 
+        open={isEditDialogOpen} 
+        onClose={() => setIsEditDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#000000'
+          }
+        }}
+      >
+        <DialogTitle style={{ color: theme === 'dark' ? '#ffffff' : '#000000' }}>
+          Edit Session
+        </DialogTitle>
         <DialogContent>
           <div className="space-y-4 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -506,6 +586,24 @@ const ManageSessions: React.FC = () => {
                 type="date"
                 value={selectedSession?.date || ''}
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#9ca3af' : '#9ca3af'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                  }
+                }}
               />
               </div>
               <div>
@@ -515,16 +613,47 @@ const ManageSessions: React.FC = () => {
                 type="time"
                 value={selectedSession?.time || ''}
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#9ca3af' : '#9ca3af'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                  }
+                }}
               />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
               <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
+                <InputLabel sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>Status</InputLabel>
                 <Select
                   value={selectedSession?.status || ''}
                   label="Status"
+                  sx={{
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme === 'dark' ? '#9ca3af' : '#9ca3af'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6'
+                    }
+                  }}
                 >
                   <MenuItem value="confirmed">Confirmed</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>
@@ -538,6 +667,24 @@ const ManageSessions: React.FC = () => {
                 fullWidth
                 label="Duration"
                 value={selectedSession?.duration || ''}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#9ca3af' : '#9ca3af'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                  }
+                }}
               />
               </div>
             </div>
@@ -546,6 +693,24 @@ const ManageSessions: React.FC = () => {
                 fullWidth
                 label="Topic"
                 value={selectedSession?.topic || ''}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#9ca3af' : '#9ca3af'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                  }
+                }}
               />
             </div>
             <div>
@@ -555,13 +720,58 @@ const ManageSessions: React.FC = () => {
                 multiline
                 rows={3}
                 value={selectedSession?.notes || ''}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#9ca3af' : '#9ca3af'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                  }
+                }}
               />
             </div>
           </div>
         </DialogContent>
         <DialogActions>
-          <MuiButton onClick={() => setIsEditDialogOpen(false)}>Cancel</MuiButton>
-          <MuiButton onClick={handleSaveEdit} variant="contained">Save Changes</MuiButton>
+          <MuiButton 
+            onClick={() => setIsEditDialogOpen(false)}
+            style={{
+              backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
+              color: theme === 'dark' ? '#ffffff' : '#000000',
+              borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db'
+            }}
+          >
+            Cancel
+          </MuiButton>
+          <MuiButton 
+            onClick={handleSaveEdit} 
+            variant="outlined"
+            style={{
+              backgroundColor: theme === 'dark' ? '#000000' : '#3b82f6',
+              color: theme === 'dark' ? '#ffffff' : '#ffffff',
+              borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+              textTransform: 'none',
+              fontWeight: '500'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1e40af' : '#2563eb'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#3b82f6'
+            }}
+          >
+            Save Changes
+          </MuiButton>
         </DialogActions>
       </Dialog>
 

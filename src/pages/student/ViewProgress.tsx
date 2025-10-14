@@ -145,22 +145,8 @@ const ViewProgress: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/student/book')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  Book Session
-                </button>
-                <button 
-                  onClick={() => navigate('/student/search')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <BarChartIcon className="mr-3 w-4 h-4" />
-                  Find Tutors
-                </button>
-                <button 
                   onClick={() => navigate('/student')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
@@ -215,7 +201,15 @@ const ViewProgress: React.FC = () => {
       {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {stats.map((stat, index) => (
-              <Card key={index} className={`p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <Card
+                key={index} 
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -234,7 +228,14 @@ const ViewProgress: React.FC = () => {
           {/* Progress Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Overall Progress */}
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+              className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Overall Progress
               </h3>
@@ -255,7 +256,14 @@ const ViewProgress: React.FC = () => {
           </Card>
 
         {/* Subject Progress */}
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+              className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Subject Progress
               </h3>
@@ -293,7 +301,14 @@ const ViewProgress: React.FC = () => {
           {/* Goals and Recent Sessions */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Learning Goals */}
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+              className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Learning Goals
               </h3>
@@ -323,7 +338,14 @@ const ViewProgress: React.FC = () => {
           </Card>
 
         {/* Recent Sessions */}
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+              className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
               <div className="flex justify-between items-center mb-4">
                 <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Recent Sessions
@@ -359,13 +381,31 @@ const ViewProgress: React.FC = () => {
           </div>
 
         {/* Achievements */}
-          <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+          <Card
+            className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+            style={{
+              borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+              boxShadow: 'none !important'
+            }}
+          >
             <h3 className={`text-lg font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               Achievements
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {progressData.achievements.map((achievement, index) => (
-                <div key={index} className={`text-center p-4 border rounded-lg ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+                <div 
+                  key={index} 
+                  className={`text-center p-4 border rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600' 
+                      : 'bg-white border-gray-200'
+                  }`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#4b5563' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff'
+                  }}
+                >
                   <div className="text-blue-600 mb-3">
                         {achievement.icon}
                   </div>

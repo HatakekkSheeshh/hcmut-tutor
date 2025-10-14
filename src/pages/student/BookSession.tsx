@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { Avatar } from '@mui/material'
 import { 
   CalendarToday, 
   Schedule, 
@@ -17,7 +18,6 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import Avatar from '../../components/ui/Avatar'
 
 const BookSession: React.FC = () => {
   const { theme } = useTheme()
@@ -33,6 +33,28 @@ const BookSession: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
   }
 
   const steps = [
@@ -83,6 +105,16 @@ const BookSession: React.FC = () => {
   }
 
   const renderStepContent = (step: number) => {
+    if (step < 0 || step >= steps.length) {
+      return (
+        <div className="text-center py-8">
+          <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            Invalid step. Please refresh the page.
+          </p>
+        </div>
+      )
+    }
+    
     switch (step) {
       case 0:
         return (
@@ -96,18 +128,36 @@ const BookSession: React.FC = () => {
                   key={tutor.id}
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     selectedTutor === tutor.id.toString()
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-blue-500 bg-blue-100'
                       : `${theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-200 hover:border-gray-300'}`
                   }`}
                     onClick={() => setSelectedTutor(tutor.id.toString())}
                   >
                   <div className="flex items-center mb-3">
-                      <Avatar src={tutor.image} name={tutor.name} size="large" />
+                      <Avatar
+                        sx={{
+                          width: 56,
+                          height: 56,
+                          bgcolor: getAvatarColor(tutor.name),
+                          fontSize: '1.25rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {getInitials(tutor.name)}
+                      </Avatar>
                     <div className="ml-3">
-                      <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      <h3 className={`font-semibold ${
+                        selectedTutor === tutor.id.toString()
+                          ? 'text-blue-900'
+                          : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>
                         {tutor.name}
                       </h3>
-                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <p className={`text-sm ${
+                        selectedTutor === tutor.id.toString()
+                          ? 'text-blue-700'
+                          : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                           {tutor.subject} • ${tutor.price}/hour
                       </p>
                     </div>
@@ -140,7 +190,7 @@ const BookSession: React.FC = () => {
                   key={index}
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     selectedDate === slot.date && selectedTime === slot.time
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-blue-500 bg-blue-100'
                       : slot.available
                       ? `${theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-200 hover:border-gray-300'}`
                       : 'opacity-50 cursor-not-allowed'
@@ -153,10 +203,18 @@ const BookSession: React.FC = () => {
                     }}
                   >
                   <div className="text-center">
-                    <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <p className={`font-medium ${
+                      selectedDate === slot.date && selectedTime === slot.time
+                        ? 'text-blue-900'
+                        : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>
                       {slot.date}
                     </p>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-sm ${
+                      selectedDate === slot.date && selectedTime === slot.time
+                        ? 'text-blue-700'
+                        : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
                       {slot.time}
                     </p>
                     {!slot.available && (
@@ -412,22 +470,8 @@ const BookSession: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/student/search')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <SearchIcon className="mr-3 w-4 h-4" />
-                  Search Tutors
-                </button>
-                <button 
-                  onClick={() => navigate('/student/progress')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  View Progress
-                </button>
-                <button 
                   onClick={() => navigate('/student')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
@@ -479,129 +523,263 @@ const BookSession: React.FC = () => {
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${((activeStep + 1) / steps.length) * 100}%` }}
-              ></div>
-            </div>
-            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Step {activeStep + 1} of {steps.length}: {steps[activeStep].label}
-            </p>
+            {activeStep < steps.length && (
+              <>
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min(((activeStep + 1) / steps.length) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Step {Math.min(activeStep + 1, steps.length)} of {steps.length}: {steps[activeStep]?.label || 'Unknown Step'}
+                </p>
+              </>
+            )}
           </div>
 
           {/* Step Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
-                {renderStepContent(activeStep)}
-              </Card>
-            </div>
+          {activeStep < steps.length && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2">
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  {renderStepContent(activeStep)}
+                </Card>
+              </div>
 
-            {/* Sidebar Content */}
-            <div className="space-y-6">
-              {/* Session Summary */}
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
-                <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Session Summary
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tutor:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {selectedTutor ? tutors.find(t => t.id.toString() === selectedTutor)?.name || 'Not selected' : 'Not selected'}
-                    </span>
+              {/* Sidebar Content */}
+              <div className="space-y-6">
+                {/* Session Summary */}
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Session Summary
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tutor:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedTutor ? tutors.find(t => t.id.toString() === selectedTutor)?.name || 'Not selected' : 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedDate || 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Time:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedTime || 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {duration ? `${duration} minutes` : 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Type:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {sessionType || 'Not selected'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {selectedDate || 'Not selected'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Time:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {selectedTime || 'Not selected'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {duration ? `${duration} minutes` : 'Not selected'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Type:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {sessionType || 'Not selected'}
-                    </span>
-                  </div>
-                </div>
-              </Card>
+                </Card>
 
-              {/* Help Section */}
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
-                <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Need Help?
-                </h3>
-                <div className="space-y-3">
-                  <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
-                    <ChatIcon className="mr-3 w-4 h-4" />
-                    Contact Support
-                  </button>
-                  <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
-                    <VideoCallIcon className="mr-3 w-4 h-4" />
-                    Video Tutorial
-                  </button>
-                  <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
-                    <LocationOnIcon className="mr-3 w-4 h-4" />
-                    Find Centers
-                  </button>
-                </div>
-              </Card>
+                {/* Help Section */}
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Need Help?
+                  </h3>
+                  <div className="space-y-3">
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <ChatIcon className="mr-3 w-4 h-4" />
+                      Contact Support
+                    </button>
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <VideoCallIcon className="mr-3 w-4 h-4" />
+                      Video Tutorial
+                    </button>
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <LocationOnIcon className="mr-3 w-4 h-4" />
+                      Find Centers
+                    </button>
+                  </div>
+                </Card>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
-            <Button
+          {activeStep < steps.length && (
+            <div className="flex justify-between mt-8">
+              <Button
                       onClick={handleBack}
-              disabled={activeStep === 0}
-              variant="outlined"
-              className="flex items-center"
-            >
-              <ArrowBackIcon className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <Button
-              onClick={handleNext}
-              className="flex items-center bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {activeStep === steps.length - 1 ? 'Complete Booking' : 'Continue'}
-              <ArrowForwardIcon className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
+                disabled={activeStep === 0}
+                variant="outlined"
+                className="flex items-center"
+              >
+                <ArrowBackIcon className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <Button
+                onClick={handleNext}
+                className="flex items-center bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {activeStep === steps.length - 1 ? 'Complete Booking' : 'Continue'}
+                <ArrowForwardIcon className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          )}
 
           {/* Completion Message */}
-          {activeStep === steps.length && (
-            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-8 text-center`}>
-              <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Booking Complete!
-              </h2>
-              <p className={`text-lg mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Your session has been successfully booked. You'll receive a confirmation email shortly.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <Button onClick={handleReset} variant="outlined">
-                  Book Another Session
-                </Button>
-                <Button onClick={() => navigate('/student')} className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Go to Dashboard
-                </Button>
+          {activeStep >= steps.length && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Success Content */}
+              <div className="lg:col-span-2">
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-8 text-center`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                  <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Booking Complete!
+                  </h2>
+                  <p className={`text-lg mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Your session has been successfully booked. You'll receive a confirmation email shortly.
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <Button 
+                      onClick={handleReset} 
+                      variant="outlined"
+                      style={{
+                        backgroundColor: '#000000',
+                        color: '#ffffff',
+                        borderColor: '#000000',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#1f2937'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#000000'
+                      }}
+                    >
+                      Book Another Session
+                    </Button>
+                    <Button onClick={() => navigate('/student')} className="bg-blue-600 hover:bg-blue-700 text-white">
+                      Go to Dashboard
+                    </Button>
+                  </div>
+                </Card>
               </div>
-            </Card>
+
+              {/* Sidebar Content */}
+              <div className="space-y-6">
+                {/* Session Summary */}
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Session Summary
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tutor:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedTutor ? tutors.find(t => t.id.toString() === selectedTutor)?.name || 'Not selected' : 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedDate || 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Time:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedTime || 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {duration ? `${duration} minutes` : 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Type:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {sessionType || 'Not selected'}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Help Section */}
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Need Help?
+                  </h3>
+                  <div className="space-y-3">
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <ChatIcon className="mr-3 w-4 h-4" />
+                      Contact Support
+                    </button>
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <VideoCallIcon className="mr-3 w-4 h-4" />
+                      Video Tutorial
+                    </button>
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <LocationOnIcon className="mr-3 w-4 h-4" />
+                      Find Centers
+                    </button>
+                  </div>
+                </Card>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -8,10 +8,20 @@ interface ButtonProps extends MuiButtonProps {
 const Button: React.FC<ButtonProps> = ({ 
   variant = 'contained',
   children,
+  className,
+  style,
   ...props 
 }) => {
   return (
-    <MuiButton variant={variant} {...props}>
+    <MuiButton 
+      variant={variant} 
+      className={className}
+      style={{
+        textTransform: 'none',
+        ...style
+      }}
+      {...props}
+    >
       {children}
     </MuiButton>
   )

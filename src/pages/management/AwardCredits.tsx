@@ -8,7 +8,8 @@ import {
   DialogActions,
   TextField,
   Button as MuiButton,
-  Typography
+  Typography,
+  Avatar
 } from '@mui/material'
 import { 
   Search, 
@@ -112,6 +113,28 @@ const AwardCredits: React.FC = () => {
     }
   }
 
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Helper function to generate avatar color based on name
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+      '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+      '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+      '#ff5722', '#795548', '#607d8b'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
+  }
+
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -169,25 +192,11 @@ const AwardCredits: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/management/approval')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Assignment className="mr-3 w-4 h-4" />
-                  Approval Requests
-                </button>
-                <button 
-                  onClick={() => navigate('/management/reports')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <BarChartIcon className="mr-3 w-4 h-4" />
-                  Reports
-                </button>
-                <button 
                   onClick={() => navigate('/management')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Dashboard
+                  Back to Dashboard
                 </button>
               </div>
             </div>
@@ -230,7 +239,14 @@ const AwardCredits: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Search */}
             <div className="lg:col-span-2">
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search Users
                 </h3>
@@ -255,7 +271,14 @@ const AwardCredits: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Quick Actions
                 </h3>
@@ -292,12 +315,31 @@ const AwardCredits: React.FC = () => {
           {/* Users List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredUsers.map((user) => (
-              <Card key={user.id} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}>
+              <Card 
+                key={user.id} 
+                className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
                 <div className="p-6">
                   {/* User Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gray-300 rounded-full mr-3"></div>
+                      <Avatar
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          bgcolor: getAvatarColor(user.name),
+                          fontSize: '1.25rem',
+                          fontWeight: 'bold',
+                          mr: 3
+                        }}
+                      >
+                        {getInitials(user.name)}
+                      </Avatar>
                       <div>
                         <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {user.name}
@@ -376,6 +418,19 @@ const AwardCredits: React.FC = () => {
                       size="small" 
                       variant="outlined"
                       className="flex-1"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                      }}
                     >
                       <Person className="w-4 h-4 mr-1" />
                       View Profile
@@ -476,17 +531,50 @@ const AwardCredits: React.FC = () => {
       )}
 
       {/* Award Credits Dialog */}
-      <Dialog open={isAwardDialogOpen} onClose={() => setIsAwardDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
+      <Dialog 
+        open={isAwardDialogOpen} 
+        onClose={() => setIsAwardDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb'
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            color: theme === 'dark' ? '#ffffff' : '#111827',
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
+          }}
+        >
           Award Credits to {selectedUser?.name}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
+          }}
+        >
           <div className="space-y-4 mt-4">
             <div>
-              <Typography variant="body1" gutterBottom>
+              <Typography 
+                variant="body1" 
+                gutterBottom
+                sx={{ 
+                  color: theme === 'dark' ? '#ffffff' : '#111827',
+                  fontWeight: '500'
+                }}
+              >
                 User: {selectedUser?.name} ({selectedUser?.role})
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: theme === 'dark' ? '#d1d5db' : '#6b7280',
+                  fontWeight: '400'
+                }}
+              >
                 Current Credits: {selectedUser?.currentCredits}
               </Typography>
             </div>
@@ -499,6 +587,27 @@ const AwardCredits: React.FC = () => {
                 value={creditAmount}
                 onChange={(e) => setCreditAmount(e.target.value)}
                 placeholder="Enter number of credits to award"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#111827',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                  },
+                }}
               />
             </div>
 
@@ -511,16 +620,58 @@ const AwardCredits: React.FC = () => {
                 value={awardReason}
                 onChange={(e) => setAwardReason(e.target.value)}
                 placeholder="Enter reason for awarding credits..."
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: theme === 'dark' ? '#ffffff' : '#111827',
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                  },
+                }}
               />
             </div>
           </div>
         </DialogContent>
-        <DialogActions>
-          <MuiButton onClick={() => setIsAwardDialogOpen(false)}>Cancel</MuiButton>
+        <DialogActions 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            padding: '16px 24px'
+          }}
+        >
+          <MuiButton 
+            onClick={() => setIsAwardDialogOpen(false)}
+            sx={{
+              color: theme === 'dark' ? '#ffffff' : '#111827',
+              '&:hover': {
+                backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6'
+              }
+            }}
+          >
+            Cancel
+          </MuiButton>
           <MuiButton 
             onClick={handleSubmitAward} 
             variant="contained"
             color="success"
+            sx={{
+              backgroundColor: '#10b981',
+              '&:hover': {
+                backgroundColor: '#059669'
+              }
+            }}
           >
             Award Credits
           </MuiButton>

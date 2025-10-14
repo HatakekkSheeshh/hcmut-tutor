@@ -8,6 +8,7 @@ interface CardProps {
   image?: string
   actions?: React.ReactNode
   className?: string
+  style?: React.CSSProperties
 }
 
 const Card: React.FC<CardProps> = ({ 
@@ -16,10 +17,19 @@ const Card: React.FC<CardProps> = ({
   subtitle, 
   image, 
   actions,
-  className 
+  className,
+  style
 }) => {
   return (
-    <MuiCard className={className}>
+    <MuiCard 
+      className={className} 
+      elevation={0}
+      style={{
+        boxShadow: 'none',
+        border: '1px solid',
+        ...style
+      }}
+    >
       {title && (
         <CardHeader 
           title={title} 
