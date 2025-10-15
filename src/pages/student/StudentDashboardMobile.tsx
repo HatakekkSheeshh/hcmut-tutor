@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card'
-import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
 import {
   Dashboard as DashboardIcon,
-  Search as SearchIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
   School as SchoolIcon,
@@ -17,9 +15,6 @@ import {
   Facebook as FacebookIcon,
   Twitter as TwitterIcon,
   Instagram as InstagramIcon,
-  MoreVert as MoreVertIcon,
-  ArrowBack as ArrowBackIcon,
-  ArrowForward as ArrowForwardIcon,
   Menu as MenuIcon,
   BarChart as BarChartIcon,
   SmartToy as SmartToyIcon,
@@ -38,7 +33,6 @@ import {
   Home as HomeIcon,
   TrendingUp as TrendingUpIcon,
   Bookmark as BookmarkIcon,
-  Settings as SettingsIcon,
   Close as CloseIcon,
   ChevronRight as ChevronRightIcon
 } from '@mui/icons-material'
@@ -264,55 +258,6 @@ const StudentDashboardMobile: React.FC = () => {
     ]
     const index = name.charCodeAt(0) % colors.length
     return colors[index]
-  }
-
-  // Helper function to generate course thumbnail
-  const generateCourseThumbnail = (course: any) => {
-    const gradients = [
-      'from-blue-500 to-purple-600',
-      'from-green-500 to-teal-600', 
-      'from-orange-500 to-red-600',
-      'from-pink-500 to-rose-600',
-      'from-indigo-500 to-blue-600',
-      'from-emerald-500 to-green-600',
-      'from-yellow-500 to-orange-600',
-      'from-cyan-500 to-blue-600',
-      'from-violet-500 to-purple-600',
-      'from-lime-500 to-green-600'
-    ]
-    
-    const gradientIndex = course.id % gradients.length
-    const gradient = gradients[gradientIndex]
-    
-    return (
-      <div className={`w-full h-32 bg-gradient-to-br ${gradient} flex items-center justify-center relative overflow-hidden rounded-t-lg`}>
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-2 left-2 w-8 h-8 bg-white rounded-full opacity-30"></div>
-          <div className="absolute bottom-2 right-2 w-6 h-6 bg-white rounded-full opacity-20"></div>
-        </div>
-        
-        <div className="relative z-10 text-center px-2">
-          <div className="text-white text-sm font-bold mb-1 line-clamp-2">
-            {course.title}
-          </div>
-          <div className="text-white text-xs opacity-90">
-            {course.subject}
-          </div>
-        </div>
-        
-        <div className="absolute bottom-2 left-2 right-2">
-          <div className="bg-black bg-opacity-50 rounded-lg p-1">
-            <div className="w-full bg-gray-300 rounded-full h-1 mb-1">
-              <div 
-                className="bg-white h-1 rounded-full" 
-                style={{ width: `${course.progress}%` }}
-              ></div>
-            </div>
-            <p className="text-white text-xs">{course.progress}% Complete</p>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   const menuItems = [

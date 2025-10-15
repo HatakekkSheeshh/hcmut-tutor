@@ -7,7 +7,6 @@ import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
 import {
   Dashboard as DashboardIcon,
-  Search as SearchIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
   CheckCircle as CheckCircleIcon,
@@ -16,9 +15,6 @@ import {
   Facebook as FacebookIcon,
   Twitter as TwitterIcon,
   Instagram as InstagramIcon,
-  MoreVert as MoreVertIcon,
-  ArrowBack as ArrowBackIcon,
-  ArrowForward as ArrowForwardIcon,
   Menu as MenuIcon,
   BarChart as BarChartIcon,
   Assignment as AssignmentIcon,
@@ -36,7 +32,6 @@ import {
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
   Home as HomeIcon,
-  Bookmark as BookmarkIcon,
   Close as CloseIcon,
   ChevronRight as ChevronRightIcon
 } from '@mui/icons-material'
