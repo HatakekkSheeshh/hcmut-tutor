@@ -350,9 +350,25 @@ const ViewProgress: React.FC = () => {
                 <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Recent Sessions
                 </h3>
-                <Button size="small" variant="outlined">
-                View All
-              </Button>
+            <Button 
+              size="small" 
+              variant="outlined"
+              style={{
+                backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                color: theme === 'dark' ? '#ffffff' : '#000000',
+                borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                textTransform: 'none',
+                fontWeight: '500'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#4b5563' : '#f3f4f6'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#ffffff'
+              }}
+            >
+              View All
+            </Button>
               </div>
               <div className="space-y-4">
             {progressData.recentSessions.map((session, index) => (

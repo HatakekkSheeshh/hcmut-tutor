@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import '../../styles/weather-animations.css'
+import '../styles/weather-animations.css'
 
 const WeatherEffectsDemo: React.FC = () => {
   const [currentWeather, setCurrentWeather] = useState('clear')

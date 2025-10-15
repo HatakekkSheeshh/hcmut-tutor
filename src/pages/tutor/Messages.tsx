@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
-import '../../styles/weather-animations.css'
 import {
   Dashboard as DashboardIcon,
   Search as SearchIcon,
@@ -24,12 +23,6 @@ import {
   Palette as PaletteIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
-  LocationOn as LocationOnIcon,
-  AccessTime as AccessTimeIcon,
-  WbSunny as WbSunnyIcon,
-  Cloud as CloudIcon,
-  Thunderstorm as ThunderstormIcon,
-  AcUnit as AcUnitIcon,
   Send as SendIcon,
   AttachFile as AttachFileIcon,
   EmojiEmotions as EmojiEmotionsIcon,
@@ -47,10 +40,6 @@ const Messages: React.FC = () => {
   const [newMessage, setNewMessage] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   
-  // Time and weather states
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [weather, setWeather] = useState<any>(null)
-  const [weatherLoading, setWeatherLoading] = useState(true)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -68,114 +57,6 @@ const Messages: React.FC = () => {
     setShowThemeOptions(false)
   }
 
-  // Weather API function
-  const fetchWeather = async () => {
-    try {
-      setWeatherLoading(true)
-      const API_KEY = 'd055198c2320f9b77049b5b9a1db7205'
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=Ho%20Chi%20Minh%20City&appid=${API_KEY}&units=metric`
-      )
-      const data = await response.json()
-      setWeather(data)
-    } catch (error) {
-      console.error('Error fetching weather:', error)
-      setWeather({
-        main: { temp: 28, humidity: 75 },
-        weather: [{ main: 'Clear', description: 'clear sky', icon: '01d' }],
-        name: 'Ho Chi Minh City'
-      })
-    } finally {
-      setWeatherLoading(false)
-    }
-  }
-
-  // Get weather icon with time consideration
-  const getWeatherIcon = (weatherMain: string) => {
-    const hour = currentTime.getHours()
-    const isNight = hour >= 18 || hour <= 6 // 6 PM to 6 AM is considered night
-    
-    switch (weatherMain.toLowerCase()) {
-      case 'clear':
-        if (isNight) {
-          return <WbSunnyIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-400'}`} />
-        } else {
-          return <WbSunnyIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'}`} />
-        }
-      case 'clouds':
-        return <CloudIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-      case 'rain':
-      case 'drizzle':
-        return <ThunderstormIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-      case 'snow':
-        return <AcUnitIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-500'}`} />
-      default:
-        if (isNight) {
-          return <WbSunnyIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-400'}`} />
-        } else {
-          return <WbSunnyIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'}`} />
-        }
-    }
-  }
-
-  // Get weather background class
-  const getWeatherBackground = (weatherMain: string) => {
-    switch (weatherMain.toLowerCase()) {
-      case 'clear':
-        return 'weather-sunny'
-      case 'clouds':
-        return 'weather-cloudy'
-      case 'rain':
-      case 'drizzle':
-        return 'weather-rainy'
-      case 'snow':
-        return 'weather-snowy'
-      default:
-        return 'weather-sunny'
-    }
-  }
-
-  // Format time
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('vi-VN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    })
-  }
-
-  // Format date
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('vi-VN', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-
-  // Get greeting based on time
-  const getGreeting = () => {
-    const hour = currentTime.getHours()
-    if (hour < 12) return 'Good Morning'
-    if (hour < 18) return 'Good Afternoon'
-    return 'Good Evening'
-  }
-
-  // useEffect for time and weather
-  useEffect(() => {
-    const timeInterval = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    fetchWeather()
-    const weatherInterval = setInterval(fetchWeather, 10 * 60 * 1000)
-
-    return () => {
-      clearInterval(timeInterval)
-      clearInterval(weatherInterval)
-    }
-  }, [])
 
   // Helper function to get initials from name
   const getInitials = (name: string) => {
@@ -439,130 +320,57 @@ const Messages: React.FC = () => {
             </div>
           </div>
 
-          {/* Time & Weather Widget */}
-          <div className="mb-8">
-            <div className={`rounded-xl p-6 shadow-lg relative overflow-hidden ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} ${weather ? getWeatherBackground(weather.weather[0].main) : 'weather-sunny'}`}>
-              {/* Weather Background Effects */}
-              {weather && (
-                <>
-                  {/* Sunny Effect */}
-                  {weather.weather[0].main.toLowerCase() === 'clear' && (
-                    <div className="absolute inset-0 opacity-20">
-                      <div className="sun-animation absolute top-4 right-4 w-16 h-16 bg-yellow-400 rounded-full"></div>
-                      <div className="sun-rays absolute top-0 right-0 w-20 h-20">
-                        <div className="ray ray-1"></div>
-                        <div className="ray ray-2"></div>
-                        <div className="ray ray-3"></div>
-                        <div className="ray ray-4"></div>
-                        <div className="ray ray-5"></div>
-                        <div className="ray ray-6"></div>
-                        <div className="ray ray-7"></div>
-                        <div className="ray ray-8"></div>
+
+          {/* Active Status Section */}
+          <div className="mb-6">
+            <div className={`rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}>
+              <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Active Now
+              </h3>
+              <div className="flex space-x-4 overflow-x-auto pb-2">
+                {/* Your Status */}
+                <div className="flex flex-col items-center min-w-[80px]">
+                  <div className="relative">
+                    <div className={`w-16 h-16 rounded-full border-2 border-dashed ${theme === 'dark' ? 'border-gray-500' : 'border-gray-400'} flex items-center justify-center mb-2`}>
+                      <div className={`w-8 h-8 rounded-full ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'} flex items-center justify-center`}>
+                        <span className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-600'}`}>+</span>
                       </div>
                     </div>
-                  )}
-                  
-                  {/* Cloudy Effect */}
-                  {weather.weather[0].main.toLowerCase() === 'clouds' && (
-                    <div className="absolute inset-0 opacity-30">
-                      <div className="cloud cloud-1"></div>
-                      <div className="cloud cloud-2"></div>
-                      <div className="cloud cloud-3"></div>
-                    </div>
-                  )}
-                  
-                  {/* Rainy Effect */}
-                  {(weather.weather[0].main.toLowerCase() === 'rain' || weather.weather[0].main.toLowerCase() === 'drizzle') && (
-                    <div className="absolute inset-0 opacity-40">
-                      <div className="rain">
-                        <div className="drop drop-1"></div>
-                        <div className="drop drop-2"></div>
-                        <div className="drop drop-3"></div>
-                        <div className="drop drop-4"></div>
-                        <div className="drop drop-5"></div>
-                        <div className="drop drop-6"></div>
-                        <div className="drop drop-7"></div>
-                        <div className="drop drop-8"></div>
-                        <div className="drop drop-9"></div>
-                        <div className="drop drop-10"></div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Snowy Effect */}
-                  {weather.weather[0].main.toLowerCase() === 'snow' && (
-                    <div className="absolute inset-0 opacity-30">
-                      <div className="snow">
-                        <div className="flake flake-1"></div>
-                        <div className="flake flake-2"></div>
-                        <div className="flake flake-3"></div>
-                        <div className="flake flake-4"></div>
-                        <div className="flake flake-5"></div>
-                        <div className="flake flake-6"></div>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-              
-              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between relative z-10">
-                {/* Time Section */}
-                <div className="flex-1 mb-4 lg:mb-0">
-                  <div className="flex items-center mb-2">
-                    <AccessTimeIcon className={`w-5 h-5 mr-2 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Current Time</span>
                   </div>
-                  <div className={`text-3xl lg:text-4xl font-bold mb-1 font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {formatTime(currentTime)}
-                  </div>
-                  <div className={`text-lg mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {formatDate(currentTime)}
-                  </div>
-                  <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {getGreeting()}, Dr. Smith
-                  </div>
+                  <span className={`text-xs text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Your story
+                  </span>
                 </div>
 
-                {/* Weather Section */}
-                <div className="flex-1 lg:ml-8">
-                  <div className="flex items-center mb-2">
-                    <LocationOnIcon className={`w-5 h-5 mr-2 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Ho Chi Minh City</span>
+                {/* Active Users */}
+                {conversations.filter(conv => conv.online).slice(0, 6).map((conversation) => (
+                  <div key={conversation.id} className="flex flex-col items-center min-w-[80px]">
+                    <div className="relative">
+                      <Avatar
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          bgcolor: getAvatarColor(conversation.name),
+                          fontSize: '1.5rem',
+                          fontWeight: 'bold',
+                          border: '3px solid #10b981'
+                        }}
+                      >
+                        {conversation.avatar}
+                      </Avatar>
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                    </div>
+                    <span className={`text-xs text-center mt-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {conversation.name.split(' ')[0]}
+                    </span>
                   </div>
-                  
-                  {weatherLoading ? (
-                    <div className="flex items-center">
-                      <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === 'dark' ? 'border-blue-400' : 'border-blue-600'}`}></div>
-                      <span className={`ml-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading weather...</span>
-                    </div>
-                  ) : weather ? (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        {getWeatherIcon(weather.weather[0].main)}
-                        <div className="ml-3">
-                          <div className={`text-2xl lg:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            {Math.round(weather.main.temp)}°C
-                          </div>
-                          <div className={`text-sm capitalize ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                            {weather.weather[0].description}
-                          </div>
-                        </div>
-                      </div>
-                      <div className={`text-right text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                        <div>Humidity: {weather.main.humidity}%</div>
-                        <div>Feels like: {Math.round(weather.main.feels_like)}°C</div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Weather unavailable</div>
-                  )}
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Messages Interface */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[620px]">
             {/* Conversations List */}
             <div className={`lg:col-span-1 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} overflow-hidden`}
                  style={{
@@ -576,7 +384,7 @@ const Messages: React.FC = () => {
                 </h2>
               </div>
               
-              <div className="overflow-y-auto h-[520px]">
+              <div className="overflow-y-auto h-[540px]">
                 {filteredConversations.map((conversation) => (
                   <div
                     key={conversation.id}

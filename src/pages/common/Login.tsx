@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -15,10 +15,13 @@ import {
   Menu as MenuIcon,
   Notifications,
   LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon
+  DarkMode as DarkModeIcon,
+  Settings as SettingsIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import MovingGif from '../../components/MovingGif'
+import BallControls from '../../components/BallControls'
 
 const Login: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
@@ -31,10 +34,29 @@ const Login: React.FC = () => {
     rememberMe: false
   })
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+  const [ballSize, setBallSize] = useState(100)
+  const [ballSpeed, setBallSpeed] = useState(1.8)
+  const [showBallControls, setShowBallControls] = useState(false)
+  const mainContentRef = useRef<HTMLDivElement>(null)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
+
+  // Update container size when window resizes
+  useEffect(() => {
+    const updateSize = () => {
+      if (mainContentRef.current) {
+        const rect = mainContentRef.current.getBoundingClientRect()
+        setContainerSize({ width: rect.width, height: rect.height })
+      }
+    }
+
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -150,7 +172,28 @@ const Login: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-4 lg:p-6">
+        <div ref={mainContentRef} className="flex-1 p-4 lg:p-6 relative overflow-hidden">
+          {/* Moving GIF */}
+          {containerSize.width > 0 && containerSize.height > 0 && (
+            <MovingGif
+              containerWidth={containerSize.width}
+              containerHeight={containerSize.height}
+              ballSize={ballSize}
+              speed={ballSpeed}
+              gifUrl="/tenor.gif"
+            />
+          )}
+
+          {/* Ball Controls */}
+          {showBallControls && (
+            <BallControls
+              ballSize={ballSize}
+              speed={ballSpeed}
+              onSizeChange={setBallSize}
+              onSpeedChange={setBallSpeed}
+              theme={theme}
+            />
+          )}
           {/* Mobile Menu Button & Theme Toggle */}
           <div className="lg:hidden mb-4 flex items-center justify-between">
             <button
@@ -182,6 +225,17 @@ const Login: React.FC = () => {
                 </p>
               </div>
               
+              {/* Control Buttons */}
+              <div className="flex items-center space-x-2">
+                {/* Ball Controls Toggle */}
+                <button
+                  onClick={() => setShowBallControls(!showBallControls)}
+                  className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} transition-colors`}
+                  title={`${showBallControls ? 'Hide' : 'Show'} Ball Controls`}
+                >
+                  <SettingsIcon className={`w-5 h-5 ${showBallControls ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : (theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}`} />
+                </button>
+              
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
@@ -190,6 +244,7 @@ const Login: React.FC = () => {
               >
                 {theme === 'dark' ? <LightModeIcon className="w-5 h-5 text-yellow-400" /> : <DarkModeIcon className="w-5 h-5" />}
               </button>
+              </div>
             </div>
           </div>
 
@@ -304,7 +359,25 @@ const Login: React.FC = () => {
                       <Button
                         key={index}
                         onClick={() => handleSSOLogin(provider.name)}
-                        className={`w-full ${provider.color} text-white flex items-center justify-center`}
+                        className={`w-full ${provider.color} text-white flex items-center justify-center py-3`}
+                        style={{
+                          backgroundColor: provider.color.includes('red') ? '#ef4444' : 
+                                         provider.color.includes('blue') ? '#2563eb' : 
+                                         theme === 'dark' ? '#374151' : '#1f2937',
+                          color: '#ffffff',
+                          textTransform: 'none',
+                          fontWeight: '500'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = provider.color.includes('red') ? '#dc2626' : 
+                                                             provider.color.includes('blue') ? '#1e40af' : 
+                                                             theme === 'dark' ? '#4b5563' : '#111827'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = provider.color.includes('red') ? '#ef4444' : 
+                                                             provider.color.includes('blue') ? '#2563eb' : 
+                                                             theme === 'dark' ? '#374151' : '#1f2937'
+                        }}
                       >
                         <span className="mr-3">{provider.icon}</span>
                         Continue with {provider.name}

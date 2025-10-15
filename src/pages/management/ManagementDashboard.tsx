@@ -421,9 +421,9 @@ const ManagementDashboard: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
-                  Search
-                </Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+                Search
+              </Button>
                 
                 {/* Desktop Theme Toggle */}
                 <button
@@ -518,8 +518,8 @@ const ManagementDashboard: React.FC = () => {
                   </div>
                   <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     {getGreeting()}, Admin
-                  </div>
-                </div>
+            </div>
+          </div>
 
                 {/* Weather Section */}
                 <div className="flex-1 lg:ml-8">
@@ -554,8 +554,8 @@ const ManagementDashboard: React.FC = () => {
                   ) : (
                     <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Weather unavailable</div>
                   )}
-                </div>
-              </div>
+            </div>
+            </div>
             </div>
           </div>
       

@@ -1,68 +1,53 @@
 import { Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './contexts/ThemeContext'
-import StudentDashboard from './pages/student/StudentDashboard.tsx'
-import SearchTutors from './pages/student/SearchTutors.tsx'
-import BookSession from './pages/student/BookSession.tsx'
-import SessionDetail from './pages/student/SessionDetail.tsx'
-import EvaluateSession from './pages/student/EvaluateSession.tsx'
-import ViewProgress from './pages/student/ViewProgress.tsx'
-import ChatbotSupport from './pages/student/ChatbotSupport.tsx'
-import StudentMessages from './pages/student/Messages.tsx'
-import TutorDashboard from './pages/tutor/TutorDashboard.tsx'
-import SetAvailability from './pages/tutor/SetAvailability.tsx'
-import ManageSessions from './pages/tutor/ManageSessions.tsx'
-import HandleCancelReschedule from './pages/tutor/HandleCancelReschedule.tsx'
-import TrackStudentProgress from './pages/tutor/TrackStudentProgress.tsx'
-import Messages from './pages/tutor/Messages.tsx'
-import ManagementDashboard from './pages/management/ManagementDashboard.tsx'
-import ApprovalRequests from './pages/management/ApprovalRequests.tsx'
-import ReportsAnalytics from './pages/management/ReportsAnalytics.tsx'
-import AwardCredits from './pages/management/AwardCredits.tsx'
-import Login from './pages/common/Login.tsx'
-import ProfileManagement from './pages/common/ProfileManagement.tsx'
-import DigitalLibraryAccess from './pages/common/DigitalLibraryAccess.tsx'
-import OnlineCommunityForum from './pages/common/OnlineCommunityForum.tsx'
-import NotificationsCenter from './pages/common/NotificationsCenter.tsx'
+import DeviceDetector from './components/DeviceDetector'
+import TutorDeviceDetector from './components/TutorDeviceDetector'
+import CommonDeviceDetector from './components/CommonDeviceDetector'
+import ManagementDeviceDetector from './components/ManagementDeviceDetector'
+import WeatherEffectsDemo from './components/WeatherEffectsDemo'
 
 function App() {
   return (
     <ThemeProvider>
       <Routes>
         {/* Student Routes */}
-        <Route path="/student" element={<StudentDashboard />} />
-        <Route path="/student/search" element={<SearchTutors />} />
-        <Route path="/student/book" element={<BookSession />} />
-        <Route path="/student/session" element={<SessionDetail />} />
-        <Route path="/student/session/:id" element={<SessionDetail />} />
-        <Route path="/student/evaluate" element={<EvaluateSession />} />
-        <Route path="/student/evaluate/:id" element={<EvaluateSession />} />
-        <Route path="/student/progress" element={<ViewProgress />} />
-        <Route path="/student/chatbot" element={<ChatbotSupport />} />
-        <Route path="/student/messages" element={<StudentMessages />} />
+        <Route path="/student" element={<DeviceDetector />} />
+        <Route path="/student/search" element={<DeviceDetector />} />
+        <Route path="/student/book" element={<DeviceDetector />} />
+        <Route path="/student/session" element={<DeviceDetector />} />
+        <Route path="/student/session/:id" element={<DeviceDetector />} />
+        <Route path="/student/evaluate" element={<DeviceDetector />} />
+        <Route path="/student/evaluate/:id" element={<DeviceDetector />} />
+        <Route path="/student/progress" element={<DeviceDetector />} />
+        <Route path="/student/chatbot" element={<DeviceDetector />} />
+        <Route path="/student/messages" element={<DeviceDetector />} />
         
         {/* Tutor Routes */}
-        <Route path="/tutor" element={<TutorDashboard />} />
-        <Route path="/tutor/availability" element={<SetAvailability />} />
-        <Route path="/tutor/sessions" element={<ManageSessions />} />
-        <Route path="/tutor/cancel-reschedule" element={<HandleCancelReschedule />} />
-        <Route path="/tutor/track-progress" element={<TrackStudentProgress />} />
-        <Route path="/tutor/messages" element={<Messages />} />
+        <Route path="/tutor" element={<TutorDeviceDetector />} />
+        <Route path="/tutor/availability" element={<TutorDeviceDetector />} />
+        <Route path="/tutor/sessions" element={<TutorDeviceDetector />} />
+        <Route path="/tutor/cancel-reschedule" element={<TutorDeviceDetector />} />
+        <Route path="/tutor/track-progress" element={<TutorDeviceDetector />} />
+        <Route path="/tutor/messages" element={<TutorDeviceDetector />} />
         
         {/* Management Routes */}
-        <Route path="/management" element={<ManagementDashboard />} />
-        <Route path="/management/approval" element={<ApprovalRequests />} />
-        <Route path="/management/reports" element={<ReportsAnalytics />} />
-        <Route path="/management/awards" element={<AwardCredits />} />
+        <Route path="/management" element={<ManagementDeviceDetector />} />
+        <Route path="/management/approval" element={<ManagementDeviceDetector />} />
+        <Route path="/management/reports" element={<ManagementDeviceDetector />} />
+        <Route path="/management/awards" element={<ManagementDeviceDetector />} />
         
         {/* Common Screens Routes */}
-        <Route path="/common" element={<Login />} />
-        <Route path="/common/profile" element={<ProfileManagement />} />
-        <Route path="/common/library" element={<DigitalLibraryAccess />} />
-        <Route path="/common/forum" element={<OnlineCommunityForum />} />
-        <Route path="/common/notifications" element={<NotificationsCenter />} />
+        <Route path="/common" element={<CommonDeviceDetector />} />
+        <Route path="/common/profile" element={<CommonDeviceDetector />} />
+        <Route path="/common/library" element={<CommonDeviceDetector />} />
+        <Route path="/common/forum" element={<CommonDeviceDetector />} />
+        <Route path="/common/notifications" element={<CommonDeviceDetector />} />
         
+        {/* Weather Effects Demo */}
+        <Route path="/weather-demo" element={<WeatherEffectsDemo />} />
+
         {/* Default redirect to login */}
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<CommonDeviceDetector />} />
       </Routes>
     </ThemeProvider>
   )

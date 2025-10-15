@@ -14,6 +14,9 @@ import {
   DateRange as DateRangeIcon
 } from '@mui/icons-material'
 import { Avatar } from '@mui/material'
+import { LineChart } from '@mui/x-charts/LineChart'
+import { axisClasses } from '@mui/x-charts/ChartsAxis'
+import { legendClasses } from '@mui/x-charts/ChartsLegend'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 
@@ -483,29 +486,107 @@ const ReportsAnalytics: React.FC = () => {
               boxShadow: 'none !important'
             }}
           >
-            <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               User Growth Trend
             </h3>
-            <div className="flex items-end space-x-2 h-32">
-              {analyticsData.userGrowth.map((data, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center">
-                  <div
-                    className="bg-blue-500 rounded-t w-full"
-                    style={{ height: `${(data.users / 200) * 100}%` }}
-                  ></div>
-                  <div className="mt-2 text-center">
-                    <p className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {data.users}
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Users</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Growth %</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Simple MUI X Line Chart */}
+            <div className="h-80">
+              <LineChart
+                height={300}
+                series={[
+                  {
+                    data: analyticsData.userGrowth.map(d => d.users),
+                    label: 'Users',
+                    color: '#3b82f6',
+                    showMark: true
+                  },
+                  {
+                    data: analyticsData.userGrowth.map(d => d.growth),
+                    label: 'Growth %',
+                    color: '#10b981',
+                    showMark: true
+                  }
+                ]}
+                xAxis={[{
+                  scaleType: 'point',
+                  data: analyticsData.userGrowth.map(d => d.month)
+                }]}
+                yAxis={[{
+                  valueFormatter: (value: number) => value.toString()
+                }]}
+                grid={{ vertical: true, horizontal: true }}
+                margin={{ left: 60, right: 24, top: 20, bottom: 20 }}
+                sx={{
+                  [`& .${axisClasses.root}`]: {
+                    [`& .${axisClasses.tickLabel}`]: {
+                      fill: theme === 'dark' ? '#ffffff' : '#374151',
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    },
+                    [`& .${axisClasses.label}`]: {
+                      fill: theme === 'dark' ? '#ffffff' : '#374151',
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    },
+                    [`& .${axisClasses.tick}, .${axisClasses.line}`]: {
+                      stroke: theme === 'dark' ? '#4b5563' : '#e5e7eb',
+                      strokeWidth: 1
+                    }
+                  },
+                  [`& .${legendClasses.root} .${legendClasses.label}`]: {
+                    fill: theme === 'dark' ? '#ffffff' : '#374151',
+                    fontSize: '0.875rem',
+                    fontWeight: 500
+                  },
+                  '& .MuiChartsGrid-root .MuiChartsGrid-line': {
+                    stroke: theme === 'dark' ? '#4b5563' : '#e5e7eb',
+                    strokeWidth: 1
+                  }
+                }}
+              />
+            </div>
+            
+            {/* Chart Summary */}
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {analyticsData.userGrowth[analyticsData.userGrowth.length - 1].users}
+                  </p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Current Users
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold text-green-600`}>
+                    +{Math.round(analyticsData.userGrowth.reduce((sum, data) => sum + data.growth, 0) / analyticsData.userGrowth.length)}%
                     </p>
                     <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {data.month}
-                    </p>
-                    <p className={`text-xs ${data.growth > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {data.growth > 0 ? '+' : ''}{data.growth}%
+                    Avg Growth
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {analyticsData.userGrowth[analyticsData.userGrowth.length - 1].users - analyticsData.userGrowth[0].users}
+                  </p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Total Growth
                     </p>
                   </div>
                 </div>
-              ))}
             </div>
           </Card>
         </div>
