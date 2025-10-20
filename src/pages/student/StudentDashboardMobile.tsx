@@ -33,6 +33,7 @@ import {
   Home as HomeIcon,
   TrendingUp as TrendingUpIcon,
   Bookmark as BookmarkIcon,
+  CalendarMonth,
   Close as CloseIcon,
   ChevronRight as ChevronRightIcon
 } from '@mui/icons-material'
@@ -264,6 +265,7 @@ const StudentDashboardMobile: React.FC = () => {
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
     { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
     { id: 'book-session', label: 'Book Session', icon: <SchoolIcon />, path: '/student/book' },
+    { id: 'calendar', label: 'Calendar', icon: <CalendarMonth />, path: '/student/calendar' },
     { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
     { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
     { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },

@@ -4,6 +4,8 @@ import DeviceDetector from './components/DeviceDetector'
 import TutorDeviceDetector from './components/TutorDeviceDetector'
 import CommonDeviceDetector from './components/CommonDeviceDetector'
 import ManagementDeviceDetector from './components/ManagementDeviceDetector'
+import StudentCalendarDetector from './components/StudentCalendarDetector'
+import TutorCalendarDetector from './components/TutorCalendarDetector'
 import WeatherEffectsDemo from './components/WeatherEffectsDemo'
 
 function App() {
@@ -21,6 +23,7 @@ function App() {
         <Route path="/student/progress" element={<DeviceDetector />} />
         <Route path="/student/chatbot" element={<DeviceDetector />} />
         <Route path="/student/messages" element={<DeviceDetector />} />
+        <Route path="/student/calendar" element={<StudentCalendarDetector />} />
         
         {/* Tutor Routes */}
         <Route path="/tutor" element={<TutorDeviceDetector />} />
@@ -29,6 +32,7 @@ function App() {
         <Route path="/tutor/cancel-reschedule" element={<TutorDeviceDetector />} />
         <Route path="/tutor/track-progress" element={<TutorDeviceDetector />} />
         <Route path="/tutor/messages" element={<TutorDeviceDetector />} />
+        <Route path="/tutor/calendar" element={<TutorCalendarDetector />} />
         
         {/* Management Routes */}
         <Route path="/management" element={<ManagementDeviceDetector />} />

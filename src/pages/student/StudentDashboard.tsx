@@ -34,7 +34,8 @@ import {
   AcUnit as AcUnitIcon,
   PersonSearch,
   Class,
-  Chat as ChatIcon
+  Chat as ChatIcon,
+  CalendarMonth
 } from '@mui/icons-material'
 
 const StudentDashboard: React.FC = () => {
@@ -321,6 +322,7 @@ const StudentDashboard: React.FC = () => {
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
     { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
     { id: 'book-session', label: 'Book Session', icon: <SchoolIcon />, path: '/student/book' },
+    { id: 'calendar', label: 'Calendar', icon: <CalendarMonth />, path: '/student/calendar' },
     { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
     { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
     { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },

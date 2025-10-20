@@ -34,6 +34,7 @@ import {
   AcUnit as AcUnitIcon,
   Home as HomeIcon,
   Bookmark as BookmarkIcon,
+  CalendarMonth,
   Close as CloseIcon,
   ChevronRight as ChevronRightIcon
 } from '@mui/icons-material'
@@ -258,6 +259,7 @@ const TutorDashboardMobile: React.FC = () => {
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/tutor' },
     { id: 'availability', label: 'Set Availability', icon: <ScheduleIcon />, path: '/tutor/availability' },
     { id: 'sessions', label: 'Manage Sessions', icon: <AssignmentIcon />, path: '/tutor/sessions' },
+    { id: 'calendar', label: 'Teaching Calendar', icon: <CalendarMonth />, path: '/tutor/calendar' },
     { id: 'progress', label: 'Track Progress', icon: <BarChartIcon />, path: '/tutor/track-progress' },
     { id: 'cancel-reschedule', label: 'Cancel/Reschedule', icon: <AutorenewIcon />, path: '/tutor/cancel-reschedule' },
     { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/tutor/messages' }

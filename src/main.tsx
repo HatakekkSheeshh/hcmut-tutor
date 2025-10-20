@@ -5,6 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import App from './App.tsx'
 import './index.css'
+import './styles/calendar.css'
 
 // MUI Theme - Luxury Black & White
 const muiTheme = createTheme({

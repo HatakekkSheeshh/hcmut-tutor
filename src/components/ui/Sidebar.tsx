@@ -10,7 +10,8 @@ import {
   Folder,
   Download,
   Lock,
-  Person as _Person
+  Person as _Person,
+  CalendarMonth
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 
@@ -20,6 +21,7 @@ const menuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: '/student' },
   { text: 'Courses', icon: <School />, path: '/student/search' },
   { text: 'Lessons', icon: <ListIcon />, path: '/student/book' },
+  { text: 'Calendar', icon: <CalendarMonth />, path: '/student/calendar' },
   { text: 'Assessments', icon: <BarChart />, path: '/student/progress' },
   { text: 'Challenges', icon: <Star />, path: '/student/evaluate' },
   { text: 'Certification', icon: <WorkspacePremium />, path: '/student/session' },
