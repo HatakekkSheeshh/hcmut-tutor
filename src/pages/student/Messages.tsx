@@ -8,7 +8,6 @@ import {
   Search as SearchIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
-  Star as StarIcon,
   Facebook as FacebookIcon,
   Twitter as TwitterIcon,
   Instagram as InstagramIcon,
@@ -249,18 +248,6 @@ const Messages: React.FC = () => {
               </div>
             </div>
 
-            {/* Upgrade Section */}
-            <div className="mt-8 p-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg">
-              <div className="flex items-center mb-2">
-                <div className="w-6 h-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-2">
-                  <StarIcon className="w-4 h-4 text-white" />
-                </div>
-                <h3 className="text-white font-semibold text-sm">Premium Student Features</h3>
-              </div>
-              <Button className="w-full bg-white text-green-600 hover:bg-gray-100 text-sm font-medium">
-                Upgrade Now
-              </Button>
-            </div>
           </div>
         </div>
 

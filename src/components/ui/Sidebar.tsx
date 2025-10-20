@@ -1,5 +1,5 @@
 import React from 'react'
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Box, Typography, Card, CardContent, Button } from '@mui/material'
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Box, Typography } from '@mui/material'
 import { 
   Dashboard, 
   School, 
@@ -9,7 +9,6 @@ import {
   WorkspacePremium, 
   Folder,
   Download,
-  Lock,
   Person as _Person,
   CalendarMonth
 } from '@mui/icons-material'
@@ -115,44 +114,6 @@ const Sidebar: React.FC = () => {
           ))}
         </List>
         
-        <Box sx={{ p: 2, mt: 'auto' }}>
-          <Card sx={{ 
-            border: '1px solid #f0f0f0',
-            borderRadius: '12px'
-          }}>
-            <CardContent sx={{ textAlign: 'center', p: 2 }}>
-              <Lock sx={{ 
-                fontSize: 40, 
-                color: '#999999', 
-                mb: 1 
-              }} />
-              <Typography variant="body2" sx={{ 
-                color: '#666666', 
-                mb: 2,
-                fontSize: '12px',
-                lineHeight: 1.4
-              }}>
-                Unlock Premium Resources & Features
-              </Typography>
-              <Button 
-                variant="contained" 
-                fullWidth
-                sx={{ 
-                  backgroundColor: '#000000',
-                  color: '#ffffff',
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  fontWeight: 500,
-                  '&:hover': {
-                    backgroundColor: '#333333',
-                  }
-                }}
-              >
-                Upgrade
-              </Button>
-            </CardContent>
-          </Card>
-        </Box>
       </Box>
     </Drawer>
   )
