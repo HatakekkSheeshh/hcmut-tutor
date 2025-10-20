@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Calendar from '../pages/tutor/Calendar'
 import CalendarMobile from '../pages/tutor/CalendarMobile'
-import DeviceSwitch from './DeviceSwitch'
 
 const TutorCalendarDetector: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false)
@@ -34,10 +33,7 @@ const TutorCalendarDetector: React.FC = () => {
     }
   }, [])
 
-  const handleDeviceChange = (forceMobile: boolean) => {
-    setIsMobile(forceMobile)
-    localStorage.setItem('deviceOverride', forceMobile ? 'mobile' : 'desktop')
-  }
+  // device switch removed
 
   if (isLoading) {
     return (
@@ -52,16 +48,6 @@ const TutorCalendarDetector: React.FC = () => {
 
   return (
     <div className="relative">
-      {/* Device Switch Button - Only show on desktop */}
-      {!isMobile && (
-        <div className="fixed top-4 right-4 z-50">
-          <DeviceSwitch 
-            onDeviceChange={handleDeviceChange}
-            currentDevice={isMobile ? 'mobile' : 'desktop'}
-          />
-        </div>
-      )}
-
       {/* Render the appropriate component */}
       {isMobile ? <CalendarMobile /> : <Calendar />}
     </div>

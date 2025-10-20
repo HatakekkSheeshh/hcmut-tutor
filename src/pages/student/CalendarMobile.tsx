@@ -15,6 +15,8 @@ import {
   Drawer,
   Fab,
   SwipeableDrawer,
+  ToggleButtonGroup,
+  ToggleButton
 } from '@mui/material'
 import {
   ArrowBack as ArrowBackIcon,
@@ -32,6 +34,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import SessionCard from '../../components/calendar/SessionCard'
+import DayView from '../../components/calendar/DayView'
 import SessionDetailModal from '../../components/calendar/SessionDetailModal'
 import SessionFormModal from '../../components/calendar/SessionFormModal'
 import { Session, CalendarFilters } from '../../types/calendar'
@@ -53,8 +56,18 @@ const CalendarMobile: React.FC = () => {
   const [filters, setFilters] = useState<CalendarFilters>({})
   const [sessions, setSessions] = useState<Session[]>([])
   const [weekSessions, setWeekSessions] = useState<{[key: string]: Session[]}>({})
+  const [viewMode, setViewMode] = useState<'week' | 'day'>('week')
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  // Time slots from 7 AM to 6 PM with 50-minute ranges (mobile day view)
+  const timeSlots = Array.from({ length: 12 }, (_, i) => {
+    const hour = 7 + i
+    const startTime = `${hour.toString().padStart(2, '0')}:00`
+    const endTime = `${hour.toString().padStart(2, '0')}:50`
+    return { start: startTime, end: endTime, display: `${startTime}-${endTime}` }
+  })
 
   // Get week start date (Monday)
   const getWeekStart = (date: Date) => {
@@ -130,19 +143,35 @@ const CalendarMobile: React.FC = () => {
 
   // Navigation handlers
   const handlePreviousWeek = () => {
-    const newWeek = new Date(currentWeek)
-    newWeek.setDate(newWeek.getDate() - 7)
-    setCurrentWeek(newWeek)
+    if (viewMode === 'day') {
+      const d = new Date(selectedDate)
+      d.setDate(d.getDate() - 1)
+      setSelectedDate(d.toISOString().split('T')[0])
+      setCurrentWeek(d)
+    } else {
+      const newWeek = new Date(currentWeek)
+      newWeek.setDate(newWeek.getDate() - 7)
+      setCurrentWeek(newWeek)
+    }
   }
 
   const handleNextWeek = () => {
-    const newWeek = new Date(currentWeek)
-    newWeek.setDate(newWeek.getDate() + 7)
-    setCurrentWeek(newWeek)
+    if (viewMode === 'day') {
+      const d = new Date(selectedDate)
+      d.setDate(d.getDate() + 1)
+      setSelectedDate(d.toISOString().split('T')[0])
+      setCurrentWeek(d)
+    } else {
+      const newWeek = new Date(currentWeek)
+      newWeek.setDate(newWeek.getDate() + 7)
+      setCurrentWeek(newWeek)
+    }
   }
 
   const handleToday = () => {
-    setCurrentWeek(new Date())
+    const now = new Date()
+    setCurrentWeek(now)
+    setSelectedDate(now.toISOString().split('T')[0])
   }
 
   // Session handlers
@@ -303,7 +332,7 @@ const CalendarMobile: React.FC = () => {
             </div>
           </div>
 
-          {/* Week Navigation */}
+          {/* Week/Day Navigation */}
           <div className="px-4 pb-4">
             <div className="flex items-center justify-between mb-3">
               <Button
@@ -343,26 +372,48 @@ const CalendarMobile: React.FC = () => {
                 <ChevronRightIcon />
               </Button>
             </div>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={handleToday}
-              size="small"
-              sx={{
-                backgroundColor: '#3b82f6',
-                '&:hover': {
-                  backgroundColor: '#2563eb'
-                }
-              }}
-            >
-              Today
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleToday}
+                size="small"
+                sx={{
+                  backgroundColor: '#3b82f6',
+                  '&:hover': {
+                    backgroundColor: '#2563eb'
+                  }
+                }}
+              >
+                Today
+              </Button>
+              <ToggleButtonGroup
+                size="small"
+                exclusive
+                value={viewMode}
+                onChange={(_, v) => v && setViewMode(v)}
+                aria-label="Calendar view switcher"
+              >
+                <ToggleButton value="week" aria-label="Week view">Week</ToggleButton>
+                <ToggleButton value="day" aria-label="Day view">Day</ToggleButton>
+              </ToggleButtonGroup>
+            </div>
           </div>
         </div>
 
         {/* Calendar Content */}
         <div className="p-4">
-          {getWeekDates(getWeekStart(currentWeek)).map((date) => {
+          {viewMode === 'day' ? (
+            <DayView
+              date={selectedDate}
+              timeSlots={timeSlots}
+              sessions={getSessionsForDate(selectedDate)}
+              onSessionClick={handleSessionClick}
+              showTutor={true}
+              showStudent={false}
+            />
+          ) : (
+          getWeekDates(getWeekStart(currentWeek)).map((date) => {
             const dateSessions = sortSessionsByTime(getSessionsForDate(date))
             const isToday = date === new Date().toISOString().split('T')[0]
             
@@ -432,7 +483,8 @@ const CalendarMobile: React.FC = () => {
                 </CardContent>
               </Card>
             )
-          })}
+          }))
+          }
         </div>
 
         {/* FAB for Add Session */}

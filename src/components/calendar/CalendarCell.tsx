@@ -25,13 +25,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
 }) => {
   const { theme } = useTheme()
 
-  const formatTime = (time: string) => {
-    const [hours] = time.split(':')
-    const hour = parseInt(hours)
-    const ampm = hour >= 12 ? 'PM' : 'AM'
-    const displayHour = hour % 12 || 12
-    return `${displayHour} ${ampm}`
-  }
+  // Time label removed; keep helper only if needed in future
 
   return (
     <Box
@@ -54,26 +48,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
         }
       }}
     >
-      {/* Time label */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 4,
-          left: 4,
-          zIndex: 1
-        }}
-      >
-        <Typography
-          variant="caption"
-          sx={{
-            color: theme === 'dark' ? '#9ca3af' : '#6b7280',
-            fontSize: '0.75rem',
-            fontWeight: 500
-          }}
-        >
-          {formatTime(time)}
-        </Typography>
-      </Box>
+      {/* Time label removed per requirement */}
 
       {/* Current time indicator */}
       {isCurrentHour && (
@@ -93,7 +68,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
       {/* Sessions */}
       <Box
         sx={{
-          pt: 3,
+          pt: 1,
           px: 0.5,
           pb: 0.5,
           height: '100%',

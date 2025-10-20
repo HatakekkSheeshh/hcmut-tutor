@@ -11,6 +11,7 @@ interface SessionCardProps {
   isCompact?: boolean
   showTutor?: boolean
   showStudent?: boolean
+  fullHeight?: boolean
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({
@@ -18,21 +19,23 @@ const SessionCard: React.FC<SessionCardProps> = ({
   onClick,
   isCompact = false,
   showTutor = true,
-  showStudent = false
+  showStudent = false,
+  fullHeight = false
 }) => {
   const { theme } = useTheme()
   const cardRef = useRef<HTMLDivElement>(null)
 
+  // Map màu theo palette Figma
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'scheduled':
-        return theme === 'dark' ? '#3b82f6' : '#2563eb'
+        return '#0C41FF' // Primary blue
       case 'completed':
-        return theme === 'dark' ? '#10b981' : '#059669'
+        return '#55D28F' // Green
       case 'cancelled':
-        return theme === 'dark' ? '#ef4444' : '#dc2626'
+        return '#BE1A1A' // Dark Red
       case 'rescheduled':
-        return theme === 'dark' ? '#f59e0b' : '#d97706'
+        return '#E7C160' // Amber Pastel Darker
       default:
         return theme === 'dark' ? '#6b7280' : '#9ca3af'
     }
@@ -101,6 +104,9 @@ const SessionCard: React.FC<SessionCardProps> = ({
         borderRadius: '12px',
         overflow: 'hidden',
         position: 'relative',
+        height: fullHeight ? '100%' : 'auto',
+        display: 'flex',
+        flexDirection: 'column',
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -112,7 +118,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
         }
       }}
     >
-      <CardContent sx={{ p: isCompact ? 1.5 : 2 }}>
+      <CardContent sx={{ p: isCompact ? 1.5 : 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Header with subject and status */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
           <Typography

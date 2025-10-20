@@ -10,7 +10,9 @@ import {
   Select,
   MenuItem,
   Card,
-  CardContent
+  CardContent,
+  ToggleButtonGroup,
+  ToggleButton
 } from '@mui/material'
 import {
   ArrowBack as ArrowBackIcon,
@@ -22,8 +24,10 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import CalendarCell from '../../components/calendar/CalendarCell'
+import DayView from '../../components/calendar/DayView'
 import SessionDetailModal from '../../components/calendar/SessionDetailModal'
 import SessionFormModal from '../../components/calendar/SessionFormModal'
+import MiniMonth from '../../components/calendar/MiniMonth'
 import { Session, CalendarFilters } from '../../types/calendar'
 import { subjects, tutors, getSessionsForWeek } from '../../data/studentSessions'
 
@@ -33,6 +37,8 @@ const Calendar: React.FC = () => {
   
   // State
   const [currentWeek, setCurrentWeek] = useState(new Date())
+  const [viewMode, setViewMode] = useState<'week' | 'day'>('week')
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
   const [selectedSession, setSelectedSession] = useState<Session | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
@@ -109,19 +115,35 @@ const Calendar: React.FC = () => {
 
   // Navigation handlers
   const handlePreviousWeek = () => {
-    const newWeek = new Date(currentWeek)
-    newWeek.setDate(newWeek.getDate() - 7)
-    setCurrentWeek(newWeek)
+    if (viewMode === 'day') {
+      const d = new Date(selectedDate)
+      d.setDate(d.getDate() - 1)
+      setSelectedDate(d.toISOString().split('T')[0])
+      setCurrentWeek(d)
+    } else {
+      const newWeek = new Date(currentWeek)
+      newWeek.setDate(newWeek.getDate() - 7)
+      setCurrentWeek(newWeek)
+    }
   }
 
   const handleNextWeek = () => {
-    const newWeek = new Date(currentWeek)
-    newWeek.setDate(newWeek.getDate() + 7)
-    setCurrentWeek(newWeek)
+    if (viewMode === 'day') {
+      const d = new Date(selectedDate)
+      d.setDate(d.getDate() + 1)
+      setSelectedDate(d.toISOString().split('T')[0])
+      setCurrentWeek(d)
+    } else {
+      const newWeek = new Date(currentWeek)
+      newWeek.setDate(newWeek.getDate() + 7)
+      setCurrentWeek(newWeek)
+    }
   }
 
   const handleToday = () => {
-    setCurrentWeek(new Date())
+    const now = new Date()
+    setCurrentWeek(now)
+    setSelectedDate(now.toISOString().split('T')[0])
   }
 
   // Session handlers
@@ -275,7 +297,7 @@ const Calendar: React.FC = () => {
                 </Button>
               </div>
 
-              {/* Week Navigation */}
+              {/* Week/Day Navigation + Mini Month */}
               <Card
                 sx={{
                   backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
@@ -285,7 +307,7 @@ const Calendar: React.FC = () => {
                 }}
               >
                 <CardContent sx={{ p: 2 }}>
-                  <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3">
                     <Button
                       variant="outlined"
                       size="small"
@@ -323,6 +345,7 @@ const Calendar: React.FC = () => {
                       <ChevronRightIcon />
                     </Button>
                   </div>
+                  <div className="flex items-center gap-2">
                   <Button
                     variant="contained"
                     fullWidth
@@ -337,8 +360,46 @@ const Calendar: React.FC = () => {
                   >
                     Today
                   </Button>
+                  <ToggleButtonGroup
+                    size="small"
+                    exclusive
+                    value={viewMode}
+                    onChange={(_, v) => v && setViewMode(v)}
+                    aria-label="Calendar view switcher"
+                    sx={{
+                      backgroundColor: theme==='dark' ? '#0b1220' : '#fff',
+                      border: `1px solid ${theme==='dark' ? '#374151' : '#d1d5db'}`,
+                      borderRadius: '12px',
+                      p: 0.5,
+                      '& .MuiToggleButton-root': {
+                        color: `${theme==='dark' ? '#cbd5e1' : '#111827'} !important`,
+                        border: 'none',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: '10px',
+                        backgroundColor: theme==='dark' ? '#111827' : '#fff'
+                      },
+                      '& .MuiToggleButton-root:hover': {
+                        backgroundColor: theme==='dark' ? '#1f2937' : '#f3f4f6'
+                      },
+                      '& .MuiToggleButton-root.Mui-selected': {
+                        backgroundColor: theme==='dark' ? '#1e40af' : '#3b82f6',
+                        color: '#ffffff !important'
+                      }
+                    }}
+                  >
+                    <ToggleButton value="week" aria-label="Week view">Week</ToggleButton>
+                    <ToggleButton value="day" aria-label="Day view">Day</ToggleButton>
+                  </ToggleButtonGroup>
+                  </div>
                 </CardContent>
               </Card>
+
+              {/* Mini Month */}
+              <MiniMonth
+                date={new Date(selectedDate)}
+                onChange={(d) => { setSelectedDate(d.toISOString().split('T')[0]); setCurrentWeek(d); setViewMode('day') }}
+              />
 
               {/* Filters */}
               {isFilterOpen && (
@@ -516,7 +577,7 @@ const Calendar: React.FC = () => {
                       mb: 2
                     }}
                   >
-                    This Week
+                    {viewMode === 'day' ? 'Today' : 'This Week'}
                   </Typography>
                   
                   <div className="space-y-2">
@@ -563,7 +624,7 @@ const Calendar: React.FC = () => {
                       fontWeight: 600
                     }}
                   >
-                    Weekly Schedule
+                    {viewMode === 'day' ? 'Day Schedule' : 'Weekly Schedule'}
                   </Typography>
                   <Button
                     variant="contained"
@@ -583,6 +644,16 @@ const Calendar: React.FC = () => {
 
               {/* Calendar Grid */}
               <div className="overflow-x-auto">
+                {viewMode === 'day' ? (
+                  <DayView
+                    date={selectedDate}
+                    timeSlots={timeSlots}
+                    sessions={weekSessions[selectedDate] || []}
+                    onSessionClick={handleSessionClick}
+                    showTutor={true}
+                    showStudent={false}
+                  />
+                ) : (
                 <div className="min-w-full">
                   {/* Days Header */}
                   <div className="grid grid-cols-8 border-b border-gray-200 dark:border-gray-700">
@@ -640,6 +711,7 @@ const Calendar: React.FC = () => {
                     </div>
                   ))}
                 </div>
+                )}
               </div>
             </div>
           </div>
