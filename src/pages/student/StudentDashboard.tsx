@@ -335,7 +335,7 @@ const StudentDashboard: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined)
 
   useEffect(() => {
-    fetch('public/user.json')
+    fetch('/user.json')
     .then(response => response.json())
     .then(data => {
       setUserName(data.name)
