@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card'
@@ -335,14 +335,39 @@ const StudentDashboard: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined)
 
   useEffect(() => {
-    fetch('/user.json')
-    .then(response => response.json())
-    .then(data => {
-      setUserName(data.name)
-      setAvatarUrl(data.avatar)
-    })
-    .catch(console.error)
+    const savedAvatar = localStorage.getItem('student_avatar')
+    if (savedAvatar) {
+      setAvatarUrl(savedAvatar)
+    } else {
+      fetch('/user.json')
+        .then(response => response.json())
+        .then(data => {
+          setUserName(data.name)
+          setAvatarUrl(data.avatar)
+        })
+        .catch(console.error)
+    }
   }, [])
+ 
+  // Avatar change handlers
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const onPickAvatar = () => fileInputRef.current?.click()
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      setAvatarUrl(dataUrl)
+      try {
+        localStorage.setItem('student_avatar', dataUrl)
+      } 
+      catch (err) {
+        console.error('Failed to save avatar to localStorage:', err)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
   
 
   return (
@@ -901,9 +926,19 @@ const StudentDashboard: React.FC = () => {
               <h4 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Tran Hong Tai
               </h4>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Continue your journey and achieve Your Target
-              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={onFileChange}
+                className="hidden"
+              />
+              <Button
+                className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
+                onClick={onPickAvatar}
+              >
+                Change Avatar
+              </Button>
             </div>
 
             {/* Social Links */}
