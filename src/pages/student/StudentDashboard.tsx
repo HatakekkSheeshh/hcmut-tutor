@@ -330,6 +330,21 @@ const StudentDashboard: React.FC = () => {
     { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
   ]
 
+  // Fetch avatar from API
+  const [userName, setUserName] = useState<string>('Tran Hong Tai') 
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    fetch('public/user.json')
+    .then(response => response.json())
+    .then(data => {
+      setUserName(data.name)
+      setAvatarUrl(data.avatar)
+    })
+    .catch(console.error)
+  }, [])
+  
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
@@ -870,20 +885,21 @@ const StudentDashboard: React.FC = () => {
             {/* User Profile */}
             <div className="text-center mb-8">
               <Avatar
+                src = {avatarUrl}
                 sx={{
                   width: 96,
                   height: 96,
-                  bgcolor: getAvatarColor('Prashant'),
+                  bgcolor: getAvatarColor(userName),
                   fontSize: '2rem',
                   fontWeight: 'bold',
                   mx: 'auto',
                   mb: 2
                 }}
               >
-                {getInitials('Prashant')}
+                {getInitials(userName)}
               </Avatar>
               <h4 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Good Morning Prashant
+                Tran Hong Tai
               </h4>
               <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                 Continue your journey and achieve Your Target
