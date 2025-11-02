@@ -5,6 +5,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
+import api from '../../lib/api'
 import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
@@ -36,7 +37,8 @@ import {
   Bookmark as BookmarkIcon,
   CalendarMonth,
   Close as CloseIcon,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon,
+  Logout as LogoutIcon
 } from '@mui/icons-material'
 
 const TutorDashboardMobile: React.FC = () => {
@@ -46,6 +48,12 @@ const TutorDashboardMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
   const [currentTab, setCurrentTab] = useState('home')
+  
+  // User data states
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [sessions, setSessions] = useState<any[]>([])
+  const [students, setStudents] = useState<{ [key: string]: any }>({})
   
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -67,6 +75,74 @@ const TutorDashboardMobile: React.FC = () => {
   const handleThemeToggle = () => {
     toggleTheme()
     setShowThemeOptions(false)
+  }
+
+  // Load user data and sessions from backend
+  const loadUserData = async () => {
+    try {
+      setLoading(true)
+      
+      // Get current user
+      const userResult = await api.auth.getMe()
+      if (userResult.success) {
+        const userData = userResult.data
+        setUser(userData)
+        
+        // Get tutor sessions
+        const sessionsResult = await api.sessions.list({
+          tutorId: userData.id,
+          limit: 100
+        })
+        
+        // API returns { data: [...], pagination: {...} }
+        if (sessionsResult && sessionsResult.data) {
+          const sessionsData = sessionsResult.data || []
+          setSessions(sessionsData)
+          
+          // Collect all unique student IDs from sessions (support both old studentId and new studentIds array)
+          const sessionStudentIds = new Set<string>()
+          sessionsData.forEach((s: any) => {
+            if (s.studentIds && Array.isArray(s.studentIds)) {
+              s.studentIds.forEach((id: string) => sessionStudentIds.add(id))
+            } else if (s.studentId) {
+              sessionStudentIds.add(s.studentId)
+            }
+          })
+          
+          const studentPromises = Array.from(sessionStudentIds).map(async (studentId: string) => {
+            try {
+              const studentResponse = await api.users.get(studentId)
+              if (studentResponse.success && studentResponse.data) {
+                return { id: studentId, data: studentResponse.data }
+              }
+            } catch (err) {
+              console.error(`Failed to load student ${studentId}:`, err)
+            }
+            return null
+          })
+          
+          const studentResults = await Promise.all(studentPromises)
+          const studentsMap: { [key: string]: any } = {}
+          studentResults.forEach(result => {
+            if (result) {
+              studentsMap[result.id] = result.data
+            }
+          })
+          setStudents(studentsMap)
+        }
+      } else {
+        // If auth fails, redirect to login
+        if (userResult.error?.includes('xác thực')) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login')
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Weather API function
@@ -163,8 +239,11 @@ const TutorDashboardMobile: React.FC = () => {
     return 'Good Evening'
   }
 
-  // useEffect for time and weather
+  // useEffect for data loading, time and weather
   useEffect(() => {
+    // Load user data and sessions
+    loadUserData()
+    
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
@@ -200,53 +279,42 @@ const TutorDashboardMobile: React.FC = () => {
     return colors[index]
   }
 
-  // Mock data for tutor
+  // Calculate stats from real data
+  const totalSessions = sessions.length
+  const upcomingCount = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
+  const uniqueStudents = new Set(sessions.map(s => s.studentId)).size
+  const tutorRating = user?.rating || 0
+  
   const stats = [
-    { title: 'Total Students', value: '24', icon: <PeopleIcon /> },
-    { title: 'Sessions This Month', value: '18', icon: <CheckCircleIcon /> },
-    { title: 'Average Rating', value: '4.9', icon: <StarIcon /> },
-    { title: 'Earnings', value: '$2,400', icon: <TrendingUpIcon /> }
+    { title: 'Total Students', value: uniqueStudents.toString(), icon: <PeopleIcon /> },
+    { title: 'Total Sessions', value: totalSessions.toString(), icon: <CheckCircleIcon /> },
+    { title: 'Rating', value: tutorRating.toFixed(1), icon: <StarIcon /> },
+    { title: 'Upcoming', value: upcomingCount.toString(), icon: <TrendingUpIcon /> }
   ]
+  
+  // User name and avatar from backend
+  const userName = user?.name || 'Tutor'
+  const avatarUrl = user?.avatar
 
-  const upcomingSessions = [
-    {
-      id: 1,
-      student: 'John Smith',
-      subject: 'Mathematics',
-      date: '2024-01-15',
-      time: '10:00 AM',
-      duration: '60 min',
-      status: 'confirmed',
-      progress: 75
-    },
-    {
-      id: 2,
-      student: 'Sarah Johnson',
-      subject: 'Physics',
-      date: '2024-01-15',
-      time: '2:00 PM',
-      duration: '90 min',
-      status: 'pending',
-      progress: 45
-    },
-    {
-      id: 3,
-      student: 'Mike Chen',
-      subject: 'Chemistry',
-      date: '2024-01-16',
-      time: '9:00 AM',
-      duration: '60 min',
-      status: 'confirmed',
-      progress: 90
-    }
-  ]
+  // Get upcoming sessions (confirmed or pending) from real data
+  const upcomingSessions = sessions
+    .filter(session => {
+      const sessionDate = new Date(session.startTime)
+      const now = new Date()
+      return (session.status === 'confirmed' || session.status === 'pending') && sessionDate >= now
+    })
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+    .slice(0, 6) // Limit to 6 upcoming sessions
 
-  const recentStudents = [
-    { name: 'Alice Brown', subject: 'Mathematics', lastSession: '2024-01-10', progress: 85, rating: 5 },
-    { name: 'David Wilson', subject: 'Physics', lastSession: '2024-01-08', progress: 78, rating: 4 },
-    { name: 'Emma Davis', subject: 'Chemistry', lastSession: '2024-01-05', progress: 92, rating: 5 },
-    { name: 'Tom Anderson', subject: 'Biology', lastSession: '2024-01-03', progress: 88, rating: 5 }
-  ]
+  // Get past sessions (completed or in the past)
+  const pastSessions = sessions
+    .filter(session => {
+      const sessionDate = new Date(session.startTime)
+      const now = new Date()
+      return session.status === 'completed' || (sessionDate < now && session.status !== 'cancelled')
+    })
+    .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()) // Most recent first
+    .slice(0, 6) // Limit to 6 past sessions
 
   const notifications = [
     { message: 'New session request from John Smith', time: '2 hours ago', type: 'session' },
@@ -264,6 +332,21 @@ const TutorDashboardMobile: React.FC = () => {
     { id: 'cancel-reschedule', label: 'Cancel/Reschedule', icon: <AutorenewIcon />, path: '/tutor/cancel-reschedule' },
     { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/tutor/messages' }
   ]
+
+  // Show loading state
+  if (loading && !user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: theme === 'dark' ? '#fff' : '#000'
+      }}>
+        <div>Đang tải...</div>
+      </div>
+    )
+  }
 
   const bottomNavItems = [
     { id: 'home', label: 'Home', icon: <HomeIcon /> },
@@ -349,7 +432,7 @@ const TutorDashboardMobile: React.FC = () => {
               {formatDate(currentTime)}
             </div>
             <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-              {getGreeting()}, Dr. Smith
+              {getGreeting()}, {userName}
             </div>
           </div>
 
@@ -433,46 +516,66 @@ const TutorDashboardMobile: React.FC = () => {
           <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Upcoming Sessions
           </h2>
-          <button className={`text-sm ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>
+          <button 
+            onClick={() => navigate('/tutor/lms')}
+            className={`text-sm ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}
+          >
             See All
           </button>
         </div>
 
         <div className="space-y-3">
-          {upcomingSessions.slice(0, 2).map((session) => (
-            <div 
-              key={session.id}
-              className={`p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {session.student}
-                </h3>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  session.status === 'confirmed' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {session.status}
-                </span>
-              </div>
+          {upcomingSessions.length === 0 ? (
+            <div className={`text-center py-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              No upcoming sessions
+            </div>
+          ) : (
+            upcomingSessions.slice(0, 2).map((session) => {
+              // Support both old studentId (string) and new studentIds (array)
+              const studentIds = session.studentIds && Array.isArray(session.studentIds) 
+                ? session.studentIds 
+                : session.studentId 
+                  ? [session.studentId] 
+                  : []
+              const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
+              const sessionDate = new Date(session.startTime)
+              const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
+              const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
               
-              <div className="mb-2">
-                <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {session.subject}
-                </p>
-                <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {session.date} at {session.time} • {session.duration}
-                </p>
-              </div>
+              return (
+                <div 
+                  key={session.id}
+                  className={`p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {firstStudent?.name || 'Loading...'}
+                    </h3>
+                    <span className={`px-2 py-1 rounded-full text-xs capitalize ${
+                      session.status === 'confirmed' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {session.status}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {session.subject}
+                    </p>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {formattedDate} at {formattedTime} • {session.duration} mins
+                    </p>
+                  </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {session.progress}% complete
-                  </p>
-                </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Session #{session.id?.slice(-4)}
+                      </p>
+                    </div>
                 <div className="flex space-x-1">
                   <Button 
                     size="small" 
@@ -506,10 +609,111 @@ const TutorDashboardMobile: React.FC = () => {
                   >
                     Message
                   </Button>
+                  <Button 
+                    size="small" 
+                    variant="outlined"
+                    onClick={() => navigate(`/tutor/session/${session.id}`)}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#000000',
+                      borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                      textTransform: 'none',
+                      fontWeight: '500',
+                      fontSize: '0.75rem',
+                      padding: '4px 8px'
+                    }}
+                  >
+                    Details
+                  </Button>
                 </div>
               </div>
             </div>
-          ))}
+              )
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Past Sessions */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Past Sessions
+          </h2>
+          <button 
+            onClick={() => navigate('/tutor/lms')}
+            className={`text-sm ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}
+          >
+            See All
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {pastSessions.length === 0 ? (
+            <div className={`text-center py-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              No past sessions
+            </div>
+          ) : (
+            pastSessions.slice(0, 3).map((session) => {
+              // Support both old studentId (string) and new studentIds (array)
+              const studentIds = session.studentIds && Array.isArray(session.studentIds) 
+                ? session.studentIds 
+                : session.studentId 
+                  ? [session.studentId] 
+                  : []
+              const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
+              const sessionDate = new Date(session.startTime)
+              const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
+              const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+              
+              return (
+                <div 
+                  key={session.id}
+                  className={`p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {firstStudent?.name || 'Loading...'}
+                    </h3>
+                    <span className={`px-2 py-1 rounded-full text-xs capitalize ${
+                      session.status === 'completed' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {session.status}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {session.subject}
+                    </p>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {formattedDate} at {formattedTime} • {session.duration} mins
+                    </p>
+                  </div>
+
+                  <Button 
+                    size="small" 
+                    variant="outlined"
+                    onClick={() => navigate(`/tutor/sessions/${session.id}`)}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#000000',
+                      borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                      textTransform: 'none',
+                      fontWeight: '500',
+                      fontSize: '0.75rem',
+                      padding: '4px 8px',
+                      width: '100%'
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </div>
+              )
+            })
+          )}
         </div>
       </div>
     </div>
@@ -527,40 +731,57 @@ const TutorDashboardMobile: React.FC = () => {
       </div>
 
       <div className="space-y-3">
-        {upcomingSessions.map((session) => (
-          <div 
-            key={session.id}
-            className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-          >
-            <div className="flex items-start justify-between mb-2">
-              <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                {session.student}
-              </h3>
-              <span className={`px-2 py-1 rounded-full text-xs ${
-                session.status === 'confirmed' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-yellow-100 text-yellow-800'
-              }`}>
-                {session.status}
-              </span>
-            </div>
+        {upcomingSessions.length === 0 ? (
+          <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            No upcoming sessions
+          </div>
+        ) : (
+          upcomingSessions.map((session) => {
+            // Support both old studentId (string) and new studentIds (array)
+            const studentIds = session.studentIds && Array.isArray(session.studentIds) 
+              ? session.studentIds 
+              : session.studentId 
+                ? [session.studentId] 
+                : []
+            const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
+            const sessionDate = new Date(session.startTime)
+            const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
+            const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
             
-            <div className="mb-2">
-              <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                {session.subject}
-              </p>
-              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                {session.date} at {session.time} • {session.duration}
-              </p>
-            </div>
+            return (
+              <div 
+                key={session.id}
+                className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {firstStudent?.name || 'Loading...'}
+                  </h3>
+                  <span className={`px-2 py-1 rounded-full text-xs capitalize ${
+                    session.status === 'confirmed' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {session.status}
+                  </span>
+                </div>
+                
+                <div className="mb-2">
+                  <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {session.subject}
+                  </p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {formattedDate} at {formattedTime} • {session.duration} mins
+                  </p>
+                </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {session.progress}% complete
-                </p>
-              </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Session #{session.id?.slice(-4)}
+                    </p>
+                  </div>
               <div className="flex space-x-1">
                 <Button 
                   size="small" 
@@ -597,7 +818,9 @@ const TutorDashboardMobile: React.FC = () => {
               </div>
             </div>
           </div>
-        ))}
+            )
+          })
+        )}
       </div>
     </div>
   )
@@ -623,43 +846,6 @@ const TutorDashboardMobile: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* Student List */}
-      <div>
-        <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          Recent Students
-        </h3>
-        
-        <div className="space-y-3">
-          {recentStudents.slice(0, 4).map((student, index) => (
-            <div key={index} className={`flex items-center p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  bgcolor: getAvatarColor(student.name),
-                  fontSize: '0.875rem',
-                  fontWeight: 'bold'
-                }}
-              >
-                {getInitials(student.name)}
-              </Avatar>
-              <div className="flex-1 ml-3">
-                <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {student.name}
-                </p>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {student.subject}
-                </p>
-              </div>
-              <div className="flex items-center">
-                <StarIcon className="w-4 h-4 text-yellow-400 mr-1" />
-                <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{student.rating}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   )
 
@@ -669,20 +855,21 @@ const TutorDashboardMobile: React.FC = () => {
       <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center mb-4">
           <Avatar
+            src={avatarUrl}
             sx={{
               width: 64,
               height: 64,
-              bgcolor: getAvatarColor('Dr. Smith'),
+              bgcolor: getAvatarColor(userName),
               fontSize: '1.5rem',
               fontWeight: 'bold',
               mr: 3
             }}
           >
-            {getInitials('Dr. Smith')}
+            {getInitials(userName)}
           </Avatar>
           <div>
             <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Dr. Smith
+              {userName}
             </h4>
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               Tutor
@@ -863,7 +1050,7 @@ const TutorDashboardMobile: React.FC = () => {
                   <div className="space-y-2">
                     <button 
                       onClick={() => {
-                        navigate('/tutor/profile')
+                        navigate('/common/profile')
                         setMobileOpen(false)
                       }}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
@@ -873,7 +1060,7 @@ const TutorDashboardMobile: React.FC = () => {
                     </button>
                     <button 
                       onClick={() => {
-                        navigate('/tutor/notifications')
+                        navigate('/common/notifications')
                         setMobileOpen(false)
                       }}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
@@ -887,6 +1074,17 @@ const TutorDashboardMobile: React.FC = () => {
                     >
                       <PaletteIcon className="mr-3 w-4 h-4" />
                       Theme
+                    </button>
+                    <button 
+                      onClick={() => {
+                        localStorage.removeItem('token')
+                        localStorage.removeItem('user')
+                        navigate('/common/login')
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
+                    >
+                      <LogoutIcon className="mr-3 w-4 h-4" />
+                      Logout
                     </button>
                   </div>
 

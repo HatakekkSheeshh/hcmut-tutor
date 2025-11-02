@@ -1,0 +1,750 @@
+[
+  {
+    "id": "assignsub__swydTn0uQvc",
+    "assignmentId": "assign_sRHKcoD1ihY1",
+    "studentId": "stu_LHJJlSGBoYYA",
+    "content": "Bài làm của học viên cho assignment Bài tập Cơ sở dữ liệu",
+    "score": 75.8,
+    "gradedBy": "tut_OWtApeq1WbQN",
+    "submittedAt": "2025-10-19T15:21:38.411Z",
+    "gradedAt": "2025-10-31T07:30:00.027Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_DLTeWIY9Soz1",
+    "assignmentId": "assign_cWrggk7v5lvJ",
+    "studentId": "stu_sPLkDLAgpTeE",
+    "content": "Bài làm của học viên cho assignment Bài tập Vật lý đại cương",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_sPLkDLAgpTeE_assign_cWrggk7v5lvJ.pdf",
+        "fileSize": 1812513
+      }
+    ],
+    "score": 8.8,
+    "gradedBy": "tut_fvnAH8e_l-lY",
+    "submittedAt": "2025-10-26T02:16:57.935Z",
+    "gradedAt": "2025-10-28T04:30:08.396Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_Q2Hk3_g0K-VG",
+    "assignmentId": "assign_of2beVXNa0p1",
+    "studentId": "stu_ehcpzpE4_TXe",
+    "content": "Bài làm của học viên cho assignment Bài tập Giải tích",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_ehcpzpE4_TXe_assign_of2beVXNa0p1.pdf",
+        "fileSize": 226514
+      }
+    ],
+    "score": 58.6,
+    "gradedBy": "tut_MhsCoIecYtJX",
+    "submittedAt": "2025-10-28T13:28:10.376Z",
+    "gradedAt": "2025-10-24T01:46:17.948Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_R91RIzAa2PPg",
+    "assignmentId": "assign_smMNeQLo7b-w",
+    "studentId": "stu_LHJJlSGBoYYA",
+    "content": "Bài làm của học viên cho assignment Bài tập Tiếng Anh",
+    "score": 13.2,
+    "feedback": "Bài làm khá tốt!",
+    "gradedBy": "tut_fvnAH8e_l-lY",
+    "submittedAt": "2025-10-29T11:00:57.841Z",
+    "gradedAt": "2025-10-28T02:25:00.315Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_vrRnq7FAiimi",
+    "assignmentId": "assign_G8FvIJ_b9brx",
+    "studentId": "stu_LHJJlSGBoYYA",
+    "content": "Bài làm của học viên cho assignment Bài tập Tiếng Anh",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_LHJJlSGBoYYA_assign_G8FvIJ_b9brx.pdf",
+        "fileSize": 216067
+      }
+    ],
+    "score": 16.4,
+    "feedback": "Bài làm khá tốt!",
+    "gradedBy": "tut_huahc_QDbkKv",
+    "submittedAt": "2025-10-16T20:30:42.934Z",
+    "gradedAt": "2025-10-26T02:56:06.139Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_TwZJuR1fx_Bn",
+    "assignmentId": "assign_lq22U_5V_Lir",
+    "studentId": "stu_oJFHhTcGAcUM",
+    "content": "Bài làm của học viên cho assignment Bài tập Vật lý đại cương",
+    "score": 37,
+    "feedback": "Bài làm khá tốt!",
+    "gradedBy": "tut_D7Q1Re4S1_wI",
+    "submittedAt": "2025-10-27T02:45:52.985Z",
+    "gradedAt": "2025-10-22T12:00:38.255Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_tof0u-LKaoub",
+    "assignmentId": "assign_hyVzRFbYKFsM",
+    "studentId": "stu_oJFHhTcGAcUM",
+    "content": "Bài làm của học viên cho assignment Bài tập Đại số tuyến tính",
+    "score": 5.800000000000001,
+    "feedback": "Bài làm khá tốt!",
+    "gradedBy": "tut_M5JSdOOUKd4U",
+    "submittedAt": "2025-10-18T20:28:32.894Z",
+    "gradedAt": "2025-10-27T01:12:31.580Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_ERlSsuItLe2s",
+    "assignmentId": "assign_bkgGfBu1rlOI",
+    "studentId": "stu_YedNfBFvNKar",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Cấu trúc dữ liệu",
+    "score": 52.2,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-22T11:29:42.440Z",
+    "gradedAt": "2025-10-26T05:46:22.728Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_sQAWWA9hwB2-",
+    "assignmentId": "assign_Ha93b60Eh_iV",
+    "studentId": "stu_oJFHhTcGAcUM",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Cấu trúc dữ liệu",
+    "score": 9.4,
+    "submittedAt": "2025-10-25T10:46:10.054Z",
+    "gradedAt": "2025-10-22T00:12:20.602Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_H-Mv0hbLaEgu",
+    "assignmentId": "assign_Ha93b60Eh_iV",
+    "studentId": "stu_YedNfBFvNKar",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Cấu trúc dữ liệu",
+    "score": 19.4,
+    "submittedAt": "2025-10-23T02:20:48.384Z",
+    "gradedAt": "2025-10-31T09:09:37.408Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_T1L02CfWUxlL",
+    "assignmentId": "assign_-LJWHHA3LGgC",
+    "studentId": "stu_oJFHhTcGAcUM",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Cấu trúc dữ liệu",
+    "score": 38.2,
+    "submittedAt": "2025-10-21T09:32:45.264Z",
+    "gradedAt": "2025-10-27T12:02:11.009Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_bCrV51_xfW7S",
+    "assignmentId": "assign_-LJWHHA3LGgC",
+    "studentId": "stu_YedNfBFvNKar",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Cấu trúc dữ liệu",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_YedNfBFvNKar_assign_-LJWHHA3LGgC.pdf",
+        "fileSize": 1408184
+      }
+    ],
+    "score": 10.200000000000001,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-29T17:35:49.998Z",
+    "gradedAt": "2025-10-27T08:02:04.216Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_JWBz8Dtdlwwd",
+    "assignmentId": "assign_akiOOaCxEPol",
+    "studentId": "stu_FAzj9t2tjtvP",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Hóa học",
+    "score": 20.8,
+    "submittedAt": "2025-10-24T02:05:04.074Z",
+    "gradedAt": "2025-10-28T17:35:06.639Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_flfykuFAtKXh",
+    "assignmentId": "assign_akiOOaCxEPol",
+    "studentId": "stu_F21N7tiaerX8",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Hóa học",
+    "score": 29.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-24T03:55:11.125Z",
+    "gradedAt": "2025-10-26T19:17:30.055Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_MAnjYOBQ2Nva",
+    "assignmentId": "assign_M2Y8RwPUT5P8",
+    "studentId": "stu_F21N7tiaerX8",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Hóa học",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_F21N7tiaerX8_assign_M2Y8RwPUT5P8.pdf",
+        "fileSize": 1046520
+      }
+    ],
+    "score": 21.4,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-17T17:36:02.307Z",
+    "gradedAt": "2025-10-23T14:34:55.817Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_zX77T68gXjJU",
+    "assignmentId": "assign_pm42eDFb4_OU",
+    "studentId": "stu_FAzj9t2tjtvP",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Hóa học",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_FAzj9t2tjtvP_assign_pm42eDFb4_OU.pdf",
+        "fileSize": 754480
+      }
+    ],
+    "score": 56.8,
+    "submittedAt": "2025-10-23T15:08:47.366Z",
+    "gradedAt": "2025-10-27T07:48:16.920Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_KEdTSpmBketY",
+    "assignmentId": "assign_pm42eDFb4_OU",
+    "studentId": "stu_F21N7tiaerX8",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Hóa học",
+    "score": 53.8,
+    "submittedAt": "2025-10-19T11:50:32.120Z",
+    "gradedAt": "2025-10-24T22:16:43.335Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_PQYHd1V2JCFA",
+    "assignmentId": "assign_URjNWCO_p6ic",
+    "studentId": "stu_FAzj9t2tjtvP",
+    "content": "Bài làm của học viên cho assignment Bài tập 4: Hóa học",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_FAzj9t2tjtvP_assign_URjNWCO_p6ic.pdf",
+        "fileSize": 1379431
+      }
+    ],
+    "score": 15.4,
+    "submittedAt": "2025-10-23T11:55:29.624Z",
+    "gradedAt": "2025-10-28T18:05:49.226Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_SNvUdLJmTEZz",
+    "assignmentId": "assign_URjNWCO_p6ic",
+    "studentId": "stu_F21N7tiaerX8",
+    "content": "Bài làm của học viên cho assignment Bài tập 4: Hóa học",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_F21N7tiaerX8_assign_URjNWCO_p6ic.pdf",
+        "fileSize": 728293
+      }
+    ],
+    "score": 24.4,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-19T12:32:13.397Z",
+    "gradedAt": "2025-10-22T19:02:47.475Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_mVLLPMFGmmDp",
+    "assignmentId": "assign_VKBtOK1rxdyC",
+    "studentId": "stu_QUwSTpa0q36b",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Mạng máy tính",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_QUwSTpa0q36b_assign_VKBtOK1rxdyC.pdf",
+        "fileSize": 1063490
+      }
+    ],
+    "score": 35.8,
+    "submittedAt": "2025-10-20T02:37:09.520Z",
+    "gradedAt": "2025-10-22T17:38:24.297Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_PXieqb4lTgb_",
+    "assignmentId": "assign_VKBtOK1rxdyC",
+    "studentId": "stu_B5LU6rrk7Xsh",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Mạng máy tính",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_B5LU6rrk7Xsh_assign_VKBtOK1rxdyC.pdf",
+        "fileSize": 1318321
+      }
+    ],
+    "score": 49.8,
+    "submittedAt": "2025-10-27T05:41:46.922Z",
+    "gradedAt": "2025-10-26T07:27:24.785Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_R0LS-Mh49yCR",
+    "assignmentId": "assign_4IyG2Jl6XgDF",
+    "studentId": "stu_QUwSTpa0q36b",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Mạng máy tính",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_QUwSTpa0q36b_assign_4IyG2Jl6XgDF.pdf",
+        "fileSize": 272504
+      }
+    ],
+    "score": 38.2,
+    "submittedAt": "2025-10-30T04:32:12.305Z",
+    "gradedAt": "2025-10-30T05:26:01.279Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_R4oCgRqooa55",
+    "assignmentId": "assign_QgtX7yiLxjcO",
+    "studentId": "stu_F21N7tiaerX8",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Đại số tuyến tính",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_F21N7tiaerX8_assign_QgtX7yiLxjcO.pdf",
+        "fileSize": 127389
+      }
+    ],
+    "score": 12.2,
+    "submittedAt": "2025-10-20T13:40:57.463Z",
+    "gradedAt": "2025-10-27T08:57:55.406Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_aEgepxWBOvOt",
+    "assignmentId": "assign_k21cIoNMu0dH",
+    "studentId": "stu_SXIlCHjlkwWT",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Tiếng Anh",
+    "score": 35.6,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-20T07:45:46.154Z",
+    "gradedAt": "2025-10-28T07:50:21.425Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_wKBs7StkGXk0",
+    "assignmentId": "assign_Qbehw1ZsfLyJ",
+    "studentId": "stu_SXIlCHjlkwWT",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Tiếng Anh",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_SXIlCHjlkwWT_assign_Qbehw1ZsfLyJ.pdf",
+        "fileSize": 1701295
+      }
+    ],
+    "score": 15.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-21T00:56:05.200Z",
+    "gradedAt": "2025-10-25T11:25:26.308Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_9210yJwX52JQ",
+    "assignmentId": "assign_WreFQDPhqYpr",
+    "studentId": "stu_VZe7XW8FM9EW",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Toán cao cấp",
+    "score": 28,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-24T06:53:27.480Z",
+    "gradedAt": "2025-10-27T09:53:11.182Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_pJSZEvln69Ib",
+    "assignmentId": "assign_WreFQDPhqYpr",
+    "studentId": "stu_TVi9sNdUPTOQ",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_TVi9sNdUPTOQ_assign_WreFQDPhqYpr.pdf",
+        "fileSize": 1191024
+      }
+    ],
+    "score": 11,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-17T13:13:24.265Z",
+    "gradedAt": "2025-10-29T04:25:54.928Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_eBhT-P2n2RN0",
+    "assignmentId": "assign_WreFQDPhqYpr",
+    "studentId": "stu_HcE1Szso4doH",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_HcE1Szso4doH_assign_WreFQDPhqYpr.pdf",
+        "fileSize": 215505
+      }
+    ],
+    "score": 31,
+    "submittedAt": "2025-10-19T07:14:43.208Z",
+    "gradedAt": "2025-10-21T16:47:36.829Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_6eVurIc4viMe",
+    "assignmentId": "assign_bcbn3tsDTw0x",
+    "studentId": "stu_QG0kkSghUUBm",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_QG0kkSghUUBm_assign_bcbn3tsDTw0x.pdf",
+        "fileSize": 1754480
+      }
+    ],
+    "score": 19.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-30T19:15:20.927Z",
+    "gradedAt": "2025-10-23T21:31:59.349Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_3yQTy9c9nUsY",
+    "assignmentId": "assign_bcbn3tsDTw0x",
+    "studentId": "stu_VZe7XW8FM9EW",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_VZe7XW8FM9EW_assign_bcbn3tsDTw0x.pdf",
+        "fileSize": 589471
+      }
+    ],
+    "score": 10.8,
+    "submittedAt": "2025-10-21T01:03:28.017Z",
+    "gradedAt": "2025-10-25T03:53:12.183Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_0qB5tqbC_DTY",
+    "assignmentId": "assign_bcbn3tsDTw0x",
+    "studentId": "stu_TVi9sNdUPTOQ",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_TVi9sNdUPTOQ_assign_bcbn3tsDTw0x.pdf",
+        "fileSize": 528934
+      }
+    ],
+    "score": 11.8,
+    "submittedAt": "2025-10-19T01:22:12.633Z",
+    "gradedAt": "2025-10-23T09:28:51.094Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_EvTiscoSGl6_",
+    "assignmentId": "assign_bcbn3tsDTw0x",
+    "studentId": "stu_HcE1Szso4doH",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Toán cao cấp",
+    "score": 7.800000000000001,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-31T06:41:41.225Z",
+    "gradedAt": "2025-10-21T22:14:22.400Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_t1xGMDRBGIJy",
+    "assignmentId": "assign_bcbn3tsDTw0x",
+    "studentId": "stu_CwfBysq_Phfh",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_CwfBysq_Phfh_assign_bcbn3tsDTw0x.pdf",
+        "fileSize": 825266
+      }
+    ],
+    "score": 20.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-17T03:03:03.417Z",
+    "gradedAt": "2025-10-24T08:48:47.754Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_xfzCXOlTiKWz",
+    "assignmentId": "assign_np9SsHYaoVRd",
+    "studentId": "stu_QG0kkSghUUBm",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Toán cao cấp",
+    "score": 43.8,
+    "submittedAt": "2025-10-24T16:07:18.050Z",
+    "gradedAt": "2025-10-29T22:12:44.618Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_haCBtJwH2s0b",
+    "assignmentId": "assign_np9SsHYaoVRd",
+    "studentId": "stu_VZe7XW8FM9EW",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_VZe7XW8FM9EW_assign_np9SsHYaoVRd.pdf",
+        "fileSize": 450653
+      }
+    ],
+    "score": 12.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-16T19:35:44.586Z",
+    "gradedAt": "2025-10-26T10:31:17.818Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_T0GtfLeB_iXD",
+    "assignmentId": "assign_np9SsHYaoVRd",
+    "studentId": "stu_TVi9sNdUPTOQ",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Toán cao cấp",
+    "score": 20.8,
+    "submittedAt": "2025-10-22T21:00:33.222Z",
+    "gradedAt": "2025-10-31T00:39:58.478Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_xvc2k3x8POPz",
+    "assignmentId": "assign_np9SsHYaoVRd",
+    "studentId": "stu_HcE1Szso4doH",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_HcE1Szso4doH_assign_np9SsHYaoVRd.pdf",
+        "fileSize": 209346
+      }
+    ],
+    "score": 42.8,
+    "submittedAt": "2025-10-17T00:24:15.494Z",
+    "gradedAt": "2025-10-24T00:30:31.734Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_-znqzcMaCiuO",
+    "assignmentId": "assign_HSd7dE9ThU8R",
+    "studentId": "stu_JgSnelf3S1oI",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Vật lý đại cương",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_JgSnelf3S1oI_assign_HSd7dE9ThU8R.pdf",
+        "fileSize": 1047747
+      }
+    ],
+    "score": 31,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-31T08:29:55.483Z",
+    "gradedAt": "2025-10-27T04:30:20.271Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_AJaN7-t6D1Mi",
+    "assignmentId": "assign_Hl7YTXx2E_yd",
+    "studentId": "stu_JgSnelf3S1oI",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Vật lý đại cương",
+    "score": 29,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-26T16:54:50.169Z",
+    "gradedAt": "2025-10-22T01:34:06.986Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_zZK8r35TSeZl",
+    "assignmentId": "assign_xEC_OQEnIfWM",
+    "studentId": "stu_QG0kkSghUUBm",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_QG0kkSghUUBm_assign_xEC_OQEnIfWM.pdf",
+        "fileSize": 633593
+      }
+    ],
+    "score": 19.8,
+    "submittedAt": "2025-10-19T01:02:42.027Z",
+    "gradedAt": "2025-10-23T17:55:11.528Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_7K5C7Qy6B7Ew",
+    "assignmentId": "assign_xEC_OQEnIfWM",
+    "studentId": "stu_HcE1Szso4doH",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Toán cao cấp",
+    "score": 44.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-17T12:28:48.517Z",
+    "gradedAt": "2025-10-21T15:16:00.042Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_1GL1vwJ5etN-",
+    "assignmentId": "assign_O2OaR9KPXwbA",
+    "studentId": "stu_QG0kkSghUUBm",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Toán cao cấp",
+    "score": 9.4,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-24T20:47:27.911Z",
+    "gradedAt": "2025-10-24T15:47:02.107Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_w80H7NVoNWvU",
+    "assignmentId": "assign_O2OaR9KPXwbA",
+    "studentId": "stu_HcE1Szso4doH",
+    "content": "Bài làm của học viên cho assignment Bài tập 2: Toán cao cấp",
+    "score": 34.4,
+    "submittedAt": "2025-10-17T16:41:39.503Z",
+    "gradedAt": "2025-10-26T20:51:23.135Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_sUuC4M7XOC8b",
+    "assignmentId": "assign_R4nIJy7lA9kF",
+    "studentId": "stu_VZe7XW8FM9EW",
+    "content": "Bài làm của học viên cho assignment Bài tập 4: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_VZe7XW8FM9EW_assign_R4nIJy7lA9kF.pdf",
+        "fileSize": 438284
+      }
+    ],
+    "score": 64.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-21T07:33:55.695Z",
+    "gradedAt": "2025-10-30T04:32:39.216Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_owM7DjmLo8jr",
+    "assignmentId": "assign_R4nIJy7lA9kF",
+    "studentId": "stu_HcE1Szso4doH",
+    "content": "Bài làm của học viên cho assignment Bài tập 4: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_HcE1Szso4doH_assign_R4nIJy7lA9kF.pdf",
+        "fileSize": 1255761
+      }
+    ],
+    "score": 56.8,
+    "submittedAt": "2025-10-28T16:35:34.754Z",
+    "gradedAt": "2025-10-26T02:24:15.145Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_-TZMUOSWZxFC",
+    "assignmentId": "assign_r17iFGGoCYVe",
+    "studentId": "stu_JgSnelf3S1oI",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Vật lý đại cương",
+    "score": 11.8,
+    "submittedAt": "2025-10-24T13:18:22.015Z",
+    "gradedAt": "2025-10-22T07:35:47.755Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_hFyaExcDYNc7",
+    "assignmentId": "assign_SeTinMPIkZ8s",
+    "studentId": "stu_JgSnelf3S1oI",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Vật lý đại cương",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_JgSnelf3S1oI_assign_SeTinMPIkZ8s.pdf",
+        "fileSize": 1745305
+      }
+    ],
+    "score": 71.6,
+    "submittedAt": "2025-10-22T08:47:58.374Z",
+    "gradedAt": "2025-10-24T18:16:20.476Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_Q3g3A8n2xoQQ",
+    "assignmentId": "assign_Nwc9030QsafI",
+    "studentId": "stu_YedNfBFvNKar",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Cấu trúc dữ liệu",
+    "score": 12.4,
+    "submittedAt": "2025-10-27T17:48:57.302Z",
+    "gradedAt": "2025-10-23T04:06:13.896Z",
+    "status": "graded"
+  },
+  {
+    "id": "assignsub_vsTqgVHw9FhN",
+    "assignmentId": "assign_ofFBVkTHwRL-",
+    "studentId": "stu_QUwSTpa0q36b",
+    "content": "Bài làm của học viên cho assignment Bài tập 1: Hệ điều hành",
+    "score": 8.8,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-19T11:31:04.014Z",
+    "gradedAt": "2025-10-28T01:23:16.984Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_pCLN5UT9eZBm",
+    "assignmentId": "assign_1VsfW2WAeoWH",
+    "studentId": "stu_B5LU6rrk7Xsh",
+    "content": "Bài làm của học viên cho assignment Bài tập 3: Lập trình Python",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_B5LU6rrk7Xsh_assign_1VsfW2WAeoWH.pdf",
+        "fileSize": 204799
+      }
+    ],
+    "score": 80.4,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-28T00:16:31.348Z",
+    "gradedAt": "2025-10-23T17:12:34.233Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_0cvSNwWRu1Mf",
+    "assignmentId": "assign_FYcf4TnA6kZz",
+    "studentId": "stu_B5LU6rrk7Xsh",
+    "content": "Bài làm của học viên cho assignment Bài tập 4: Lập trình Python",
+    "score": 10.600000000000001,
+    "feedback": "Bài làm tốt!",
+    "submittedAt": "2025-10-30T09:14:17.786Z",
+    "gradedAt": "2025-10-27T03:57:37.139Z",
+    "status": "submitted"
+  },
+  {
+    "id": "assignsub_BM8KM16FSRgg",
+    "assignmentId": "assign_Hym1sUteR7_9",
+    "studentId": "stu_QG0kkSghUUBm",
+    "content": "Bài làm của học viên cho assignment Bài tập 4: Toán cao cấp",
+    "attachments": [
+      {
+        "fileName": "submission.pdf",
+        "fileUrl": "https://example.com/submissions/stu_QG0kkSghUUBm_assign_Hym1sUteR7_9.pdf",
+        "fileSize": 1454853
+      }
+    ],
+    "score": 54.8,
+    "submittedAt": "2025-10-26T13:52:46.172Z",
+    "gradedAt": "2025-10-25T09:55:02.935Z",
+    "status": "graded"
+  }
+]

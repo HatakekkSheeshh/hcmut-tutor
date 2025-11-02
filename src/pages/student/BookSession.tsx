@@ -1,19 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
-import { useNavigate } from 'react-router-dom'
-import { Avatar } from '@mui/material'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { Avatar, Tabs, Tab, Box, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
+import api from '../../lib/api'
 import { 
   CalendarToday, 
   Schedule, 
   Person, 
-  Payment,
+  School,
   Menu as MenuIcon,
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
   CheckCircle as CheckCircleIcon,
   VideoCall as VideoCallIcon,
   Chat as ChatIcon,
-  LocationOn as LocationOnIcon
+  LocationOn as LocationOnIcon,
+  Group as GroupIcon,
+  AccessTime,
+  Event as EventIcon,
+  Class as ClassIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -21,17 +26,222 @@ import Button from '../../components/ui/Button'
 const BookSession: React.FC = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [bookingMode, setBookingMode] = useState<'session' | 'class'>('session') // Default to session mode
+  
+  // Session booking states
   const [activeStep, setActiveStep] = useState(0)
   const [selectedTutor, setSelectedTutor] = useState('')
+  const [selectedSubject, setSelectedSubject] = useState('') // Selected subject
+  const [selectedDuration, setSelectedDuration] = useState<number>(60) // Duration in minutes
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
-  const [sessionType, setSessionType] = useState('')
-  const [duration, setDuration] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('')
+  const [sessionType, setSessionType] = useState('online') // Default to online
+  const [sessionNotes, setSessionNotes] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [dateSelectionStep, setDateSelectionStep] = useState<'date' | 'time'>('date')
+  
+  // Class enrollment states
+  const [classes, setClasses] = useState<any[]>([])
+  const [myEnrollments, setMyEnrollments] = useState<any[]>([])
+  const [classesLoading, setClassesLoading] = useState(false)
+  const [enrollmentsLoading, setEnrollmentsLoading] = useState(false)
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([])
+  const [availableTutors, setAvailableTutors] = useState<any[]>([])
+  const [availableStartTimes, setAvailableStartTimes] = useState<string[]>([])
+  const [classFilters, setClassFilters] = useState({
+    subject: '',
+    day: '',
+    tutorId: '',
+    startTime: '',
+    minRating: '',
+    status: '',
+    isOnline: '',
+    availableOnly: true
+  })
+  const [selectedClass, setSelectedClass] = useState<any>(null)
+  const [enrollDialogOpen, setEnrollDialogOpen] = useState(false)
+  const [enrolling, setEnrolling] = useState(false)
+  
+  // Booking result states
+  const [bookingSuccess, setBookingSuccess] = useState(false)
+  const [bookingError, setBookingError] = useState('')
+  const [bookedSessionId, setBookedSessionId] = useState('')
+  
+  // Backend data states
+  const [tutors, setTutors] = useState<any[]>([])
+  const [selectedTutorData, setSelectedTutorData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [availabilityLoading, setAvailabilityLoading] = useState(false)
+  const [availableSlots, setAvailableSlots] = useState<any[]>([])
+  const tutorIdFromState = (location.state as any)?.tutorId
+  
+  // Pagination for tutors list
+  const [tutorPage, setTutorPage] = useState(1)
+  const tutorsPerPage = 6
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Load classes when in class mode
+  useEffect(() => {
+    if (bookingMode === 'class') {
+      loadAvailableSubjects()
+      loadAvailableTutors()
+      loadClasses()
+      loadMyEnrollments()
+    }
+  }, [bookingMode, classFilters])
+
+  // Load available subjects and start times from all classes in database
+  const loadAvailableSubjects = async () => {
+    try {
+      // Load all classes to get unique subjects and start times
+      const response = await api.classes.list({ limit: 100, page: 1 })
+      if (response.success && response.data) {
+        // Extract unique subjects from classes
+        const subjects = [...new Set(response.data.map((cls: any) => cls.subject).filter(Boolean))] as string[]
+        setAvailableSubjects(subjects.sort())
+        
+        // Extract unique start times from classes
+        const startTimes = [...new Set(response.data.map((cls: any) => cls.startTime).filter(Boolean))] as string[]
+        setAvailableStartTimes(startTimes.sort())
+      }
+    } catch (error) {
+      console.error('Failed to load subjects:', error)
+    }
+  }
+
+  // Load available tutors from classes
+  const loadAvailableTutors = async () => {
+    try {
+      // Load all classes to get unique tutor IDs
+      const response = await api.classes.list({ limit: 100, page: 1 })
+      if (response.success && response.data) {
+        // Extract unique tutor IDs from classes
+        const tutorIds = [...new Set(response.data.map((cls: any) => cls.tutorId).filter(Boolean))] as string[]
+        
+        // Load tutor details for each tutor ID
+        const tutorPromises = tutorIds.map(async (tutorId: string) => {
+          try {
+            const tutorResponse = await api.users.get(tutorId)
+            if (tutorResponse.success && tutorResponse.data) {
+              return tutorResponse.data
+            }
+          } catch (error) {
+            console.error(`Failed to load tutor ${tutorId}:`, error)
+          }
+          return null
+        })
+        
+        const tutorResults = await Promise.all(tutorPromises)
+        const tutors = tutorResults.filter(t => t !== null).sort((a, b) => 
+          (a.name || '').localeCompare(b.name || '')
+        )
+        setAvailableTutors(tutors)
+      }
+    } catch (error) {
+      console.error('Failed to load tutors:', error)
+    }
+  }
+
+  const loadClasses = async () => {
+    try {
+      setClassesLoading(true)
+      const params: any = { 
+        availableOnly: classFilters.availableOnly ? 'true' : undefined,
+        limit: 100, // Load up to 100 classes (or all if less than 100)
+        page: 1
+      }
+      if (classFilters.subject) params.subject = classFilters.subject
+      if (classFilters.day) params.day = classFilters.day
+      if (classFilters.tutorId) params.tutorId = classFilters.tutorId
+      if (classFilters.status) params.status = classFilters.status
+      
+      const response = await api.classes.list(params)
+      if (response.success && response.data) {
+        // Enrich classes with tutor info
+        const enrichedClasses = await Promise.all(
+          response.data.map(async (cls: any) => {
+            try {
+              const tutorResponse = await api.users.get(cls.tutorId)
+              if (tutorResponse.success && tutorResponse.data) {
+                return { ...cls, tutor: tutorResponse.data }
+              }
+            } catch (error) {
+              console.error(`Failed to load tutor for class ${cls.id}:`, error)
+            }
+            return cls
+          })
+        )
+        setClasses(enrichedClasses)
+      }
+    } catch (error) {
+      console.error('Failed to load classes:', error)
+    } finally {
+      setClassesLoading(false)
+    }
+  }
+
+  const loadMyEnrollments = async () => {
+    try {
+      setEnrollmentsLoading(true)
+      const userStr = localStorage.getItem('user')
+      if (!userStr) return
+      
+      const user = JSON.parse(userStr)
+      const response = await api.enrollments.list({ studentId: user.id })
+      if (response.success && response.data) {
+        setMyEnrollments(response.data)
+      }
+    } catch (error) {
+      console.error('Failed to load enrollments:', error)
+    } finally {
+      setEnrollmentsLoading(false)
+    }
+  }
+
+  const handleEnrollClass = async () => {
+    if (!selectedClass) return
+    
+    try {
+      setEnrolling(true)
+      const response = await api.enrollments.create({ classId: selectedClass.id })
+      if (response.success) {
+        setBookingSuccess(true)
+        setEnrollDialogOpen(false)
+        loadClasses()
+        loadMyEnrollments()
+        setTimeout(() => setBookingSuccess(false), 3000)
+      } else {
+        setBookingError(response.error || 'Failed to enroll in class')
+      }
+    } catch (error: any) {
+      console.error('Enrollment error:', error)
+      setBookingError(error.message || 'An error occurred while enrolling')
+    } finally {
+      setEnrolling(false)
+    }
+  }
+
+  const handleCancelEnrollment = async (enrollmentId: string) => {
+    if (!window.confirm('Are you sure you want to cancel this enrollment?')) return
+    
+    try {
+      const response = await api.enrollments.delete(enrollmentId)
+      if (response.success) {
+        setBookingSuccess(true)
+        loadClasses()
+        loadMyEnrollments()
+        setTimeout(() => setBookingSuccess(false), 3000)
+      } else {
+        setBookingError(response.error || 'Failed to cancel enrollment')
+      }
+    } catch (error: any) {
+      console.error('Cancel enrollment error:', error)
+      setBookingError(error.message || 'An error occurred')
+    }
   }
 
   // Helper function to get initials from name
@@ -56,43 +266,205 @@ const BookSession: React.FC = () => {
     return colors[index]
   }
 
+  // Load tutors data from backend
+  useEffect(() => {
+    const loadTutors = async () => {
+      try {
+        setLoading(true)
+        const result = await api.tutors.list({ limit: 20 })
+        
+        if (result && result.data) {
+          setTutors(result.data)
+          
+          // If tutorId is provided, pre-select that tutor
+          if (tutorIdFromState) {
+            const preSelectedTutor = result.data.find((t: any) => t.id === tutorIdFromState)
+            if (preSelectedTutor) {
+              setSelectedTutor(preSelectedTutor.id)
+              setSelectedTutorData(preSelectedTutor)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load tutors:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadTutors()
+  }, [tutorIdFromState])
+
   const steps = [
     { label: 'Select Tutor', icon: <Person /> },
+    { label: 'Select Subject', icon: <School /> },
+    { label: 'Select Duration', icon: <Schedule /> },
     { label: 'Choose Date & Time', icon: <CalendarToday /> },
     { label: 'Session Details', icon: <Schedule /> },
-    { label: 'Payment', icon: <Payment /> },
   ]
 
-  const tutors = [
-    {
-      id: 1,
-      name: 'Dr. Sarah Johnson',
-      subject: 'Mathematics',
-      rating: 4.9,
-      price: 50,
-      image: '/api/placeholder/100/100',
-      specialties: ['Calculus', 'Algebra']
-    },
-    {
-      id: 2,
-      name: 'Prof. Michael Chen',
-      subject: 'Physics',
-      rating: 4.8,
-      price: 45,
-      image: '/api/placeholder/100/100',
-      specialties: ['Quantum Physics', 'Mechanics']
+  // Load availability when tutor is selected
+  useEffect(() => {
+    const loadAvailability = async () => {
+      if (!selectedTutor) {
+        setAvailableSlots([])
+        setDateSelectionStep('date')
+        setSelectedDate('')
+        setSelectedTime('')
+        return
+      }
+
+      try {
+        setAvailabilityLoading(true)
+        setDateSelectionStep('date')
+        setSelectedDate('')
+        setSelectedTime('')
+        // Get availability excluding class schedules
+        const result = await api.availability.get(selectedTutor, true)
+        
+        if (result && result.data && result.data.timeSlots) {
+          // Generate time slots for the next 7 days based on availability
+          const slots: any[] = []
+          const today = new Date()
+          
+          for (let i = 0; i < 14; i++) { // Next 14 days
+            const date = new Date(today)
+            date.setDate(date.getDate() + i)
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
+            
+            // Find availability for this day
+            const dayAvailability = result.data.timeSlots.filter(
+              (slot: any) => slot.day === dayName
+            )
+            
+            if (dayAvailability.length > 0) {
+              dayAvailability.forEach((avail: any) => {
+                // Generate hourly slots between startTime and endTime
+                const [startHour, startMin] = avail.startTime.split(':').map(Number)
+                const [endHour, endMin] = avail.endTime.split(':').map(Number)
+                
+                const startMinutes = startHour * 60 + startMin
+                const endMinutes = endHour * 60 + endMin
+                
+                // Generate slots based on selected duration
+                // Make sure there's enough time for the full duration
+                for (let minutes = startMinutes; minutes + selectedDuration <= endMinutes; minutes += selectedDuration) {
+                  const hour = Math.floor(minutes / 60)
+                  const min = minutes % 60
+                  
+                  // Calculate end time for this slot
+                  const endSlotMinutes = minutes + selectedDuration
+                  const endSlotHour = Math.floor(endSlotMinutes / 60)
+                  const endSlotMin = endSlotMinutes % 60
+                  
+                  // Format start time as 12-hour format
+                  const period = hour >= 12 ? 'PM' : 'AM'
+                  const hour12 = hour % 12 || 12
+                  const timeStr = `${hour12}:${min.toString().padStart(2, '0')} ${period}`
+                  
+                  // Format end time
+                  const endPeriod = endSlotHour >= 12 ? 'PM' : 'AM'
+                  const endHour12 = endSlotHour % 12 || 12
+                  const endTimeStr = `${endHour12}:${endSlotMin.toString().padStart(2, '0')} ${endPeriod}`
+                  
+                  slots.push({
+                    date: date.toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: '2-digit', 
+                      day: '2-digit' 
+                    }),
+                    time: timeStr,
+                    endTime: endTimeStr,
+                    available: true,
+                    dayName: dayName,
+                    duration: selectedDuration
+                  })
+                }
+              })
+            }
+          }
+          
+          setAvailableSlots(slots)
+        } else {
+          setAvailableSlots([])
+        }
+      } catch (error) {
+        console.error('Failed to load availability:', error)
+        setAvailableSlots([])
+      } finally {
+        setAvailabilityLoading(false)
+      }
     }
-  ]
 
-  const availableSlots = [
-    { date: '2024-01-15', time: '10:00 AM', available: true },
-    { date: '2024-01-15', time: '2:00 PM', available: true },
-    { date: '2024-01-16', time: '9:00 AM', available: true },
-    { date: '2024-01-16', time: '3:00 PM', available: false },
-  ]
+    loadAvailability()
+  }, [selectedTutor, selectedDuration])
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // If at final step (Session Details), book the session
+    if (activeStep === steps.length - 1) {
+      await handleBookSession()
+    } else {
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    }
+  }
+  
+  const handleBookSession = async () => {
+    try {
+      setBookingError('')
+      
+      // Calculate start and end time
+      const [dateStr] = selectedDate.split(' ') // Get MM/DD/YYYY part
+      const selectedSlot = availableSlots.find(s => s.time === selectedTime)
+      
+      if (!selectedSlot) {
+        setBookingError('Invalid time slot selected')
+        return
+      }
+      
+      // Parse date and time
+      const [month, day, year] = dateStr.split('/').map(Number)
+      const startDateTime = new Date(year, month - 1, day)
+      
+      // Parse start time (e.g., "10:00 AM")
+      const [timeStr, period] = selectedTime.split(' ')
+      const [hours, minutes] = timeStr.split(':').map(Number)
+      let hour24 = hours
+      if (period === 'PM' && hours !== 12) hour24 += 12
+      if (period === 'AM' && hours === 12) hour24 = 0
+      
+      startDateTime.setHours(hour24, minutes, 0, 0)
+      
+      // Calculate end time
+      const endDateTime = new Date(startDateTime)
+      endDateTime.setMinutes(endDateTime.getMinutes() + selectedDuration)
+      
+      // Prepare booking data
+      const bookingData = {
+        tutorId: selectedTutor,
+        subject: selectedSubject || 'General',
+        topic: sessionNotes || 'Tutoring session',
+        description: sessionNotes,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        duration: selectedDuration,
+        isOnline: sessionType === 'online',
+        notes: sessionNotes
+      }
+      
+      // Call API
+      const response = await api.sessions.create(bookingData)
+      
+      if (response.success) {
+        setBookingSuccess(true)
+        setBookedSessionId(response.data.id)
+        setActiveStep((prevActiveStep) => prevActiveStep + 1)
+      } else {
+        setBookingError(response.message || 'Booking failed')
+      }
+    } catch (error: any) {
+      console.error('Booking error:', error)
+      setBookingError(error.message || 'An error occurred while booking the session')
+    }
   }
 
   const handleBack = () => {
@@ -116,125 +488,479 @@ const BookSession: React.FC = () => {
     
     switch (step) {
       case 0:
+        // Calculate pagination
+        const totalTutorPages = Math.ceil(tutors.length / tutorsPerPage)
+        const startIndex = (tutorPage - 1) * tutorsPerPage
+        const endIndex = startIndex + tutorsPerPage
+        const currentTutors = tutors.slice(startIndex, endIndex)
+        
         return (
           <div>
-            <h2 className={`text-xl font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Choose a Tutor
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tutors.map((tutor) => (
-                <div
-                  key={tutor.id}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                    selectedTutor === tutor.id.toString()
-                      ? 'border-blue-500 bg-blue-100'
-                      : `${theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-200 hover:border-gray-300'}`
-                  }`}
-                    onClick={() => setSelectedTutor(tutor.id.toString())}
-                  >
-                  <div className="flex items-center mb-3">
-                      <Avatar
-                        sx={{
-                          width: 56,
-                          height: 56,
-                          bgcolor: getAvatarColor(tutor.name),
-                          fontSize: '1.25rem',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {getInitials(tutor.name)}
-                      </Avatar>
-                    <div className="ml-3">
-                      <h3 className={`font-semibold ${
-                        selectedTutor === tutor.id.toString()
-                          ? 'text-blue-900'
-                          : theme === 'dark' ? 'text-white' : 'text-gray-900'
-                      }`}>
-                        {tutor.name}
-                      </h3>
-                      <p className={`text-sm ${
-                        selectedTutor === tutor.id.toString()
-                          ? 'text-blue-700'
-                          : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                          {tutor.subject} • ${tutor.price}/hour
-                      </p>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Choose a Tutor
+              </h2>
+              {!loading && totalTutorPages > 1 && (
+                <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Page {tutorPage} of {totalTutorPages}
+                </span>
+              )}
+            </div>
+            {loading ? (
+              <div className="text-center py-8">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading tutors...</p>
+              </div>
+            ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {currentTutors.map((tutor) => (
+                  <div
+                    key={tutor.id}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      selectedTutor === tutor.id
+                        ? 'border-blue-500 bg-blue-100'
+                        : `${theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-200 hover:border-gray-300'}`
+                    }`}
+                      onClick={() => {
+                        setSelectedTutor(tutor.id)
+                        setSelectedTutorData(tutor)
+                      }}
+                    >
+                    <div className="flex items-center mb-3">
+                        <Avatar
+                          src={tutor.avatar}
+                          sx={{
+                            width: 56,
+                            height: 56,
+                            bgcolor: getAvatarColor(tutor.name),
+                            fontSize: '1.25rem',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {getInitials(tutor.name)}
+                        </Avatar>
+                      <div className="ml-3">
+                        <h3 className={`font-semibold ${
+                          selectedTutor === tutor.id
+                            ? 'text-blue-900'
+                            : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {tutor.name}
+                        </h3>
+                        <p className={`text-sm ${
+                          selectedTutor === tutor.id
+                            ? 'text-blue-700'
+                            : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            {tutor.subjects?.[0] || 'N/A'} • {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tutor.hourlyRate || 0)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                        {(tutor.subjects || []).slice(0, 3).map((subject: string, index: number) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
+                          {subject}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-1">
-                      {tutor.specialties.map((specialty, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
+                ))}
+              </div>
+              
+              {/* Pagination Controls */}
+              {totalTutorPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-6">
+                  <Button
+                    onClick={() => setTutorPage(prev => Math.max(1, prev - 1))}
+                    disabled={tutorPage === 1}
+                    style={{
+                      backgroundColor: tutorPage === 1 ? (theme === 'dark' ? '#374151' : '#e5e7eb') : '#2563eb',
+                      color: tutorPage === 1 ? (theme === 'dark' ? '#6b7280' : '#9ca3af') : '#ffffff',
+                      textTransform: 'none',
+                      padding: '8px 16px'
+                    }}
+                  >
+                    Previous
+                  </Button>
+                  <span className={`px-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {tutorPage} / {totalTutorPages}
+                  </span>
+                  <Button
+                    onClick={() => setTutorPage(prev => Math.min(totalTutorPages, prev + 1))}
+                    disabled={tutorPage === totalTutorPages}
+                    style={{
+                      backgroundColor: tutorPage === totalTutorPages ? (theme === 'dark' ? '#374151' : '#e5e7eb') : '#2563eb',
+                      color: tutorPage === totalTutorPages ? (theme === 'dark' ? '#6b7280' : '#9ca3af') : '#ffffff',
+                      textTransform: 'none',
+                      padding: '8px 16px'
+                    }}
+                  >
+                    Next
+                  </Button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
+            )}
           </div>
         )
 
       case 1:
+        // Subject Selection
+        const tutorSubjects = selectedTutorData?.subjects || []
+        
         return (
           <div>
             <h2 className={`text-xl font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Select Date & Time
+              Select Subject
             </h2>
+            <p className={`text-sm mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Choose the subject you want to learn from{' '}
+              <span className="font-semibold">{selectedTutorData?.name || 'this tutor'}</span>:
+            </p>
+            {tutorSubjects.length === 0 ? (
+              <div className="text-center py-8">
+                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  No subjects available for this tutor
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tutorSubjects.map((subject: string, index: number) => (
+                  <div
+                    key={index}
+                    className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                      selectedSubject === subject
+                        ? 'border-blue-500 bg-blue-50'
+                        : `${theme === 'dark' ? 'border-gray-600 hover:border-blue-400 bg-gray-800' : 'border-gray-200 hover:border-blue-400 bg-white'}`
+                    }`}
+                    onClick={() => setSelectedSubject(subject)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <School className={`w-6 h-6 mr-3 ${
+                          selectedSubject === subject
+                            ? 'text-blue-600'
+                            : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`} />
+                        <h3 className={`text-lg font-bold ${
+                          selectedSubject === subject
+                            ? 'text-blue-900'
+                            : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {subject}
+                        </h3>
+                      </div>
+                      {selectedSubject === subject && (
+                        <CheckCircleIcon className="text-blue-600 w-6 h-6" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+
+      case 2:
+        // Duration Selection
+        const durationOptions = [
+          { value: 30, label: '30 minutes', description: 'Quick review or Q&A' },
+          { value: 60, label: '60 minutes', description: 'Standard lesson (Recommended)' },
+          { value: 90, label: '90 minutes', description: 'In-depth learning' },
+          { value: 120, label: '120 minutes', description: 'Intensive session' },
+        ]
+
+        return (
+          <div>
+            <h2 className={`text-xl font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              Select Session Duration
+            </h2>
+            <p className={`text-sm mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Choose how long you'd like your tutoring session to be:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {durationOptions.map((option) => {
+                return (
+                  <div
+                    key={option.value}
+                    className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                      selectedDuration === option.value
+                        ? 'border-blue-500 bg-blue-50'
+                        : `${theme === 'dark' ? 'border-gray-600 hover:border-blue-400 bg-gray-800' : 'border-gray-200 hover:border-blue-400 bg-white'}`
+                    }`}
+                    onClick={() => setSelectedDuration(option.value)}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className={`text-lg font-bold ${
+                          selectedDuration === option.value
+                            ? 'text-blue-900'
+                            : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {option.label}
+                        </h3>
+                        <p className={`text-sm mt-1 ${
+                          selectedDuration === option.value
+                            ? 'text-blue-700'
+                            : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          {option.description}
+                        </p>
+                      </div>
+                      {selectedDuration === option.value && (
+                        <CheckCircleIcon className="text-blue-600 w-6 h-6 ml-3" />
+                      )}
+                    </div>
+                    {option.value === 60 && (
+                      <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                        Most Popular
+                      </span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            
+            <div className={`mt-6 p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
+              <p className={`text-sm ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
+                💡 <strong>Tip:</strong> 60-minute sessions are ideal for most topics. Choose longer durations for complex subjects or exam preparation.
+              </p>
+            </div>
+          </div>
+        )
+
+      case 3:
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                {dateSelectionStep === 'date' ? 'Select Date' : 'Select Time'}
+            </h2>
+              {dateSelectionStep === 'time' && selectedDate && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => {
+                    setDateSelectionStep('date')
+                    setSelectedTime('')
+                  }}
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                    textTransform: 'none',
+                  }}
+                >
+                  ← Change Date
+                </Button>
+              )}
+            </div>
+            {!selectedTutor ? (
+              <div className="text-center py-12">
+                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Please select a tutor first
+                </p>
+              </div>
+            ) : availabilityLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Loading available time slots...
+                </p>
+              </div>
+            ) : availableSlots.length === 0 ? (
+              <div className="text-center py-12">
+                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  No available time slots found for this tutor
+                </p>
+                <p className={`text-sm mt-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                  The tutor may not have set their availability yet
+                </p>
+              </div>
+            ) : dateSelectionStep === 'date' ? (
+              // Step 1: Select Date
+              <div>
+                <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Choose an available date:
+                </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {availableSlots.map((slot, index) => (
+                  {(() => {
+                    // Group slots by date
+                    const dateGroups = availableSlots.reduce((acc: any, slot) => {
+                      if (!acc[slot.date]) {
+                        acc[slot.date] = {
+                          date: slot.date,
+                          dayName: slot.dayName,
+                          count: 0
+                        }
+                      }
+                      acc[slot.date].count++
+                      return acc
+                    }, {})
+                    
+                    const uniqueDates = Object.values(dateGroups)
+                    
+                    return uniqueDates.map((dateInfo: any, index) => {
+                      const dateObj = new Date(dateInfo.date)
+                      
+                      return (
                 <div
                   key={index}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                    selectedDate === slot.date && selectedTime === slot.time
+                          className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                            theme === 'dark' 
+                              ? 'border-gray-600 hover:border-blue-500 bg-gray-800' 
+                              : 'border-gray-200 hover:border-blue-500 bg-white'
+                          }`}
+                          onClick={() => {
+                            setSelectedDate(dateInfo.date)
+                            setDateSelectionStep('time')
+                          }}
+                        >
+                          <div className="text-center">
+                            <p className={`font-bold text-lg ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {dateObj.getDate()}
+                            </p>
+                            <p className={`text-sm font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                              {dateObj.toLocaleDateString('en-US', { month: 'short' })}
+                            </p>
+                            <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              {dateObj.toLocaleDateString('en-US', { weekday: 'short' })}
+                            </p>
+                            <p className={`text-xs mt-2 px-2 py-1 rounded-full ${
+                              theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'
+                            }`}>
+                              {dateInfo.count} slots
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })
+                  })()}
+                </div>
+              </div>
+            ) : (
+              // Step 2: Select Time
+              <div>
+                <div className={`mb-4 p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
+                  <p className={`text-sm font-medium ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
+                    Selected Date: {new Date(selectedDate).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      month: 'long', 
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
+                <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Choose an available time slot:
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {availableSlots
+                    .filter(slot => slot.date === selectedDate)
+                    .map((slot, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          selectedTime === slot.time
                       ? 'border-blue-500 bg-blue-100'
                       : slot.available
-                      ? `${theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-200 hover:border-gray-300'}`
+                            ? `${theme === 'dark' ? 'border-gray-600 hover:border-blue-500 bg-gray-800' : 'border-gray-200 hover:border-blue-500 bg-white'}`
                       : 'opacity-50 cursor-not-allowed'
                   }`}
                     onClick={() => {
                       if (slot.available) {
-                        setSelectedDate(slot.date)
                         setSelectedTime(slot.time)
                       }
                     }}
                   >
                   <div className="text-center">
-                    <p className={`font-medium ${
-                      selectedDate === slot.date && selectedTime === slot.time
+                          <p className={`font-medium text-sm ${
+                            selectedTime === slot.time
                         ? 'text-blue-900'
                         : theme === 'dark' ? 'text-white' : 'text-gray-900'
                     }`}>
-                      {slot.date}
+                            {slot.time}
                     </p>
-                    <p className={`text-sm ${
-                      selectedDate === slot.date && selectedTime === slot.time
+                          <p className={`text-xs ${
+                            selectedTime === slot.time
                         ? 'text-blue-700'
                         : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                     }`}>
-                      {slot.time}
-                    </p>
-                    {!slot.available && (
-                      <span className="inline-block mt-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                        Unavailable
-                      </span>
-                    )}
+                            {slot.endTime}
+                          </p>
+                          <p className={`text-xs mt-1 ${
+                            selectedTime === slot.time
+                              ? 'text-blue-700'
+                              : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            ({selectedDuration} min)
+                          </p>
                   </div>
                 </div>
               ))}
             </div>
+              </div>
+            )}
           </div>
         )
 
-      case 2:
+      case 4:
         return (
           <div>
             <h2 className={`text-xl font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               Session Details
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Summary of selections */}
+            <div className={`mb-6 p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
+              <h3 className={`text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
+                📋 Session Summary
+              </h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tutor:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedTutorData?.name || 'Not selected'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Subject:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedSubject || 'Not selected'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Duration:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedDuration} minutes
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Date:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedDate || 'Not selected'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Time:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedTime ? (
+                      <>
+                        {selectedTime}
+                        {availableSlots.find(s => s.time === selectedTime)?.endTime && 
+                          ` - ${availableSlots.find(s => s.time === selectedTime)?.endTime}`
+                        }
+                      </>
+                    ) : 'Not selected'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
               <div>
                 <label className={`block text-sm font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Session Type
@@ -268,139 +994,22 @@ const BookSession: React.FC = () => {
                   </label>
                 </div>
               </div>
+              
               <div>
                 <label className={`block text-sm font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Duration
-                </label>
-                <select
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg ${
-                    theme === 'dark'
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                >
-                  <option value="">Select duration</option>
-                  <option value="30">30 minutes</option>
-                  <option value="60">1 hour</option>
-                  <option value="90">1.5 hours</option>
-                  <option value="120">2 hours</option>
-                </select>
-              </div>
-              <div className="md:col-span-2">
-                <label className={`block text-sm font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Additional Notes
+                  Additional Notes (Optional)
                 </label>
                 <textarea
-                  rows={3}
-                  placeholder="Any specific topics you'd like to focus on?"
+                  rows={4}
+                  value={sessionNotes}
+                  onChange={(e) => setSessionNotes(e.target.value)}
+                  placeholder="Any specific topics you'd like to focus on? Any questions or concerns?"
                   className={`w-full px-3 py-2 border rounded-lg ${
                     theme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                   } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 />
-              </div>
-            </div>
-          </div>
-        )
-
-      case 3:
-        return (
-          <div>
-            <h2 className={`text-xl font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Payment Information
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className={`block text-sm font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Payment Method
-                </label>
-                <div className="space-y-3">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="card"
-                      checked={paymentMethod === 'card'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
-                    />
-                    <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Credit/Debit Card
-                    </span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="paypal"
-                      checked={paymentMethod === 'paypal'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
-                    />
-                    <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      PayPal
-                    </span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="bank"
-                      checked={paymentMethod === 'bank'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
-                    />
-                    <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Bank Transfer
-                    </span>
-                  </label>
-                </div>
-              </div>
-              <div>
-                <div className={`p-4 border rounded-lg ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
-                  <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Session Summary
-                  </h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tutor:</span>
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Dr. Sarah Johnson
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {selectedDate}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Time:</span>
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {selectedTime}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {duration} minutes
-                      </span>
-                    </div>
-                    <div className="border-t pt-2 mt-4">
-                      <div className="flex justify-between">
-                        <span className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Total:
-                        </span>
-                        <span className={`text-lg font-semibold text-blue-600`}>
-                          $50.00
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -414,8 +1023,8 @@ const BookSession: React.FC = () => {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -497,10 +1106,12 @@ const BookSession: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
                   <div>
                 <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Book a Session
+                  {bookingMode === 'session' ? 'Book a Session' : 'Browse Classes'}
                 </h1>
                 <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Find the perfect tutor for your learning needs
+                  {bookingMode === 'session' 
+                    ? 'Find the perfect tutor for your learning needs'
+                    : 'Enroll in classes for the entire semester'}
                 </p>
               </div>
               <div className="flex space-x-2">
@@ -521,8 +1132,51 @@ const BookSession: React.FC = () => {
               </div>
             </div>
 
-            {/* Progress Bar */}
-            {activeStep < steps.length && (
+            {/* Tabs */}
+            <Box sx={{ borderBottom: 1, borderColor: theme === 'dark' ? '#374151' : 'divider', mb: 3 }}>
+              <Tabs 
+                value={bookingMode === 'session' ? 0 : 1} 
+                onChange={(_, newValue) => setBookingMode(newValue === 0 ? 'session' : 'class')}
+                textColor="primary"
+                indicatorColor="primary"
+                sx={{
+                  '& .MuiTab-root': {
+                    color: theme === 'dark' ? '#9ca3af' : 'inherit',
+                    '&.Mui-selected': {
+                      color: theme === 'dark' ? '#3b82f6' : 'primary.main'
+                    }
+                  }
+                }}
+              >
+                <Tab 
+                  icon={<Schedule />} 
+                  label="Book Session" 
+                  iconPosition="start"
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                />
+                <Tab 
+                  icon={<ClassIcon />} 
+                  label="Browse Classes" 
+                  iconPosition="start"
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                />
+              </Tabs>
+            </Box>
+
+            {/* Success Message */}
+            {bookingSuccess && (
+              <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                {bookingMode === 'session' ? 'Session booked successfully!' : 'Enrolled successfully!'}
+              </div>
+            )}
+            {bookingError && (
+              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                {bookingError}
+              </div>
+            )}
+
+            {/* Progress Bar (for session mode only) */}
+            {bookingMode === 'session' && activeStep < steps.length && (
               <>
                 <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                   <div 
@@ -537,11 +1191,14 @@ const BookSession: React.FC = () => {
             )}
           </div>
 
-          {/* Step Content */}
-          {activeStep < steps.length && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Main Content */}
-              <div className="lg:col-span-2">
+          {/* Content */}
+          {bookingMode === 'session' ? (
+            <>
+            {/* Session Booking Content */}
+            {activeStep < steps.length && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Content */}
+                <div className="lg:col-span-2">
                 <Card 
                   className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
                   style={{
@@ -590,7 +1247,7 @@ const BookSession: React.FC = () => {
                     <div className="flex justify-between">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {duration ? `${duration} minutes` : 'Not selected'}
+                        {selectedDuration} minutes
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -631,23 +1288,39 @@ const BookSession: React.FC = () => {
                 </Card>
               </div>
             </div>
-          )}
+            )}
 
-          {/* Navigation Buttons */}
-          {activeStep < steps.length && (
-            <div className="flex justify-between mt-8">
+          {/* Navigation Buttons - Sticky Bottom (for session mode) */}
+          {bookingMode === 'session' && activeStep < steps.length && (
+            <div className={`sticky bottom-0 left-0 right-0 z-10 flex justify-between p-4 mt-8 border-t ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} shadow-lg`}>
               <Button
                       onClick={handleBack}
                 disabled={activeStep === 0}
                 variant="outlined"
                 className="flex items-center"
+                style={{
+                  borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                  color: theme === 'dark' ? '#e5e7eb' : '#374151'
+                }}
               >
                 <ArrowBackIcon className="w-4 h-4 mr-2" />
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="flex items-center bg-blue-600 hover:bg-blue-700 text-white"
+                style={{
+                  backgroundColor: '#2563eb',
+                  color: '#ffffff',
+                  textTransform: 'none',
+                  fontWeight: '600',
+                  padding: '10px 24px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1d4ed8'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb'
+                }}
               >
                 {activeStep === steps.length - 1 ? 'Complete Booking' : 'Continue'}
                 <ArrowForwardIcon className="w-4 h-4 ml-2" />
@@ -655,8 +1328,8 @@ const BookSession: React.FC = () => {
             </div>
           )}
 
-          {/* Completion Message */}
-          {activeStep >= steps.length && (
+          {/* Completion Message (for session mode) */}
+          {bookingMode === 'session' && activeStep >= steps.length && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Success Content */}
               <div className="lg:col-span-2">
@@ -668,13 +1341,25 @@ const BookSession: React.FC = () => {
                     boxShadow: 'none !important'
                   }}
                 >
-                  <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                  {bookingSuccess ? (
+                    <>
+                      <CheckCircleIcon className="w-24 h-24 text-green-500 mx-auto mb-6" />
                   <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Booking Complete!
+                        🎉 Đặt lịch thành công!
                   </h2>
-                  <p className={`text-lg mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Your session has been successfully booked. You'll receive a confirmation email shortly.
-                  </p>
+                      <p className={`text-lg mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Buổi học của bạn đã được đặt thành công. Gia sư sẽ nhận được thông báo ngay.
+                      </p>
+                      {bookedSessionId && (
+                        <div className={`mb-6 p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
+                          <p className={`text-sm ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
+                            <strong>Session ID:</strong> {bookedSessionId}
+                          </p>
+                          <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Bạn có thể xem chi tiết buổi học trong Calendar hoặc Session Details
+                          </p>
+                        </div>
+                      )}
                   <div className="flex justify-center space-x-4">
                     <Button 
                       onClick={handleReset} 
@@ -686,19 +1371,63 @@ const BookSession: React.FC = () => {
                         textTransform: 'none',
                         fontWeight: '500'
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#1f2937'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#000000'
-                      }}
-                    >
-                      Book Another Session
+                        >
+                          Đặt buổi học khác
                     </Button>
                     <Button onClick={() => navigate('/student')} className="bg-blue-600 hover:bg-blue-700 text-white">
-                      Go to Dashboard
+                          Về Dashboard
                     </Button>
                   </div>
+                    </>
+                  ) : bookingError ? (
+                    <>
+                      <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span className="text-6xl">❌</span>
+                      </div>
+                      <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        Đặt lịch thất bại
+                      </h2>
+                      <div className={`mb-6 p-4 rounded-lg ${theme === 'dark' ? 'bg-red-900/20' : 'bg-red-50'}`}>
+                        <p className={`text-sm ${theme === 'dark' ? 'text-red-300' : 'text-red-900'}`}>
+                          {bookingError}
+                        </p>
+                      </div>
+                      <div className="flex justify-center space-x-4">
+                        <Button 
+                          onClick={() => {
+                            setActiveStep(steps.length - 1)
+                            setBookingError('')
+                          }} 
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          Thử lại
+                        </Button>
+                        <Button 
+                          onClick={() => navigate('/student')} 
+                          variant="outlined"
+                          style={{
+                            textTransform: 'none'
+                          }}
+                        >
+                          Về Dashboard
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                      <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        Booking Complete!
+                      </h2>
+                      <p className={`text-lg mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Your session has been successfully booked.
+                      </p>
+                      <div className="flex justify-center space-x-4">
+                        <Button onClick={handleReset} variant="outlined">Book Another</Button>
+                        <Button onClick={() => navigate('/student')} className="bg-blue-600">Dashboard</Button>
+                      </div>
+                    </>
+                  )}
                 </Card>
               </div>
 
@@ -738,7 +1467,7 @@ const BookSession: React.FC = () => {
                     <div className="flex justify-between">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {duration ? `${duration} minutes` : 'Not selected'}
+                        {selectedDuration} minutes
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -780,8 +1509,491 @@ const BookSession: React.FC = () => {
               </div>
             </div>
           )}
+          </>
+          ) : (
+            /* Classes Browsing Content */
+            <div className="space-y-8">
+              {/* Filters */}
+              <Card 
+                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  boxShadow: 'none !important'
+                }}
+              >
+                <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Filter Classes
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Subject
+                    </label>
+                    <select
+                      value={classFilters.subject}
+                      onChange={(e) => setClassFilters({...classFilters, subject: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="">All Subjects</option>
+                      {availableSubjects.map((subject) => (
+                        <option key={subject} value={subject}>
+                          {subject}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Tutor
+                    </label>
+                    <select
+                      value={classFilters.tutorId}
+                      onChange={(e) => setClassFilters({...classFilters, tutorId: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="">All Tutors</option>
+                      {availableTutors.map((tutor) => (
+                        <option key={tutor.id} value={tutor.id}>
+                          {tutor.name} {tutor.rating ? `(${tutor.rating.toFixed(1)}⭐)` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Day
+                    </label>
+                    <select
+                      value={classFilters.day}
+                      onChange={(e) => setClassFilters({...classFilters, day: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="">All Days</option>
+                      <option value="monday">Monday</option>
+                      <option value="tuesday">Tuesday</option>
+                      <option value="wednesday">Wednesday</option>
+                      <option value="thursday">Thursday</option>
+                      <option value="friday">Friday</option>
+                      <option value="saturday">Saturday</option>
+                      <option value="sunday">Sunday</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Start Time
+                    </label>
+                    <select
+                      value={classFilters.startTime}
+                      onChange={(e) => setClassFilters({...classFilters, startTime: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="">All Times</option>
+                      {availableStartTimes.length > 0 ? (
+                        availableStartTimes.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))
+                      ) : (
+                        ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'].map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Min Rating
+                    </label>
+                    <select
+                      value={classFilters.minRating}
+                      onChange={(e) => setClassFilters({...classFilters, minRating: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="">All Ratings</option>
+                      <option value="4.5">4.5⭐ and above</option>
+                      <option value="4.0">4.0⭐ and above</option>
+                      <option value="3.5">3.5⭐ and above</option>
+                      <option value="3.0">3.0⭐ and above</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Status
+                    </label>
+                    <select
+                      value={classFilters.status}
+                      onChange={(e) => setClassFilters({...classFilters, status: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="full">Full</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Type
+                    </label>
+                    <select
+                      value={classFilters.isOnline}
+                      onChange={(e) => setClassFilters({...classFilters, isOnline: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="">All Types</option>
+                      <option value="true">Online</option>
+                      <option value="false">In-Person</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={classFilters.availableOnly}
+                        onChange={(e) => setClassFilters({...classFilters, availableOnly: e.target.checked})}
+                        className="mr-2 w-4 h-4"
+                      />
+                      <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        Available Only (Not Full)
+                      </span>
+                    </label>
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => setClassFilters({
+                        subject: '',
+                        day: '',
+                        tutorId: '',
+                        startTime: '',
+                        minRating: '',
+                        status: '',
+                        isOnline: '',
+                        availableOnly: true
+                      })}
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+                          : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
+                    >
+                      Clear All Filters
+                    </button>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Available Classes */}
+              <div>
+                <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Available Classes
+                </h3>
+                {classesLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Loading classes...
+                    </p>
+                  </div>
+                ) : classes.length === 0 ? (
+                  <Card 
+                    className={`p-12 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} text-center`}
+                    style={{
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                      boxShadow: 'none !important'
+                    }}
+                  >
+                    <ClassIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+                    <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      No classes available
+                    </p>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {classes.map((cls) => {
+                      const isEnrolled = myEnrollments.some(e => e.classId === cls.id && e.status === 'active')
+                      const isFull = cls.currentEnrollment >= cls.maxStudents
+                      
+                      return (
+                        <Card
+                          key={cls.id}
+                          className={`p-4 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                          style={{
+                            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                            boxShadow: 'none !important'
+                          }}
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                  {cls.code}
+                                </h4>
+                                {isEnrolled && (
+                                  <Chip 
+                                    label="Enrolled" 
+                                    size="small"
+                                    color="success"
+                                  />
+                                )}
+                                {isFull && !isEnrolled && (
+                                  <Chip 
+                                    label="Full" 
+                                    size="small"
+                                    color="warning"
+                                  />
+                                )}
+                              </div>
+                              <p className={`text-sm mb-2 font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                                {cls.subject}
+                              </p>
+                              {cls.tutor?.name && (
+                                <p className={`text-xs mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                  <Person className="w-3 h-3 inline mr-1" />
+                                  Tutor: {cls.tutor.name}
+                                </p>
+                              )}
+                              {cls.description && (
+                                <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                  {cls.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="space-y-2 mb-4">
+                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <CalendarToday className="w-4 h-4" />
+                              <span>{cls.day.charAt(0).toUpperCase() + cls.day.slice(1)}</span>
+                            </div>
+                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <AccessTime className="w-4 h-4" />
+                              <span>{cls.startTime} - {cls.endTime} ({cls.duration} min)</span>
+                            </div>
+                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <GroupIcon className="w-4 h-4" />
+                              <span>{cls.currentEnrollment || 0} / {cls.maxStudents} students</span>
+                            </div>
+                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <EventIcon className="w-4 h-4" />
+                              <span>{new Date(cls.semesterStart).toLocaleDateString()} - {new Date(cls.semesterEnd).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => {
+                              setSelectedClass(cls)
+                              setEnrollDialogOpen(true)
+                            }}
+                            disabled={isEnrolled || isFull}
+                            fullWidth
+                            style={{
+                              backgroundColor: isEnrolled || isFull ? '#9ca3af' : '#2563eb',
+                              color: '#ffffff',
+                              textTransform: 'none'
+                            }}
+                          >
+                            {isEnrolled ? 'Already Enrolled' : isFull ? 'Class Full' : 'Enroll Now'}
+                          </Button>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* My Enrollments */}
+              {myEnrollments.length > 0 && (
+                <div>
+                  <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    My Enrolled Classes
+                  </h3>
+                  {enrollmentsLoading ? (
+                    <div className="text-center py-12">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {myEnrollments.map((enrollment) => (
+                        <Card
+                          key={enrollment.id}
+                          className={`p-4 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                          style={{
+                            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                            boxShadow: 'none !important'
+                          }}
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                {enrollment.class?.code}
+                              </h4>
+                              <p className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                                {enrollment.class?.subject}
+                              </p>
+                            </div>
+                            <Chip 
+                              label={enrollment.status} 
+                              size="small"
+                              color={enrollment.status === 'active' ? 'success' : 'default'}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2 mb-4">
+                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <CalendarToday className="w-4 h-4" />
+                              <span>{enrollment.class?.day}</span>
+                            </div>
+                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <AccessTime className="w-4 h-4" />
+                              <span>{enrollment.class?.startTime} - {enrollment.class?.endTime}</span>
+                            </div>
+                            <div className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                              Enrolled: {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                            </div>
+                          </div>
+
+                          {enrollment.status === 'active' && (
+                            <Button
+                              onClick={() => handleCancelEnrollment(enrollment.id)}
+                              fullWidth
+                              variant="outlined"
+                              style={{
+                                color: theme === 'dark' ? '#ef4444' : '#dc2626',
+                                borderColor: theme === 'dark' ? '#ef4444' : '#dc2626',
+                                textTransform: 'none'
+                              }}
+                            >
+                              Cancel Enrollment
+                            </Button>
+                          )}
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Enroll Confirmation Dialog */}
+      <Dialog 
+        open={enrollDialogOpen} 
+        onClose={() => setEnrollDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle className={theme === 'dark' ? 'bg-gray-800 text-white' : ''}>
+          Confirm Enrollment
+        </DialogTitle>
+        <DialogContent className={theme === 'dark' ? 'bg-gray-800' : ''}>
+          {selectedClass && (
+            <div className="space-y-4 pt-4">
+              <div>
+                <p className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  {selectedClass.code} - {selectedClass.subject}
+                </p>
+                {selectedClass.description && (
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {selectedClass.description}
+                  </p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Schedule:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedClass.day} {selectedClass.startTime} - {selectedClass.endTime}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedClass.duration} minutes
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Semester:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {new Date(selectedClass.semesterStart).toLocaleDateString()} - {new Date(selectedClass.semesterEnd).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Capacity:</span>
+                  <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedClass.currentEnrollment || 0} / {selectedClass.maxStudents} students
+                  </span>
+                </div>
+              </div>
+
+              <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
+                <p className={`text-sm ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
+                  ℹ️ You will be enrolled for the entire semester. Sessions will be automatically created.
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions className={theme === 'dark' ? 'bg-gray-800' : ''}>
+          <Button 
+            onClick={() => setEnrollDialogOpen(false)}
+            variant="outlined"
+            style={{
+              textTransform: 'none'
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleEnrollClass}
+            disabled={enrolling}
+            style={{
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              textTransform: 'none'
+            }}
+          >
+            {enrolling ? 'Enrolling...' : 'Confirm Enrollment'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Mobile Drawer */}
       {mobileOpen && (

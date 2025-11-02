@@ -1,0 +1,866 @@
+[
+  {
+    "id": "cmt_eiVcDEirhTPj",
+    "postId": "post_ZvyoMrmNIw5S",
+    "authorId": "mgmt_3nypc8z3UAxl",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_QG0kkSghUUBm",
+      "tut_2p_KNhI-iEIX",
+      "stu_ehcpzpE4_TXe",
+      "stu_TVi9sNdUPTOQ",
+      "tut_OWtApeq1WbQN"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_K2Nw5clHHAVK",
+    "postId": "post_ZvyoMrmNIw5S",
+    "authorId": "tut_28co6GH68MtZ",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_B5LU6rrk7Xsh",
+      "stu_SXIlCHjlkwWT"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_KUXy9PfHDaqD",
+    "postId": "post_ZvyoMrmNIw5S",
+    "authorId": "tut_OWtApeq1WbQN",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_ehcpzpE4_TXe"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_caflyYOxxrWK",
+    "postId": "post_ZvyoMrmNIw5S",
+    "authorId": "stu_SXIlCHjlkwWT",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_ehcpzpE4_TXe",
+      "stu_CwfBysq_Phfh",
+      "stu_66O3ugd6i2Cn",
+      "tut_jiwmW2eBp3d4"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_y-2gMQSLccG3",
+    "postId": "post_HzG76bsy9w8s",
+    "authorId": "tut_kpC5U_goDXvk",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_CwfBysq_Phfh",
+      "stu_B5LU6rrk7Xsh"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_joETKNeAs-hj",
+    "postId": "post_HzG76bsy9w8s",
+    "authorId": "stu_sPLkDLAgpTeE",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "tut_iQGe3z04cJLD",
+      "stu_TVi9sNdUPTOQ",
+      "stu_ehcpzpE4_TXe",
+      "tut_GDPlGtIendxp"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_bPQD0u5GA3B9",
+    "postId": "post_HzG76bsy9w8s",
+    "authorId": "tut_iQGe3z04cJLD",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_VZe7XW8FM9EW",
+      "stu_QUwSTpa0q36b",
+      "tut_kpC5U_goDXvk",
+      "tut_GDPlGtIendxp",
+      "stu_TVi9sNdUPTOQ"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_3eZjcfViF3X6",
+    "postId": "post_HzG76bsy9w8s",
+    "authorId": "stu_SXIlCHjlkwWT",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "tut_huahc_QDbkKv",
+      "stu_QG0kkSghUUBm"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_DVxZQlBLbHVQ",
+    "postId": "post_avC6G_AK_q5Z",
+    "authorId": "mgmt_D1ywWBVIXsFp",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_ehcpzpE4_TXe",
+      "stu_LHJJlSGBoYYA"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_pNSxs4HSte2J",
+    "postId": "post_avC6G_AK_q5Z",
+    "authorId": "tut_28co6GH68MtZ",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_XkRh1PyYQyz5",
+    "postId": "post_avC6G_AK_q5Z",
+    "authorId": "stu_F21N7tiaerX8",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_LHJJlSGBoYYA",
+      "stu_NiBb17088IqN",
+      "stu_SXIlCHjlkwWT",
+      "mgmt_D1ywWBVIXsFp"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_b9TkZ7zoVsP0",
+    "postId": "post_avC6G_AK_q5Z",
+    "authorId": "tut_iQGe3z04cJLD",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_QG0kkSghUUBm",
+      "stu_HcE1Szso4doH",
+      "tut_28co6GH68MtZ"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_J3gjiNiJQIIy",
+    "postId": "post_avC6G_AK_q5Z",
+    "authorId": "tut_M5JSdOOUKd4U",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_HcE1Szso4doH",
+      "stu_LHJJlSGBoYYA"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_dSQa3-4Wjime",
+    "postId": "post_3c01H95XdPim",
+    "authorId": "tut_GDPlGtIendxp",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_YedNfBFvNKar"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_36nMwswZdHXR",
+    "postId": "post_3c01H95XdPim",
+    "authorId": "stu_HcE1Szso4doH",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_HcE1Szso4doH",
+      "tut_2p_KNhI-iEIX",
+      "mgmt_nDZemkiZv0AW",
+      "stu_oJFHhTcGAcUM"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_TTwbc3kYgbj8",
+    "postId": "post_3c01H95XdPim",
+    "authorId": "stu_SXIlCHjlkwWT",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_LHJJlSGBoYYA",
+      "tut_M5JSdOOUKd4U",
+      "stu_66O3ugd6i2Cn"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_BqVOIDX0rgl1",
+    "postId": "post__3dh1oc3oy6W",
+    "authorId": "stu_NiBb17088IqN",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_HcE1Szso4doH",
+      "stu_JgSnelf3S1oI",
+      "stu_FAzj9t2tjtvP",
+      "stu_ovDNVZAwtMnI"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_YaWCzGD2zl4I",
+    "postId": "post__3dh1oc3oy6W",
+    "authorId": "stu_QG0kkSghUUBm",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "tut_2p_KNhI-iEIX"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_2aFnSqwm7JJ1",
+    "postId": "post__3dh1oc3oy6W",
+    "authorId": "tut_jiwmW2eBp3d4",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_NiBb17088IqN",
+      "tut_pxQDWdvyjnan",
+      "tut_2p_KNhI-iEIX"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_Ukqu4fYWB1AR",
+    "postId": "post__3dh1oc3oy6W",
+    "authorId": "tut_pxQDWdvyjnan",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_sPLkDLAgpTeE",
+      "stu_F21N7tiaerX8"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_bL0Q3xlRzt0J",
+    "postId": "post__3dh1oc3oy6W",
+    "authorId": "stu_ovDNVZAwtMnI",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_QUwSTpa0q36b",
+      "stu_sPLkDLAgpTeE",
+      "stu_TVi9sNdUPTOQ",
+      "stu_YedNfBFvNKar",
+      "stu_i4i7waoqWAyN"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_JRO7RQ5YAN0L",
+    "postId": "post_Eu8SYWVvq3mh",
+    "authorId": "mgmt_D1ywWBVIXsFp",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_sPLkDLAgpTeE",
+      "stu_FAzj9t2tjtvP",
+      "tut_28co6GH68MtZ",
+      "stu_QG0kkSghUUBm",
+      "stu_SXIlCHjlkwWT"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_hr_WyxGOLTg4",
+    "postId": "post_Eu8SYWVvq3mh",
+    "authorId": "stu_JgSnelf3S1oI",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_XrU6tiTHZ91i",
+    "postId": "post_WBh__Hk5iAAM",
+    "authorId": "stu_JgSnelf3S1oI",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "tut_MhsCoIecYtJX",
+      "tut_M5JSdOOUKd4U",
+      "stu_FAzj9t2tjtvP"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_YJ9y-uDYyPnt",
+    "postId": "post_WBh__Hk5iAAM",
+    "authorId": "mgmt_nDZemkiZv0AW",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "tut_pxQDWdvyjnan",
+      "stu_LHJJlSGBoYYA",
+      "tut_fvnAH8e_l-lY",
+      "stu_TVi9sNdUPTOQ"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_pITDiuBlSqmK",
+    "postId": "post_WBh__Hk5iAAM",
+    "authorId": "tut_M5JSdOOUKd4U",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "tut_pxQDWdvyjnan",
+      "stu_SXIlCHjlkwWT"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_L1FUUfn6E3eZ",
+    "postId": "post_WBh__Hk5iAAM",
+    "authorId": "stu_B5LU6rrk7Xsh",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_Bf0ZAMOHjZc5",
+    "postId": "post_WBh__Hk5iAAM",
+    "authorId": "tut_r7t6RzMQA2iW",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_TVi9sNdUPTOQ",
+      "stu_i4i7waoqWAyN",
+      "stu_QUwSTpa0q36b"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_oDzMdu9jkHKC",
+    "postId": "post_t3wH3NwOxZWp",
+    "authorId": "mgmt_D1ywWBVIXsFp",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_LHJJlSGBoYYA",
+      "stu_oJFHhTcGAcUM",
+      "tut_jiwmW2eBp3d4"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_FO6ouLDGA0qx",
+    "postId": "post_t3wH3NwOxZWp",
+    "authorId": "stu_ehcpzpE4_TXe",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "tut_kpC5U_goDXvk",
+      "tut_M5JSdOOUKd4U"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_JcIirZquaOiq",
+    "postId": "post_t3wH3NwOxZWp",
+    "authorId": "mgmt_nDZemkiZv0AW",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_ovDNVZAwtMnI"
+    ],
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "cmt_Tt8D8H5_zbY6",
+    "postId": "post_t3wH3NwOxZWp",
+    "authorId": "stu_ovDNVZAwtMnI",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_QUwSTpa0q36b",
+      "stu_QG0kkSghUUBm",
+      "stu_ovDNVZAwtMnI",
+      "stu_NiBb17088IqN",
+      "stu_oJFHhTcGAcUM"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_PS1BRr9jcEhq",
+    "postId": "post_t3wH3NwOxZWp",
+    "authorId": "tut_iQGe3z04cJLD",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_8w_FI3kjFvDI",
+    "postId": "post_1hbRtZenn2TV",
+    "authorId": "stu_ovDNVZAwtMnI",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "tut_huahc_QDbkKv",
+      "tut_fKfAVq6FIDoy"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_LCQIGPBxZK7B",
+    "postId": "post_1hbRtZenn2TV",
+    "authorId": "stu_YedNfBFvNKar",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_QUwSTpa0q36b",
+      "stu_F21N7tiaerX8"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_d2r6rmyEXX5M",
+    "postId": "post_1hbRtZenn2TV",
+    "authorId": "stu_F21N7tiaerX8",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "tut_fvnAH8e_l-lY"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_jr6YPW7R0Oji",
+    "postId": "post_1hbRtZenn2TV",
+    "authorId": "stu_B5LU6rrk7Xsh",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "tut_D7Q1Re4S1_wI",
+      "stu_HcE1Szso4doH",
+      "stu_JgSnelf3S1oI",
+      "stu_sPLkDLAgpTeE",
+      "stu_VZe7XW8FM9EW"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_Y5ofrA7qkL4x",
+    "postId": "post_1hbRtZenn2TV",
+    "authorId": "stu_HcE1Szso4doH",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_HcE1Szso4doH",
+      "tut_28co6GH68MtZ",
+      "tut_OWtApeq1WbQN",
+      "stu_FAzj9t2tjtvP",
+      "mgmt_irG1OTQ38xRQ"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_i7pL3m7xL-Jg",
+    "postId": "post_OC5aPz8BBs4N",
+    "authorId": "stu_YedNfBFvNKar",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "tut_fKfAVq6FIDoy",
+      "tut_pxQDWdvyjnan",
+      "stu_sPLkDLAgpTeE"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_X4q6NAPXOF_I",
+    "postId": "post_OC5aPz8BBs4N",
+    "authorId": "stu_YedNfBFvNKar",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_oJFHhTcGAcUM",
+      "tut_jiwmW2eBp3d4",
+      "stu_QUwSTpa0q36b"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_8KHubsCZMlMq",
+    "postId": "post_OC5aPz8BBs4N",
+    "authorId": "mgmt_irG1OTQ38xRQ",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_NiBb17088IqN",
+      "stu_VZe7XW8FM9EW",
+      "stu_ovDNVZAwtMnI",
+      "stu_LHJJlSGBoYYA",
+      "tut_jiwmW2eBp3d4"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_Ow6lcg_bzAhi",
+    "postId": "post_OC5aPz8BBs4N",
+    "authorId": "stu_B5LU6rrk7Xsh",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_uUdmCLw7Lf2D",
+    "postId": "post_7JGPJlcFwJuN",
+    "authorId": "tut_2p_KNhI-iEIX",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_SXIlCHjlkwWT",
+      "stu_CwfBysq_Phfh",
+      "tut_pxQDWdvyjnan",
+      "tut_fKfAVq6FIDoy",
+      "stu_YedNfBFvNKar"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_RUW9SNejmoh9",
+    "postId": "post_7JGPJlcFwJuN",
+    "authorId": "stu_QUwSTpa0q36b",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_Tp7lydNHmkDb",
+    "postId": "post_7JGPJlcFwJuN",
+    "authorId": "stu_CwfBysq_Phfh",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_QG0kkSghUUBm",
+      "stu_i4i7waoqWAyN"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_NHjG_nUJeQPQ",
+    "postId": "post_7JGPJlcFwJuN",
+    "authorId": "stu_F21N7tiaerX8",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_CwfBysq_Phfh",
+      "mgmt_irG1OTQ38xRQ"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_LaxbqfkTmBM9",
+    "postId": "post_7JGPJlcFwJuN",
+    "authorId": "stu_B5LU6rrk7Xsh",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_QUwSTpa0q36b",
+      "stu_VZe7XW8FM9EW"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_iLcV2mOb5Dgl",
+    "postId": "post_5wLLdr88xSel",
+    "authorId": "stu_ovDNVZAwtMnI",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_HcE1Szso4doH",
+      "tut_kpC5U_goDXvk"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_P5JHp-Uznh2q",
+    "postId": "post_5wLLdr88xSel",
+    "authorId": "tut_pxQDWdvyjnan",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "mgmt_irG1OTQ38xRQ",
+      "stu_NiBb17088IqN",
+      "stu_B5LU6rrk7Xsh",
+      "tut_huahc_QDbkKv",
+      "mgmt_3nypc8z3UAxl"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_wn9wkXUhtjZK",
+    "postId": "post_5wLLdr88xSel",
+    "authorId": "tut_28co6GH68MtZ",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_F21N7tiaerX8",
+      "stu_VZe7XW8FM9EW",
+      "stu_LHJJlSGBoYYA",
+      "stu_i4i7waoqWAyN"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_ZOlU5CPLY3j3",
+    "postId": "post_5wLLdr88xSel",
+    "authorId": "mgmt_D1ywWBVIXsFp",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_CwfBysq_Phfh"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_yj-X096RaLJz",
+    "postId": "post_LXSPTv4AsOBe",
+    "authorId": "stu_sPLkDLAgpTeE",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_d5N1o56yS8Az",
+    "postId": "post_GWwETRNtxgZS",
+    "authorId": "mgmt_3nypc8z3UAxl",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "tut_28co6GH68MtZ",
+      "stu_VZe7XW8FM9EW",
+      "tut_GDPlGtIendxp"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_iKzwVyhED7h6",
+    "postId": "post_GWwETRNtxgZS",
+    "authorId": "tut_fvnAH8e_l-lY",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "tut_2p_KNhI-iEIX",
+      "tut_jiwmW2eBp3d4",
+      "stu_VZe7XW8FM9EW"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_fS6kG1MyJCRl",
+    "postId": "post_NJHU-00cL4-z",
+    "authorId": "tut_M5JSdOOUKd4U",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_9w1CYI2sxkbr",
+    "postId": "post_NJHU-00cL4-z",
+    "authorId": "stu_sPLkDLAgpTeE",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_oJFHhTcGAcUM",
+      "tut_D7Q1Re4S1_wI",
+      "tut_MhsCoIecYtJX",
+      "stu_66O3ugd6i2Cn",
+      "tut_r7t6RzMQA2iW"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_cBvAooiFubL9",
+    "postId": "post_NJHU-00cL4-z",
+    "authorId": "stu_ovDNVZAwtMnI",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_oJFHhTcGAcUM",
+      "tut_D7Q1Re4S1_wI",
+      "stu_F21N7tiaerX8",
+      "tut_M5JSdOOUKd4U"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_96pUNvHWa4n-",
+    "postId": "post_NJHU-00cL4-z",
+    "authorId": "tut_huahc_QDbkKv",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_VZe7XW8FM9EW"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_QK1-7uIUFNRb",
+    "postId": "post_NJHU-00cL4-z",
+    "authorId": "stu_F21N7tiaerX8",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_uM7aizRM8wUl",
+    "postId": "post_xF1HdoiijjeO",
+    "authorId": "tut_2p_KNhI-iEIX",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_JgSnelf3S1oI"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_XnZ1ysiofuEq",
+    "postId": "post_OvWUDa1fzBYT",
+    "authorId": "tut_r7t6RzMQA2iW",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_VZe7XW8FM9EW",
+      "mgmt_3nypc8z3UAxl",
+      "stu_QUwSTpa0q36b",
+      "stu_sPLkDLAgpTeE"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_UfBywGd_19du",
+    "postId": "post_OvWUDa1fzBYT",
+    "authorId": "tut_pxQDWdvyjnan",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [
+      "stu_F21N7tiaerX8",
+      "stu_VZe7XW8FM9EW",
+      "tut_2p_KNhI-iEIX",
+      "stu_CwfBysq_Phfh",
+      "stu_HcE1Szso4doH"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_Ci35X8jI9i9x",
+    "postId": "post_OvWUDa1fzBYT",
+    "authorId": "stu_NiBb17088IqN",
+    "content": "Cảm ơn bạn đã chia sẻ!",
+    "likes": [
+      "stu_VZe7XW8FM9EW",
+      "tut_jiwmW2eBp3d4",
+      "stu_QUwSTpa0q36b",
+      "tut_pxQDWdvyjnan",
+      "tut_D7Q1Re4S1_wI"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_HwX0sXfr_XC3",
+    "postId": "post_OvWUDa1fzBYT",
+    "authorId": "stu_SXIlCHjlkwWT",
+    "content": "Mình cũng gặp vấn đề tương tự, đã giải quyết bằng cách...",
+    "likes": [],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_CGxkxGWBPISK",
+    "postId": "post_OvWUDa1fzBYT",
+    "authorId": "mgmt_irG1OTQ38xRQ",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_i4i7waoqWAyN",
+      "tut_D7Q1Re4S1_wI",
+      "stu_B5LU6rrk7Xsh",
+      "tut_jiwmW2eBp3d4"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_k_fjarjjBR2r",
+    "postId": "post_NMi_Y6YvChBh",
+    "authorId": "tut_OWtApeq1WbQN",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_FAzj9t2tjtvP",
+      "tut_GDPlGtIendxp"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_Hnr_Gj23HBhb",
+    "postId": "post_dFtD-m87T2rq",
+    "authorId": "mgmt_3nypc8z3UAxl",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "tut_MhsCoIecYtJX",
+      "mgmt_irG1OTQ38xRQ",
+      "stu_F21N7tiaerX8"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_WVkZaKrThBTg",
+    "postId": "post_dFtD-m87T2rq",
+    "authorId": "stu_66O3ugd6i2Cn",
+    "content": "Bạn nên liên hệ với giảng viên để được hỗ trợ thêm.",
+    "likes": [
+      "stu_NiBb17088IqN",
+      "stu_B5LU6rrk7Xsh",
+      "tut_28co6GH68MtZ",
+      "mgmt_nDZemkiZv0AW"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  },
+  {
+    "id": "cmt_kFqUK6jNxYKO",
+    "postId": "post_-4eALqhyGi5n",
+    "authorId": "stu_HcE1Szso4doH",
+    "content": "Bạn có thể tham khảo tài liệu này để học tốt hơn.",
+    "likes": [
+      "stu_SXIlCHjlkwWT",
+      "tut_28co6GH68MtZ",
+      "stu_HcE1Szso4doH",
+      "tut_OWtApeq1WbQN"
+    ],
+    "createdAt": "2025-10-31T15:07:37.466Z",
+    "updatedAt": "2025-10-31T15:07:37.466Z"
+  }
+]

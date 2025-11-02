@@ -25,6 +25,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import MovingGif from '../../components/MovingGif'
 import BallControls from '../../components/BallControls'
+import api from '../../lib/api'
 
 const Login: React.FC = () => {
   const { theme, toggleTheme, setTheme } = useTheme()
@@ -43,6 +44,8 @@ const Login: React.FC = () => {
   const [showBallControls, setShowBallControls] = useState(false)
   const [showBall, setShowBall] = useState(false)
   const [showThemeSettings, setShowThemeSettings] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const mainContentRef = useRef<HTMLDivElement>(null)
   const themeSettingsRef = useRef<HTMLDivElement>(null)
   const loginFormRef = useRef<HTMLDivElement>(null)
@@ -154,11 +157,38 @@ const Login: React.FC = () => {
     }))
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Login attempt:', formData)
-    // Navigate to appropriate dashboard based on user role
-    navigate('/student')
+    setError('')
+    setLoading(true)
+    
+    try {
+      const result = await api.auth.login(formData.email, formData.password)
+      
+      if (result.success) {
+        const { user, token } = result.data
+        
+        // Save token and user info
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(user))
+        
+        // Navigate based on role
+        if (user.role === 'student') {
+          navigate('/student')
+        } else if (user.role === 'tutor') {
+          navigate('/tutor')
+        } else if (user.role === 'management') {
+          navigate('/management')
+        }
+      } else {
+        setError(result.error || 'Đăng nhập thất bại')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      setError('Có lỗi xảy ra khi đăng nhập')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleSSOLogin = (provider: string) => {
@@ -180,10 +210,10 @@ const Login: React.FC = () => {
       className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : theme === 'neo-brutalism' ? '' : 'bg-gray-50'}`}
       style={theme === 'neo-brutalism' ? neoStyles.container : {}}
     >
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Sidebar */}
         <div 
-          className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : theme === 'neo-brutalism' ? '' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : theme === 'neo-brutalism' ? '' : 'border-gray-200'} lg:block`}
+          className={`w-full lg:w-60 lg:min-w-[240px] h-auto lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : theme === 'neo-brutalism' ? '' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : theme === 'neo-brutalism' ? '' : 'border-gray-200'} lg:block`}
           style={theme === 'neo-brutalism' ? neoStyles.sidebar : {}}
         >
           <div className="p-6">
@@ -268,7 +298,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div ref={mainContentRef} className="flex-1 p-4 lg:p-6 relative overflow-hidden">
+        <div ref={mainContentRef} className="flex-1 p-4 lg:p-6 xl:p-8 relative overflow-y-auto overflow-x-hidden max-h-screen">
           {/* Moving GIF */}
           {showBall && containerSize.width > 0 && containerSize.height > 0 && (
             <MovingGif
@@ -334,18 +364,18 @@ const Login: React.FC = () => {
 
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+              <div className="flex-shrink-0">
+                <h1 className={`text-2xl lg:text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Welcome Back
                 </h1>
-                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-base lg:text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                   Sign in to your account to continue learning
                 </p>
               </div>
               
               {/* Control Buttons */}
-              <div className="flex items-center space-x-2">
+              <div className="hidden lg:flex items-center space-x-2 flex-shrink-0">
                 {/* Ball Toggle */}
                 <button
                   onClick={() => setShowBall(!showBall)}
@@ -397,9 +427,9 @@ const Login: React.FC = () => {
                 className="fixed inset-0 bg-black bg-opacity-50 z-40"
                 onClick={() => setShowThemeSettings(false)}
               />
-              <div className="fixed top-0 right-0 h-full w-80 z-50" ref={themeSettingsRef}>
+              <div className="fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50" ref={themeSettingsRef}>
               <div 
-                className={`h-full p-6 border-l ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : theme === 'neo-brutalism' ? 'bg-white' : 'bg-white border-gray-200'}`}
+                className={`h-full p-6 border-l overflow-y-auto ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : theme === 'neo-brutalism' ? 'bg-white' : 'bg-white border-gray-200'}`}
                 style={theme === 'neo-brutalism' ? neoStyles.card : {}}
               >
                 <div className="flex items-center justify-between mb-6">
@@ -486,9 +516,9 @@ const Login: React.FC = () => {
           )}
 
           {/* Login Form */}
-          <div className="max-w-md mx-auto" ref={loginFormRef}>
+          <div className="w-full max-w-md mx-auto px-4 sm:px-0" ref={loginFormRef}>
             <Card 
-              className={`p-8 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : theme === 'neo-brutalism' ? 'bg-white' : 'bg-white border-gray-200'}`}
+              className={`p-6 sm:p-8 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : theme === 'neo-brutalism' ? 'bg-white' : 'bg-white border-gray-200'}`}
               style={{
                 borderColor: theme === 'dark' ? '#374151' : theme === 'neo-brutalism' ? '#000000' : '#e5e7eb',
                 backgroundColor: theme === 'dark' ? '#1f2937' : theme === 'neo-brutalism' ? '#ffffff' : '#ffffff',
@@ -604,9 +634,17 @@ const Login: React.FC = () => {
                     </button>
                   </div>
 
+                  {/* Error message */}
+                  {error && (
+                    <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                      {error}
+                    </div>
+                  )}
+
                   <Button 
                     type="submit" 
-                    className={`w-full ${theme === 'neo-brutalism' ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                    disabled={loading}
+                    className={`w-full ${theme === 'neo-brutalism' ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-700'} text-white ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     style={theme === 'neo-brutalism' ? { 
                       border: '3px solid #000000',
                       borderRadius: '0px',
@@ -621,7 +659,7 @@ const Login: React.FC = () => {
                       textTransform: 'none'
                     }}
                   >
-                    Sign In
+                    {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                   </Button>
                 </form>
               ) : (
@@ -682,7 +720,10 @@ const Login: React.FC = () => {
               <div className="mt-6 text-center">
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                   Don't have an account?{' '}
-                  <button className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}>
+                  <button 
+                    onClick={() => navigate('/common/register')}
+                    className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
+                  >
                     Sign up here
                   </button>
                 </p>
@@ -696,7 +737,7 @@ const Login: React.FC = () => {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={handleDrawerToggle}></div>
-          <div className={`fixed left-0 top-0 h-full w-80 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl`}>
+          <div className={`fixed left-0 top-0 h-full w-80 max-w-[85vw] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl overflow-y-auto`}>
             <div className="p-6">
               {/* Mobile Header */}
               <div className="flex items-center justify-between mb-8">

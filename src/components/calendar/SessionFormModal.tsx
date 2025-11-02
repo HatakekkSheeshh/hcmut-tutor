@@ -125,8 +125,10 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
       }
     }
   })
+  const [eventType, setEventType] = useState<'session' | 'personal' | 'reminder'>('session')
   const [formData, setFormData] = useState({
     subject: '',
+    title: '',
     tutorId: '',
     studentId: '',
     date: new Date(),
@@ -143,8 +145,10 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
 
   useEffect(() => {
     if (session) {
+      setEventType('session') // Edit mode always shows session type
       setFormData({
         subject: session.subject,
+        title: session.subject,
         tutorId: session.tutor?.id || '',
         studentId: session.student?.id || '',
         date: new Date(session.date),
@@ -157,9 +161,11 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
         status: session.status
       })
     } else {
-      // Reset form for new session
+      // Reset form for new event
+      setEventType('session')
       setFormData({
         subject: '',
+        title: '',
         tutorId: '',
         studentId: '',
         date: new Date(),
@@ -193,16 +199,34 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.subject) {
-      newErrors.subject = 'Subject is required'
-    }
+    if (eventType === 'session') {
+      if (!formData.subject) {
+        newErrors.subject = 'Subject is required'
+      }
 
-    if (showTutor && !formData.tutorId) {
-      newErrors.tutorId = 'Tutor is required'
-    }
+      if (showTutor && !formData.tutorId) {
+        newErrors.tutorId = 'Tutor is required'
+      }
 
-    if (showStudent && !formData.studentId) {
-      newErrors.studentId = 'Student is required'
+      if (showStudent && !formData.studentId) {
+        newErrors.studentId = 'Student is required'
+      }
+
+      if (formData.locationType === 'offline' && !formData.address) {
+        newErrors.address = 'Address is required for offline sessions'
+      }
+
+      if (formData.locationType === 'online' && !formData.meetingLink) {
+        newErrors.meetingLink = 'Meeting link is required for online sessions'
+      }
+    } else if (eventType === 'personal') {
+      if (!formData.title) {
+        newErrors.title = 'Event title is required'
+      }
+    } else if (eventType === 'reminder') {
+      if (!formData.title) {
+        newErrors.title = 'Reminder title is required'
+      }
     }
 
     if (!formData.date) {
@@ -213,20 +237,14 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
       newErrors.startTime = 'Start time is required'
     }
 
-    if (!formData.endTime) {
-      newErrors.endTime = 'End time is required'
-    }
+    if (eventType !== 'reminder') {
+      if (!formData.endTime) {
+        newErrors.endTime = 'End time is required'
+      }
 
-    if (formData.startTime && formData.endTime && formData.startTime >= formData.endTime) {
-      newErrors.endTime = 'End time must be after start time'
-    }
-
-    if (formData.locationType === 'offline' && !formData.address) {
-      newErrors.address = 'Address is required for offline sessions'
-    }
-
-    if (formData.locationType === 'online' && !formData.meetingLink) {
-      newErrors.meetingLink = 'Meeting link is required for online sessions'
+      if (formData.startTime && formData.endTime && formData.startTime >= formData.endTime) {
+        newErrors.endTime = 'End time must be after start time'
+      }
     }
 
     setErrors(newErrors)
@@ -238,25 +256,43 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
       return
     }
 
+    // Determine subject/title based on event type
+    const eventTitle = eventType === 'session' 
+      ? formData.subject 
+      : formData.title
+    
+    // Determine color based on event type
+    let eventColor = '#3b82f6'
+    if (eventType === 'session') {
+      eventColor = subjects.find(s => s.name === formData.subject)?.color || '#3b82f6'
+    } else if (eventType === 'personal') {
+      eventColor = '#8b5cf6' // Purple for personal events (different from class green and session blue)
+    } else if (eventType === 'reminder') {
+      eventColor = '#f59e0b' // Amber/Orange for reminders (different from others)
+    }
+
     const sessionData: Partial<Session> = {
-      id: session?.id || `session_${Date.now()}`,
-      subject: formData.subject,
+      id: session?.id || `${eventType}_${Date.now()}`,
+      subject: eventTitle,
+      eventType: eventType, // Store event type
       date: formData.date.toISOString().split('T')[0],
       startTime: formData.startTime.toTimeString().slice(0, 5),
-      endTime: formData.endTime.toTimeString().slice(0, 5),
+      endTime: eventType === 'reminder' 
+        ? formData.startTime.toTimeString().slice(0, 5) 
+        : formData.endTime.toTimeString().slice(0, 5),
       location: {
-        type: formData.locationType,
-        address: formData.locationType === 'offline' ? formData.address : undefined,
-        meetingLink: formData.locationType === 'online' ? formData.meetingLink : undefined
+        type: eventType === 'session' ? formData.locationType : 'offline',
+        address: eventType === 'session' && formData.locationType === 'offline' ? formData.address : undefined,
+        meetingLink: eventType === 'session' && formData.locationType === 'online' ? formData.meetingLink : undefined
       },
       notes: formData.notes,
       status: formData.status,
-      color: subjects.find(s => s.name === formData.subject)?.color || '#3b82f6',
+      color: eventColor,
       createdAt: session?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
 
-    if (showTutor && formData.tutorId) {
+    if (eventType === 'session' && showTutor && formData.tutorId) {
       const tutor = tutors.find(t => t.id === formData.tutorId)
       sessionData.tutor = tutor ? {
         id: tutor.id,
@@ -265,7 +301,7 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
       } : undefined
     }
 
-    if (showStudent && formData.studentId) {
+    if (eventType === 'session' && showStudent && formData.studentId) {
       const student = students.find(s => s.id === formData.studentId)
       sessionData.student = student ? {
         id: student.id,
@@ -305,7 +341,8 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            pb: 1,
+            pb: 2,
+            pt: 3,
             borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`
           }}
         >
@@ -317,7 +354,7 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
               fontSize: '1.25rem'
             }}
           >
-            {session ? 'Edit Session' : 'Create New Session'}
+            {session ? 'Edit Event' : 'Add Event'}
           </Typography>
           <IconButton
             onClick={handleClose}
@@ -332,36 +369,73 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <DialogContent sx={{ pt: 3, pb: 3, px: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Event Type Selector (only show when creating new event) */}
+            {!session && (
+              <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+                <InputLabel sx={getFormFieldStyles().inputLabel}>Event Type</InputLabel>
+                <Select
+                  value={eventType}
+                  onChange={(e) => {
+                    const newType = e.target.value as 'session' | 'personal' | 'reminder'
+                    setEventType(newType)
+                    // Reset relevant fields when switching types
+                    if (newType !== 'session') {
+                      setFormData(prev => ({ ...prev, subject: '', tutorId: '', studentId: '', locationType: 'offline' }))
+                    }
+                  }}
+                  label="Event Type"
+                  sx={getFormFieldStyles().select}
+                >
+                  <MenuItem value="session">Session</MenuItem>
+                  <MenuItem value="personal">Personal Event</MenuItem>
+                  <MenuItem value="reminder">Reminder</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+
             {/* Basic Information */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-                <FormControl fullWidth error={!!errors.subject}>
-                  <InputLabel sx={getFormFieldStyles().inputLabel}>
-                    Subject
-                  </InputLabel>
-                  <Select
-                    value={formData.subject}
-                    onChange={(e) => handleInputChange('subject', e.target.value)}
-                    label="Subject"
-                    sx={getFormFieldStyles().select}
-                  >
-                    {subjects.map((subject) => (
-                      <MenuItem key={subject.id} value={subject.name}>
-                        {subject.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.subject && (
-                    <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-                      {errors.subject}
-                    </Typography>
-                  )}
-                </FormControl>
-              </Box>
+              {eventType === 'session' ? (
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                  <FormControl fullWidth error={!!errors.subject}>
+                    <InputLabel sx={getFormFieldStyles().inputLabel}>
+                      Subject
+                    </InputLabel>
+                    <Select
+                      value={formData.subject}
+                      onChange={(e) => handleInputChange('subject', e.target.value)}
+                      label="Subject"
+                      sx={getFormFieldStyles().select}
+                    >
+                      {subjects.map((subject) => (
+                        <MenuItem key={subject.id} value={subject.name}>
+                          {subject.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.subject && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                        {errors.subject}
+                      </Typography>
+                    )}
+                  </FormControl>
+                </Box>
+              ) : (
+                <TextField
+                  fullWidth
+                  label={eventType === 'personal' ? 'Event Title' : 'Reminder Title'}
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  error={!!errors.title}
+                  helperText={errors.title}
+                  placeholder={eventType === 'personal' ? 'e.g., Meeting with John' : 'e.g., Submit assignment'}
+                  sx={getFormFieldStyles().textField}
+                />
+              )}
 
-              {showTutor && (
+              {eventType === 'session' && showTutor && (
                 <Box sx={{ flex: 1 }}>
                   <FormControl fullWidth error={!!errors.tutorId}>
                     <InputLabel sx={getFormFieldStyles().inputLabel}>Tutor</InputLabel>
@@ -386,7 +460,7 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
                 </Box>
               )}
 
-              {showStudent && (
+              {eventType === 'session' && showStudent && (
                 <Box sx={{ flex: 1 }}>
                   <FormControl fullWidth error={!!errors.studentId}>
                     <InputLabel sx={getFormFieldStyles().inputLabel}>Student</InputLabel>
@@ -413,7 +487,7 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
             </Box>
 
             {/* Date and Time */}
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, mt: 2 }}>
                 <Box sx={{ flex: 1 }}>
                 <DatePicker
                   label="Date"
@@ -500,105 +574,121 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
                   }}
                 />
               </Box>
-                <Box sx={{ flex: 1 }}>
-                <TimePicker
-                  label="End Time"
-                  value={formData.endTime}
-                  onChange={(newValue) => handleInputChange('endTime', newValue)}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      error: !!errors.endTime,
-                      helperText: errors.endTime,
-                      sx: {
-                        ...getFormFieldStyles().textField,
-                        '& .MuiInputBase-input': {
-                          color: theme === 'dark' ? '#ffffff' : '#111827',
-                        },
-                        '& input': {
-                          color: theme === 'dark' ? '#ffffff' : '#111827',
-                        },
-                        // Target MUI X Date Pickers specific classes with !important
-                        '& .MuiPickersInputBase-root': {
-                          color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
-                        },
-                        '& .MuiPickersOutlinedInput-root': {
-                          color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
-                        },
-                        '& [class*="MuiPickersInputBase-root"]': {
-                          color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
-                        },
-                        '& [class*="MuiPickersOutlinedInput-root"]': {
-                          color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
-                        },
-                        // Target SVG icons in DatePicker/TimePicker
-                        '& .MuiSvgIcon-root': {
-                          color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
-                        },
-                        '& [class*="MuiSvgIcon-root"]': {
-                          color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                {eventType !== 'reminder' && (
+                  <Box sx={{ flex: 1 }}>
+                    <TimePicker
+                      label="End Time"
+                      value={formData.endTime}
+                      onChange={(newValue) => handleInputChange('endTime', newValue)}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          error: !!errors.endTime,
+                          helperText: errors.endTime,
+                          sx: {
+                            ...getFormFieldStyles().textField,
+                            '& .MuiInputBase-input': {
+                              color: theme === 'dark' ? '#ffffff' : '#111827',
+                            },
+                            '& input': {
+                              color: theme === 'dark' ? '#ffffff' : '#111827',
+                            },
+                            // Target MUI X Date Pickers specific classes with !important
+                            '& .MuiPickersInputBase-root': {
+                              color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                            },
+                            '& .MuiPickersOutlinedInput-root': {
+                              color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                            },
+                            '& [class*="MuiPickersInputBase-root"]': {
+                              color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                            },
+                            '& [class*="MuiPickersOutlinedInput-root"]': {
+                              color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                            },
+                            // Target SVG icons in DatePicker/TimePicker
+                            '& .MuiSvgIcon-root': {
+                              color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                            },
+                            '& [class*="MuiSvgIcon-root"]': {
+                              color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                            }
+                          }
                         }
-                      }
+                      }}
+                    />
+                  </Box>
+                )}
+            </Box>
+
+            {/* Location (only for sessions) */}
+            {eventType === 'session' && (
+              <Box sx={{ mt: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.locationType === 'online'}
+                      onChange={(e) => handleInputChange('locationType', e.target.checked ? 'online' : 'offline')}
+                      sx={{
+                        '& .MuiSwitch-thumb': {
+                          backgroundColor: theme === 'dark' ? '#ffffff' : '#ffffff',
+                        },
+                        '& .MuiSwitch-track': {
+                          backgroundColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                        },
+                        '&.Mui-checked .MuiSwitch-track': {
+                          backgroundColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                        }
+                      }}
+                    />
+                  }
+                  label={formData.locationType === 'online' ? 'Online Session' : 'In-Person Session'}
+                  sx={{ 
+                    mb: 2,
+                    '& .MuiFormControlLabel-label': {
+                      color: theme === 'dark' ? '#ffffff' : '#111827',
+                      fontWeight: 500
                     }
                   }}
                 />
-              </Box>
-            </Box>
 
-            {/* Location */}
-            <Box>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.locationType === 'online'}
-                    onChange={(e) => handleInputChange('locationType', e.target.checked ? 'online' : 'offline')}
-                    sx={{
-                      '& .MuiSwitch-thumb': {
-                        backgroundColor: theme === 'dark' ? '#ffffff' : '#ffffff',
-                      },
-                      '& .MuiSwitch-track': {
-                        backgroundColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
-                      },
-                      '&.Mui-checked .MuiSwitch-track': {
-                        backgroundColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
-                      }
-                    }}
+                {formData.locationType === 'online' ? (
+                  <TextField
+                    fullWidth
+                    label="Meeting Link"
+                    value={formData.meetingLink}
+                    onChange={(e) => handleInputChange('meetingLink', e.target.value)}
+                    error={!!errors.meetingLink}
+                    helperText={errors.meetingLink}
+                    placeholder="https://meet.google.com/abc-defg-hij"
+                    sx={getFormFieldStyles().textField}
                   />
-                }
-                label={formData.locationType === 'online' ? 'Online Session' : 'In-Person Session'}
-                sx={{ 
-                  mb: 2,
-                  '& .MuiFormControlLabel-label': {
-                    color: theme === 'dark' ? '#ffffff' : '#111827',
-                    fontWeight: 500
-                  }
-                }}
-              />
+                ) : (
+                  <TextField
+                    fullWidth
+                    label="Address"
+                    value={formData.address}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    error={!!errors.address}
+                    helperText={errors.address}
+                    placeholder="Room 201, Building A"
+                    sx={getFormFieldStyles().textField}
+                  />
+                )}
+              </Box>
+            )}
 
-              {formData.locationType === 'online' ? (
-                <TextField
-                  fullWidth
-                  label="Meeting Link"
-                  value={formData.meetingLink}
-                  onChange={(e) => handleInputChange('meetingLink', e.target.value)}
-                  error={!!errors.meetingLink}
-                  helperText={errors.meetingLink}
-                  placeholder="https://meet.google.com/abc-defg-hij"
-                  sx={getFormFieldStyles().textField}
-                />
-              ) : (
-                <TextField
-                  fullWidth
-                  label="Address"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  error={!!errors.address}
-                  helperText={errors.address}
-                  placeholder="Room 201, Building A"
-                  sx={getFormFieldStyles().textField}
-                />
-              )}
-            </Box>
+            {/* Location for personal events */}
+            {eventType === 'personal' && (
+              <TextField
+                fullWidth
+                label="Location (Optional)"
+                value={formData.address}
+                onChange={(e) => handleInputChange('address', e.target.value)}
+                placeholder="e.g., Coffee Shop, Room 201"
+                sx={{ ...getFormFieldStyles().textField, mt: 2 }}
+              />
+            )}
 
             {/* Notes */}
             <TextField
@@ -609,7 +699,7 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               placeholder="Additional notes about the session..."
-              sx={getFormFieldStyles().textField}
+              sx={{ ...getFormFieldStyles().textField, mt: 2 }}
             />
 
             {/* Status (only for editing) */}
@@ -659,7 +749,7 @@ const SessionFormModal: React.FC<SessionFormModalProps> = ({
               }
             }}
           >
-            {session ? 'Update Session' : 'Create Session'}
+            {session ? 'Update Event' : 'Create Event'}
           </Button>
         </DialogActions>
       </Dialog>

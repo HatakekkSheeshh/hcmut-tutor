@@ -9,6 +9,8 @@ interface CardProps {
   actions?: React.ReactNode
   className?: string
   style?: React.CSSProperties
+  sx?: any
+  onClick?: () => void
 }
 
 const Card: React.FC<CardProps> = ({ 
@@ -18,15 +20,20 @@ const Card: React.FC<CardProps> = ({
   image, 
   actions,
   className,
-  style
+  style,
+  sx,
+  onClick
 }) => {
   return (
     <MuiCard 
       className={className} 
       elevation={0}
+      sx={sx}
+      onClick={onClick}
       style={{
         boxShadow: 'none',
         border: '1px solid',
+        cursor: onClick ? 'pointer' : 'default',
         ...style
       }}
     >

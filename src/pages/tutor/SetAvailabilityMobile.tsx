@@ -17,9 +17,25 @@ import {
   Schedule as ScheduleIcon,
   Autorenew as AutorenewIcon,
   Chat as ChatIcon,
+  School as SchoolIcon,
+  Group as GroupIcon,
+  Event as EventIcon,
+  CalendarToday,
+  AccessTime
 } from '@mui/icons-material'
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions,
+  Tabs,
+  Tab,
+  Box,
+  Chip
+} from '@mui/material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import { availabilityAPI, classesAPI } from '../../lib/api'
 
 interface TimeSlot {
   id: string
@@ -33,7 +49,35 @@ const SetAvailabilityMobile: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState('availability')
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [selectedWeek, setSelectedWeek] = useState('current')
+  const [currentTab, setCurrentTab] = useState(0)
+  
+  // Classes states
+  const [classes, setClasses] = useState<any[]>([])
+  const [classesLoading, setClassesLoading] = useState(false)
+  const [createClassDialogOpen, setCreateClassDialogOpen] = useState(false)
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<any[]>([])
+  const [tutorSubjects, setTutorSubjects] = useState<string[]>([])
+  const [newClass, setNewClass] = useState({
+    subject: '',
+    description: '',
+    availabilitySlotIndex: 0,
+    startTime: '',
+    endTime: '',
+    maxStudents: 20,
+    isOnline: true,
+    location: ''
+  })
+  const [timeValidationError, setTimeValidationError] = useState<string | null>(null)
+  
+  // Global semester dates
+  const SEMESTER_START = '2025-08-13T00:00:00.000Z'
+  const SEMESTER_END = '2026-01-30T23:59:59.999Z'
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([
     {
       id: '1',
@@ -117,6 +161,244 @@ const SetAvailabilityMobile: React.FC = () => {
     toggleTheme()
   }
 
+  // Load user and availability data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
+        // Get user from localStorage
+        const userStr = localStorage.getItem('user')
+        if (!userStr) {
+          navigate('/login')
+          return
+        }
+        const userData = JSON.parse(userStr)
+        setUser(userData)
+
+        // Load existing availability from backend
+        const response = await availabilityAPI.get(userData.id)
+        if (response.success && response.data) {
+          const availData = response.data
+          
+          // Convert backend data to frontend format
+          if (availData.timeSlots && availData.timeSlots.length > 0) {
+            const formattedSlots = availData.timeSlots.map((slot: any, index: number) => ({
+              id: `${index + 1}`,
+              day: slot.day.charAt(0).toUpperCase() + slot.day.slice(1), // Capitalize: "monday" -> "Monday"
+              startTime: slot.startTime,
+              endTime: slot.endTime,
+              isAvailable: true
+            }))
+            setTimeSlots(formattedSlots)
+          }
+        }
+      } catch (err: any) {
+        console.error('Error loading availability:', err)
+        setError(err.message || 'Failed to load availability data')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [navigate])
+
+  // Load classes when tab changes to classes tab
+  useEffect(() => {
+    if (currentTab === 1 && user) {
+      loadClasses()
+      loadAvailableTimeSlots()
+    }
+  }, [currentTab, user])
+
+  const loadClasses = async () => {
+    if (!user) return
+    try {
+      setClassesLoading(true)
+      const response = await classesAPI.list({ tutorId: user.id })
+      if (response.success && response.data) {
+        setClasses(response.data)
+      }
+    } catch (err: any) {
+      console.error('Error loading classes:', err)
+      setError(err.message || 'Failed to load classes')
+    } finally {
+      setClassesLoading(false)
+    }
+  }
+
+  const loadAvailableTimeSlots = async () => {
+    if (!user) return
+    try {
+      // Load tutor's subjects
+      if (user.subjects && Array.isArray(user.subjects)) {
+        setTutorSubjects(user.subjects)
+      }
+
+      // Load tutor's availability to get available time slots
+      const response = await availabilityAPI.get(user.id)
+      if (response.success && response.data && response.data.timeSlots) {
+        setAvailableTimeSlots(response.data.timeSlots)
+      }
+    } catch (err: any) {
+      console.error('Error loading availability:', err)
+    }
+  }
+
+  const validateClassTime = () => {
+    const selectedSlot = availableTimeSlots[newClass.availabilitySlotIndex]
+    if (!selectedSlot || !newClass.startTime || !newClass.endTime) {
+      return { valid: false, error: 'Vui lòng nhập đầy đủ thời gian' }
+    }
+
+    const parseTime = (time: string) => {
+      const [h, m] = time.split(':').map(Number)
+      return h * 60 + m
+    }
+
+    const slotStart = parseTime(selectedSlot.startTime)
+    const slotEnd = parseTime(selectedSlot.endTime)
+    const classStart = parseTime(newClass.startTime)
+    const classEnd = parseTime(newClass.endTime)
+
+    if (classStart < slotStart || classEnd > slotEnd) {
+      return { 
+        valid: false, 
+        error: `Thời gian lớp học phải nằm trong khung ${selectedSlot.startTime} - ${selectedSlot.endTime}` 
+      }
+    }
+
+    if (classStart >= classEnd) {
+      return { valid: false, error: 'Thời gian bắt đầu phải trước thời gian kết thúc' }
+    }
+
+    const duration = classEnd - classStart
+    if (duration < 30) {
+      return { valid: false, error: 'Lớp học phải có thời lượng tối thiểu 30 phút' }
+    }
+
+    const sameDayClasses = classes.filter(cls => cls.day === selectedSlot.day)
+    for (const existingClass of sameDayClasses) {
+      const existingStart = parseTime(existingClass.startTime)
+      const existingEnd = parseTime(existingClass.endTime)
+      
+      if (
+        (classStart >= existingStart && classStart < existingEnd) ||
+        (classEnd > existingStart && classEnd <= existingEnd) ||
+        (classStart <= existingStart && classEnd >= existingEnd)
+      ) {
+        return { 
+          valid: false, 
+          error: `Trùng lịch với lớp ${existingClass.code} (${existingClass.startTime}-${existingClass.endTime})` 
+        }
+      }
+    }
+
+    return { valid: true, error: null }
+  }
+
+  const handleCreateClass = async () => {
+    try {
+      setSaving(true)
+      setError(null)
+      setTimeValidationError(null)
+
+      const selectedSlot = availableTimeSlots[newClass.availabilitySlotIndex]
+      if (!selectedSlot) {
+        setError('Vui lòng chọn khung giờ availability')
+        setSaving(false)
+        return
+      }
+
+      const validation = validateClassTime()
+      if (!validation.valid) {
+        setTimeValidationError(validation.error)
+        setSaving(false)
+        return
+      }
+
+      const [startHour, startMin] = newClass.startTime.split(':').map(Number)
+      const [endHour, endMin] = newClass.endTime.split(':').map(Number)
+      const duration = (endHour * 60 + endMin) - (startHour * 60 + startMin)
+
+      const classData = {
+        code: `C${(classes.length + 1).toString().padStart(2, '0')}`,
+        subject: newClass.subject,
+        description: newClass.description,
+        day: selectedSlot.day,
+        startTime: newClass.startTime,
+        endTime: newClass.endTime,
+        duration,
+        maxStudents: newClass.maxStudents,
+        semesterStart: SEMESTER_START,
+        semesterEnd: SEMESTER_END,
+        isOnline: newClass.isOnline,
+        location: newClass.location
+      }
+
+      const response = await classesAPI.create(classData)
+      if (response.success) {
+        setSuccessMessage(`Lớp học ${response.data.code} đã được tạo thành công!`)
+        setCreateClassDialogOpen(false)
+        loadClasses()
+        setNewClass({
+          subject: '',
+          description: '',
+          availabilitySlotIndex: 0,
+          startTime: '',
+          endTime: '',
+          maxStudents: 20,
+          isOnline: true,
+          location: ''
+        })
+        setTimeout(() => setSuccessMessage(null), 3000)
+      } else {
+        setError(response.error || 'Không thể tạo lớp học')
+      }
+    } catch (err: any) {
+      console.error('Error creating class:', err)
+      setError(err.message || 'Đã xảy ra lỗi khi tạo lớp học')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteClass = async (classId: string) => {
+    if (!window.confirm('Bạn có chắc muốn xóa lớp học này?')) return
+    
+    try {
+      const response = await classesAPI.delete(classId)
+      if (response.success) {
+        setSuccessMessage('Đã xóa lớp học thành công!')
+        loadClasses()
+        setTimeout(() => setSuccessMessage(null), 3000)
+      } else {
+        setError(response.error || 'Không thể xóa lớp học')
+      }
+    } catch (err: any) {
+      console.error('Error deleting class:', err)
+      setError(err.message || 'Lỗi khi xóa lớp học')
+    }
+  }
+
+  const handleGenerateSessions = async (classId: string) => {
+    if (!window.confirm('Tạo sessions cho cả học kỳ cho lớp này?')) return
+    
+    try {
+      setSaving(true)
+      const response = await classesAPI.generateSessions(classId)
+      if (response.success) {
+        setSuccessMessage(`Đã tạo ${response.data.count} sessions thành công!`)
+        setTimeout(() => setSuccessMessage(null), 3000)
+      } else {
+        setError(response.error || 'Không thể tạo sessions')
+      }
+    } catch (err: any) {
+      console.error('Error generating sessions:', err)
+      setError(err.message || 'Lỗi khi tạo sessions')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -177,12 +459,47 @@ const SetAvailabilityMobile: React.FC = () => {
     setTimeSlots(prev => prev.filter(slot => slot.id !== id))
   }
 
-  const handleSaveAvailability = () => {
-    // In a real app, this would save to the backend
-    console.log('Availability saved:', {
-      timeSlots,
-      sessionDuration
-    })
+  const handleSaveAvailability = async () => {
+    try {
+      setSaving(true)
+      setError(null)
+      setSuccessMessage(null)
+
+      if (!user) {
+        setError('User not found. Please login again.')
+        return
+      }
+
+      // Convert frontend format to backend format
+      const availableSlots = timeSlots
+        .filter(slot => slot.isAvailable)
+        .map(slot => ({
+          day: slot.day.toLowerCase(), // Convert "Monday" -> "monday" for backend
+          startTime: slot.startTime,
+          endTime: slot.endTime
+        }))
+
+      const data = {
+        timeSlots: availableSlots,
+        exceptions: []
+      }
+
+      // Call backend API
+      const response = await availabilityAPI.set(data)
+      
+      if (response.success) {
+        setSuccessMessage('Availability saved successfully!')
+        // Auto-hide success message after 3 seconds
+        setTimeout(() => setSuccessMessage(null), 3000)
+      } else {
+        setError(response.error || 'Failed to save availability')
+      }
+    } catch (err: any) {
+      console.error('Error saving availability:', err)
+      setError(err.message || 'Failed to save availability')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const getDaySlots = (day: string) => {
@@ -212,6 +529,18 @@ const SetAvailabilityMobile: React.FC = () => {
     return weekOptions.find(option => option.value === selectedWeek) || weekOptions[0]
   }
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Loading availability data...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} pb-16`}>
       {/* Mobile Header */}
@@ -226,10 +555,10 @@ const SetAvailabilityMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Set Availability
+                {currentTab === 0 ? 'Set Availability' : 'Manage Classes'}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Manage your teaching schedule
+                {currentTab === 0 ? 'Manage your teaching schedule' : 'Create and manage your classes'}
               </p>
             </div>
           </div>
@@ -251,8 +580,59 @@ const SetAvailabilityMobile: React.FC = () => {
         </div>
       </div>
 
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: theme === 'dark' ? '#374151' : 'divider', px: 2 }}>
+        <Tabs 
+          value={currentTab} 
+          onChange={(_, newValue) => setCurrentTab(newValue)}
+          textColor="primary"
+          indicatorColor="primary"
+          variant="fullWidth"
+          sx={{
+            '& .MuiTab-root': {
+              color: theme === 'dark' ? '#9ca3af' : 'inherit',
+              fontSize: '0.875rem',
+              minHeight: '48px',
+              '&.Mui-selected': {
+                color: theme === 'dark' ? '#3b82f6' : 'primary.main'
+              }
+            }
+          }}
+        >
+          <Tab 
+            icon={<ScheduleIcon sx={{ fontSize: 20 }} />} 
+            label="Availability" 
+            iconPosition="start"
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
+          <Tab 
+            icon={<SchoolIcon sx={{ fontSize: 20 }} />} 
+            label="Classes" 
+            iconPosition="start"
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
+        </Tabs>
+      </Box>
+
       {/* Mobile Content */}
       <div className="p-4 space-y-4">
+
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <div className="p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            {successMessage}
+          </div>
+        )}
+        {error && (
+          <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
+
+        {/* Tab Content */}
+        {currentTab === 0 ? (
+          /* Availability Tab */
+          <>
 
         {/* Quick Settings - Mobile */}
         <div className="grid grid-cols-2 gap-3">
@@ -518,25 +898,356 @@ const SetAvailabilityMobile: React.FC = () => {
         <div className="sticky bottom-4">
           <Button 
             onClick={handleSaveAvailability}
+            disabled={saving || loading}
             className="w-full bg-green-600 hover:bg-green-700 text-white py-3"
             style={{
-              backgroundColor: theme === 'dark' ? '#10b981' : '#16a34a',
+              backgroundColor: saving ? '#9ca3af' : (theme === 'dark' ? '#10b981' : '#16a34a'),
               color: '#ffffff',
               textTransform: 'none',
               fontWeight: '500'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = theme === 'dark' ? '#059669' : '#15803d'
+              if (!saving) {
+                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#059669' : '#15803d'
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = theme === 'dark' ? '#10b981' : '#16a34a'
+              if (!saving) {
+                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#10b981' : '#16a34a'
+              }
             }}
           >
             <Save className="w-4 h-4 mr-2" />
-            Save Availability
+            {saving ? 'Saving...' : 'Save Availability'}
           </Button>
         </div>
+        </>
+        ) : (
+          /* Classes Tab */
+          <>
+            {classesLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Loading classes...
+                </p>
+              </div>
+            ) : classes.length === 0 ? (
+              <div className="text-center py-12">
+                <SchoolIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+                <p className={`text-lg mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Chưa có lớp học nào
+                </p>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                  Tạo lớp học đầu tiên của bạn
+                </p>
+              </div>
+            ) : (
+              /* Weekly Classes Schedule - Mobile */
+              <div className="space-y-4">
+                {daysOfWeek.map((day) => {
+                  const dayClasses = classes.filter(cls => 
+                    cls.day.toLowerCase() === day.toLowerCase()
+                  )
+                  
+                  if (dayClasses.length === 0) return null
+                  
+                  return (
+                    <Card
+                      key={day}
+                      className={`p-4 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                      style={{
+                        borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                        backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                        boxShadow: 'none !important'
+                      }}
+                    >
+                      <h4 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {day}
+                      </h4>
+                      
+                      <div className="space-y-3">
+                        {dayClasses.map((cls) => (
+                          <div 
+                            key={cls.id} 
+                            className={`p-3 border rounded-lg ${theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-gray-50'}`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h5 className={`text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {cls.code}
+                                  </h5>
+                                  <Chip 
+                                    label={cls.status} 
+                                    size="small"
+                                    color={cls.status === 'active' ? 'success' : cls.status === 'full' ? 'warning' : 'default'}
+                                    sx={{ height: '18px', fontSize: '0.65rem' }}
+                                  />
+                                </div>
+                                <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                  {cls.subject}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => handleDeleteClass(cls.id)}
+                                className={`p-1 rounded ${theme === 'dark' ? 'text-red-400 hover:bg-gray-600' : 'text-red-600 hover:bg-gray-100'}`}
+                              >
+                                <Delete className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 mb-2">
+                              <div className={`flex items-center gap-1.5 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <AccessTime sx={{ fontSize: 12 }} />
+                                <span>{cls.startTime} - {cls.endTime}</span>
+                              </div>
+                              <div className={`flex items-center gap-1.5 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <GroupIcon sx={{ fontSize: 12 }} />
+                                <span>{cls.currentEnrollment || 0} / {cls.maxStudents} students</span>
+                              </div>
+                            </div>
+
+                            <Button
+                              onClick={() => handleGenerateSessions(cls.id)}
+                              disabled={saving}
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                              style={{
+                                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                color: theme === 'dark' ? '#3b82f6' : '#2563eb',
+                                borderColor: theme === 'dark' ? '#3b82f6' : '#2563eb',
+                                textTransform: 'none',
+                                fontSize: '0.7rem',
+                                padding: '4px 8px',
+                                minHeight: '32px'
+                              }}
+                            >
+                              <EventIcon sx={{ fontSize: 12, mr: 0.5 }} />
+                              Generate Sessions
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Summary Section - Mobile */}
+            {classes.length > 0 && (
+              <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <h3 className={`text-base font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Classes Summary
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total Classes:</span>
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {classes.length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Active Classes:</span>
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {classes.filter(c => c.status === 'active').length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total Students:</span>
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {classes.reduce((sum, c) => sum + (c.currentEnrollment || 0), 0)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Create Button - Fixed at bottom */}
+            <div className="sticky bottom-4">
+              <Button 
+                onClick={() => setCreateClassDialogOpen(true)}
+                disabled={saving || loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+                style={{
+                  backgroundColor: theme === 'dark' ? '#2563eb' : '#3b82f6',
+                  color: '#ffffff',
+                  textTransform: 'none',
+                  fontWeight: '500'
+                }}
+              >
+                <Add className="w-4 h-4 mr-2" />
+                Create New Class
+              </Button>
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Create Class Dialog */}
+      <Dialog 
+        open={createClassDialogOpen} 
+        onClose={() => setCreateClassDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen
+      >
+        <DialogTitle className={theme === 'dark' ? 'bg-gray-800 text-white' : ''}>
+          <div className="flex items-center justify-between">
+            <span>Create New Class</span>
+            <button onClick={() => setCreateClassDialogOpen(false)} className="p-1">
+              <CloseIcon />
+            </button>
+          </div>
+        </DialogTitle>
+        <DialogContent className={theme === 'dark' ? 'bg-gray-800' : ''}>
+          <div className="space-y-4 pt-4">
+            <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
+              <p className={`text-sm ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
+                ℹ️ Mã lớp sẽ được tạo tự động
+              </p>
+            </div>
+
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Môn học *
+              </label>
+              {tutorSubjects.length === 0 ? (
+                <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-900'}`}>
+                  <p className="text-sm">⚠️ Cập nhật profile để thêm môn học</p>
+                </div>
+              ) : (
+                <select
+                  value={newClass.subject}
+                  onChange={(e) => setNewClass({...newClass, subject: e.target.value})}
+                  className={`w-full px-3 py-2 border rounded-lg ${
+                    theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                >
+                  <option value="">-- Chọn môn học --</option>
+                  {tutorSubjects.map((subject, index) => (
+                    <option key={index} value={subject}>{subject}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {availableTimeSlots.length > 0 && (
+              <>
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Chọn khung giờ *
+                  </label>
+                  <select
+                    value={newClass.availabilitySlotIndex}
+                    onChange={(e) => {
+                      setNewClass({
+                        ...newClass,
+                        availabilitySlotIndex: parseInt(e.target.value),
+                        startTime: '',
+                        endTime: ''
+                      })
+                      setTimeValidationError(null)
+                    }}
+                    className={`w-full px-3 py-2 border rounded-lg ${
+                      theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                    }`}
+                  >
+                    {availableTimeSlots.map((slot, index) => (
+                      <option key={index} value={index}>
+                        {slot.day.charAt(0).toUpperCase() + slot.day.slice(1)} • {slot.startTime} - {slot.endTime}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Thời gian lớp học *
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={`block text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Bắt đầu</label>
+                      <input
+                        type="time"
+                        value={newClass.startTime}
+                        onChange={(e) => {
+                          setNewClass({...newClass, startTime: e.target.value})
+                          setTimeValidationError(null)
+                        }}
+                        className={`w-full px-3 py-2 border rounded-lg ${
+                          theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Kết thúc</label>
+                      <input
+                        type="time"
+                        value={newClass.endTime}
+                        onChange={(e) => {
+                          setNewClass({...newClass, endTime: e.target.value})
+                          setTimeValidationError(null)
+                        }}
+                        className={`w-full px-3 py-2 border rounded-lg ${
+                          theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                  {timeValidationError && (
+                    <div className={`mt-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-red-900/20' : 'bg-red-50'}`}>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-red-300' : 'text-red-700'}`}>⚠️ {timeValidationError}</p>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Số sinh viên tối đa *
+              </label>
+              <input
+                type="number"
+                value={newClass.maxStudents}
+                onChange={(e) => setNewClass({...newClass, maxStudents: parseInt(e.target.value) || 1})}
+                min="1"
+                max="100"
+                className={`w-full px-3 py-2 border rounded-lg ${
+                  theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              />
+            </div>
+
+            <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
+              <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                📅 Học kỳ: {new Date(SEMESTER_START).toLocaleDateString('vi-VN')} - {new Date(SEMESTER_END).toLocaleDateString('vi-VN')}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions className={theme === 'dark' ? 'bg-gray-800' : ''}>
+          <Button 
+            onClick={() => setCreateClassDialogOpen(false)}
+            variant="outlined"
+          >
+            Hủy
+          </Button>
+          <Button 
+            onClick={handleCreateClass}
+            disabled={saving || !newClass.subject || !newClass.startTime || !newClass.endTime || availableTimeSlots.length === 0}
+            style={{
+              backgroundColor: saving || !newClass.subject || !newClass.startTime || !newClass.endTime ? '#9ca3af' : '#2563eb',
+              color: '#ffffff'
+            }}
+          >
+            {saving ? 'Đang tạo...' : 'Tạo lớp'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Mobile Drawer */}
       {mobileOpen && (

@@ -28,6 +28,7 @@ import {
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import '../../styles/weather-animations.css'
+import api from '../../lib/api'
 
 const LoginMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
@@ -172,11 +173,41 @@ const LoginMobile: React.FC = () => {
     }))
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Login attempt:', formData)
-    // Navigate to appropriate dashboard based on user role
-    navigate('/student')
+    setError('')
+    setLoading(true)
+    
+    try {
+      const result = await api.auth.login(formData.email, formData.password)
+      
+      if (result.success) {
+        const { user, token } = result.data
+        
+        // Save token and user info
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(user))
+        
+        // Navigate based on role
+        if (user.role === 'student') {
+          navigate('/student')
+        } else if (user.role === 'tutor') {
+          navigate('/tutor')
+        } else if (user.role === 'management') {
+          navigate('/management')
+        }
+      } else {
+        setError(result.error || 'Đăng nhập thất bại')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      setError('Có lỗi xảy ra khi đăng nhập')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleSSOLogin = (provider: string) => {
@@ -460,9 +491,17 @@ const LoginMobile: React.FC = () => {
                 </button>
               </div>
 
+              {/* Error message */}
+              {error && (
+                <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {error}
+                </div>
+              )}
+
               <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+                type="submit"
+                disabled={loading}
+                className={`w-full bg-blue-600 hover:bg-blue-700 text-white py-3 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 style={{
                   backgroundColor: theme === 'dark' ? '#2563eb' : '#3b82f6',
                   color: '#ffffff',
@@ -470,13 +509,15 @@ const LoginMobile: React.FC = () => {
                   fontWeight: '500'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1e40af' : '#2563eb'
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1e40af' : '#2563eb'
+                  }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = theme === 'dark' ? '#2563eb' : '#3b82f6'
                 }}
               >
-                Sign In
+                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </Button>
             </form>
           ) : (
@@ -526,7 +567,10 @@ const LoginMobile: React.FC = () => {
           <div className="mt-6 text-center">
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               Don't have an account?{' '}
-              <button className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}>
+              <button 
+                onClick={() => navigate('/common/register')}
+                className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
+              >
                 Sign up here
               </button>
             </p>

@@ -12,13 +12,13 @@ import SetAvailability from '../pages/tutor/SetAvailability'
 import SetAvailabilityMobile from '../pages/tutor/SetAvailabilityMobile'
 import TrackStudentProgress from '../pages/tutor/TrackStudentProgress'
 import TrackStudentProgressMobile from '../pages/tutor/TrackStudentProgressMobile'
-import DeviceSwitch from './DeviceSwitch'
+import TutorSessionDetail from '../pages/tutor/TutorSessionDetail'
+import TutorLMS from '../pages/tutor/TutorLMS'
 
 const TutorDeviceDetector: React.FC = () => {
   const location = useLocation()
   const [isMobile, setIsMobile] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [manualOverride, setManualOverride] = useState<boolean | null>(null)
 
   useEffect(() => {
     const checkDevice = () => {
@@ -26,9 +26,7 @@ const TutorDeviceDetector: React.FC = () => {
       const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
       const isSmallScreen = window.innerWidth <= 768
       
-      if (manualOverride === null) {
-        setIsMobile(isMobileDevice || isSmallScreen)
-      }
+      setIsMobile(isMobileDevice || isSmallScreen)
       setIsLoading(false)
     }
 
@@ -38,12 +36,7 @@ const TutorDeviceDetector: React.FC = () => {
     return () => {
       window.removeEventListener('resize', checkDevice)
     }
-  }, [manualOverride])
-
-  const handleDeviceChange = (forceMobile: boolean) => {
-    setManualOverride(forceMobile)
-    setIsMobile(forceMobile)
-  }
+  }, [])
 
   if (isLoading) {
     return (
@@ -69,11 +62,17 @@ const TutorDeviceDetector: React.FC = () => {
       if (location.pathname === '/tutor/sessions') {
         return <ManageSessionsMobile />
       }
+      if (location.pathname === '/tutor/lms') {
+        return <TutorLMS />
+      }
       if (location.pathname === '/tutor/messages') {
         return <MessagesMobile />
       }
       if (location.pathname === '/tutor/track-progress') {
         return <TrackStudentProgressMobile />
+      }
+      if (location.pathname.startsWith('/tutor/session/') || location.pathname.startsWith('/tutor/class/')) {
+        return <TutorSessionDetail />
       }
       return <TutorDashboardMobile />
     }
@@ -88,26 +87,24 @@ const TutorDeviceDetector: React.FC = () => {
     if (location.pathname === '/tutor/sessions') {
       return <ManageSessions />
     }
+    if (location.pathname === '/tutor/lms') {
+      return <TutorLMS />
+    }
     if (location.pathname === '/tutor/messages') {
       return <Messages />
     }
     if (location.pathname === '/tutor/track-progress') {
       return <TrackStudentProgress />
     }
+    if (location.pathname.startsWith('/tutor/session/') || location.pathname.startsWith('/tutor/class/')) {
+      return <TutorSessionDetail />
+    }
     return <TutorDashboard />
   }
 
   return (
     <div className="relative">
-      {/* Device Switch Button - Only show on desktop */}
-      {!isMobile && (
-        <div className="fixed top-4 right-4 z-50">
-          <DeviceSwitch 
-            onDeviceChange={handleDeviceChange}
-            currentDevice={isMobile ? 'mobile' : 'desktop'}
-          />
-        </div>
-      )}
+      {/* Device Switch removed as per user request */}
       
       {renderComponent()}
     </div>

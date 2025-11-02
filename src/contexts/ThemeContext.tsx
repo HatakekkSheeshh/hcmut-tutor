@@ -30,8 +30,26 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('theme', theme)
-    document.documentElement.classList.toggle('dark', theme === 'dark')
-    document.documentElement.classList.toggle('neo-brutalism', theme === 'neo-brutalism')
+    const root = document.documentElement
+    const body = document.body
+    
+    // Check if DOM elements exist
+    if (!root || !body) {
+      return
+    }
+    
+    // Toggle dark mode class
+    root.classList.toggle('dark', theme === 'dark')
+    root.classList.toggle('neo-brutalism', theme === 'neo-brutalism')
+    
+    // Set background colors to prevent flash
+    if (theme === 'dark') {
+      root.style.backgroundColor = '#111827' // bg-gray-900
+      body.style.backgroundColor = '#111827'
+    } else {
+      root.style.backgroundColor = '#f9fafb' // bg-gray-50
+      body.style.backgroundColor = '#f9fafb'
+    }
   }, [theme])
 
   const toggleTheme = () => {

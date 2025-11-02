@@ -16,13 +16,11 @@ import SessionDetail from '../pages/student/SessionDetail'
 import SessionDetailMobile from '../pages/student/SessionDetailMobile'
 import ViewProgress from '../pages/student/ViewProgress'
 import ViewProgressMobile from '../pages/student/ViewProgressMobile'
-import DeviceSwitch from './DeviceSwitch'
 
 const DeviceDetector: React.FC = () => {
   const location = useLocation()
   const [isMobile, setIsMobile] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [manualOverride, setManualOverride] = useState<boolean | null>(null)
 
   useEffect(() => {
     const checkDevice = () => {
@@ -30,9 +28,7 @@ const DeviceDetector: React.FC = () => {
       const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
       const isSmallScreen = window.innerWidth <= 768
       
-      if (manualOverride === null) {
-        setIsMobile(isMobileDevice || isSmallScreen)
-      }
+      setIsMobile(isMobileDevice || isSmallScreen)
       setIsLoading(false)
     }
 
@@ -42,12 +38,7 @@ const DeviceDetector: React.FC = () => {
     return () => {
       window.removeEventListener('resize', checkDevice)
     }
-  }, [manualOverride])
-
-  const handleDeviceChange = (forceMobile: boolean) => {
-    setManualOverride(forceMobile)
-    setIsMobile(forceMobile)
-  }
+  }, [])
 
   if (isLoading) {
     return (
@@ -70,7 +61,7 @@ const DeviceDetector: React.FC = () => {
             if (location.pathname === '/student/chatbot') {
               return <ChatbotSupportMobile />
             }
-            if (location.pathname === '/student/evaluate') {
+            if (location.pathname.startsWith('/student/evaluate/')) {
               return <EvaluateSessionMobile />
             }
             if (location.pathname === '/student/messages') {
@@ -95,7 +86,7 @@ const DeviceDetector: React.FC = () => {
           if (location.pathname === '/student/chatbot') {
             return <ChatbotSupport />
           }
-          if (location.pathname === '/student/evaluate') {
+          if (location.pathname.startsWith('/student/evaluate/')) {
             return <EvaluateSession />
           }
           if (location.pathname === '/student/messages') {
@@ -115,15 +106,7 @@ const DeviceDetector: React.FC = () => {
 
   return (
     <div className="relative">
-      {/* Device Switch Button - Only show on desktop */}
-      {!isMobile && (
-        <div className="fixed top-4 right-4 z-50">
-          <DeviceSwitch 
-            onDeviceChange={handleDeviceChange}
-            currentDevice={isMobile ? 'mobile' : 'desktop'}
-          />
-        </div>
-      )}
+      {/* Device Switch removed as per user request */}
       
       {renderComponent()}
     </div>

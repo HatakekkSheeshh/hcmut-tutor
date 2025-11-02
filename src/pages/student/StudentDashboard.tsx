@@ -5,6 +5,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
+import api from '../../lib/api'
 import {
   Dashboard as DashboardIcon,
   Search as SearchIcon,
@@ -35,7 +36,8 @@ import {
   PersonSearch,
   Class,
   Chat as ChatIcon,
-  CalendarMonth
+  CalendarMonth,
+  Logout as LogoutIcon
 } from '@mui/icons-material'
 
 const StudentDashboard: React.FC = () => {
@@ -44,6 +46,14 @@ const StudentDashboard: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState('dashboard')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
+  
+  // User data states
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [sessions, setSessions] = useState<any[]>([])
+  const [enrollments, setEnrollments] = useState<any[]>([])
+  const [classes, setClasses] = useState<{ [key: string]: any }>({})
+  const [tutors, setTutors] = useState<{ [key: string]: any }>({})
   
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -64,6 +74,133 @@ const StudentDashboard: React.FC = () => {
   const handleThemeToggle = () => {
     toggleTheme()
     setShowThemeOptions(false)
+  }
+
+  // Load user data and sessions from backend
+  const loadUserData = async () => {
+    try {
+      setLoading(true)
+      
+      // Get current user
+      const userResult = await api.auth.getMe()
+      if (userResult.success) {
+        const userData = userResult.data
+        setUser(userData)
+        
+        // Get user sessions and enrollments
+        const [sessionsResult, enrollmentsResult] = await Promise.all([
+          api.sessions.list({
+            studentId: userData.id,
+            limit: 100
+          }),
+          api.enrollments.list({
+            studentId: userData.id,
+            status: 'active'
+          })
+        ])
+        
+        console.log('Sessions API Response:', sessionsResult)
+        console.log('Enrollments API Response:', enrollmentsResult)
+        
+        if (sessionsResult.data && Array.isArray(sessionsResult.data)) {
+          const sessionsData = sessionsResult.data
+          setSessions(sessionsData)
+          console.log('Sessions loaded:', sessionsData.length)
+          
+          // Load tutor data for each session
+          const uniqueTutorIds = [...new Set(sessionsData.map((s: any) => s.tutorId))] as string[]
+          const tutorPromises = uniqueTutorIds.map(async (tutorId: string) => {
+            try {
+              const tutorResponse = await api.users.get(tutorId)
+              if (tutorResponse.success && tutorResponse.data) {
+                return { id: tutorId, data: tutorResponse.data }
+              }
+            } catch (err) {
+              console.error(`Failed to load tutor ${tutorId}:`, err)
+            }
+            return null
+          })
+          
+          const tutorResults = await Promise.all(tutorPromises)
+          let tutorsMap: { [key: string]: any } = {}
+          tutorResults.forEach(result => {
+            if (result) {
+              tutorsMap[result.id] = result.data
+            }
+          })
+          
+          // Load enrollments and classes
+          if (enrollmentsResult.success && enrollmentsResult.data && Array.isArray(enrollmentsResult.data)) {
+            const enrollmentsData = enrollmentsResult.data
+            setEnrollments(enrollmentsData)
+            console.log('Enrollments loaded:', enrollmentsData.length)
+
+            // Load class details for each enrollment
+            const uniqueClassIds = [...new Set(enrollmentsData.map((e: any) => e.classId))] as string[]
+            const classPromises = uniqueClassIds.map(async (classId: string) => {
+              try {
+                const classResponse = await api.classes.get(classId)
+                if (classResponse.success && classResponse.data) {
+                  return { id: classId, data: classResponse.data }
+                }
+              } catch (err) {
+                console.error(`Failed to load class ${classId}:`, err)
+              }
+              return null
+            })
+
+            const classResults = await Promise.all(classPromises)
+            const classesMap: { [key: string]: any } = {}
+            const classTutorIds: string[] = []
+            
+            classResults.forEach(result => {
+              if (result) {
+                classesMap[result.id] = result.data
+                if (result.data.tutorId && !tutorsMap[result.data.tutorId]) {
+                  classTutorIds.push(result.data.tutorId)
+                }
+              }
+            })
+            setClasses(classesMap)
+
+            // Load tutors for classes if needed
+            if (classTutorIds.length > 0) {
+              const classTutorPromises = classTutorIds.map(async (tutorId: string) => {
+                try {
+                  const tutorResponse = await api.users.get(tutorId)
+                  if (tutorResponse.success && tutorResponse.data) {
+                    return { id: tutorId, data: tutorResponse.data }
+                  }
+                } catch (err) {
+                  console.error(`Failed to load tutor ${tutorId}:`, err)
+                }
+                return null
+              })
+
+              const classTutorResults = await Promise.all(classTutorPromises)
+              classTutorResults.forEach(result => {
+                if (result) {
+                  tutorsMap[result.id] = result.data
+                }
+              })
+            }
+          }
+          
+          setTutors(tutorsMap)
+        }
+      } else {
+        // If auth fails, redirect to login
+        if (userResult.error?.includes('xác thực')) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login')
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Weather API function
@@ -162,8 +299,11 @@ const StudentDashboard: React.FC = () => {
     return 'Good Evening'
   }
 
-  // useEffect for time and weather
+  // useEffect for data loading, time and weather
   useEffect(() => {
+    // Load user data and sessions
+    loadUserData()
+    
     // Update time every second
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date())
@@ -181,67 +321,60 @@ const StudentDashboard: React.FC = () => {
     }
   }, [])
 
-  // Mock data
+  // Calculate stats from real data
+  const totalSessions = sessions.length
+  const completedSessions = sessions.filter(s => s.status === 'completed').length
+  const upcomingSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
+  const totalClasses = enrollments.length
+  
   const stats = [
-    { title: 'Total Courses', value: '24', icon: <SchoolIcon /> },
-    { title: 'Completed', value: '18', icon: <CheckCircleIcon /> },
-    { title: 'In Progress', value: '6', icon: <AutorenewIcon /> }
+    { title: 'Enrolled Classes', value: totalClasses.toString(), icon: <SchoolIcon /> },
+    { title: 'Total Sessions', value: totalSessions.toString(), icon: <CheckCircleIcon /> },
+    { title: 'Upcoming', value: upcomingSessions.toString(), icon: <AutorenewIcon /> }
   ]
 
-  const registeredCourses = [
-    {
-      id: 1,
-      title: 'Advanced React Patterns',
-      instructor: 'John Doe',
-      subject: 'Computer Science',
-      progress: 75,
-      duration: '2h 30m',
-      nextSession: '2024-01-15T14:00:00Z',
-      totalSessions: 12,
-      completedSessions: 9,
-      rating: 4.8,
-      status: 'active'
-    },
-    {
-      id: 2,
-      title: 'TypeScript Fundamentals',
-      instructor: 'Jane Smith',
-      subject: 'Programming',
-      progress: 45,
-      duration: '3h 15m',
-      nextSession: '2024-01-16T10:00:00Z',
-      totalSessions: 8,
-      completedSessions: 4,
-      rating: 4.9,
-      status: 'active'
-    },
-    {
-      id: 3,
-      title: 'Node.js Backend Development',
-      instructor: 'Mike Johnson',
-      subject: 'Backend Development',
-      progress: 90,
-      duration: '4h 20m',
-      nextSession: '2024-01-17T16:00:00Z',
-      totalSessions: 10,
-      completedSessions: 9,
-      rating: 4.7,
-      status: 'active'
-    }
-  ]
+  // Map sessions to course format for UI (only show upcoming/confirmed sessions)
+  const sessionsCourses = sessions
+    .filter(session => session.status === 'confirmed' || session.status === 'pending')
+    .map(session => {
+      const tutor = tutors[session.tutorId]
+      return {
+        id: session.id,
+        type: 'session' as const,
+        title: session.subject,
+        instructor: tutor?.name || 'Loading...',
+        subject: session.topic || session.subject,
+        duration: `${session.duration} mins`,
+        nextSession: session.startTime,
+        rating: tutor?.rating || 4.5,
+        status: session.status === 'confirmed' ? 'active' : 'pending',
+        sessionData: session // Keep original session data for reference
+      }
+    })
 
-  const mentors = [
-    { name: 'Sarah Wilson', course: 'Web Development', status: 'Online' },
-    { name: 'David Chen', course: 'Data Science', status: 'Offline' },
-    { name: 'Emily Brown', course: 'UI/UX Design', status: 'Online' },
-    { name: 'Alex Taylor', course: 'Mobile Development', status: 'Online' }
-  ]
+  // Map classes to course format
+  const classesCourses = enrollments
+    .map(enrollment => {
+      const classItem = classes[enrollment.classId]
+      const tutor = classItem ? tutors[classItem.tutorId] : null
+      return {
+        id: enrollment.classId,
+        type: 'class' as const,
+        title: classItem?.subject || 'Loading...',
+        instructor: tutor?.name || 'Loading...',
+        subject: `${classItem?.code || 'N/A'} - ${classItem?.day || ''}`,
+        duration: `${classItem?.duration || 0} mins`,
+        nextSession: classItem?.semesterStart || new Date().toISOString(),
+        rating: tutor?.rating || 4.5,
+        status: classItem?.status === 'active' ? 'active' : 'inactive',
+        classData: classItem // Keep original class data for reference
+      }
+    })
 
-  const friends = [
-    { name: 'Alice Johnson', course: 'React Mastery' },
-    { name: 'Bob Smith', course: 'Python Basics' },
-    { name: 'Carol Davis', course: 'JavaScript ES6' }
-  ]
+  // Combine and sort by date
+  const registeredCourses = [...sessionsCourses, ...classesCourses]
+    .sort((a, b) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
+    .slice(0, 6) // Limit to 6 items for display
 
   // Helper function to get initials from name
   const getInitials = (name: string) => {
@@ -267,51 +400,65 @@ const StudentDashboard: React.FC = () => {
 
   // Helper function to generate course thumbnail
   const generateCourseThumbnail = (course: any) => {
-    const gradients = [
-      'from-blue-500 to-purple-600',
-      'from-green-500 to-teal-600', 
-      'from-orange-500 to-red-600',
-      'from-pink-500 to-rose-600',
-      'from-indigo-500 to-blue-600',
-      'from-emerald-500 to-green-600',
-      'from-yellow-500 to-orange-600',
-      'from-cyan-500 to-blue-600',
-      'from-violet-500 to-purple-600',
-      'from-lime-500 to-green-600'
+    // Subject-based background images with beautiful patterns
+    const subjectBackgrounds: { [key: string]: string } = {
+      'Toán học': 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop',
+      'Vật lý': 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=800&h=400&fit=crop',
+      'Hóa học': 'https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?w=800&h=400&fit=crop',
+      'Sinh học': 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&h=400&fit=crop',
+      'Văn học': 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=400&fit=crop',
+      'Tiếng Anh': 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&h=400&fit=crop',
+      'Lịch sử': 'https://images.unsplash.com/photo-1461360228754-6e81c478b882?w=800&h=400&fit=crop',
+      'Địa lý': 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&h=400&fit=crop',
+      'Tin học': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop',
+      'Lập trình': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop',
+      'Kinh tế': 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&h=400&fit=crop',
+      'Triết học': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&h=400&fit=crop',
+      'Nghệ thuật': 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=400&fit=crop',
+      'Âm nhạc': 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&h=400&fit=crop',
+      'Thể dục': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=400&fit=crop',
+      'Cấu trúc dữ liệu': 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&h=400&fit=crop',
+      'Đại số tuyến tính': 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&h=400&fit=crop',
+      'Giải tích': 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop'
+    }
+    
+    // Default backgrounds if subject not found
+    const defaultBackgrounds = [
+      'https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=800&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1557682224-5b8590cd9ec5?w=800&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1557683311-eac922347aa1?w=800&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800&h=400&fit=crop'
     ]
     
-    const gradientIndex = course.id % gradients.length
-    const gradient = gradients[gradientIndex]
+    // Get background image
+    let backgroundImage = subjectBackgrounds[course.title] || subjectBackgrounds[course.subject]
+    if (!backgroundImage) {
+      const index = (course.id?.charCodeAt(0) || 0) % defaultBackgrounds.length
+      backgroundImage = defaultBackgrounds[index]
+    }
     
     return (
-      <div className={`w-full h-48 bg-gradient-to-br ${gradient} flex items-center justify-center relative overflow-hidden rounded-t-lg`}>
-        {/* Decorative pattern */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-4 left-4 w-16 h-16 bg-white rounded-full opacity-30"></div>
-          <div className="absolute bottom-4 right-4 w-12 h-12 bg-white rounded-full opacity-20"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white rounded-full opacity-10"></div>
+      <div 
+        className="w-full h-48 flex items-center justify-center relative overflow-hidden rounded-t-lg bg-cover bg-center"
+        style={{ backgroundImage: `url('${backgroundImage}')` }}
+      >
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-4 left-4 w-16 h-16 bg-white rounded-full blur-xl"></div>
+          <div className="absolute bottom-4 right-4 w-20 h-20 bg-white rounded-full blur-2xl"></div>
         </div>
         
         {/* Course title overlay */}
         <div className="relative z-10 text-center px-4">
-          <div className="text-white text-lg font-bold mb-2 line-clamp-2">
+          <div className="text-white text-lg font-bold mb-2 line-clamp-2 drop-shadow-lg">
             {course.title}
           </div>
-          <div className="text-white text-sm opacity-90">
+          <div className="text-white text-sm opacity-90 drop-shadow-md">
             {course.subject}
-          </div>
-        </div>
-        
-        {/* Progress overlay */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="bg-black bg-opacity-50 rounded-lg p-2">
-            <div className="w-full bg-gray-300 rounded-full h-2 mb-2">
-              <div 
-                className="bg-white h-2 rounded-full" 
-                style={{ width: `${course.progress}%` }}
-              ></div>
-            </div>
-            <p className="text-white text-sm">{course.progress}% Complete</p>
           </div>
         </div>
       </div>
@@ -330,51 +477,41 @@ const StudentDashboard: React.FC = () => {
     { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
   ]
 
-  // Fetch avatar from API
-  const [userName, setUserName] = useState<string>('Tran Hong Tai') 
-  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    const savedAvatar = localStorage.getItem('student_avatar')
-    if (savedAvatar) {
-      setAvatarUrl(savedAvatar)
-    } else {
-      fetch('/user.json')
-        .then(response => response.json())
-        .then(data => {
-          setUserName(data.name)
-          setAvatarUrl(data.avatar)
-        })
-        .catch(console.error)
-    }
-  }, [])
+  // User name and avatar are now from backend
+  const userName = user?.name || 'Student'
+  const avatarUrl = user?.avatar
  
-  // Avatar change handlers
+  // Avatar change handlers (commented out - to be implemented with backend API)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const onPickAvatar = () => fileInputRef.current?.click()
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const dataUrl = reader.result as string
-      setAvatarUrl(dataUrl)
-      try {
-        localStorage.setItem('student_avatar', dataUrl)
-      } 
-      catch (err) {
-        console.error('Failed to save avatar to localStorage:', err)
-      }
-    }
-    reader.readAsDataURL(file)
+  const onPickAvatar = () => {
+    // TODO: Implement avatar upload to backend
+    console.log('Avatar upload to be implemented')
+  }
+  const onFileChange = (_e: React.ChangeEvent<HTMLInputElement>) => {
+    // TODO: Implement avatar upload to backend
+    console.log('Avatar upload to be implemented')
   }
   
+  // Show loading state
+  if (loading && !user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: theme === 'dark' ? '#fff' : '#000'
+      }}>
+        <div>Đang tải...</div>
+      </div>
+    )
+  }
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -406,38 +543,6 @@ const StudentDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Friends Section */}
-            <div className="mb-8">
-              <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                FRIENDS
-              </h3>
-              <div className="space-y-3">
-                {friends.map((friend, index) => (
-                  <div key={index} className="flex items-center">
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        bgcolor: getAvatarColor(friend.name),
-                        fontSize: '0.875rem',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {getInitials(friend.name)}
-                    </Avatar>
-                    <div className="ml-3">
-                      <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {friend.name}
-                      </p>
-                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {friend.course}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Settings */}
             <div>
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -464,6 +569,17 @@ const StudentDashboard: React.FC = () => {
                 >
                   <PaletteIcon className="mr-3 w-4 h-4" />
                   Theme
+                </button>
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('token')
+                    localStorage.removeItem('user')
+                    navigate('/common/login')
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
+                >
+                  <LogoutIcon className="mr-3 w-4 h-4" />
+                  Logout
                 </button>
               </div>
 
@@ -628,7 +744,7 @@ const StudentDashboard: React.FC = () => {
                     {formatDate(currentTime)}
                   </div>
                   <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {getGreeting()}, Prashant
+                    {getGreeting()}, {userName}
                   </div>
                 </div>
 
@@ -697,11 +813,11 @@ const StudentDashboard: React.FC = () => {
             ))}
           </div>
 
-          {/* Registered Courses Section */}
+          {/* My Sessions Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                My Registered Courses
+                My Upcoming Sessions
               </h2>
               <div className="flex space-x-2">
                 <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
@@ -713,12 +829,29 @@ const StudentDashboard: React.FC = () => {
               </div>
             </div>
 
+            {registeredCourses.length === 0 ? (
+              <div className="text-center py-12">
+                <SchoolIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+                <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  No Upcoming Sessions
+                </h3>
+                <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  You don't have any confirmed or pending sessions yet.
+                </p>
+                <Button 
+                  onClick={() => navigate('/student/book')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                >
+                  Book a Session
+                </Button>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {registeredCourses.map((course) => (
                 <div 
                   key={course.id}
                   className="cursor-pointer transition-all duration-200 hover:shadow-lg h-full"
-                  onClick={() => navigate(`/student/session/${course.id}`)}
+                  onClick={() => navigate(course.type === 'class' ? `/student/class/${course.id}` : `/student/session/${course.id}`)}
                 >
                   <Card 
                     className={`overflow-hidden h-full flex flex-col rounded-lg border ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-750 border-gray-700' : 'bg-white hover:bg-gray-50 border-gray-200'}`}
@@ -735,11 +868,11 @@ const StudentDashboard: React.FC = () => {
                     {/* Status Badge */}
                     <div className="absolute top-4 right-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        course.status === 'active' 
+                        course.type === 'session' && (course as any).sessionData?.status === 'confirmed' 
                           ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
+                          : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {course.status === 'active' ? 'Active' : 'Inactive'}
+                        {course.type === 'session' && (course as any).sessionData?.status === 'confirmed' ? 'Confirmed' : course.type === 'class' ? 'Active' : 'Pending'}
                       </span>
                     </div>
                   </div>
@@ -768,27 +901,36 @@ const StudentDashboard: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4 mb-3">
                       <div>
                         <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Sessions
-                        </p>
-                        <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {course.completedSessions}/{course.totalSessions}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                           Duration
                         </p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {course.duration}
                         </p>
                       </div>
+                      <div>
+                        <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Type
+                        </p>
+                        <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {course.type === 'class' 
+                            ? ((course as any).classData?.isOnline ? 'Online' : 'In-Person')
+                            : ((course as any).sessionData?.isOnline ? 'Online' : 'In-Person')}
+                        </p>
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between mt-auto">
                       <div className="flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        <div className={`w-2 h-2 rounded-full mr-2 ${
+                          course.type === 'class' || (course.type === 'session' && (course as any).sessionData?.status === 'confirmed') ? 'bg-green-500' : 'bg-yellow-500'
+                        }`}></div>
                         <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Next: {new Date(course.nextSession).toLocaleDateString()}
+                          {new Date(course.nextSession).toLocaleDateString('vi-VN', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </p>
                       </div>
                       <Button 
@@ -804,98 +946,128 @@ const StudentDashboard: React.FC = () => {
                 </div>
               ))}
             </div>
+            )}
           </div>
 
-          {/* Your Mentor Section */}
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Your Mentor
-              </h2>
-              <button className={`text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}>
-                See All
-              </button>
-            </div>
-
-            <div className={`rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} overflow-hidden`}>
-              {/* Table Header - Hidden on mobile */}
-              <div className={`px-6 py-3 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hidden lg:block`}>
-                <div className="grid grid-cols-4 gap-4 text-sm font-medium">
-                  <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Instructor & Date</div>
-                  <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>COURSE TYPE</div>
-                  <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>COURSE TITLE</div>
-                  <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>ACTIONS</div>
-                </div>
+          {/* My Classes Section */}
+          {classesCourses.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  My Classes
+                </h2>
+                <Button 
+                  onClick={() => navigate('/student/session?view=classes')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm"
+                >
+                  View All
+                </Button>
               </div>
 
-              {/* Table Rows */}
-              {mentors.map((mentor, index) => (
-                <div key={index} className={`px-4 lg:px-6 py-4 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} last:border-b-0`}>
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-                    <div className="flex items-center">
-                      <Avatar
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          bgcolor: getAvatarColor(mentor.name),
-                          fontSize: '0.875rem',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {getInitials(mentor.name)}
-                      </Avatar>
-                      <div className="ml-3">
-                        <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {mentor.name}
-                        </p>
-                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {mentor.course}
-                        </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+                {classesCourses.slice(0, 6).map((course) => (
+                  <div 
+                    key={course.id}
+                    className="cursor-pointer transition-all duration-200 hover:shadow-lg h-full"
+                    onClick={() => navigate(`/student/class/${course.id}`)}
+                  >
+                    <Card 
+                      className={`overflow-hidden h-full flex flex-col rounded-lg border ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-750 border-gray-700' : 'bg-white hover:bg-gray-50 border-gray-200'}`}
+                      style={{
+                        borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                        backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                        boxShadow: 'none !important'
+                      }}
+                    >
+                      <div className="relative">
+                        {/* Generated Thumbnail */}
+                        {generateCourseThumbnail(course)}
+                        
+                        {/* Status Badge */}
+                        <div className="absolute top-4 right-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            course.status === 'active' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {course.status === 'active' ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="hidden lg:block">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        mentor.status === 'Online' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {mentor.status}
-                      </span>
-                    </div>
-                    <div className={`hidden lg:block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {mentor.course}
-                    </div>
-                    <div className="flex justify-end lg:justify-start">
-                      <Button 
-                        size="small" 
-                        variant="outlined"
-                        style={{
-                          backgroundColor: '#000000',
-                          color: '#ffffff',
-                          borderColor: '#000000',
-                          textTransform: 'none',
-                          fontWeight: '500',
-                          minWidth: '60px'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#1f2937'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#000000'
-                        }}
-                      >
-                        View
-                      </Button>
-                    </div>
+                      <div className="p-4 flex flex-col flex-grow">
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className={`font-semibold text-lg line-clamp-2 min-h-[3.5rem] ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            {course.title}
+                          </h3>
+                          <div className="flex items-center flex-shrink-0 ml-2">
+                            <StarIcon className="w-4 h-4 text-yellow-400 mr-1" />
+                            <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              {course.rating}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="mb-3">
+                          <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {course.instructor}
+                          </p>
+                          <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {course.subject}
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 mb-3">
+                          <div>
+                            <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              Duration
+                            </p>
+                            <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {course.duration}
+                            </p>
+                          </div>
+                          <div>
+                            <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              Type
+                            </p>
+                            <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {(course as any).classData?.isOnline ? 'Online' : 'In-Person'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between mt-auto">
+                          <div className="flex items-center">
+                            <div className={`w-2 h-2 rounded-full mr-2 ${
+                              course.status === 'active' ? 'bg-green-500' : 'bg-gray-500'
+                            }`}></div>
+                            <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              {new Date(course.nextSession).toLocaleDateString('vi-VN', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                          <Button 
+                            size="small" 
+                            variant="contained"
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1"
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Profile Panel */}
-        <div className={`w-full lg:w-80 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-l ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} mt-6 lg:mt-0`}>
+        {/* Profile Panel - Sticky */}
+        <div className={`w-full lg:w-80 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-l ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} mt-6 lg:mt-0`}>
           <div className="p-6">
             {/* Profile Header */}
             <div className="flex items-center justify-between mb-6">
@@ -924,7 +1096,7 @@ const StudentDashboard: React.FC = () => {
                 {getInitials(userName)}
               </Avatar>
               <h4 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Tran Hong Tai
+                {userName}
               </h4>
               <input
                 ref={fileInputRef}
@@ -970,61 +1142,121 @@ const StudentDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Mentor List */}
+            {/* My Tutor List */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Your Mentor
+                  My Tutor
                 </h4>
-                <button className="text-sm text-blue-600">
+                <button 
+                  onClick={() => navigate('/student/search')}
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                >
                   <MoreVertIcon className="w-4 h-4" />
                 </button>
               </div>
               
-              <div className="space-y-3">
-                {mentors.slice(0, 4).map((mentor, index) => (
-                  <div key={index} className="flex items-center">
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        bgcolor: getAvatarColor(mentor.name),
-                        fontSize: '0.875rem',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {getInitials(mentor.name)}
-                    </Avatar>
-                    <div className="flex-1 ml-3">
-                      <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {mentor.name}
-                      </p>
-                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {mentor.course}
-                      </p>
-                    </div>
+              {Object.keys(tutors).length === 0 ? (
+                <div className="text-center py-8">
+                  <PersonSearch className={`w-12 h-12 mx-auto mb-2 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    No tutors yet
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/student/search')}
+                    className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 text-xs"
+                  >
+                    Find Tutors
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-3">
+                    {Object.values(tutors).slice(0, 4).map((tutor: any, index: number) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
+                        onClick={() => navigate('/student/search')}
+                      >
+                        <Avatar
+                          src={tutor.avatar}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            bgcolor: getAvatarColor(tutor.name),
+                            fontSize: '0.875rem',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {getInitials(tutor.name)}
+                        </Avatar>
+                        <div className="flex-1 ml-3">
+                          <p className={`font-medium text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            {tutor.name}
+                          </p>
+                          <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {tutor.subjects?.[0] || 'Tutor'}
+                          </p>
+                        </div>
+                        <div className="flex items-center">
+                          <StarIcon className="w-3 h-3 text-yellow-400 mr-1" />
+                          <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {tutor.rating || 'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
 
+                  <Button 
+                    onClick={() => navigate('/student/search')}
+                    className="w-full mt-4"
+                    variant="outlined"
+                    style={{
+                      backgroundColor: '#000000',
+                      color: '#ffffff',
+                      borderColor: '#000000',
+                      textTransform: 'none',
+                      fontWeight: '500'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1f2937'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#000000'
+                    }}
+                  >
+                    View All Tutors
+                  </Button>
+                </>
+              )}
+            </div>
+
+            {/* Logout Button */}
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
               <Button 
-                className="w-full mt-4"
-                variant="outlined"
+                className="w-full"
+                onClick={() => {
+                  localStorage.removeItem('token')
+                  localStorage.removeItem('user')
+                  navigate('/common/login')
+                }}
                 style={{
-                  backgroundColor: '#000000',
+                  backgroundColor: '#dc2626',
                   color: '#ffffff',
-                  borderColor: '#000000',
                   textTransform: 'none',
-                  fontWeight: '500'
+                  fontWeight: '600',
+                  padding: '12px'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#1f2937'
+                  e.currentTarget.style.backgroundColor = '#b91c1c'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#000000'
+                  e.currentTarget.style.backgroundColor = '#dc2626'
                 }}
               >
-                View All Mentors
+                <LogoutIcon className="mr-2 w-5 h-5" />
+                Logout
               </Button>
             </div>
           </div>
@@ -1107,6 +1339,17 @@ const StudentDashboard: React.FC = () => {
                     >
                       <PaletteIcon className="mr-3 w-4 h-4" />
                       Theme
+                    </button>
+                    <button 
+                      onClick={() => {
+                        localStorage.removeItem('token')
+                        localStorage.removeItem('user')
+                        navigate('/common/login')
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
+                    >
+                      <LogoutIcon className="mr-3 w-4 h-4" />
+                      Logout
                     </button>
                   </div>
 

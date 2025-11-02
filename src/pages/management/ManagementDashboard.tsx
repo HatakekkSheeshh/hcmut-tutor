@@ -5,6 +5,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
+import api from '../../lib/api'
 import {
   Dashboard as DashboardIcon,
   Search as SearchIcon,
@@ -34,7 +35,8 @@ import {
   AcUnit as AcUnitIcon,
   Palette as PaletteIcon,
   LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon
+  DarkMode as DarkModeIcon,
+  Logout as LogoutIcon
 } from '@mui/icons-material'
 
 const ManagementDashboard: React.FC = () => {
@@ -43,6 +45,12 @@ const ManagementDashboard: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState('dashboard')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
+  
+  // User data states
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState<any[]>([])
+  const [sessions, setSessions] = useState<any[]>([])
   
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -63,6 +71,43 @@ const ManagementDashboard: React.FC = () => {
   const handleThemeToggle = () => {
     toggleTheme()
     setShowThemeOptions(false)
+  }
+
+  // Load user data and system stats from backend
+  const loadUserData = async () => {
+    try {
+      setLoading(true)
+      
+      // Get current user
+      const userResult = await api.auth.getMe()
+      if (userResult.success) {
+        const userData = userResult.data
+        setUser(userData)
+        
+        // Get all users (for stats)
+        const usersResult = await api.users.list({ limit: 1000 })
+        if (usersResult.success) {
+          setUsers(usersResult.data || [])
+        }
+        
+        // Get all sessions (for stats)
+        const sessionsResult = await api.sessions.list({ limit: 1000 })
+        if (sessionsResult.success) {
+          setSessions(sessionsResult.data || [])
+        }
+      } else {
+        // If auth fails, redirect to login
+        if (userResult.error?.includes('xác thực')) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login')
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Helper function to get initials from name
@@ -183,8 +228,11 @@ const ManagementDashboard: React.FC = () => {
     return 'Good Evening'
   }
 
-  // useEffect for time and weather
+  // useEffect for data loading, time and weather
   useEffect(() => {
+    // Load user data and stats
+    loadUserData()
+    
     // Update time every second
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date())
@@ -202,13 +250,37 @@ const ManagementDashboard: React.FC = () => {
     }
   }, [])
 
-  // Mock data for management
+  // Calculate stats from real data
+  const totalUsers = users.length
+  const studentCount = users.filter(u => u.role === 'student').length
+  const tutorCount = users.filter(u => u.role === 'tutor').length
+  const activeSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
+  const completedSessions = sessions.filter(s => s.status === 'completed').length
+  
   const stats = [
-    { title: 'Total Users', value: '1,247', icon: <PeopleIcon /> },
-    { title: 'Active Sessions', value: '89', icon: <CheckCircleIcon /> },
-    { title: 'Pending Requests', value: '23', icon: <AutorenewIcon /> },
-    { title: 'System Health', value: '99.8%', icon: <TrendingUpIcon /> }
+    { title: 'Total Users', value: totalUsers.toString(), icon: <PeopleIcon /> },
+    { title: 'Students', value: studentCount.toString(), icon: <PersonIcon /> },
+    { title: 'Tutors', value: tutorCount.toString(), icon: <AssignmentIcon /> },
+    { title: 'Active Sessions', value: activeSessions.toString(), icon: <CheckCircleIcon /> }
   ]
+
+  // User name from backend
+  const userName = user?.name || 'Management'
+  
+  // Show loading state
+  if (loading && !user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: theme === 'dark' ? '#fff' : '#000'
+      }}>
+        <div>Đang tải...</div>
+      </div>
+    )
+  }
 
   const recentRequests = [
     {
@@ -261,8 +333,8 @@ const ManagementDashboard: React.FC = () => {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -328,19 +400,36 @@ const ManagementDashboard: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
+                  onClick={() => navigate('/common/profile')}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <PersonIcon className="mr-3 w-4 h-4" />
+                  Profile
+                </button>
+                <button 
+                  onClick={() => navigate('/common/notifications')}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <NotificationsIcon className="mr-3 w-4 h-4" />
+                  Notifications
+                </button>
+                <button 
                   onClick={() => setShowThemeOptions(!showThemeOptions)}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PaletteIcon className="mr-3 w-4 h-4" />
                   Theme
                 </button>
-                <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  <PersonIcon className="mr-3 w-4 h-4" />
-                  User Management
-                </button>
-                <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  <NotificationsIcon className="mr-3 w-4 h-4" />
-                  System Alerts
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('token')
+                    localStorage.removeItem('user')
+                    navigate('/common/login')
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
+                >
+                  <LogoutIcon className="mr-3 w-4 h-4" />
+                  Logout
                 </button>
               </div>
 
@@ -365,19 +454,6 @@ const ManagementDashboard: React.FC = () => {
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Upgrade Section */}
-            <div className="mt-8 p-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg">
-              <div className="flex items-center mb-2">
-                <div className="w-6 h-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-2">
-                  <StarIcon className="w-4 h-4 text-white" />
-                </div>
-                <h3 className="text-white font-semibold text-sm">Admin Pro Features</h3>
-              </div>
-              <Button className="w-full bg-white text-purple-600 hover:bg-gray-100 text-sm font-medium">
-                Upgrade Plan
-              </Button>
             </div>
           </div>
         </div>
@@ -517,7 +593,7 @@ const ManagementDashboard: React.FC = () => {
                     {formatDate(currentTime)}
                   </div>
                   <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {getGreeting()}, Admin
+                    {getGreeting()}, {userName}
             </div>
           </div>
 
@@ -741,8 +817,8 @@ const ManagementDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Profile Panel */}
-        <div className={`w-full lg:w-80 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-l ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} mt-6 lg:mt-0`}>
+        {/* Profile Panel - Sticky */}
+        <div className={`w-full lg:w-80 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-l ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} mt-6 lg:mt-0`}>
           <div className="p-6">
             {/* Profile Header */}
             <div className="flex items-center justify-between mb-6">
@@ -757,20 +833,21 @@ const ManagementDashboard: React.FC = () => {
             {/* User Profile */}
             <div className="text-center mb-8">
               <Avatar
+                src={user?.avatar}
                 sx={{
                   width: 96,
                   height: 96,
-                  bgcolor: getAvatarColor('Admin User'),
+                  bgcolor: getAvatarColor(userName),
                   fontSize: '2rem',
                   fontWeight: 'bold',
                   mx: 'auto',
                   mb: 2
                 }}
               >
-                {getInitials('Admin User')}
+                {getInitials(userName)}
               </Avatar>
               <h4 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Good Morning Admin
+                {getGreeting()}, {userName}
               </h4>
               <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                 Manage and monitor the entire system
@@ -853,6 +930,34 @@ const ManagementDashboard: React.FC = () => {
                 View All Activity
               </Button>
             </div>
+
+            {/* Logout Button */}
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <Button 
+                className="w-full"
+                onClick={() => {
+                  localStorage.removeItem('token')
+                  localStorage.removeItem('user')
+                  navigate('/common/login')
+                }}
+                style={{
+                  backgroundColor: '#dc2626',
+                  color: '#ffffff',
+                  textTransform: 'none',
+                  fontWeight: '600',
+                  padding: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#b91c1c'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#dc2626'
+                }}
+              >
+                <LogoutIcon className="mr-2 w-5 h-5" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -908,11 +1013,42 @@ const ManagementDashboard: React.FC = () => {
                   </h3>
                   <div className="space-y-2">
                     <button 
+                      onClick={() => {
+                        navigate('/common/profile')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <PersonIcon className="mr-3 w-4 h-4" />
+                      Profile
+                    </button>
+                    <button 
+                      onClick={() => {
+                        navigate('/common/notifications')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <NotificationsIcon className="mr-3 w-4 h-4" />
+                      Notifications
+                    </button>
+                    <button 
                       onClick={() => setShowThemeOptions(!showThemeOptions)}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <PaletteIcon className="mr-3 w-4 h-4" />
                       Theme
+                    </button>
+                    <button 
+                      onClick={() => {
+                        localStorage.removeItem('token')
+                        localStorage.removeItem('user')
+                        navigate('/common/login')
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
+                    >
+                      <LogoutIcon className="mr-3 w-4 h-4" />
+                      Logout
                     </button>
                   </div>
 

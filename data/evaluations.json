@@ -1,0 +1,122 @@
+[
+  {
+    "id": "eval_azhk0Gg-6ey_",
+    "sessionId": "ses_BtrgQN6R3Zur",
+    "studentId": "stu_LHJJlSGBoYYA",
+    "tutorId": "tut_fvnAH8e_l-lY",
+    "rating": 3,
+    "comment": "Giảng viên giải thích rất chi tiết.",
+    "aspects": {
+      "communication": 3,
+      "knowledge": 5,
+      "helpfulness": 5,
+      "punctuality": 5
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  },
+  {
+    "id": "eval_nK0n-rC4-LFW",
+    "sessionId": "ses_cWgzODB_-cma",
+    "studentId": "stu_VZe7XW8FM9EW",
+    "tutorId": "tut_fvnAH8e_l-lY",
+    "rating": 3,
+    "comment": "Nội dung hay, cần thêm bài tập thực hành.",
+    "aspects": {
+      "communication": 4,
+      "knowledge": 5,
+      "helpfulness": 5,
+      "punctuality": 4
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  },
+  {
+    "id": "eval_Yywrsw7O6C-M",
+    "sessionId": "ses_2mPOs55n4lw4",
+    "studentId": "stu_F21N7tiaerX8",
+    "tutorId": "tut_28co6GH68MtZ",
+    "rating": 4,
+    "comment": "Buổi học rất bổ ích, giảng viên nhiệt tình!",
+    "aspects": {
+      "communication": 5,
+      "knowledge": 4,
+      "helpfulness": 5,
+      "punctuality": 5
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  },
+  {
+    "id": "eval_IEUI6UBNu6MR",
+    "sessionId": "ses_OE5xjsRxZYco",
+    "studentId": "stu_LHJJlSGBoYYA",
+    "tutorId": "tut_fvnAH8e_l-lY",
+    "rating": 3,
+    "comment": "Giảng viên giải thích rất chi tiết.",
+    "aspects": {
+      "communication": 3,
+      "knowledge": 4,
+      "helpfulness": 3,
+      "punctuality": 4
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  },
+  {
+    "id": "eval_QYwzN331iWm5",
+    "sessionId": "ses_udkWPnNJqVMu",
+    "studentId": "stu_QUwSTpa0q36b",
+    "tutorId": "tut_MhsCoIecYtJX",
+    "rating": 4,
+    "comment": "Giảng viên dạy dễ hiểu, tận tâm.",
+    "aspects": {
+      "communication": 5,
+      "knowledge": 4,
+      "helpfulness": 3,
+      "punctuality": 5
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  },
+  {
+    "id": "eval_D0TBprqdm5SM",
+    "sessionId": "ses_kPjRYWFEZfX-",
+    "studentId": "stu_B5LU6rrk7Xsh",
+    "tutorId": "tut_kpC5U_goDXvk",
+    "rating": 4,
+    "comment": "Giảng viên dạy dễ hiểu, tận tâm.",
+    "aspects": {
+      "communication": 5,
+      "knowledge": 4,
+      "helpfulness": 3,
+      "punctuality": 5
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  },
+  {
+    "id": "eval_j9U8RURw9-4O",
+    "sessionId": "ses_EDyCcgofbfUj",
+    "studentId": "stu_NiBb17088IqN",
+    "tutorId": "tut_fKfAVq6FIDoy",
+    "rating": 5,
+    "comment": "Buổi học rất bổ ích, giảng viên nhiệt tình!",
+    "aspects": {
+      "communication": 3,
+      "knowledge": 4,
+      "helpfulness": 3,
+      "punctuality": 4
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  },
+  {
+    "id": "eval_kz5VfxaRiSa5",
+    "sessionId": "ses_cXRe1snv5ouG",
+    "studentId": "stu_JgSnelf3S1oI",
+    "tutorId": "tut_r7t6RzMQA2iW",
+    "rating": 3,
+    "comment": "Giảng viên giải thích rất chi tiết.",
+    "aspects": {
+      "communication": 3,
+      "knowledge": 4,
+      "helpfulness": 5,
+      "punctuality": 4
+    },
+    "createdAt": "2025-10-31T15:07:37.463Z"
+  }
+]

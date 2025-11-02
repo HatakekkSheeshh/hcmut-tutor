@@ -29,14 +29,11 @@ import SessionDetailModal from '../../components/calendar/SessionDetailModal'
 import SessionFormModal from '../../components/calendar/SessionFormModal'
 import MiniMonth from '../../components/calendar/MiniMonth'
 import { Session, CalendarFilters } from '../../types/calendar'
-import { students, getTutorSessionsForWeek } from '../../data/tutorSessions'
-import { subjects } from '../../data/studentSessions'
-import { useCalendarAnimations } from '../../utils/calendarAnimations'
+import { api } from '../../lib/api'
 
 const Calendar: React.FC = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
-  useCalendarAnimations()
   
   // State
   const [currentWeek, setCurrentWeek] = useState(new Date())
@@ -49,12 +46,17 @@ const Calendar: React.FC = () => {
   const [filters, setFilters] = useState<CalendarFilters>({})
   const [sessions, setSessions] = useState<Session[]>([])
   const [weekSessions, setWeekSessions] = useState<{[key: string]: Session[]}>({})
+  const [loading, setLoading] = useState(true)
+  const [students, setStudents] = useState<{[key: string]: any}>({})
+  const [subjects, setSubjects] = useState<string[]>([])
+  const [classes, setClasses] = useState<any[]>([])
 
-  // Time slots from 7 AM to 6 PM with 50-minute ranges
+  // Time slots from 7 AM to 6 PM with 1-hour ranges
   const timeSlots = Array.from({ length: 12 }, (_, i) => {
     const hour = 7 + i
+    const nextHour = hour + 1
     const startTime = `${hour.toString().padStart(2, '0')}:00`
-    const endTime = `${hour.toString().padStart(2, '0')}:50`
+    const endTime = `${nextHour.toString().padStart(2, '0')}:00`
     return {
       start: startTime,
       end: endTime,
@@ -92,14 +94,182 @@ const Calendar: React.FC = () => {
     })
   }
 
-  // Load sessions for current week
+  // Helper function to convert classes to calendar sessions based on week dates
+  const convertClassesToSessions = (classes: any[], weekDates: string[], studentsMap: {[key: string]: any}): Session[] => {
+    const classSessions: Session[] = []
+    
+    classes.forEach((classItem) => {
+      if (!classItem || classItem.status !== 'active') return
+      
+      const semesterStart = new Date(classItem.semesterStart)
+      const semesterEnd = new Date(classItem.semesterEnd)
+      const dayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(classItem.day.toLowerCase())
+      
+      if (dayIndex === -1) return
+      
+      weekDates.forEach((dateStr) => {
+        const date = new Date(dateStr)
+        const currentDay = date.getDay()
+        const mappedDay = currentDay === 0 ? 6 : currentDay - 1 // Map Sunday (0) to 6, Monday (1) to 0, etc.
+        
+        if (mappedDay === dayIndex) {
+          // Check if date is within semester range
+          if (date >= semesterStart && date <= semesterEnd) {
+            const [startHour, startMin] = classItem.startTime.split(':').map(Number)
+            const [endHour, endMin] = classItem.endTime.split(':').map(Number)
+            
+            const sessionStart = new Date(date)
+            sessionStart.setHours(startHour, startMin, 0, 0)
+            
+            const sessionEnd = new Date(date)
+            sessionEnd.setHours(endHour, endMin, 0, 0)
+            
+            classSessions.push({
+              id: `class_${classItem.id}_${dateStr}`,
+              subject: classItem.subject,
+              student: undefined,
+              date: dateStr,
+              startTime: classItem.startTime,
+              endTime: classItem.endTime,
+              location: {
+                type: classItem.isOnline ? 'online' : 'offline',
+                address: classItem.location,
+                meetingLink: classItem.isOnline ? undefined : undefined
+              },
+              status: 'scheduled' as const,
+              notes: `${classItem.code} - ${classItem.description || ''}`,
+              color: '#10b981', // Green color for classes
+              createdAt: classItem.createdAt,
+              updatedAt: classItem.updatedAt,
+              classId: classItem.id // Add classId to identify it's from a class
+            })
+          }
+        }
+      })
+    })
+    
+    return classSessions
+  }
+
+  // Load sessions and classes from backend
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
+        const userStr = localStorage.getItem('user')
+        if (!userStr) {
+          navigate('/login')
+          return
+        }
+        
+        const user = JSON.parse(userStr)
+        const tutorId = user.id || user.userId
+        
+        // Fetch all sessions for this tutor
+        const sessionsResponse = await api.sessions.list({ 
+          tutorId, 
+          limit: 1000 
+        })
+        
+        // Fetch classes for this tutor
+        const classesResponse = await api.classes.list({ tutorId })
+        
+        let allSessionsData: any[] = []
+        let classesData: any[] = []
+        let allStudentIds: string[] = []
+        
+        // Process sessions
+        if (sessionsResponse.data && Array.isArray(sessionsResponse.data)) {
+          allSessionsData = sessionsResponse.data
+          allStudentIds = [...allStudentIds, ...allSessionsData.map((s: any) => s.studentId)]
+        }
+        
+        // Process classes
+        if (classesResponse.success && classesResponse.data && Array.isArray(classesResponse.data)) {
+          classesData = classesResponse.data.filter((c: any) => c.status === 'active')
+        }
+        
+        // Fetch student details for all unique students
+        const uniqueStudentIds = [...new Set(allStudentIds)] as string[]
+        const studentPromises = uniqueStudentIds.map(async (studentId: string) => {
+          try {
+            const studentResponse = await api.users.get(studentId)
+            if (studentResponse.success && studentResponse.data) {
+              return { id: studentId, data: studentResponse.data }
+            }
+          } catch (err) {
+            console.error(`Failed to load student ${studentId}:`, err)
+          }
+          return null
+        })
+        
+        const studentResults = await Promise.all(studentPromises)
+        const studentsMap: { [key: string]: any } = {}
+        studentResults.forEach(result => {
+          if (result) {
+            studentsMap[result.id] = result.data
+          }
+        })
+        
+        // Get unique subjects
+        const uniqueSubjects = [...new Set([
+          ...allSessionsData.map((s: any) => s.subject),
+          ...classesData.map((c: any) => c.subject)
+        ])] as string[]
+        
+        // Transform sessions to calendar format
+        const transformedSessions: Session[] = allSessionsData.map((s: any) => ({
+          id: s.id,
+          subject: s.subject,
+          eventType: 'session' as const,
+          student: studentsMap[s.studentId] ? {
+            id: s.studentId,
+            name: studentsMap[s.studentId].name,
+            avatar: studentsMap[s.studentId].avatar
+          } : {
+            id: s.studentId,
+            name: 'Loading...',
+            avatar: ''
+          },
+          date: new Date(s.startTime).toISOString().split('T')[0],
+          startTime: new Date(s.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+          endTime: new Date(s.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+          location: {
+            type: s.isOnline ? 'online' : 'offline',
+            address: s.location,
+            meetingLink: s.meetingLink
+          },
+          status: s.status === 'confirmed' ? 'scheduled' : s.status === 'completed' ? 'completed' : s.status === 'cancelled' ? 'cancelled' : 'scheduled',
+          notes: s.notes || s.description,
+          color: '#3b82f6', // Blue color for individual sessions
+          createdAt: s.createdAt,
+          updatedAt: s.updatedAt
+        }))
+        
+        setSessions(transformedSessions)
+        setStudents(studentsMap)
+        setSubjects(uniqueSubjects)
+        setClasses(classesData)
+      } catch (error) {
+        console.error('Failed to load data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadData()
+  }, [navigate])
+
+  // Organize sessions by week
   useEffect(() => {
     const weekStart = getWeekStart(currentWeek)
     const weekDates = getWeekDates(weekStart)
-    const weekSessionsData = getTutorSessionsForWeek(weekStart.toISOString().split('T')[0])
     
-    // Merge mock data with sessions from state
-    const allSessions = [...weekSessionsData, ...sessions]
+    // Convert classes to sessions for current week
+    const classSessions = convertClassesToSessions(classes, weekDates, students)
+    
+    // Combine regular sessions with class sessions
+    const allSessions = [...sessions, ...classSessions]
     const filteredSessions = filterSessions(allSessions, filters)
     
     // Group sessions by date and time
@@ -107,8 +277,9 @@ const Calendar: React.FC = () => {
     weekDates.forEach(date => {
       groupedSessions[date] = filteredSessions.filter(session => session.date === date)
     })
+    
     setWeekSessions(groupedSessions)
-  }, [currentWeek, filters])
+  }, [currentWeek, filters, sessions, classes, students])
 
   // Navigation handlers
   const handlePreviousWeek = () => {
@@ -156,10 +327,12 @@ const Calendar: React.FC = () => {
 
   const handleCancelSession = (session: Session) => {
     console.log('Cancel session:', session.id)
+    // Implement cancel logic
   }
 
   const handleRescheduleSession = (session: Session) => {
     console.log('Reschedule session:', session.id)
+    // Implement reschedule logic
   }
 
   const handleJoinSession = (session: Session) => {
@@ -173,39 +346,44 @@ const Calendar: React.FC = () => {
     setIsFormModalOpen(true)
   }
 
-  const handleSaveSession = (sessionData: Partial<Session>) => {
+  const handleSaveSession = async (sessionData: Partial<Session>) => {
     console.log('Save session:', sessionData)
     
-    // Create new session with unique ID
-    const newSession: Session = {
-      id: `session_${Date.now()}`,
-      subject: sessionData.subject || '',
-      student: sessionData.student || students[0],
-      date: sessionData.date || '',
-      startTime: sessionData.startTime || '',
-      endTime: sessionData.endTime || '',
-      location: sessionData.location || { type: 'online', address: '', meetingLink: '' },
-      status: sessionData.status || 'scheduled',
-      notes: sessionData.notes || '',
-      color: sessionData.color || '#3b82f6',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-    
-    // Add new session to sessions state
-    setSessions(prevSessions => [...prevSessions, newSession])
-    
-    // Update weekSessions to include the new session
-    setWeekSessions(prevWeekSessions => {
-      const dateKey = newSession.date
-      const existingSessions = prevWeekSessions[dateKey] || []
-      return {
-        ...prevWeekSessions,
-        [dateKey]: [...existingSessions, newSession]
+    try {
+      // Create new session with unique ID and include eventType
+      const newSession: Session = {
+        id: sessionData.id || `${sessionData.eventType || 'session'}_${Date.now()}`,
+        subject: sessionData.subject || '',
+        eventType: sessionData.eventType,
+        student: sessionData.student,
+        date: sessionData.date || '',
+        startTime: sessionData.startTime || '',
+        endTime: sessionData.endTime || '',
+        location: sessionData.location || { type: 'online', address: '', meetingLink: '' },
+        status: sessionData.status || 'scheduled',
+        notes: sessionData.notes || '',
+        color: sessionData.color || '#3b82f6',
+        createdAt: sessionData.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       }
-    })
-    
-    setIsFormModalOpen(false)
+      
+      // Add new session to sessions state
+      setSessions(prevSessions => [...prevSessions, newSession])
+      
+      // Update weekSessions to include the new session
+      setWeekSessions(prevWeekSessions => {
+        const dateKey = newSession.date
+        const existingSessions = prevWeekSessions[dateKey] || []
+        return {
+          ...prevWeekSessions,
+          [dateKey]: [...existingSessions, newSession]
+        }
+      })
+      
+      setIsFormModalOpen(false)
+    } catch (error) {
+      console.error('Failed to save session:', error)
+    }
   }
 
   // Helper function to get sessions for specific date and time
@@ -248,12 +426,112 @@ const Calendar: React.FC = () => {
     return `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
   }
 
+  // Clock Widget Component
+  const ClockWidget = ({ theme }: { theme: string }) => {
+    const [currentTime, setCurrentTime] = useState(new Date())
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setCurrentTime(new Date())
+      }, 1000)
+
+      return () => clearInterval(timer)
+    }, [])
+
+    const formatTime = (date: Date) => {
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })
+    }
+
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    }
+
+    return (
+      <Card
+        sx={{
+          backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+          border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+          borderRadius: '12px',
+          mb: 3,
+          overflow: 'hidden'
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          {/* Time Display */}
+          <div className="text-center mb-2">
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 700,
+                color: theme === 'dark' ? '#ffffff' : '#111827',
+                fontFamily: 'monospace',
+                letterSpacing: '0.05em',
+                fontSize: '2.5rem'
+              }}
+            >
+              {formatTime(currentTime)}
+            </Typography>
+          </div>
+
+          {/* Date Display */}
+          <div className="text-center">
+            <Typography
+              variant="body2"
+              sx={{
+                color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                fontWeight: 500,
+                fontSize: '0.875rem'
+              }}
+            >
+              {formatDate(currentTime)}
+            </Typography>
+          </div>
+
+          {/* Decorative line */}
+          <div
+            style={{
+              marginTop: '16px',
+              height: '2px',
+              background: theme === 'dark' 
+                ? 'linear-gradient(90deg, transparent, #10b981, transparent)' 
+                : 'linear-gradient(90deg, transparent, #059669, transparent)',
+              borderRadius: '2px'
+            }}
+          />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+            Loading calendar...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="flex">
-          {/* Sidebar */}
-          <div className={`w-80 h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} overflow-y-auto`}>
+          {/* Sidebar - Sticky */}
+          <div className={`w-80 sticky top-0 h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} overflow-y-auto`}>
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
@@ -292,7 +570,10 @@ const Calendar: React.FC = () => {
                 </Button>
               </div>
 
-              {/* Week Navigation */}
+              {/* Clock Widget */}
+              <ClockWidget theme={theme} />
+
+              {/* Week/Day Navigation + Mini Month */}
               <Card
                 sx={{
                   backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
@@ -302,7 +583,7 @@ const Calendar: React.FC = () => {
                 }}
               >
                 <CardContent sx={{ p: 2 }}>
-                  <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3">
                     <Button
                       variant="outlined"
                       size="small"
@@ -341,51 +622,53 @@ const Calendar: React.FC = () => {
                     </Button>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={handleToday}
-                      size="small"
-                      sx={{
-                        backgroundColor: '#10b981',
-                        '&:hover': {
-                          backgroundColor: '#059669'
-                        }
-                      }}
-                    >
-                      Today
-                    </Button>
-                    <ToggleButtonGroup
-                      size="small"
-                      exclusive
-                      value={viewMode}
-                      onChange={(_, v) => v && setViewMode(v)}
-                      aria-label="Calendar view switcher"
-                      sx={{
-                        backgroundColor: theme==='dark' ? '#0b1220' : '#fff',
-                        border: `1px solid ${theme==='dark' ? '#374151' : '#d1d5db'}`,
-                        borderRadius: '12px',
-                        p: 0.5,
-                        '& .MuiToggleButton-root': {
-                          color: `${theme==='dark' ? '#cbd5e1' : '#111827'} !important`,
-                          border: 'none',
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          borderRadius: '10px',
-                          backgroundColor: theme==='dark' ? '#111827' : '#fff'
-                        },
-                        '& .MuiToggleButton-root:hover': {
-                          backgroundColor: theme==='dark' ? '#1f2937' : '#f3f4f6'
-                        },
-                        '& .MuiToggleButton-root.Mui-selected': {
-                          backgroundColor: theme==='dark' ? '#1e40af' : '#10b981',
-                          color: '#ffffff !important'
-                        }
-                      }}
-                    >
-                      <ToggleButton value="week" aria-label="Week view">Week</ToggleButton>
-                      <ToggleButton value="day" aria-label="Day view">Day</ToggleButton>
-                    </ToggleButtonGroup>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={handleToday}
+                    size="small"
+                    sx={{
+                      backgroundColor: '#10b981',
+                      '&:hover': {
+                        backgroundColor: '#059669'
+                      }
+                    }}
+                  >
+                    Today
+                  </Button>
+                  <ToggleButtonGroup
+                    size="small"
+                    exclusive
+                    value={viewMode}
+                    onChange={(_, v) => v && setViewMode(v)}
+                    aria-label="Calendar view switcher"
+                    sx={{
+                      backgroundColor: theme==='dark' ? '#1f2937' : '#ffffff',
+                      border: `1px solid ${theme==='dark' ? '#374151' : '#e5e7eb'}`,
+                      borderRadius: '12px',
+                      p: 0.5,
+                      '& .MuiToggleButton-root': {
+                        color: `${theme==='dark' ? '#e5e7eb' : '#111827'} !important`,
+                        border: 'none',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: '10px',
+                        backgroundColor: 'transparent',
+                        px: 2,
+                        py: 0.75
+                      },
+                      '& .MuiToggleButton-root:hover': {
+                        backgroundColor: theme==='dark' ? '#374151' : '#f3f4f6'
+                      },
+                      '& .MuiToggleButton-root.Mui-selected': {
+                        backgroundColor: theme==='dark' ? '#059669' : '#10b981',
+                        color: '#ffffff !important'
+                      }
+                    }}
+                  >
+                    <ToggleButton value="week" aria-label="Week view">Week</ToggleButton>
+                    <ToggleButton value="day" aria-label="Day view">Day</ToggleButton>
+                  </ToggleButtonGroup>
                   </div>
                 </CardContent>
               </Card>
@@ -443,7 +726,7 @@ const Calendar: React.FC = () => {
                               borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
                             },
                             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                              borderColor: theme === 'dark' ? '#10b981' : '#10b981',
                             },
                             '& .MuiSelect-icon': {
                               color: theme === 'dark' ? '#9ca3af' : '#6b7280',
@@ -452,8 +735,8 @@ const Calendar: React.FC = () => {
                         >
                           <MenuItem value="">All Subjects</MenuItem>
                           {subjects.map((subject) => (
-                            <MenuItem key={subject.id} value={subject.name}>
-                              {subject.name}
+                            <MenuItem key={subject} value={subject}>
+                              {subject}
                             </MenuItem>
                           ))}
                         </Select>
@@ -483,7 +766,7 @@ const Calendar: React.FC = () => {
                               borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
                             },
                             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                              borderColor: theme === 'dark' ? '#10b981' : '#10b981',
                             },
                             '& .MuiSelect-icon': {
                               color: theme === 'dark' ? '#9ca3af' : '#6b7280',
@@ -491,7 +774,7 @@ const Calendar: React.FC = () => {
                           }}
                         >
                           <MenuItem value="">All Students</MenuItem>
-                          {students.map((student) => (
+                          {Object.values(students).map((student: any) => (
                             <MenuItem key={student.id} value={student.id}>
                               {student.name}
                             </MenuItem>
@@ -523,7 +806,7 @@ const Calendar: React.FC = () => {
                               borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
                             },
                             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                              borderColor: theme === 'dark' ? '#10b981' : '#10b981',
                             },
                             '& .MuiSelect-icon': {
                               color: theme === 'dark' ? '#9ca3af' : '#6b7280',
@@ -572,7 +855,7 @@ const Calendar: React.FC = () => {
                       mb: 2
                     }}
                   >
-                    This Week
+                    {viewMode === 'day' ? 'Today' : 'This Week'}
                   </Typography>
                   
                   <div className="space-y-2">
@@ -598,14 +881,6 @@ const Calendar: React.FC = () => {
                       </span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {sessions.filter(s => s.status === 'completed').length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Unique Students:
-                      </span>
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {new Set(sessions.map(s => s.student?.id)).size}
                       </span>
                     </div>
                   </div>
@@ -634,9 +909,9 @@ const Calendar: React.FC = () => {
                     startIcon={<AddIcon />}
                     onClick={handleCreateSession}
                     sx={{
-                      backgroundColor: '#3b82f6',
+                      backgroundColor: '#10b981',
                       '&:hover': {
-                        backgroundColor: '#2563eb'
+                        backgroundColor: '#059669'
                       }
                     }}
                   >
@@ -672,7 +947,7 @@ const Calendar: React.FC = () => {
                         <div
                           key={day}
                           className={`p-3 text-center border-l border-gray-200 dark:border-gray-700 ${
-                            isToday ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                            isToday ? 'bg-green-50 dark:bg-green-900/20' : ''
                           }`}
                         >
                           <div className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -739,8 +1014,8 @@ const Calendar: React.FC = () => {
           onSave={handleSaveSession}
           session={selectedSession}
           tutors={[]}
-          students={students}
-          subjects={subjects}
+          students={Object.values(students).map((s: any) => ({ id: s.id, name: s.name, avatar: s.avatar }))}
+          subjects={subjects.map((s, idx) => ({ id: `subj_${idx}`, name: s, color: '#10b981' }))}
           showTutor={false}
           showStudent={true}
         />

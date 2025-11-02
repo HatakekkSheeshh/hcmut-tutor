@@ -1,0 +1,445 @@
+[
+  {
+    "id": "post_ZvyoMrmNIw5S",
+    "authorId": "tut_fvnAH8e_l-lY",
+    "title": "Câu hỏi về Cấu trúc dữ liệu",
+    "content": "Mình đang gặp khó khăn với Lập trình C/C++, mọi người có thể giúp mình được không?",
+    "category": "Học tập",
+    "tags": [
+      "Đại số tuyến tính",
+      "Lập trình C/C++"
+    ],
+    "likes": [
+      "tut_OWtApeq1WbQN"
+    ],
+    "views": 100,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.464Z",
+    "updatedAt": "2025-10-31T15:07:37.464Z"
+  },
+  {
+    "id": "post_HzG76bsy9w8s",
+    "authorId": "stu_YedNfBFvNKar",
+    "title": "Câu hỏi về Điện tử",
+    "content": "Mình đang gặp khó khăn với Cấu trúc dữ liệu, mọi người có thể giúp mình được không?",
+    "category": "Khác",
+    "tags": [
+      "Tiếng Anh",
+      "Vật lý đại cương",
+      "Cấu trúc dữ liệu"
+    ],
+    "likes": [
+      "stu_sPLkDLAgpTeE",
+      "stu_VZe7XW8FM9EW",
+      "stu_LHJJlSGBoYYA",
+      "tut_28co6GH68MtZ"
+    ],
+    "views": 69,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.464Z",
+    "updatedAt": "2025-10-31T15:07:37.464Z"
+  },
+  {
+    "id": "post_avC6G_AK_q5Z",
+    "authorId": "mgmt_nDZemkiZv0AW",
+    "title": "Câu hỏi về Xác suất thống kê",
+    "content": "Mình đang gặp khó khăn với Hóa học, mọi người có thể giúp mình được không?",
+    "category": "Học tập",
+    "tags": [
+      "Tiếng Anh",
+      "Điện tử"
+    ],
+    "likes": [
+      "tut_pxQDWdvyjnan",
+      "stu_LHJJlSGBoYYA"
+    ],
+    "views": 23,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.464Z",
+    "updatedAt": "2025-10-31T15:07:37.464Z"
+  },
+  {
+    "id": "post_3c01H95XdPim",
+    "authorId": "tut_kpC5U_goDXvk",
+    "title": "Câu hỏi về Xác suất thống kê",
+    "content": "Mình đang gặp khó khăn với Cấu trúc dữ liệu, mọi người có thể giúp mình được không?",
+    "category": "Hỏi đáp",
+    "tags": [
+      "Hóa học"
+    ],
+    "likes": [
+      "mgmt_irG1OTQ38xRQ",
+      "tut_MhsCoIecYtJX",
+      "stu_SXIlCHjlkwWT"
+    ],
+    "views": 94,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post__3dh1oc3oy6W",
+    "authorId": "tut_huahc_QDbkKv",
+    "title": "Câu hỏi về Toán cao cấp",
+    "content": "Mình đang gặp khó khăn với Hóa học, mọi người có thể giúp mình được không?",
+    "category": "Khác",
+    "tags": [
+      "Đại số tuyến tính"
+    ],
+    "likes": [
+      "stu_oJFHhTcGAcUM",
+      "stu_B5LU6rrk7Xsh",
+      "mgmt_3ZQ_VRYJy0OB",
+      "tut_fKfAVq6FIDoy"
+    ],
+    "views": 56,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_Eu8SYWVvq3mh",
+    "authorId": "tut_28co6GH68MtZ",
+    "title": "Câu hỏi về Hóa học",
+    "content": "Mình đang gặp khó khăn với Toán cao cấp, mọi người có thể giúp mình được không?",
+    "category": "Khác",
+    "tags": [
+      "Hệ điều hành"
+    ],
+    "likes": [
+      "stu_VZe7XW8FM9EW",
+      "tut_D7Q1Re4S1_wI",
+      "mgmt_irG1OTQ38xRQ",
+      "stu_QG0kkSghUUBm",
+      "tut_M5JSdOOUKd4U",
+      "tut_iQGe3z04cJLD",
+      "tut_pxQDWdvyjnan",
+      "stu_LHJJlSGBoYYA",
+      "stu_YedNfBFvNKar"
+    ],
+    "views": 102,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_WBh__Hk5iAAM",
+    "authorId": "tut_OWtApeq1WbQN",
+    "title": "Câu hỏi về Điện tử",
+    "content": "Mình đang gặp khó khăn với Tiếng Anh, mọi người có thể giúp mình được không?",
+    "category": "Hỏi đáp",
+    "tags": [
+      "Điện tử"
+    ],
+    "likes": [
+      "tut_D7Q1Re4S1_wI",
+      "tut_28co6GH68MtZ",
+      "mgmt_3ZQ_VRYJy0OB",
+      "tut_OWtApeq1WbQN",
+      "stu_F21N7tiaerX8",
+      "stu_66O3ugd6i2Cn",
+      "stu_ehcpzpE4_TXe",
+      "tut_kpC5U_goDXvk",
+      "mgmt_irG1OTQ38xRQ"
+    ],
+    "views": 158,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_t3wH3NwOxZWp",
+    "authorId": "tut_D7Q1Re4S1_wI",
+    "title": "Câu hỏi về Cơ sở dữ liệu",
+    "content": "Mình đang gặp khó khăn với Mạng máy tính, mọi người có thể giúp mình được không?",
+    "category": "Hỏi đáp",
+    "tags": [
+      "Lập trình C/C++",
+      "Hóa học",
+      "Xác suất thống kê"
+    ],
+    "likes": [
+      "tut_fKfAVq6FIDoy"
+    ],
+    "views": 95,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_1hbRtZenn2TV",
+    "authorId": "mgmt_D1ywWBVIXsFp",
+    "title": "Câu hỏi về Hóa học",
+    "content": "Mình đang gặp khó khăn với Hệ điều hành, mọi người có thể giúp mình được không?",
+    "category": "Thông báo",
+    "tags": [
+      "Giải tích"
+    ],
+    "likes": [
+      "mgmt_nDZemkiZv0AW",
+      "tut_huahc_QDbkKv",
+      "stu_LHJJlSGBoYYA",
+      "mgmt_D1ywWBVIXsFp",
+      "tut_fvnAH8e_l-lY",
+      "tut_OWtApeq1WbQN",
+      "stu_VZe7XW8FM9EW",
+      "stu_i4i7waoqWAyN"
+    ],
+    "views": 195,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_OC5aPz8BBs4N",
+    "authorId": "tut_D7Q1Re4S1_wI",
+    "title": "Câu hỏi về Điện tử",
+    "content": "Mình đang gặp khó khăn với Xác suất thống kê, mọi người có thể giúp mình được không?",
+    "category": "Học tập",
+    "tags": [
+      "Vật lý đại cương",
+      "Cơ học kỹ thuật",
+      "Toán cao cấp"
+    ],
+    "likes": [],
+    "views": 133,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_7JGPJlcFwJuN",
+    "authorId": "tut_fKfAVq6FIDoy",
+    "title": "Câu hỏi về Cấu trúc dữ liệu",
+    "content": "Mình đang gặp khó khăn với Giải tích, mọi người có thể giúp mình được không?",
+    "category": "Khác",
+    "tags": [
+      "Toán cao cấp",
+      "Vật lý đại cương",
+      "Hóa học"
+    ],
+    "likes": [
+      "stu_SXIlCHjlkwWT",
+      "tut_fvnAH8e_l-lY",
+      "stu_oJFHhTcGAcUM",
+      "tut_jiwmW2eBp3d4",
+      "tut_iQGe3z04cJLD",
+      "mgmt_nDZemkiZv0AW",
+      "stu_F21N7tiaerX8",
+      "stu_LHJJlSGBoYYA",
+      "stu_FAzj9t2tjtvP"
+    ],
+    "views": 184,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_5wLLdr88xSel",
+    "authorId": "stu_ovDNVZAwtMnI",
+    "title": "Câu hỏi về Tiếng Anh",
+    "content": "Mình đang gặp khó khăn với Mạng máy tính, mọi người có thể giúp mình được không?",
+    "category": "Thông báo",
+    "tags": [
+      "Hệ điều hành",
+      "Đại số tuyến tính",
+      "Toán cao cấp"
+    ],
+    "likes": [
+      "stu_FAzj9t2tjtvP",
+      "tut_iQGe3z04cJLD",
+      "stu_NiBb17088IqN"
+    ],
+    "views": 195,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_LXSPTv4AsOBe",
+    "authorId": "stu_TVi9sNdUPTOQ",
+    "title": "Câu hỏi về Hệ điều hành",
+    "content": "Mình đang gặp khó khăn với Tiếng Anh, mọi người có thể giúp mình được không?",
+    "category": "Khác",
+    "tags": [
+      "Mạng máy tính",
+      "Cơ sở dữ liệu"
+    ],
+    "likes": [
+      "stu_QUwSTpa0q36b",
+      "tut_huahc_QDbkKv",
+      "stu_B5LU6rrk7Xsh",
+      "stu_NiBb17088IqN",
+      "tut_28co6GH68MtZ",
+      "tut_D7Q1Re4S1_wI",
+      "stu_i4i7waoqWAyN"
+    ],
+    "views": 199,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_GWwETRNtxgZS",
+    "authorId": "stu_QG0kkSghUUBm",
+    "title": "Câu hỏi về Cấu trúc dữ liệu",
+    "content": "Mình đang gặp khó khăn với Mạng máy tính, mọi người có thể giúp mình được không?",
+    "category": "Khác",
+    "tags": [
+      "Đại số tuyến tính",
+      "Toán cao cấp",
+      "Vật lý đại cương"
+    ],
+    "likes": [
+      "stu_HcE1Szso4doH",
+      "mgmt_3ZQ_VRYJy0OB",
+      "stu_YedNfBFvNKar"
+    ],
+    "views": 128,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_NJHU-00cL4-z",
+    "authorId": "stu_NiBb17088IqN",
+    "title": "Câu hỏi về Lập trình Python",
+    "content": "Mình đang gặp khó khăn với Cơ sở dữ liệu, mọi người có thể giúp mình được không?",
+    "category": "Học tập",
+    "tags": [
+      "Toán cao cấp",
+      "Vật lý đại cương",
+      "Tiếng Anh"
+    ],
+    "likes": [],
+    "views": 91,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_xF1HdoiijjeO",
+    "authorId": "stu_F21N7tiaerX8",
+    "title": "Câu hỏi về Cơ sở dữ liệu",
+    "content": "Mình đang gặp khó khăn với Cơ sở dữ liệu, mọi người có thể giúp mình được không?",
+    "category": "Hỏi đáp",
+    "tags": [
+      "Lập trình Python",
+      "Mạng máy tính"
+    ],
+    "likes": [
+      "tut_pxQDWdvyjnan",
+      "stu_oJFHhTcGAcUM",
+      "stu_HcE1Szso4doH",
+      "stu_JgSnelf3S1oI",
+      "tut_OWtApeq1WbQN",
+      "stu_LHJJlSGBoYYA",
+      "tut_r7t6RzMQA2iW",
+      "stu_SXIlCHjlkwWT"
+    ],
+    "views": 154,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_OvWUDa1fzBYT",
+    "authorId": "stu_B5LU6rrk7Xsh",
+    "title": "Câu hỏi về Mạng máy tính",
+    "content": "Mình đang gặp khó khăn với Vật lý đại cương, mọi người có thể giúp mình được không?",
+    "category": "Khác",
+    "tags": [
+      "Hóa học"
+    ],
+    "likes": [
+      "tut_MhsCoIecYtJX"
+    ],
+    "views": 22,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_NMi_Y6YvChBh",
+    "authorId": "stu_FAzj9t2tjtvP",
+    "title": "Câu hỏi về Toán cao cấp",
+    "content": "Mình đang gặp khó khăn với Cơ học kỹ thuật, mọi người có thể giúp mình được không?",
+    "category": "Học tập",
+    "tags": [
+      "Cấu trúc dữ liệu"
+    ],
+    "likes": [
+      "tut_GDPlGtIendxp",
+      "tut_fKfAVq6FIDoy",
+      "stu_LHJJlSGBoYYA",
+      "tut_pxQDWdvyjnan",
+      "mgmt_irG1OTQ38xRQ"
+    ],
+    "views": 33,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_dFtD-m87T2rq",
+    "authorId": "stu_JgSnelf3S1oI",
+    "title": "Câu hỏi về Cơ sở dữ liệu",
+    "content": "Mình đang gặp khó khăn với Cơ học kỹ thuật, mọi người có thể giúp mình được không?",
+    "category": "Thông báo",
+    "tags": [
+      "Toán cao cấp"
+    ],
+    "likes": [
+      "stu_HcE1Szso4doH",
+      "stu_66O3ugd6i2Cn"
+    ],
+    "views": 157,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  },
+  {
+    "id": "post_-4eALqhyGi5n",
+    "authorId": "tut_iQGe3z04cJLD",
+    "title": "Câu hỏi về Giải tích",
+    "content": "Mình đang gặp khó khăn với Hóa học, mọi người có thể giúp mình được không?",
+    "category": "Chia sẻ kiến thức",
+    "tags": [
+      "Giải tích",
+      "Toán cao cấp",
+      "Lập trình Python"
+    ],
+    "likes": [
+      "stu_QUwSTpa0q36b",
+      "stu_SXIlCHjlkwWT",
+      "tut_M5JSdOOUKd4U",
+      "stu_JgSnelf3S1oI",
+      "tut_fvnAH8e_l-lY",
+      "stu_F21N7tiaerX8"
+    ],
+    "views": 60,
+    "pinned": false,
+    "locked": false,
+    "createdAt": "2025-10-31T15:07:37.465Z",
+    "updatedAt": "2025-10-31T15:07:37.465Z"
+  }
+]

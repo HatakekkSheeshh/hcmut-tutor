@@ -35,17 +35,17 @@ const MiniMonth: React.FC<MiniMonthProps> = ({ date, onChange }) => {
   const inCurrentMonth = (iso: string) => new Date(iso).getMonth() === anchor.getMonth()
 
   return (
-    <Box sx={{ border: `1px solid ${theme==='dark'?'#374151':'#e5e7eb'}`, borderRadius: '8px', overflow: 'hidden', backgroundColor: theme==='dark'?'#0b1220':'#fff' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1.5, backgroundColor: theme==='dark'?'#111827':'#fff', borderBottom: `1px solid ${theme==='dark'?'#374151':'#e5e7eb'}` }}>
+    <Box sx={{ border: `1px solid ${theme==='dark'?'#374151':'#e5e7eb'}`, borderRadius: '12px', overflow: 'hidden', backgroundColor: theme==='dark'?'#1f2937':'#ffffff', mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1.5, backgroundColor: theme==='dark'?'#1f2937':'#ffffff', borderBottom: `1px solid ${theme==='dark'?'#374151':'#e5e7eb'}` }}>
         <Typography sx={{ fontWeight: 600, color: theme==='dark'?'#fff':'#111827' }}>
           {anchor.toLocaleDateString('en-US',{ month:'long', year:'numeric'})}
         </Typography>
         <Box>
-          <IconButton size="small" onClick={() => setAnchor(new Date(anchor.getFullYear(), anchor.getMonth()-1, 1))} sx={{ color: theme==='dark'?'#cbd5e1':'#6b7280', '&:hover': { backgroundColor: theme==='dark'?'#1f2937':'#f3f4f6' } }}><ChevronLeft/></IconButton>
-          <IconButton size="small" onClick={() => setAnchor(new Date(anchor.getFullYear(), anchor.getMonth()+1, 1))} sx={{ color: theme==='dark'?'#cbd5e1':'#6b7280', '&:hover': { backgroundColor: theme==='dark'?'#1f2937':'#f3f4f6' } }}><ChevronRight/></IconButton>
+          <IconButton size="small" onClick={() => setAnchor(new Date(anchor.getFullYear(), anchor.getMonth()-1, 1))} sx={{ color: theme==='dark'?'#9ca3af':'#6b7280', '&:hover': { backgroundColor: theme==='dark'?'#374151':'#f3f4f6' } }}><ChevronLeft/></IconButton>
+          <IconButton size="small" onClick={() => setAnchor(new Date(anchor.getFullYear(), anchor.getMonth()+1, 1))} sx={{ color: theme==='dark'?'#9ca3af':'#6b7280', '&:hover': { backgroundColor: theme==='dark'?'#374151':'#f3f4f6' } }}><ChevronRight/></IconButton>
         </Box>
       </Box>
-      <Box sx={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:0 }}>
+      <Box sx={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:0, p: 0.5 }}>
         {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
           <Box key={d} sx={{ textAlign:'center', py:0.5, fontSize:12, color: theme==='dark'?'#9ca3af':'#6b7280' }}>{d}</Box>
         ))}
@@ -56,14 +56,33 @@ const MiniMonth: React.FC<MiniMonthProps> = ({ date, onChange }) => {
             <button
               key={iso}
               onClick={() => onChange(new Date(iso))}
-              className="focus:outline-none"
+              className="focus:outline-none transition-colors duration-200"
               style={{
-                padding: 6,
-                margin: 2,
-                borderRadius: 8,
-                border: selected ? `1px solid ${theme==='dark'?'#3b82f6':'#0C41FF'}` : '1px solid transparent',
-                background: selected ? (theme==='dark'?'#1e40af33':'#E5EDFF') : 'transparent',
-                color: selected ? (theme==='dark'?'#ffffff':'#0b1220') : (muted ? (theme==='dark'?'#6b7280':'#9ca3af') : (theme==='dark'?'#e5e7eb':'#111827')),
+                padding: '8px',
+                margin: '2px',
+                borderRadius: '8px',
+                border: selected ? `2px solid ${theme==='dark'?'#3b82f6':'#3b82f6'}` : '2px solid transparent',
+                background: selected ? (theme==='dark'?'#1e40af':'#3b82f6') : 'transparent',
+                color: selected ? '#ffffff' : (muted ? (theme==='dark'?'#6b7280':'#9ca3af') : (theme==='dark'?'#e5e7eb':'#111827')),
+                cursor: 'pointer',
+                fontWeight: selected ? 600 : 500,
+                boxSizing: 'border-box',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: '32px',
+                minHeight: '32px',
+                fontSize: '14px'
+              }}
+              onMouseEnter={(e) => {
+                if (!selected) {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#f3f4f6'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!selected) {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }
               }}
               aria-label={`Select ${iso}`}
             >

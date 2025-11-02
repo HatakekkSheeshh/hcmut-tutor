@@ -1,0 +1,251 @@
+/**
+ * Express API Server
+ * Main server file for Tutor Support System APIs
+ */
+
+import express from 'express';
+import cors from 'cors';
+import { config } from './lib/config.js';
+import { authenticate, authorize, validateBody, errorHandler } from './lib/middleware.js';
+import { loginSchema, registerSchema, updateProfileSchema, createClassSchema, updateClassSchema, createEnrollmentSchema, updateEnrollmentSchema } from './lib/schemas.js';
+import { UserRole } from './lib/types.js';
+
+// Import handlers - Auth
+import { loginHandler } from './api/auth/login.js';
+import { registerHandler } from './api/auth/register.js';
+import { meHandler } from './api/auth/me.js';
+import { refreshTokenHandler } from './api/auth/refresh.js';
+import { logoutHandler } from './api/auth/logout.js';
+
+// Import handlers - Users
+import { listUsersHandler } from './api/users/index.js';
+import { getUserHandler, updateUserHandler, deleteUserHandler } from './api/users/[id].js';
+
+// Import handlers - Tutors & Students
+import { listTutorsHandler } from './api/tutors/index.js';
+import { getTutorHandler, getTutorReviewsHandler } from './api/tutors/[id].js';
+import { getStudentHandler, getStudentSessionsHandler } from './api/students/[id].js';
+
+// Import handlers - Sessions
+import { listSessionsHandler, createSessionHandler } from './api/sessions/index.js';
+import { getSessionHandler, updateSessionHandler, cancelSessionHandler, rescheduleSessionHandler } from './api/sessions/[id].js';
+
+// Import handlers - Course Contents, Quizzes, Assignments
+import { getCourseContentsHandler, createCourseContentHandler, updateCourseContentHandler, deleteCourseContentHandler } from './api/sessions/[id]/course-contents.js';
+import { getQuizzesHandler, createQuizHandler, updateQuizHandler, deleteQuizHandler, submitQuizHandler, getQuizSubmissionsHandler } from './api/sessions/[id]/quizzes.js';
+import { getAssignmentsHandler, createAssignmentHandler, updateAssignmentHandler, deleteAssignmentHandler, submitAssignmentHandler } from './api/sessions/[id]/assignments.js';
+import { getSubmissionsHandler, gradeSubmissionHandler } from './api/sessions/[id]/submissions.js';
+import { getGradesHandler, getGradesSummaryHandler } from './api/sessions/[id]/grades.js';
+import { getSessionStudentsHandler, addStudentToSessionHandler, removeStudentFromSessionHandler } from './api/sessions/[id]/students.js';
+
+// Import handlers - Calendar & Availability
+import { getCalendarHandler } from './api/calendar/[userId].js';
+import { getAvailabilityHandler, setAvailabilityHandler, updateAvailabilityHandler } from './api/availability/index.js';
+
+// Import handlers - Classes & Enrollments
+import { listClassesHandler, createClassHandler } from './api/classes/index.js';
+import { getClassHandler, updateClassHandler, deleteClassHandler } from './api/classes/[id].js';
+import { generateSessionsHandler } from './api/classes/[id]/generate-sessions.js';
+import { listEnrollmentsHandler, createEnrollmentHandler } from './api/enrollments/index.js';
+import { getEnrollmentHandler, updateEnrollmentHandler, deleteEnrollmentHandler } from './api/enrollments/[id].js';
+
+// Import handlers - Notifications
+import { getNotificationsHandler, markAsReadHandler, deleteNotificationHandler } from './api/notifications/index.js';
+
+// Import handlers - Progress
+import { listProgressHandler, createProgressHandler, getProgressHandler } from './api/progress/index.js';
+
+// Import handlers - Evaluations
+import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, updateEvaluationHandler, deleteEvaluationHandler } from './api/evaluations/index.js';
+
+// Import handlers - Forum
+import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './api/forum/posts.js';
+import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './api/forum/comments.js';
+
+// Create Express app
+const app = express();
+
+// Middleware
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? '*' : config.frontend.url,
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Request logger
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// ===== AUTHENTICATION ROUTES =====
+
+app.post('/api/auth/login', validateBody(loginSchema), loginHandler);
+app.post('/api/auth/register', validateBody(registerSchema), registerHandler);
+app.post('/api/auth/logout', authenticate, logoutHandler);
+app.get('/api/auth/me', authenticate, meHandler);
+app.post('/api/auth/refresh-token', refreshTokenHandler);
+
+// ===== USER MANAGEMENT ROUTES =====
+
+app.get('/api/users', authenticate, listUsersHandler);
+app.get('/api/users/:id', authenticate, getUserHandler);
+app.put('/api/users/:id', authenticate, validateBody(updateProfileSchema), updateUserHandler);
+app.delete('/api/users/:id', authenticate, authorize(UserRole.MANAGEMENT), deleteUserHandler);
+
+// ===== TUTOR ROUTES =====
+
+app.get('/api/tutors', listTutorsHandler);
+app.get('/api/tutors/:id', getTutorHandler);
+app.get('/api/tutors/:id/reviews', getTutorReviewsHandler);
+
+// ===== STUDENT ROUTES =====
+
+app.get('/api/students/:id', authenticate, getStudentHandler);
+app.get('/api/students/:id/sessions', authenticate, getStudentSessionsHandler);
+
+// ===== SESSION ROUTES =====
+
+app.get('/api/sessions', authenticate, listSessionsHandler);
+app.post('/api/sessions', authenticate, createSessionHandler);
+app.get('/api/sessions/:id', authenticate, getSessionHandler);
+app.put('/api/sessions/:id', authenticate, updateSessionHandler);
+app.delete('/api/sessions/:id', authenticate, cancelSessionHandler);
+app.post('/api/sessions/:id/reschedule', authenticate, rescheduleSessionHandler);
+
+// Session-specific routes: Course Contents
+app.get('/api/sessions/:id/course-contents', authenticate, getCourseContentsHandler);
+app.post('/api/sessions/:id/course-contents', authenticate, createCourseContentHandler);
+app.put('/api/sessions/:id/course-contents/:contentId', authenticate, updateCourseContentHandler);
+app.delete('/api/sessions/:id/course-contents/:contentId', authenticate, deleteCourseContentHandler);
+
+// Session-specific routes: Quizzes
+app.get('/api/sessions/:id/quizzes', authenticate, getQuizzesHandler);
+app.post('/api/sessions/:id/quizzes', authenticate, createQuizHandler);
+app.put('/api/sessions/:id/quizzes/:quizId', authenticate, updateQuizHandler);
+app.delete('/api/sessions/:id/quizzes/:quizId', authenticate, deleteQuizHandler);
+app.get('/api/sessions/:id/quizzes/:quizId/submissions', authenticate, getQuizSubmissionsHandler);
+app.post('/api/sessions/:id/quizzes/:quizId/submit', authenticate, submitQuizHandler);
+
+// Session-specific routes: Assignments
+app.get('/api/sessions/:id/assignments', authenticate, getAssignmentsHandler);
+app.post('/api/sessions/:id/assignments', authenticate, createAssignmentHandler);
+app.put('/api/sessions/:id/assignments/:assignmentId', authenticate, updateAssignmentHandler);
+app.delete('/api/sessions/:id/assignments/:assignmentId', authenticate, deleteAssignmentHandler);
+app.post('/api/sessions/:id/assignments/:assignmentId/submit', authenticate, submitAssignmentHandler);
+
+// Session-specific routes: Submissions & Grading
+app.get('/api/sessions/:id/submissions', authenticate, getSubmissionsHandler);
+app.put('/api/sessions/:id/submissions/:submissionId/grade', authenticate, gradeSubmissionHandler);
+
+// Session-specific routes: Grades
+app.get('/api/sessions/:id/grades', authenticate, getGradesHandler);
+app.get('/api/sessions/:id/grades/summary', authenticate, getGradesSummaryHandler);
+
+// Session-specific routes: Students
+app.get('/api/sessions/:id/students', authenticate, getSessionStudentsHandler);
+app.post('/api/sessions/:id/students', authenticate, addStudentToSessionHandler);
+app.delete('/api/sessions/:id/students/:studentId', authenticate, removeStudentFromSessionHandler);
+
+// ===== CALENDAR & AVAILABILITY ROUTES =====
+
+app.get('/api/calendar/:userId', authenticate, getCalendarHandler);
+app.get('/api/availability/:tutorId', getAvailabilityHandler);
+app.post('/api/availability', authenticate, setAvailabilityHandler);
+app.put('/api/availability/:id', authenticate, updateAvailabilityHandler);
+
+// ===== CLASSES ROUTES =====
+
+app.get('/api/classes', listClassesHandler);
+app.post('/api/classes', authenticate, validateBody(createClassSchema), createClassHandler);
+app.get('/api/classes/:id', getClassHandler);
+app.put('/api/classes/:id', authenticate, validateBody(updateClassSchema), updateClassHandler);
+app.delete('/api/classes/:id', authenticate, deleteClassHandler);
+app.post('/api/classes/:id/generate-sessions', authenticate, generateSessionsHandler);
+
+// ===== ENROLLMENTS ROUTES =====
+
+app.get('/api/enrollments', authenticate, listEnrollmentsHandler);
+app.post('/api/enrollments', authenticate, validateBody(createEnrollmentSchema), createEnrollmentHandler);
+app.get('/api/enrollments/:id', authenticate, getEnrollmentHandler);
+app.put('/api/enrollments/:id', authenticate, validateBody(updateEnrollmentSchema), updateEnrollmentHandler);
+app.delete('/api/enrollments/:id', authenticate, deleteEnrollmentHandler);
+
+// ===== NOTIFICATIONS ROUTES =====
+
+app.get('/api/notifications', authenticate, getNotificationsHandler);
+app.put('/api/notifications/:id/read', authenticate, markAsReadHandler);
+app.delete('/api/notifications/:id', authenticate, deleteNotificationHandler);
+
+// ===== PROGRESS ROUTES =====
+
+app.get('/api/progress', authenticate, listProgressHandler);
+app.post('/api/progress', authenticate, createProgressHandler);
+app.get('/api/progress/:id', authenticate, getProgressHandler);
+
+// ===== EVALUATIONS ROUTES =====
+
+app.get('/api/evaluations', authenticate, listEvaluationsHandler);
+app.post('/api/evaluations', authenticate, createEvaluationHandler);
+app.get('/api/evaluations/:id', authenticate, getEvaluationHandler);
+app.put('/api/evaluations/:id', authenticate, updateEvaluationHandler);
+app.delete('/api/evaluations/:id', authenticate, deleteEvaluationHandler);
+
+// ===== FORUM ROUTES =====
+
+app.get('/api/forum/posts', listPostsHandler);
+app.post('/api/forum/posts', authenticate, createPostHandler);
+app.get('/api/forum/posts/:id', getPostHandler);
+app.put('/api/forum/posts/:id', authenticate, updatePostHandler);
+app.delete('/api/forum/posts/:id', authenticate, deletePostHandler);
+app.post('/api/forum/posts/:id/like', authenticate, likePostHandler);
+app.get('/api/forum/posts/:id/comments', getCommentsHandler);
+app.post('/api/forum/posts/:id/comments', authenticate, createCommentHandler);
+app.delete('/api/forum/comments/:id', authenticate, deleteCommentHandler);
+
+// ===== ERROR HANDLING =====
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Endpoint not found'
+  });
+});
+
+// Error handler
+app.use(errorHandler);
+
+// Start server (only in development, Vercel handles this in production)
+if (process.env.NODE_ENV !== 'production') {
+const PORT = config.api.port;
+app.listen(PORT, () => {
+  console.log(`
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║           🎓 Tutor Support System API Server                ║
+║                                                              ║
+║  Status: ✅ Running                                          ║
+║  Port: ${PORT}                                                  ║
+║  Environment: ${config.env}                               ║
+║                                                              ║
+║  API Base: http://localhost:${PORT}/api                       ║
+║  Health Check: http://localhost:${PORT}/health                ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+  `);
+});
+}
+
+export default app;
+

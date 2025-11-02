@@ -5,32 +5,51 @@ import {
   TrendingUp, 
   School, 
   Schedule, 
-  Star,
   Assignment,
   Menu as MenuIcon,
   ArrowBack as ArrowBackIcon,
   CheckCircle as CheckCircleIcon,
   BarChart as BarChartIcon,
+  Warning as WarningIcon,
+  CalendarToday as CalendarTodayIcon,
   Close as CloseIcon,
-  ArrowForward as ArrowForwardIcon,
-  Person as PersonIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
   Dashboard as DashboardIcon,
   PersonSearch,
   Class,
   SmartToy as SmartToyIcon,
-  LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon,
   Chat as ChatIcon
 } from '@mui/icons-material'
-import Card from '../../components/ui/Card'
-import Button from '../../components/ui/Button'
+import { 
+  Box,
+  Paper,
+  Typography,
+  LinearProgress,
+  Chip,
+  Divider
+} from '@mui/material'
+import { progressAPI, usersAPI } from '../../lib/api'
+
+interface SubjectProgress {
+  subject: string
+  averageScore: number
+  totalRecords: number
+  topics: string[]
+  improvements: string[]
+  challenges: string[]
+  progressRecords: any[]
+}
 
 const ViewProgressMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [progressRecords, setProgressRecords] = useState<any[]>([])
+  const [tutorsMap, setTutorsMap] = useState<Record<string, any>>({})
+  const [subjectsProgress, setSubjectsProgress] = useState<SubjectProgress[]>([])
   const [timeRange, setTimeRange] = useState('3months')
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [showHelp, setShowHelp] = useState(false)
   const [showTimeRangeDropdown, setShowTimeRangeDropdown] = useState(false)
   const [activeMenu, setActiveMenu] = useState('view-progress')
 
@@ -56,7 +75,6 @@ const ViewProgressMobile: React.FC = () => {
     { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
     { id: 'book-session', label: 'Book Session', icon: <School />, path: '/student/book' },
     { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'evaluate-session', label: 'Evaluate Session', icon: <Star />, path: '/student/evaluate' },
     { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
     { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
     { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
@@ -95,80 +113,135 @@ const ViewProgressMobile: React.FC = () => {
     return timeRangeOptions.find(option => option.value === timeRange) || timeRangeOptions[1]
   }
 
+  // Load progress data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
 
-  const progressData = {
-    overallProgress: 85,
-    subjects: [
-      {
-        name: 'Mathematics',
-        progress: 90,
-        sessionsCompleted: 12,
-        averageRating: 4.8,
-        lastSession: '2024-01-10',
-        topics: ['Calculus', 'Algebra', 'Statistics']
-      },
-      {
-        name: 'Physics',
-        progress: 75,
-        sessionsCompleted: 8,
-        averageRating: 4.6,
-        lastSession: '2024-01-08',
-        topics: ['Mechanics', 'Thermodynamics', 'Quantum Physics']
-      },
-      {
-        name: 'Chemistry',
-        progress: 80,
-        sessionsCompleted: 6,
-        averageRating: 4.7,
-        lastSession: '2024-01-05',
-        topics: ['Organic Chemistry', 'Inorganic Chemistry', 'Physical Chemistry']
+        // Get user from localStorage
+        const userStr = localStorage.getItem('user')
+        if (!userStr) {
+          navigate('/login')
+          return
+        }
+        const userData = JSON.parse(userStr)
+
+        // Load progress records for this student
+        const progressResponse = await progressAPI.list({ studentId: userData.id, limit: 1000 })
+        
+        if (progressResponse.data && Array.isArray(progressResponse.data)) {
+          const records = progressResponse.data
+          setProgressRecords(records)
+
+          // Get unique tutor IDs
+          const tutorIds = [...new Set(records.map((p: any) => p.tutorId))] as string[]
+          
+          // Load tutor data
+          const tutorsData: Record<string, any> = {}
+          await Promise.all(
+            tutorIds.map(async (tutorId) => {
+              try {
+                const response = await usersAPI.get(tutorId)
+                const tutorData = response.success ? response.data : response
+                if (tutorData) {
+                  tutorsData[tutorId] = tutorData
+                }
+              } catch (err) {
+                console.error(`Error loading tutor ${tutorId}:`, err)
+              }
+            })
+          )
+
+          setTutorsMap(tutorsData)
+
+          // Process data by subject
+          const subjectMap = new Map<string, SubjectProgress>()
+
+          records.forEach((progress: any) => {
+            if (!subjectMap.has(progress.subject)) {
+              subjectMap.set(progress.subject, {
+                subject: progress.subject,
+                averageScore: 0,
+                totalRecords: 0,
+                topics: [],
+                improvements: [],
+                challenges: [],
+                progressRecords: []
+              })
+            }
+
+            const subjectProgress = subjectMap.get(progress.subject)!
+            subjectProgress.progressRecords.push(progress)
+            
+            // Add unique topics
+            if (progress.topic && !subjectProgress.topics.includes(progress.topic)) {
+              subjectProgress.topics.push(progress.topic)
+            }
+
+            // Collect improvements and challenges
+            if (progress.improvements) {
+              progress.improvements.forEach((imp: string) => {
+                if (!subjectProgress.improvements.includes(imp)) {
+                  subjectProgress.improvements.push(imp)
+                }
+              })
+            }
+            if (progress.challenges) {
+              progress.challenges.forEach((chal: string) => {
+                if (!subjectProgress.challenges.includes(chal)) {
+                  subjectProgress.challenges.push(chal)
+                }
+              })
+            }
+          })
+
+          // Calculate averages
+          subjectMap.forEach((subjectProgress) => {
+            const scores = subjectProgress.progressRecords.map((p: any) => p.score || 0)
+            const averageScore = scores.length > 0 
+              ? scores.reduce((a, b) => a + b, 0) / scores.length
+              : 0
+            subjectProgress.averageScore = Math.round(averageScore * 10) // Convert 0-10 to 0-100%
+            subjectProgress.totalRecords = subjectProgress.progressRecords.length
+          })
+
+          setSubjectsProgress(Array.from(subjectMap.values()))
+        }
+      } catch (err: any) {
+        console.error('Error loading progress:', err)
+      } finally {
+        setLoading(false)
       }
-    ],
-    achievements: [
-      { title: 'First Session', description: 'Completed your first tutoring session', date: '2023-10-15', icon: <Star /> },
-      { title: 'Math Master', description: 'Completed 10 Mathematics sessions', date: '2023-12-20', icon: <School /> },
-      { title: 'Consistent Learner', description: 'Attended sessions for 3 consecutive months', date: '2024-01-01', icon: <TrendingUp /> },
-      { title: 'Top Performer', description: 'Achieved 90%+ in Mathematics', date: '2024-01-10', icon: <Assignment /> }
-    ],
-    recentSessions: [
-      {
-        date: '2024-01-10',
-        subject: 'Mathematics',
-        tutor: 'Dr. Sarah Johnson',
-        duration: '60 min',
-        rating: 5,
-        topic: 'Advanced Calculus'
-      },
-      {
-        date: '2024-01-08',
-        subject: 'Physics',
-        tutor: 'Prof. Michael Chen',
-        duration: '90 min',
-        rating: 4,
-        topic: 'Quantum Mechanics'
-      },
-      {
-        date: '2024-01-05',
-        subject: 'Chemistry',
-        tutor: 'Dr. Emily Davis',
-        duration: '60 min',
-        rating: 5,
-        topic: 'Organic Reactions'
-      }
-    ],
-    goals: [
-      { subject: 'Mathematics', target: 95, current: 90, deadline: '2024-02-15' },
-      { subject: 'Physics', target: 85, current: 75, deadline: '2024-03-01' },
-      { subject: 'Chemistry', target: 90, current: 80, deadline: '2024-02-28' }
-    ]
-  }
+    }
+    loadData()
+  }, [navigate])
+
+  // Calculate overall stats
+  const overallProgress = subjectsProgress.length > 0
+    ? Math.round(subjectsProgress.reduce((sum, s) => sum + s.averageScore, 0) / subjectsProgress.length)
+    : 0
+
+  const totalSessions = subjectsProgress.reduce((sum, s) => sum + s.totalRecords, 0)
 
   const stats = [
-    { title: 'Total Sessions', value: '26', icon: <Schedule />, color: 'primary' },
-    { title: 'Average Rating', value: '4.7', icon: <Star />, color: 'secondary' },
-    { title: 'Subjects Studied', value: '3', icon: <School />, color: 'success' },
-    { title: 'Achievements', value: '4', icon: <TrendingUp />, color: 'info' },
+    { title: 'Total Sessions', value: totalSessions.toString(), icon: <Schedule />, color: 'primary' },
+    { title: 'Subjects Studied', value: subjectsProgress.length.toString(), icon: <School />, color: 'success' },
+    { title: 'Overall Progress', value: `${overallProgress}%`, icon: <TrendingUp />, color: 'info' },
+    { title: 'Progress Records', value: progressRecords.length.toString(), icon: <Assignment />, color: 'secondary' },
   ]
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Loading your progress...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -183,12 +256,9 @@ const ViewProgressMobile: React.FC = () => {
               <ArrowBackIcon className="w-5 h-5" />
             </button>
             <div>
-              <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Learning Progress
+              <h1 className={`text-base font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Progress Report
               </h1>
-              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Track your learning journey
-              </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -211,48 +281,53 @@ const ViewProgressMobile: React.FC = () => {
 
       {/* Mobile Content */}
       <div className="p-4 space-y-4">
+        {/* Header Section */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+            borderRadius: '12px'
+          }}
+        >
         {/* Time Range Selector */}
-        <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} overflow-visible`} style={{ overflow: 'visible' }}>
-          <div className="flex items-center justify-between">
-            <h3 className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+          <div className="flex items-center justify-between mb-4 relative time-range-dropdown-container">
+            <Typography variant="body2" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
               Time Range
-            </h3>
-            <div className="relative time-range-dropdown-container">
-              {/* Custom Time Range Dropdown Button */}
+            </Typography>
               <button
                 onClick={() => setShowTimeRangeDropdown(!showTimeRangeDropdown)}
-                className={`px-3 py-2 border rounded-xl text-sm flex items-center justify-between transition-all duration-200 ${
+              className={`px-3 py-1.5 border rounded-lg text-sm flex items-center justify-between transition-all ${
                 theme === 'dark'
                     ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
                     : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
               } focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
-                <div className="flex items-center">
                   <span className="font-medium">{getSelectedTimeRange().label}</span>
-                </div>
-                <div className={`transform transition-transform duration-200 ml-2 ${showTimeRangeDropdown ? 'rotate-180' : ''}`}>
+              <div className={`transform transition-transform ml-2 ${showTimeRangeDropdown ? 'rotate-180' : ''}`}>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
               </button>
 
-              {/* Custom Time Range Dropdown Options */}
+            {/* Dropdown Options */}
               {showTimeRangeDropdown && (
-                <div className="absolute top-full right-0 z-[9999] mt-1 min-w-[200px]">
-                  <div className={`rounded-xl shadow-xl border overflow-hidden ${
+              <div className="absolute top-full right-0 z-[9999] mt-1 min-w-[180px]">
+                <div className={`rounded-lg shadow-xl border overflow-hidden ${
                     theme === 'dark' 
                       ? 'bg-gray-700 border-gray-600' 
                       : 'bg-white border-gray-200'
                   }`}>
-                    {timeRangeOptions.map((option, index) => (
+                  {timeRangeOptions.map((option) => (
                       <button
                         key={option.value}
                         onClick={() => {
                           setTimeRange(option.value)
                           setShowTimeRangeDropdown(false)
                         }}
-                        className={`w-full px-4 py-3 text-left flex items-center transition-colors duration-150 ${
+                      className={`w-full px-3 py-2 text-left text-sm transition-colors ${
                           option.value === timeRange
                             ? theme === 'dark'
                               ? 'bg-blue-600 text-white'
@@ -260,297 +335,352 @@ const ViewProgressMobile: React.FC = () => {
                             : theme === 'dark'
                               ? 'text-gray-300 hover:bg-gray-600'
                               : 'text-gray-700 hover:bg-gray-50'
-                        } ${index !== timeRangeOptions.length - 1 ? 'border-b border-gray-200 dark:border-gray-600' : ''}`}
+                      }`}
                       >
                         <span className="font-medium">{option.label}</span>
-                        {option.value === timeRange && (
-                          <div className="ml-auto">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Overall Progress */}
-        <Card
-          className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
-          style={{
-            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-            boxShadow: 'none !important'
-          }}
-        >
-          <div className="text-center mb-4">
-            <div className={`text-3xl font-bold text-blue-600 mb-2`}>
-              {progressData.overallProgress}%
-            </div>
-            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Overall Learning Progress
-            </p>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
-            <div 
-              className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-              style={{ width: `${progressData.overallProgress}%` }}
-            ></div>
-          </div>
-        </Card>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
           {stats.map((stat, index) => (
-            <Card
+              <Box 
               key={index} 
-              className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-3`}
-              style={{
-                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                boxShadow: 'none !important'
-              }}
-            >
-              <div className="text-center">
-                <div className="text-2xl text-blue-600 mb-1">{stat.icon}</div>
-                <p className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {stat.value}
-                </p>
-                <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {stat.title}
-                </p>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Subject Progress */}
-        <Card
-          className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
-          style={{
-            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-            boxShadow: 'none !important'
-          }}
-        >
-          <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Subject Progress
-          </h3>
-          <div className="space-y-4">
-            {progressData.subjects.map((subject, index) => (
-              <div key={index}>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {subject.name}
-                  </span>
-                  <span className="text-blue-600 font-semibold">
-                    {subject.progress}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${subject.progress}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {subject.sessionsCompleted} sessions
-                  </span>
-                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Avg: {subject.averageRating}★
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Learning Goals */}
-        <Card
-          className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
-          style={{
-            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-            boxShadow: 'none !important'
-          }}
-        >
-          <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Learning Goals
-          </h3>
-          <div className="space-y-3">
-            {progressData.goals.map((goal, index) => (
-              <div key={index} className={`p-3 border rounded-lg ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {goal.subject}
-                  </span>
-                  <span className="text-blue-600 font-semibold">
-                    {goal.current}/{goal.target}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                  <div 
-                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(goal.current / goal.target) * 100}%` }}
-                  ></div>
-                </div>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Target: {goal.target}% by {goal.deadline}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Recent Sessions */}
-        <Card
-          className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
-          style={{
-            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-            boxShadow: 'none !important'
-          }}
-        >
-          <div className="flex justify-between items-center mb-4">
-            <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Recent Sessions
-            </h3>
-            <Button 
-              size="small" 
-              variant="outlined"
-              style={{
-                backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                color: theme === 'dark' ? '#ffffff' : '#000000',
-                borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db',
-                textTransform: 'none',
-                fontWeight: '500'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#4b5563' : '#f3f4f6'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#ffffff'
-              }}
-            >
-              View All
-            </Button>
-          </div>
-          <div className="space-y-3">
-            {progressData.recentSessions.map((session, index) => (
-              <div key={index} className={`p-3 border rounded-lg ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {session.subject}
-                  </span>
-                  <div className="flex items-center">
-                    <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                    <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {session.rating}
-                    </span>
-                  </div>
-                </div>
-                <p className={`text-sm mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {session.tutor} • {session.topic}
-                </p>
-                <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                  {session.date} • {session.duration}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Achievements */}
-        <Card
-          className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
-          style={{
-            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-            boxShadow: 'none !important'
-          }}
-        >
-          <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Achievements
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            {progressData.achievements.map((achievement, index) => (
-              <div 
-                key={index} 
-                className={`text-center p-3 border rounded-lg ${
-                  theme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600' 
-                    : 'bg-white border-gray-200'
-                }`}
-                style={{
-                  borderColor: theme === 'dark' ? '#4b5563' : '#e5e7eb',
-                  backgroundColor: theme === 'dark' ? '#374151' : '#ffffff'
+                sx={{ 
+                  p: 2,
+                  backgroundColor: theme === 'dark' ? '#374151' : '#f9fafb',
+                  borderRadius: '8px',
+                  textAlign: 'center'
                 }}
               >
-                <div className="text-blue-600 mb-2">
-                  {achievement.icon}
-                </div>
-                <h4 className={`font-semibold mb-1 text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {achievement.title}
-                </h4>
-                <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {achievement.description}
-                </p>
-                <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                  {achievement.date}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Help Section - Mobile with Toggle */}
-        <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <button 
-            onClick={() => setShowHelp(!showHelp)}
-            className={`w-full flex items-center justify-between p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
-          >
-            <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Need Help?
-            </h3>
-            <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
-              <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-            </div>
-          </button>
-          
-          {showHelp && (
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <div className="space-y-3">
-                <button 
-                  onClick={() => navigate('/student/book')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'} transition-colors`}
-                >
-                  <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  Book New Session
-                </button>
-                <button 
-                  onClick={() => navigate('/student/search')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'} transition-colors`}
-                >
-                  <BarChartIcon className="mr-3 w-4 h-4" />
-                  Find Tutors
-                </button>
-                <button 
-                  onClick={() => navigate('/student/chatbot')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'} transition-colors`}
-                >
-                  <PersonIcon className="mr-3 w-4 h-4" />
-                  AI Support
-                </button>
-              </div>
-            </div>
-          )}
+                <Box sx={{ color: '#3b82f6', fontSize: '1.5rem', mb: 0.5 }}>
+                  {stat.icon}
+                </Box>
+                <Typography variant="h6" fontWeight="bold" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 0.25 }}>
+                  {stat.value}
+                </Typography>
+                <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: '0.7rem' }}>
+                  {stat.title}
+                </Typography>
+              </Box>
+          ))}
         </div>
+        </Paper>
+
+        {/* Overall Performance */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+            borderRadius: '12px'
+          }}
+        >
+          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
+              Overall Performance
+            </Typography>
+            <Chip 
+              label={`${overallProgress}%`} 
+              sx={{ 
+                backgroundColor: '#3b82f6', 
+                color: '#ffffff',
+                fontWeight: 'bold',
+                fontSize: '0.875rem',
+                height: '28px'
+              }} 
+            />
+          </Box>
+          <LinearProgress 
+            variant="determinate" 
+            value={overallProgress} 
+            sx={{ 
+              height: 10, 
+              borderRadius: 5,
+              backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: '#3b82f6',
+                borderRadius: 5
+              }
+            }} 
+          />
+          <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', mt: 1, display: 'block' }}>
+            Average across all subjects
+          </Typography>
+        </Paper>
+
+        {/* Subject Performance */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+            borderRadius: '12px'
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 2 }}>
+            Subject Performance
+          </Typography>
+          {subjectsProgress.length === 0 ? (
+            <Box 
+              sx={{ 
+                textAlign: 'center', 
+                py: 4,
+                backgroundColor: theme === 'dark' ? '#374151' : '#f9fafb',
+                borderRadius: '8px'
+              }}
+            >
+              <School sx={{ fontSize: 40, color: theme === 'dark' ? '#6b7280' : '#9ca3af', mb: 1 }} />
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
+                No progress records yet
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+              {subjectsProgress.map((subject, index) => (
+                <Box 
+                  key={index}
+                  sx={{ 
+                    p: 2,
+                    backgroundColor: theme === 'dark' ? '#374151' : '#f9fafb',
+                    borderRadius: '8px',
+                    border: `1px solid ${theme === 'dark' ? '#4b5563' : '#e5e7eb'}`
+                  }}
+                >
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5}>
+                    <Typography variant="body2" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
+                      {subject.subject}
+                    </Typography>
+                    <Chip 
+                      label={`${subject.averageScore}%`} 
+                      size="small"
+                      sx={{ 
+                        backgroundColor: subject.averageScore >= 80 ? '#10b981' : subject.averageScore >= 60 ? '#f59e0b' : '#ef4444',
+                        color: '#ffffff',
+                        fontWeight: 'bold',
+                        fontSize: '0.75rem'
+                      }} 
+                    />
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={subject.averageScore} 
+                    sx={{ 
+                      height: 6, 
+                      borderRadius: 3,
+                      mb: 1.5,
+                      backgroundColor: theme === 'dark' ? '#1f2937' : '#e5e7eb',
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: subject.averageScore >= 80 ? '#10b981' : subject.averageScore >= 60 ? '#f59e0b' : '#ef4444',
+                        borderRadius: 3
+                      }
+                    }} 
+                  />
+                  <Box display="flex" justifyContent="space-between" flexWrap="wrap" gap={1}>
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <Assignment sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
+                      <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: '0.7rem' }}>
+                        {subject.totalRecords} sessions
+                      </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <School sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
+                      <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: '0.7rem' }}>
+                        {subject.topics.length} topics
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Paper>
+
+        {/* Recent Sessions */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+            borderRadius: '12px'
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 2 }}>
+              Recent Sessions
+          </Typography>
+          {progressRecords.length === 0 ? (
+            <Box 
+              sx={{ 
+                textAlign: 'center', 
+                py: 4,
+                backgroundColor: theme === 'dark' ? '#374151' : '#f9fafb',
+                borderRadius: '8px'
+              }}
+            >
+              <CalendarTodayIcon sx={{ fontSize: 40, color: theme === 'dark' ? '#6b7280' : '#9ca3af', mb: 1 }} />
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
+                No sessions completed yet
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {progressRecords.slice(0, 4).map((record, index) => {
+                const tutor = tutorsMap[record.tutorId]
+                const tutorName = tutor?.name || 'Unknown Tutor'
+                const scorePercentage = Math.round(record.score * 10)
+                const recordDate = new Date(record.createdAt).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })
+                
+                return (
+                  <Box 
+                    key={index}
+                    sx={{ 
+                      p: 2,
+                      backgroundColor: theme === 'dark' ? '#374151' : '#f9fafb',
+                      borderRadius: '8px',
+                      border: `1px solid ${theme === 'dark' ? '#4b5563' : '#e5e7eb'}`
+                    }}
+                  >
+                    <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+                      <Box flex={1}>
+                        <Typography variant="body2" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 0.5 }}>
+                          {record.subject} - {record.topic}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', display: 'block', fontSize: '0.7rem' }}>
+                          {tutorName} • {recordDate}
+                        </Typography>
+                      </Box>
+                      <Chip 
+                        label={`${scorePercentage}%`} 
+              size="small" 
+                        sx={{ 
+                          backgroundColor: scorePercentage >= 80 ? '#10b981' : scorePercentage >= 60 ? '#f59e0b' : '#ef4444',
+                          color: '#ffffff',
+                          fontWeight: 'bold',
+                          fontSize: '0.7rem',
+                          height: '22px'
+                        }} 
+                      />
+                    </Box>
+                    {record.notes && (
+                      <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', display: 'block', fontStyle: 'italic', fontSize: '0.7rem' }}>
+                        "{record.notes}"
+                      </Typography>
+                    )}
+                  </Box>
+                )
+              })}
+            </Box>
+          )}
+        </Paper>
+
+        {/* Improvements */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+            borderRadius: '12px'
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <CheckCircleIcon sx={{ color: '#10b981', fontSize: 20 }} />
+            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
+              Improvements
+            </Typography>
+          </Box>
+          {progressRecords.length === 0 || progressRecords.filter(r => r.improvements && r.improvements.length > 0).length === 0 ? (
+            <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', textAlign: 'center', py: 3 }}>
+              No improvements recorded yet
+            </Typography>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {progressRecords
+                .filter(r => r.improvements && r.improvements.length > 0)
+                .slice(0, 4)
+                .flatMap(r => r.improvements.map((imp: string) => ({ text: imp, subject: r.subject })))
+                .slice(0, 4)
+                .map((item: any, index: number) => (
+                  <Box 
+                    key={index}
+                    sx={{ 
+                      p: 1.5,
+                      backgroundColor: theme === 'dark' ? '#374151' : '#f0fdf4',
+                      borderRadius: '6px',
+                      border: `1px solid ${theme === 'dark' ? '#4b5563' : '#bbf7d0'}`
+                    }}
+                  >
+                    <Typography variant="caption" fontWeight="600" sx={{ color: theme === 'dark' ? '#10b981' : '#059669', display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+                      {item.subject}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: theme === 'dark' ? '#e5e7eb' : '#111827', fontSize: '0.8rem' }}>
+                      {item.text}
+                    </Typography>
+                  </Box>
+                ))}
+            </Box>
+          )}
+        </Paper>
+
+        {/* Challenges */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+            borderRadius: '12px'
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <WarningIcon sx={{ color: '#f59e0b', fontSize: 20 }} />
+            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
+              Areas to Focus
+            </Typography>
+          </Box>
+          {progressRecords.length === 0 || progressRecords.filter(r => r.challenges && r.challenges.length > 0).length === 0 ? (
+            <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', textAlign: 'center', py: 3 }}>
+              No challenges recorded yet
+            </Typography>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {progressRecords
+                .filter(r => r.challenges && r.challenges.length > 0)
+                .slice(0, 4)
+                .flatMap(r => r.challenges.map((chal: string) => ({ text: chal, subject: r.subject })))
+                .slice(0, 4)
+                .map((item: any, index: number) => (
+                  <Box 
+                key={index} 
+                    sx={{ 
+                      p: 1.5,
+                      backgroundColor: theme === 'dark' ? '#374151' : '#fffbeb',
+                      borderRadius: '6px',
+                      border: `1px solid ${theme === 'dark' ? '#4b5563' : '#fde68a'}`
+                    }}
+                  >
+                    <Typography variant="caption" fontWeight="600" sx={{ color: theme === 'dark' ? '#f59e0b' : '#d97706', display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+                      {item.subject}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: theme === 'dark' ? '#e5e7eb' : '#111827', fontSize: '0.8rem' }}>
+                      {item.text}
+                    </Typography>
+                  </Box>
+                ))}
+            </Box>
+          )}
+        </Paper>
       </div>
 
       {/* Mobile Drawer */}
@@ -579,7 +709,7 @@ const ViewProgressMobile: React.FC = () => {
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto">
-                {/* Quick Actions - Moved to top */}
+                {/* Quick Actions */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     QUICK ACTIONS
@@ -606,7 +736,7 @@ const ViewProgressMobile: React.FC = () => {
                   <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="text-center mb-3">
                       <div className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {progressData.overallProgress}%
+                        {overallProgress}%
                       </div>
                       <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                         Overall Progress
@@ -615,7 +745,7 @@ const ViewProgressMobile: React.FC = () => {
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${progressData.overallProgress}%` }}
+                        style={{ width: `${overallProgress}%` }}
                       ></div>
                     </div>
                   </div>
@@ -638,7 +768,6 @@ const ViewProgressMobile: React.FC = () => {
                     </button>
                   ))}
                 </div>
-
               </div>
             </div>
           </div>

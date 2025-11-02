@@ -64,7 +64,10 @@ const DayView: React.FC<DayViewProps> = ({
         <Box sx={{ position: 'absolute', inset: 0 }}>
           {sessions.filter(s => s.date === date).map((s) => {
             const sStartAbs = toMinutes(s.startTime)
-            const sEndAbs = toMinutes(s.endTime)
+            // For reminders, use startTime for both start and end, with minimum height
+            const sEndAbs = s.eventType === 'reminder' 
+              ? sStartAbs + 30 // 30 minutes minimum height for reminders
+              : toMinutes(s.endTime)
             const clampedStartAbs = Math.max(dayStartMin, Math.min(dayEndMin, sStartAbs))
             const clampedEndAbs = Math.max(clampedStartAbs + 1, Math.min(dayEndMin, sEndAbs))
             const startMin = clampedStartAbs - dayStartMin

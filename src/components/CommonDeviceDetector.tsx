@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import Login from '../pages/common/Login'
 import LoginMobile from '../pages/common/LoginMobile'
+import Register from '../pages/common/Register'
+import RegisterMobile from '../pages/common/RegisterMobile'
 import ProfileManagement from '../pages/common/ProfileManagement'
 import ProfileManagementMobile from '../pages/common/ProfileManagementMobile'
 import DigitalLibraryAccess from '../pages/common/DigitalLibraryAccess'
@@ -61,6 +63,12 @@ const CommonDeviceDetector: React.FC = () => {
       if (location.pathname === '/common' || location.pathname === '/') {
         return <LoginMobile />
       }
+      if (location.pathname === '/common/login') {
+        return <LoginMobile />
+      }
+      if (location.pathname === '/common/register') {
+        return <RegisterMobile />
+      }
       if (location.pathname === '/common/profile') {
         return <ProfileManagementMobile />
       }
@@ -81,6 +89,12 @@ const CommonDeviceDetector: React.FC = () => {
     // Desktop routes
     if (location.pathname === '/common' || location.pathname === '/') {
       return <Login />
+    }
+    if (location.pathname === '/common/login') {
+      return <Login />
+    }
+    if (location.pathname === '/common/register') {
+      return <Register />
     }
     if (location.pathname === '/common/profile') {
       return <ProfileManagement />

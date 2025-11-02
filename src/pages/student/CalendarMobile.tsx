@@ -29,7 +29,9 @@ import {
   Close as CloseIcon,
   Dashboard as DashboardIcon,
   PersonSearch,
-  BarChart as BarChartIcon
+  BarChart as BarChartIcon,
+  AccessTime as AccessTimeIcon,
+  AccessTimeFilledOutlined as AccessTimeFilledIcon
 } from '@mui/icons-material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
@@ -38,8 +40,8 @@ import DayView from '../../components/calendar/DayView'
 import SessionDetailModal from '../../components/calendar/SessionDetailModal'
 import SessionFormModal from '../../components/calendar/SessionFormModal'
 import { Session, CalendarFilters } from '../../types/calendar'
-import { subjects, tutors, getSessionsForWeek } from '../../data/studentSessions'
 import { useCalendarAnimations } from '../../utils/calendarAnimations'
+import { api } from '../../lib/api'
 
 const CalendarMobile: React.FC = () => {
   const { theme } = useTheme()
@@ -60,12 +62,18 @@ const CalendarMobile: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [tutors, setTutors] = useState<{[key: string]: any}>({})
+  const [subjects, setSubjects] = useState<string[]>([])
+  const [classes, setClasses] = useState<any[]>([])
+  const [showClock, setShowClock] = useState(true)
 
-  // Time slots from 7 AM to 6 PM with 50-minute ranges (mobile day view)
+  // Time slots from 7 AM to 6 PM with 1-hour ranges (mobile day view)
   const timeSlots = Array.from({ length: 12 }, (_, i) => {
     const hour = 7 + i
+    const nextHour = hour + 1
     const startTime = `${hour.toString().padStart(2, '0')}:00`
-    const endTime = `${hour.toString().padStart(2, '0')}:50`
+    const endTime = `${nextHour.toString().padStart(2, '0')}:00`
     return { start: startTime, end: endTime, display: `${startTime}-${endTime}` }
   })
 
@@ -96,17 +104,205 @@ const CalendarMobile: React.FC = () => {
     })
   }
 
-  // Load sessions for current week
+  // Helper function to convert classes to calendar sessions based on week dates
+  const convertClassesToSessions = (classes: any[], weekDates: string[], tutorsMap: {[key: string]: any}): Session[] => {
+    const classSessions: Session[] = []
+    
+    classes.forEach((classItem) => {
+      if (!classItem || classItem.status !== 'active') return
+      
+      const semesterStart = new Date(classItem.semesterStart)
+      const semesterEnd = new Date(classItem.semesterEnd)
+      const dayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(classItem.day.toLowerCase())
+      
+      if (dayIndex === -1) return
+      
+      weekDates.forEach((dateStr) => {
+        const date = new Date(dateStr)
+        const currentDay = date.getDay()
+        const mappedDay = currentDay === 0 ? 6 : currentDay - 1 // Map Sunday (0) to 6, Monday (1) to 0, etc.
+        
+        if (mappedDay === dayIndex) {
+          // Check if date is within semester range
+          if (date >= semesterStart && date <= semesterEnd) {
+            const [startHour, startMin] = classItem.startTime.split(':').map(Number)
+            const [endHour, endMin] = classItem.endTime.split(':').map(Number)
+            
+            const sessionStart = new Date(date)
+            sessionStart.setHours(startHour, startMin, 0, 0)
+            
+            const sessionEnd = new Date(date)
+            sessionEnd.setHours(endHour, endMin, 0, 0)
+            
+            const tutor = tutorsMap[classItem.tutorId] || { id: classItem.tutorId, name: 'Loading...', avatar: '' }
+            
+            classSessions.push({
+              id: `class_${classItem.id}_${dateStr}`,
+              subject: classItem.subject,
+              tutor: {
+                id: classItem.tutorId,
+                name: tutor.name,
+                avatar: tutor.avatar || ''
+              },
+              date: dateStr,
+              startTime: classItem.startTime,
+              endTime: classItem.endTime,
+              location: {
+                type: classItem.isOnline ? 'online' : 'offline',
+                address: classItem.location,
+                meetingLink: classItem.isOnline ? undefined : undefined
+              },
+              status: 'scheduled' as const,
+              notes: `${classItem.code} - ${classItem.description || ''}`,
+              color: '#10b981', // Green color for classes
+              createdAt: classItem.createdAt,
+              updatedAt: classItem.updatedAt,
+              classId: classItem.id // Add classId to identify it's from a class
+            })
+          }
+        }
+      })
+    })
+    
+    return classSessions
+  }
+
+  // Load sessions and classes from backend
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
+        const userStr = localStorage.getItem('user')
+        if (!userStr) {
+          navigate('/login')
+          return
+        }
+        
+        const user = JSON.parse(userStr)
+        const studentId = user.id || user.userId
+        
+        // Fetch all sessions for this student
+        const sessionsResponse = await api.sessions.list({ 
+          studentId, 
+          limit: 1000 
+        })
+        
+        // Fetch enrollments and classes
+        const enrollmentsResponse = await api.enrollments.list({ studentId })
+        
+        let allSessionsData: any[] = []
+        let classesData: any[] = []
+        let allTutorIds: string[] = []
+        
+        // Process sessions
+        if (sessionsResponse.data && Array.isArray(sessionsResponse.data)) {
+          allSessionsData = sessionsResponse.data
+          allTutorIds = [...allTutorIds, ...allSessionsData.map((s: any) => s.tutorId)]
+        }
+        
+        // Process enrollments and classes
+        if (enrollmentsResponse.success && enrollmentsResponse.data && Array.isArray(enrollmentsResponse.data)) {
+          const enrollments = enrollmentsResponse.data.filter((e: any) => e.status === 'active')
+          const uniqueClassIds = [...new Set(enrollments.map((e: any) => e.classId))] as string[]
+          
+          const classPromises = uniqueClassIds.map(async (classId: string) => {
+            try {
+              const classResponse = await api.classes.get(classId)
+              if (classResponse.success && classResponse.data) {
+                return classResponse.data
+              }
+            } catch (err) {
+              console.error(`Failed to load class ${classId}:`, err)
+            }
+            return null
+          })
+          
+          const classResults = await Promise.all(classPromises)
+          classesData = classResults.filter(c => c !== null)
+          allTutorIds = [...allTutorIds, ...classesData.map((c: any) => c.tutorId)]
+        }
+        
+        // Fetch tutor details for all unique tutors
+        const uniqueTutorIds = [...new Set(allTutorIds)] as string[]
+        const tutorPromises = uniqueTutorIds.map(async (tutorId: string) => {
+          try {
+            const tutorResponse = await api.users.get(tutorId)
+            if (tutorResponse.success && tutorResponse.data) {
+              return { id: tutorId, data: tutorResponse.data }
+            }
+          } catch (err) {
+            console.error(`Failed to load tutor ${tutorId}:`, err)
+          }
+          return null
+        })
+        
+        const tutorResults = await Promise.all(tutorPromises)
+        const tutorsMap: { [key: string]: any } = {}
+        tutorResults.forEach(result => {
+          if (result) {
+            tutorsMap[result.id] = result.data
+          }
+        })
+        
+        // Get unique subjects
+        const uniqueSubjects = [...new Set([
+          ...allSessionsData.map((s: any) => s.subject),
+          ...classesData.map((c: any) => c.subject)
+        ])] as string[]
+        
+        // Transform sessions to calendar format
+        const transformedSessions: Session[] = allSessionsData.map((s: any) => ({
+          id: s.id,
+          subject: s.subject,
+          tutor: tutorsMap[s.tutorId] ? {
+            id: s.tutorId,
+            name: tutorsMap[s.tutorId].name,
+            avatar: tutorsMap[s.tutorId].avatar
+          } : {
+            id: s.tutorId,
+            name: 'Loading...',
+            avatar: ''
+          },
+          date: new Date(s.startTime).toISOString().split('T')[0],
+          startTime: new Date(s.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+          endTime: new Date(s.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+          location: {
+            type: s.isOnline ? 'online' : 'offline',
+            address: s.location,
+            meetingLink: s.meetingLink
+          },
+          status: s.status === 'confirmed' ? 'scheduled' : s.status === 'completed' ? 'completed' : s.status === 'cancelled' ? 'cancelled' : 'scheduled',
+          notes: s.notes || s.description,
+          color: '#3b82f6',
+          createdAt: s.createdAt,
+          updatedAt: s.updatedAt
+        }))
+        
+        setSessions(transformedSessions)
+        setTutors(tutorsMap)
+        setSubjects(uniqueSubjects)
+        setClasses(classesData)
+      } catch (error) {
+        console.error('Failed to load data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadData()
+  }, [navigate])
+
+  // Organize sessions by week
   useEffect(() => {
     const weekStart = getWeekStart(currentWeek)
     const weekDates = getWeekDates(weekStart)
-    const weekSessionsData = getSessionsForWeek(weekStart.toISOString().split('T')[0])
     
-    // Merge mock data with sessions from state
-    const allSessions = [...weekSessionsData, ...sessions]
+    // Convert classes to sessions for current week
+    const classSessions = convertClassesToSessions(classes, weekDates, tutors)
+    
+    // Combine regular sessions with class sessions
+    const allSessions = [...sessions, ...classSessions]
     const filteredSessions = filterSessions(allSessions, filters)
-    
-    setSessions(filteredSessions)
     
     // Group sessions by date
     const groupedSessions: {[key: string]: Session[]} = {}
@@ -114,7 +310,7 @@ const CalendarMobile: React.FC = () => {
       groupedSessions[date] = filteredSessions.filter(session => session.date === date)
     })
     setWeekSessions(groupedSessions)
-  }, [currentWeek, filters])
+  }, [currentWeek, filters, sessions, classes, tutors])
 
   // Touch handlers for swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -287,6 +483,105 @@ const CalendarMobile: React.FC = () => {
     return sessions.sort((a, b) => a.startTime.localeCompare(b.startTime))
   }
 
+  // Clock Widget Component for Mobile
+  const ClockWidgetMobile = ({ theme }: { theme: string }) => {
+    const [currentTime, setCurrentTime] = useState(new Date())
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setCurrentTime(new Date())
+      }, 1000)
+
+      return () => clearInterval(timer)
+    }, [])
+
+    const formatTime = (date: Date) => {
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })
+    }
+
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })
+    }
+
+    return (
+      <Card
+        sx={{
+          backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+          border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+          borderRadius: '12px',
+          overflow: 'hidden'
+        }}
+      >
+        <CardContent sx={{ p: 2 }}>
+          {/* Time Display */}
+          <div className="text-center mb-1">
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                color: theme === 'dark' ? '#ffffff' : '#111827',
+                fontFamily: 'monospace',
+                letterSpacing: '0.05em',
+                fontSize: '2rem'
+              }}
+            >
+              {formatTime(currentTime)}
+            </Typography>
+          </div>
+
+          {/* Date Display */}
+          <div className="text-center">
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                fontWeight: 500,
+                fontSize: '0.75rem'
+              }}
+            >
+              {formatDate(currentTime)}
+            </Typography>
+          </div>
+
+          {/* Decorative line */}
+          <div
+            style={{
+              marginTop: '12px',
+              height: '2px',
+              background: theme === 'dark' 
+                ? 'linear-gradient(90deg, transparent, #3b82f6, transparent)' 
+                : 'linear-gradient(90deg, transparent, #60a5fa, transparent)',
+              borderRadius: '2px'
+            }}
+          />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+            Loading calendar...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <div 
@@ -318,6 +613,17 @@ const CalendarMobile: React.FC = () => {
             </div>
             <div className="flex items-center gap-2">
               <IconButton
+                onClick={() => setShowClock(!showClock)}
+                sx={{ 
+                  color: showClock 
+                    ? (theme === 'dark' ? '#3b82f6' : '#3b82f6')
+                    : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                  transition: 'color 0.2s'
+                }}
+              >
+                {showClock ? <AccessTimeFilledIcon /> : <AccessTimeIcon />}
+              </IconButton>
+              <IconButton
                 onClick={() => setIsFilterOpen(true)}
                 sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
               >
@@ -330,6 +636,18 @@ const CalendarMobile: React.FC = () => {
                 <MenuIcon />
               </IconButton>
             </div>
+          </div>
+
+          {/* Clock Widget Mobile */}
+          <div 
+            className="px-4 overflow-hidden transition-all duration-300 ease-in-out"
+            style={{
+              maxHeight: showClock ? '200px' : '0px',
+              paddingBottom: showClock ? '8px' : '0px',
+              opacity: showClock ? 1 : 0
+            }}
+          >
+            <ClockWidgetMobile theme={theme} />
           </div>
 
           {/* Week/Day Navigation */}
@@ -393,6 +711,30 @@ const CalendarMobile: React.FC = () => {
                 value={viewMode}
                 onChange={(_, v) => v && setViewMode(v)}
                 aria-label="Calendar view switcher"
+                sx={{
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                  border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+                  borderRadius: '12px',
+                  p: 0.5,
+                  '& .MuiToggleButton-root': {
+                    color: `${theme === 'dark' ? '#e5e7eb' : '#111827'} !important`,
+                    border: 'none',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    borderRadius: '10px',
+                    backgroundColor: 'transparent',
+                    fontSize: '0.75rem',
+                    px: 2,
+                    py: 0.5
+                  },
+                  '& .MuiToggleButton-root:hover': {
+                    backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6'
+                  },
+                  '& .MuiToggleButton-root.Mui-selected': {
+                    backgroundColor: theme === 'dark' ? '#1e40af' : '#3b82f6',
+                    color: '#ffffff !important'
+                  }
+                }}
               >
                 <ToggleButton value="week" aria-label="Week view">Week</ToggleButton>
                 <ToggleButton value="day" aria-label="Day view">Day</ToggleButton>
@@ -487,10 +829,10 @@ const CalendarMobile: React.FC = () => {
           }
         </div>
 
-        {/* FAB for Add Session */}
+        {/* FAB for Add Event */}
         <Fab
           color="primary"
-          aria-label="add session"
+          aria-label="add event"
           onClick={handleCreateSession}
           sx={{
             position: 'fixed',
@@ -566,8 +908,8 @@ const CalendarMobile: React.FC = () => {
                   >
                     <MenuItem value="">All Subjects</MenuItem>
                     {subjects.map((subject) => (
-                      <MenuItem key={subject.id} value={subject.name}>
-                        {subject.name}
+                      <MenuItem key={subject} value={subject}>
+                        {subject}
                       </MenuItem>
                     ))}
                   </Select>
@@ -605,7 +947,7 @@ const CalendarMobile: React.FC = () => {
                     }}
                   >
                     <MenuItem value="">All Tutors</MenuItem>
-                    {tutors.map((tutor) => (
+                    {Object.values(tutors).map((tutor: any) => (
                       <MenuItem key={tutor.id} value={tutor.id}>
                         {tutor.name}
                       </MenuItem>
@@ -731,7 +1073,7 @@ const CalendarMobile: React.FC = () => {
                   }`}
                 >
                   <span className="mr-3">{<SchoolIcon />}</span>
-                  Book Session
+                  Add Event
                   <ChevronRightIcon className="ml-auto w-4 h-4" />
                 </button>
                 <button
@@ -770,9 +1112,9 @@ const CalendarMobile: React.FC = () => {
           onClose={() => setIsFormModalOpen(false)}
           onSave={handleSaveSession}
           session={selectedSession}
-          tutors={tutors}
+          tutors={Object.values(tutors).map((t: any) => ({ id: t.id, name: t.name, avatar: t.avatar }))}
           students={[]}
-          subjects={subjects}
+          subjects={subjects.map((s, idx) => ({ id: `subj_${idx}`, name: s, color: '#3b82f6' }))}
           showTutor={true}
           showStudent={false}
         />

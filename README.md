@@ -279,6 +279,19 @@ const theme = {
 - **Dark Mode**: Native dark mode support
 - **Performance**: Purged CSS, small bundle size
 
+## 📚 Documentation
+
+Chi tiết các document được lưu trong thư mục `docs/` (không bao gồm trong repository):
+- `API_DOCS.md` - API Reference
+- `BACKEND_README.md` - Backend Architecture & Setup
+- `CLASS_ENROLLMENT_API_DOCS.md` - Class & Enrollment APIs
+- `DEPLOYMENT.md` - Deployment Guide (Vercel)
+- `FLOW_DOCUMENTATION.md` - System Flow & Architecture
+- `HUONG_DAN_SU_DUNG.md` - User Guide
+- `QUICK_REFERENCE.md` - Quick Reference
+- `SCHEMAS_REFERENCE.md` - Data Schemas
+- `TYPES_REFERENCE.md` - TypeScript Types
+
 ## 📄 License
 
 MIT License - Xem file LICENSE để biết thêm chi tiết.

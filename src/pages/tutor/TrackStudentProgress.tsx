@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -16,14 +16,125 @@ import {
 import { Avatar } from '@mui/material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import { progressAPI, usersAPI, sessionsAPI } from '../../lib/api'
+
+interface StudentProgress {
+  studentId: string
+  studentName: string
+  progressRecords: any[]
+  sessions: any[]
+  averageScore: number
+  totalSessions: number
+  subjects: string[]
+}
 
 const TrackStudentProgress: React.FC = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [progressData, setProgressData] = useState<any[]>([])
+  const [studentsMap, setStudentsMap] = useState<Record<string, any>>({})
+  const [studentsProgress, setStudentsProgress] = useState<StudentProgress[]>([])
   const [selectedStudent, setSelectedStudent] = useState('all')
   const [selectedSubject, setSelectedSubject] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Load progress data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Get user from localStorage
+        const userStr = localStorage.getItem('user')
+        if (!userStr) {
+          navigate('/login')
+          return
+        }
+        const userData = JSON.parse(userStr)
+        setUser(userData)
+
+        // Load progress records for this tutor
+        const progressResponse = await progressAPI.list({ tutorId: userData.id, limit: 1000 })
+        
+        console.log('Progress response:', progressResponse) // Debug
+
+        if (progressResponse.data && Array.isArray(progressResponse.data)) {
+          const progressRecords = progressResponse.data
+
+          // Get unique student IDs
+          const studentIds = [...new Set(progressRecords.map((p: any) => p.studentId))] as string[]
+          
+          // Load student data
+          const studentsData: Record<string, any> = {}
+          await Promise.all(
+            studentIds.map(async (studentId) => {
+              try {
+                const response = await usersAPI.get(studentId)
+                const userData = response.success ? response.data : response
+                if (userData) {
+                  studentsData[studentId] = userData
+                }
+              } catch (err) {
+                console.error(`Error loading student ${studentId}:`, err)
+              }
+            })
+          )
+
+          setStudentsMap(studentsData)
+          setProgressData(progressRecords)
+
+          // Process data by student
+          const studentProgressMap = new Map<string, StudentProgress>()
+
+          progressRecords.forEach((progress: any) => {
+            if (!studentProgressMap.has(progress.studentId)) {
+              studentProgressMap.set(progress.studentId, {
+                studentId: progress.studentId,
+                studentName: studentsData[progress.studentId]?.name || 'Unknown Student',
+                progressRecords: [],
+                sessions: [],
+                averageScore: 0,
+                totalSessions: 0,
+                subjects: []
+              })
+            }
+
+            const studentProgress = studentProgressMap.get(progress.studentId)!
+            studentProgress.progressRecords.push(progress)
+            
+            // Add unique subjects
+            if (!studentProgress.subjects.includes(progress.subject)) {
+              studentProgress.subjects.push(progress.subject)
+            }
+          })
+
+          // Calculate averages
+          studentProgressMap.forEach((studentProgress) => {
+            const scores = studentProgress.progressRecords.map((p: any) => p.score || 0)
+            // Convert score from 0-10 scale to 0-100 percentage
+            const averageScore = scores.length > 0 
+              ? scores.reduce((a, b) => a + b, 0) / scores.length
+              : 0
+            studentProgress.averageScore = Math.round(averageScore * 10) // Convert to percentage
+            studentProgress.totalSessions = studentProgress.progressRecords.length
+          })
+
+          setStudentsProgress(Array.from(studentProgressMap.values()))
+        }
+      } catch (err: any) {
+        console.error('Error loading progress:', err)
+        setError(err.message || 'Failed to load progress data')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [navigate])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -51,91 +162,44 @@ const TrackStudentProgress: React.FC = () => {
     return colors[index]
   }
 
-  const students = [
-    {
-      id: 1,
-      name: 'John Smith',
-      subject: 'Mathematics',
-      progress: 85,
-      sessionsCompleted: 12,
-      averageRating: 4.8,
-      lastSession: '2024-01-10',
-      avatar: '/api/placeholder/40/40',
-      goals: [
-        { topic: 'Calculus', target: 90, current: 85, deadline: '2024-02-15' },
-        { topic: 'Algebra', target: 95, current: 88, deadline: '2024-02-20' }
-      ],
-      recentSessions: [
-        { date: '2024-01-10', topic: 'Derivatives', rating: 5, duration: '60 min' },
-        { date: '2024-01-08', topic: 'Limits', rating: 4, duration: '60 min' },
-        { date: '2024-01-05', topic: 'Functions', rating: 5, duration: '90 min' }
-      ],
-      strengths: ['Problem Solving', 'Critical Thinking'],
-      weaknesses: ['Time Management', 'Complex Calculations']
-    },
-    {
-      id: 2,
-      name: 'Sarah Johnson',
-      subject: 'Physics',
-      progress: 78,
-      sessionsCompleted: 8,
-      averageRating: 4.6,
-      lastSession: '2024-01-08',
-      avatar: '/api/placeholder/40/40',
-      goals: [
-        { topic: 'Mechanics', target: 85, current: 80, deadline: '2024-03-01' },
-        { topic: 'Thermodynamics', target: 80, current: 75, deadline: '2024-03-15' }
-      ],
-      recentSessions: [
-        { date: '2024-01-08', topic: 'Newton\'s Laws', rating: 4, duration: '90 min' },
-        { date: '2024-01-05', topic: 'Kinematics', rating: 5, duration: '60 min' },
-        { date: '2024-01-03', topic: 'Forces', rating: 4, duration: '60 min' }
-      ],
-      strengths: ['Conceptual Understanding', 'Visual Learning'],
-      weaknesses: ['Mathematical Applications', 'Problem Setup']
-    },
-    {
-      id: 3,
-      name: 'Mike Chen',
-      subject: 'Chemistry',
-      progress: 92,
-      sessionsCompleted: 6,
-      averageRating: 4.9,
-      lastSession: '2024-01-05',
-      avatar: '/api/placeholder/40/40',
-      goals: [
-        { topic: 'Organic Chemistry', target: 95, current: 92, deadline: '2024-02-28' },
-        { topic: 'Inorganic Chemistry', target: 90, current: 88, deadline: '2024-03-10' }
-      ],
-      recentSessions: [
-        { date: '2024-01-05', topic: 'Organic Reactions', rating: 5, duration: '60 min' },
-        { date: '2024-01-03', topic: 'Bonding', rating: 5, duration: '90 min' },
-        { date: '2024-01-01', topic: 'Stoichiometry', rating: 4, duration: '60 min' }
-      ],
-      strengths: ['Memorization', 'Pattern Recognition'],
-      weaknesses: ['Laboratory Skills', 'Safety Protocols']
-    }
-  ]
-
-  const filteredStudents = students.filter(student => {
-    const matchesStudent = selectedStudent === 'all' || student.id.toString() === selectedStudent
-    const matchesSubject = selectedSubject === 'all' || student.subject === selectedSubject
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter students
+  const filteredStudents = studentsProgress.filter(student => {
+    const matchesStudent = selectedStudent === 'all' || student.studentId === selectedStudent
+    const matchesSubject = selectedSubject === 'all' || student.subjects.includes(selectedSubject)
+    const matchesSearch = student.studentName.toLowerCase().includes(searchTerm.toLowerCase())
     return matchesStudent && matchesSubject && matchesSearch
   })
 
+  // Calculate overall stats
   const overallStats = {
-    totalStudents: students.length,
-    averageProgress: Math.round(students.reduce((sum, student) => sum + student.progress, 0) / students.length),
-    totalSessions: students.reduce((sum, student) => sum + student.sessionsCompleted, 0),
-    averageRating: (students.reduce((sum, student) => sum + student.averageRating, 0) / students.length).toFixed(1)
+    totalStudents: studentsProgress.length,
+    averageProgress: studentsProgress.length > 0 
+      ? Math.round(studentsProgress.reduce((sum, s) => sum + s.averageScore, 0) / studentsProgress.length)
+      : 0,
+    totalSessions: studentsProgress.reduce((sum, s) => sum + s.totalSessions, 0),
+    averageRating: '0.0' // Not available in progress data
+  }
+
+  // Get unique subjects for filter
+  const allSubjects = [...new Set(studentsProgress.flatMap(s => s.subjects))]
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Loading student progress...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -378,9 +442,9 @@ const TrackStudentProgress: React.FC = () => {
                       } focus:outline-none focus:ring-2 focus:ring-blue-500`}
               >
                       <option value="all">All Students</option>
-                {students.map((student) => (
-                        <option key={student.id} value={student.id.toString()}>
-                    {student.name}
+                {studentsProgress.map((student) => (
+                        <option key={student.studentId} value={student.studentId}>
+                          {student.studentName}
                         </option>
                       ))}
                     </select>
@@ -396,9 +460,11 @@ const TrackStudentProgress: React.FC = () => {
                       } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     >
                       <option value="all">All Subjects</option>
-                      <option value="Mathematics">Mathematics</option>
-                      <option value="Physics">Physics</option>
-                      <option value="Chemistry">Chemistry</option>
+                      {allSubjects.map((subject) => (
+                        <option key={subject} value={subject}>
+                          {subject}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -449,10 +515,23 @@ const TrackStudentProgress: React.FC = () => {
           </div>
 
       {/* Student Progress Cards */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {filteredStudents.length === 0 ? (
+            <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              <Person className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <h3 className="text-xl font-semibold mb-2">No students found</h3>
+              <p>No progress records match the current filters.</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredStudents.map((student) => (
               <Card 
-                key={student.id} 
+                key={student.studentId} 
                 className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
                 style={{
                   borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
@@ -467,27 +546,21 @@ const TrackStudentProgress: React.FC = () => {
                       sx={{
                         width: 48,
                         height: 48,
-                        bgcolor: getAvatarColor(student.name),
+                        bgcolor: getAvatarColor(student.studentName),
                         fontSize: '1.25rem',
                         fontWeight: 'bold',
                         mr: 3
                       }}
                     >
-                      {getInitials(student.name)}
+                      {getInitials(student.studentName)}
                     </Avatar>
                     <div className="flex-1">
                       <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {student.name}
+                        {student.studentName}
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {student.subject}
+                        {student.subjects.length > 0 ? student.subjects.join(', ') : 'No subjects'}
                       </p>
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                          {student.averageRating}
-                        </span>
-                      </div>
                     </div>
                   </div>
 
@@ -495,83 +568,84 @@ const TrackStudentProgress: React.FC = () => {
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Overall Progress
+                        Average Score
                       </span>
                       <span className={`text-sm font-medium text-blue-600`}>
-                    {student.progress}%
+                        {student.averageScore}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${student.progress}%` }}
+                        style={{ width: `${student.averageScore}%` }}
                       ></div>
                     </div>
                     <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {student.sessionsCompleted} sessions • Last: {student.lastSession}
+                      {student.totalSessions} progress records
                     </p>
                   </div>
 
-                  {/* Learning Goals */}
+                  {/* Recent Progress Records */}
                   <div className="mb-4">
                     <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Learning Goals:
+                      Recent Topics:
                     </h4>
                     <div className="space-y-2">
-                {student.goals.map((goal, index) => (
-                        <div key={index}>
-                          <div className="flex justify-between items-center mb-1">
+                      {student.progressRecords.slice(0, 3).map((progress: any, index: number) => {
+                        const scorePercentage = Math.round(progress.score * 10) // Convert 0-10 to 0-100
+                        return (
+                          <div key={index} className={`p-2 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                            <div className="flex justify-between items-center">
                             <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                              {goal.topic}
+                                {progress.topic}
                             </span>
-                            <span className={`text-xs font-medium text-blue-600`}>
-                        {goal.current}/{goal.target}%
+                              <span className={`text-xs font-medium ${scorePercentage >= 80 ? 'text-green-600' : scorePercentage >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                                {scorePercentage}%
                             </span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1">
-                            <div
-                              className="bg-green-500 h-1 rounded-full"
-                              style={{ width: `${(goal.current / goal.target) * 100}%` }}
-                            ></div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
 
-                  {/* Strengths */}
+                  {/* Improvements from latest record */}
+                  {student.progressRecords.length > 0 && student.progressRecords[0].improvements && student.progressRecords[0].improvements.length > 0 && (
                   <div className="mb-4">
                     <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Strengths:
+                        Recent Improvements:
                     </h4>
                     <div className="flex flex-wrap gap-1">
-                  {student.strengths.map((strength, index) => (
+                        {student.progressRecords[0].improvements.slice(0, 3).map((improvement: string, index: number) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
                         >
-                          {strength}
+                            {improvement}
                         </span>
                       ))}
                     </div>
                   </div>
+                  )}
 
-                  {/* Areas for Improvement */}
+                  {/* Challenges from latest record */}
+                  {student.progressRecords.length > 0 && student.progressRecords[0].challenges && student.progressRecords[0].challenges.length > 0 && (
                   <div className="mb-4">
                     <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Areas for Improvement:
+                        Challenges:
                     </h4>
                     <div className="flex flex-wrap gap-1">
-                  {student.weaknesses.map((weakness, index) => (
+                        {student.progressRecords[0].challenges.slice(0, 3).map((challenge: string, index: number) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full"
                         >
-                          {weakness}
+                            {challenge}
                         </span>
                       ))}
                     </div>
                   </div>
+                  )}
 
                   {/* Action Buttons */}
                   <div className="flex space-x-2">
@@ -608,6 +682,7 @@ const TrackStudentProgress: React.FC = () => {
             </Card>
             ))}
           </div>
+          )}
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
+import api from '../../lib/api'
 import { 
   Typography, 
   Button as MuiButton,
@@ -49,6 +50,13 @@ const SessionDetailMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [activeMenu, setActiveMenu] = useState('session-detail')
+  
+  // Backend data states
+  const [loading, setLoading] = useState(true)
+  const [session, setSession] = useState<any>(null)
+  const [tutor, setTutor] = useState<any>(null)
+  const [mySessions, setMySessions] = useState<any[]>([])
+  const [sessionsLoading, setSessionsLoading] = useState(true)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -105,28 +113,116 @@ const SessionDetailMobile: React.FC = () => {
     return colors[index]
   }
 
-  // Mock session data
-  const session = {
-    id: id,
-    tutor: {
-      name: 'Dr. Sarah Johnson',
-      subject: 'Mathematics',
-      rating: 4.9,
-      image: '/api/placeholder/100/100',
-      specialties: ['Calculus', 'Algebra', 'Statistics']
-    },
-    date: '2024-01-15',
-    time: '10:00 AM - 11:00 AM',
-    duration: '60 minutes',
-    type: 'Online Video Call',
-    status: 'upcoming',
-    meetingLink: 'https://meet.example.com/session-123',
-    materials: [
-      { name: 'Calculus Chapter 5.pdf', type: 'PDF', size: '2.3 MB' },
-      { name: 'Practice Problems.docx', type: 'Word', size: '1.1 MB' }
-    ],
-    notes: 'Focus on derivatives and integration techniques. Bring your calculator and notebook.',
-    price: 50
+  // Load my sessions list
+  useEffect(() => {
+    const loadMySessions = async () => {
+      try {
+        setSessionsLoading(true)
+        const userStr = localStorage.getItem('user')
+        if (!userStr) return
+        
+        const user = JSON.parse(userStr)
+        const response = await api.sessions.list({ studentId: user.id || user.userId, limit: 1000 })
+        
+        if (response.data && Array.isArray(response.data)) {
+          setMySessions(response.data)
+        }
+      } catch (error) {
+        console.error('Failed to load sessions list:', error)
+      } finally {
+        setSessionsLoading(false)
+      }
+    }
+
+    loadMySessions()
+  }, [])
+
+  // Load session data
+  useEffect(() => {
+    const loadSessionData = async () => {
+      if (!id) {
+        console.log('No session ID provided')
+        setLoading(false)
+        return
+      }
+      
+      try {
+        setLoading(true)
+        console.log('Fetching session:', id)
+        
+        // Fetch session data
+        const sessionResponse = await api.sessions.get(id)
+        console.log('Session response:', sessionResponse)
+        
+        if (sessionResponse.success && sessionResponse.data) {
+          setSession(sessionResponse.data)
+          console.log('Session data loaded:', sessionResponse.data)
+          
+          // Fetch tutor data
+          console.log('Fetching tutor:', sessionResponse.data.tutorId)
+          const tutorResponse = await api.users.get(sessionResponse.data.tutorId)
+          console.log('Tutor response:', tutorResponse)
+          
+          if (tutorResponse.success && tutorResponse.data) {
+            setTutor(tutorResponse.data)
+            console.log('Tutor data loaded:', tutorResponse.data)
+          } else {
+            console.error('Failed to load tutor:', tutorResponse)
+          }
+        } else {
+          console.error('Session not found or failed:', sessionResponse)
+        }
+      } catch (error) {
+        console.error('Failed to load session data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadSessionData()
+  }, [id])
+
+  // Format date and time
+  const formatDateTime = (isoString: string) => {
+    const date = new Date(isoString)
+    return date.toLocaleString('vi-VN', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const formatTime = (isoString: string) => {
+    const date = new Date(isoString)
+    return date.toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const getStatusLabel = (status: string) => {
+    const statusMap: any = {
+      pending: 'Pending',
+      confirmed: 'Confirmed',
+      completed: 'Completed',
+      cancelled: 'Cancelled',
+      rescheduled: 'Rescheduled'
+    }
+    return statusMap[status] || status
+  }
+
+  const getStatusColor = (status: string) => {
+    const colorMap: any = {
+      pending: 'bg-yellow-500',
+      confirmed: 'bg-green-500',
+      completed: 'bg-blue-500',
+      cancelled: 'bg-red-500',
+      rescheduled: 'bg-orange-500'
+    }
+    return colorMap[status] || 'bg-gray-500'
   }
 
   const handleJoinSession = () => {
@@ -135,7 +231,9 @@ const SessionDetailMobile: React.FC = () => {
 
   const handleStartSession = () => {
     // In a real app, this would open the video call
+    if (session?.meetingLink) {
     window.open(session.meetingLink, '_blank')
+    }
     setIsJoinDialogOpen(false)
   }
 
@@ -147,6 +245,37 @@ const SessionDetailMobile: React.FC = () => {
     // In a real app, this would submit feedback to the backend
     console.log('Feedback submitted:', { rating, feedback })
     setIsFeedbackDialogOpen(false)
+  }
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            Loading session...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!session || !tutor) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center p-4">
+          <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
+            Session not found
+          </p>
+          <Button
+            onClick={() => navigate('/student')}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Back to Dashboard
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -219,31 +348,31 @@ const SessionDetailMobile: React.FC = () => {
               sx={{
                 width: 56,
                 height: 56,
-                bgcolor: getAvatarColor(session.tutor.name),
+                bgcolor: getAvatarColor(tutor.name),
                 fontSize: '1.25rem',
                 fontWeight: 'bold'
               }}
             >
-              {getInitials(session.tutor.name)}
+              {getInitials(tutor.name)}
             </Avatar>
             <div className="ml-4 flex-1">
               <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                {session.tutor.name}
+                {tutor.name}
               </h3>
               <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                {session.tutor.subject}
+                {session.subject}
               </p>
               <div className="flex items-center mt-1">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <Star 
                       key={i} 
-                      className={`w-4 h-4 ${i < Math.floor(session.tutor.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                      className={`w-4 h-4 ${i < Math.floor(tutor.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
                     />
                   ))}
                 </div>
                 <span className={`text-sm ml-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {session.tutor.rating}
+                  {tutor.rating?.toFixed(1) || 'N/A'}
                 </span>
               </div>
             </div>
@@ -255,10 +384,10 @@ const SessionDetailMobile: React.FC = () => {
               <Schedule className="w-4 h-4 text-gray-400 mr-3" />
               <div>
                 <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {session.date} at {session.time}
+                  {formatDateTime(session.startTime)}
                 </p>
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Duration: {session.duration}
+                  Duration: {session.duration} minutes
                 </p>
               </div>
             </div>
@@ -266,10 +395,10 @@ const SessionDetailMobile: React.FC = () => {
               <Person className="w-4 h-4 text-gray-400 mr-3" />
               <div>
                 <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {session.type}
+                  {session.isOnline ? 'Online Video Call' : 'In-Person Meeting'}
                 </p>
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Online Meeting
+                  {session.isOnline ? 'Virtual' : 'Physical Location'}
                 </p>
               </div>
             </div>
@@ -400,6 +529,7 @@ const SessionDetailMobile: React.FC = () => {
         </Card>
 
         {/* Tutor Specialties */}
+        {tutor.subjects && tutor.subjects.length > 0 && (
         <Card
           className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
           style={{
@@ -412,19 +542,20 @@ const SessionDetailMobile: React.FC = () => {
             Tutor Specialties
           </h3>
           <div className="flex flex-wrap gap-2">
-            {session.tutor.specialties.map((specialty, index) => (
+              {tutor.subjects.map((subject: string, index: number) => (
               <span
                 key={index}
                 className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
               >
-                {specialty}
+                  {subject}
               </span>
             ))}
           </div>
         </Card>
+        )}
 
-        {/* Session Materials */}
-        <Card
+        {/* Session Materials - Commented out: not in backend yet */}
+        {/* <Card
           className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
           style={{
             borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
@@ -435,40 +566,10 @@ const SessionDetailMobile: React.FC = () => {
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Session Materials
           </h3>
-          <div className="space-y-3">
-            {session.materials.map((material, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {material.name}
-                  </p>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {material.type} • {material.size}
-                  </p>
-                </div>
-                <Button 
-                  size="small" 
-                  variant="outlined"
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                    color: theme === 'dark' ? '#ffffff' : '#000000',
-                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                    textTransform: 'none',
-                    fontWeight: '500'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
-                  }}
-                >
-                  Download
-                </Button>
-              </div>
-            ))}
-          </div>
-        </Card>
+            No materials uploaded yet
+          </p>
+        </Card> */}
 
         {/* Session Info */}
         <Card 
@@ -593,6 +694,51 @@ const SessionDetailMobile: React.FC = () => {
                   </div>
                 </div>
 
+                {/* My Sessions */}
+                <div className="mb-8">
+                  <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    MY SESSIONS ({mySessions.length})
+                  </h3>
+                  {sessionsLoading ? (
+                    <div className="text-center py-4">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                    </div>
+                  ) : mySessions.length === 0 ? (
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      No sessions found
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {mySessions.map((sess: any) => (
+                        <button
+                          key={sess.id}
+                          onClick={() => {
+                            navigate(`/student/session/${sess.id}`)
+                            setMobileOpen(false)
+                          }}
+                          className={`w-full px-3 py-2 rounded-lg text-left transition-colors ${
+                            sess.id === id
+                              ? 'bg-blue-600 text-white'
+                              : theme === 'dark'
+                              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                              : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-semibold truncate">
+                              {sess.subject}
+                            </span>
+                            <span className={`w-2 h-2 rounded-full ${getStatusColor(sess.status)}`}></span>
+                          </div>
+                          <p className={`text-xs ${sess.id === id ? 'text-blue-100' : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {formatTime(sess.startTime)}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 {/* Mobile Session Status */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -640,16 +786,16 @@ const SessionDetailMobile: React.FC = () => {
         <DialogTitle>Join Session</DialogTitle>
         <DialogContent>
           <Typography variant="body1" gutterBottom>
-            You are about to join the session with {session.tutor.name}.
+            You are about to join the session with {tutor?.name}.
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Session: {session.tutor.subject} - {session.date} at {session.time}
+            Session: {session?.subject} - {formatDateTime(session?.startTime || '')}
           </Typography>
           <div className="mt-4">
             <TextField
               fullWidth
               label="Meeting Link"
-              value={session.meetingLink}
+              value={session?.meetingLink || 'No meeting link available'}
               InputProps={{ readOnly: true }}
             />
           </div>

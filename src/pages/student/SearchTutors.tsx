@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { Avatar } from '@mui/material'
+import api from '../../lib/api'
 import { 
   Search, 
   Star, 
-  LocationOn, 
-  Schedule,
   Menu as MenuIcon,
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
@@ -14,6 +13,7 @@ import {
   VideoCall as VideoCallIcon,
   Chat as ChatIcon,
   Person as PersonIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -26,6 +26,16 @@ const SearchTutors: React.FC = () => {
   const [rating, setRating] = useState('')
   const [availability, setAvailability] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  
+  // Backend data states
+  const [tutors, setTutors] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  
+  // Tutor detail modal state
+  const [selectedTutor, setSelectedTutor] = useState<any>(null)
+  const [showTutorModal, setShowTutorModal] = useState(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -53,72 +63,64 @@ const SearchTutors: React.FC = () => {
     return colors[index]
   }
 
-  const tutors = [
-    {
-      id: 1,
-      name: 'Dr. Sarah Johnson',
-      subject: 'Mathematics',
-      rating: 4.9,
-      reviews: 127,
-      price: 50,
-      experience: '8 years',
-      location: 'New York, NY',
-      availability: 'Available',
-      image: '/api/placeholder/100/100',
-      specialties: ['Calculus', 'Algebra', 'Statistics'],
-      nextAvailable: 'Today at 2:00 PM'
-    },
-    {
-      id: 2,
-      name: 'Prof. Michael Chen',
-      subject: 'Physics',
-      rating: 4.8,
-      reviews: 89,
-      price: 45,
-      experience: '12 years',
-      location: 'San Francisco, CA',
-      availability: 'Available',
-      image: '/api/placeholder/100/100',
-      specialties: ['Quantum Physics', 'Mechanics', 'Thermodynamics'],
-      nextAvailable: 'Tomorrow at 10:00 AM'
-    },
-    {
-      id: 3,
-      name: 'Dr. Emily Davis',
-      subject: 'Chemistry',
-      rating: 4.7,
-      reviews: 156,
-      price: 55,
-      experience: '6 years',
-      location: 'Boston, MA',
-      availability: 'Busy',
-      image: '/api/placeholder/100/100',
-      specialties: ['Organic Chemistry', 'Biochemistry', 'Analytical Chemistry'],
-      nextAvailable: 'Next week'
-    },
-    {
-      id: 4,
-      name: 'Dr. James Wilson',
-      subject: 'Biology',
-      rating: 4.9,
-      reviews: 203,
-      price: 48,
-      experience: '10 years',
-      location: 'Chicago, IL',
-      availability: 'Available',
-      image: '/api/placeholder/100/100',
-      specialties: ['Cell Biology', 'Genetics', 'Ecology'],
-      nextAvailable: 'Today at 4:00 PM'
+  // Load tutors from backend
+  const loadTutors = async () => {
+    try {
+      setLoading(true)
+      
+      // Build filters
+      const params: any = {
+        page,
+        limit: 10
+      }
+      
+      // Only add subject if it's not empty
+      if (subject && subject !== '') {
+        params.subject = subject
+      }
+      
+      // Only add rating if it's not empty
+      if (rating && rating !== '') {
+        const minRating = parseFloat(rating.replace('+', ''))
+        params.minRating = minRating
+      }
+      
+      // Only add search if it's not empty
+      if (searchTerm && searchTerm.trim() !== '') {
+        params.search = searchTerm
+      }
+      
+      console.log('Loading tutors with params:', params)
+      const result = await api.tutors.list(params)
+      console.log('Tutors result:', result)
+      
+      if (result.success) {
+        setTutors(result.data || [])
+        if (result.pagination) {
+          setTotalPages(result.pagination.totalPages || 1)
+        }
+      } else {
+        console.error('Failed to load tutors:', result.error)
+      }
+    } catch (error) {
+      console.error('Error loading tutors:', error)
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
-  const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'English']
+  // Load tutors on mount and when filters change
+  useEffect(() => {
+    loadTutors()
+  }, [page, subject, rating, searchTerm])
+
+  const subjects = ['Toán cao cấp', 'Vật lý đại cương', 'Hóa học', 'Sinh học', 'Lập trình', 'Tiếng Anh']
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Left Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -267,16 +269,40 @@ const SearchTutors: React.FC = () => {
               Available Tutors ({tutors.length})
             </h2>
             <div className="flex space-x-2">
-              <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              <button 
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} disabled:opacity-50`}
+              >
                 <ArrowBackIcon className="w-4 h-4" />
               </button>
-              <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              <span className={`px-3 py-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                {page} / {totalPages}
+              </span>
+              <button 
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} disabled:opacity-50`}
+              >
                 <ArrowForwardIcon className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-      {/* Tutors Grid */}
+          {/* Loading State */}
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                Đang tải gia sư...
+              </div>
+            </div>
+          ) : tutors.length === 0 ? (
+            <div className="flex justify-center items-center py-20">
+              <div className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Không tìm thấy gia sư phù hợp
+              </div>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tutors.map((tutor) => (
             <Card
@@ -292,6 +318,7 @@ const SearchTutors: React.FC = () => {
                   {/* Tutor Header */}
                   <div className="flex items-center mb-4">
                     <Avatar
+                      src={tutor.avatar}
                       sx={{
                         width: 56,
                         height: 56,
@@ -307,7 +334,7 @@ const SearchTutors: React.FC = () => {
                         {tutor.name}
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {tutor.subject} • {tutor.experience} experience
+                        {tutor.subjects?.[0] || 'N/A'} • {tutor.experience || 'Experienced'}
                       </p>
                     </div>
                   </div>
@@ -319,63 +346,66 @@ const SearchTutors: React.FC = () => {
                         {[...Array(5)].map((_, i) => (
                           <Star 
                             key={i} 
-                            className={`w-4 h-4 ${i < Math.floor(tutor.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                            className={`w-4 h-4 ${i < Math.floor(tutor.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
                           />
                         ))}
                       </div>
                       <span className={`text-sm ml-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {tutor.rating} ({tutor.reviews} reviews)
+                        {tutor.rating?.toFixed(1) || '0.0'} ({tutor.totalReviews || 0} reviews)
                       </span>
                     </div>
                     <p className={`text-lg font-semibold text-blue-600`}>
-                      ${tutor.price}/hour
+                      {tutor.hourlyRate ? `${tutor.hourlyRate.toLocaleString('vi-VN')} VND` : 'Liên hệ'}/giờ
                     </p>
                   </div>
 
-                  {/* Location & Availability */}
+                  {/* Bio & Info */}
                   <div className="mb-4 space-y-2">
+                    {tutor.education && (
                     <div className="flex items-center">
-                      <LocationOn className="w-4 h-4 text-gray-400 mr-2" />
+                        <CheckCircleIcon className="w-4 h-4 text-blue-400 mr-2" />
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {tutor.location}
+                          {tutor.education}
                       </span>
                     </div>
-                    <div className="flex items-center">
-                      <Schedule className="w-4 h-4 text-gray-400 mr-2" />
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Next: {tutor.nextAvailable}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
+                    )}
+                    {tutor.bio && (
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} line-clamp-2`}>
+                        {tutor.bio}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between mt-2">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                         Status:
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        tutor.availability === 'Available' 
+                        tutor.verified 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {tutor.availability}
+                        {tutor.verified ? 'Verified' : 'Pending'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Specialties */}
+                  {/* Subjects */}
+                  {tutor.subjects && tutor.subjects.length > 0 && (
                   <div className="mb-4">
                     <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Specialties:
+                        Môn dạy:
                     </p>
                     <div className="flex flex-wrap gap-1">
-                      {tutor.specialties.map((specialty, index) => (
+                        {tutor.subjects.map((subject: string, index: number) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
                         >
-                          {specialty}
+                            {subject}
                         </span>
                       ))}
                     </div>
                   </div>
+                  )}
 
                   {/* Actions */}
                   <div className="flex space-x-2">
@@ -383,6 +413,10 @@ const SearchTutors: React.FC = () => {
                       size="small" 
                       variant="outlined"
                       className="flex-1"
+                      onClick={() => {
+                        setSelectedTutor(tutor)
+                        setShowTutorModal(true)
+                      }}
                       style={{
                         backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
                         color: theme === 'dark' ? '#ffffff' : '#000000',
@@ -402,20 +436,22 @@ const SearchTutors: React.FC = () => {
                   <Button 
                     size="small" 
                     variant="contained"
-                    disabled={tutor.availability === 'Busy'}
+                    disabled={!tutor.verified}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => navigate('/student/book', { state: { tutorId: tutor.id } })}
                   >
-                    Book Session
+                    Đặt lịch
                   </Button>
                   </div>
                 </div>
               </Card>
             ))}
           </div>
+          )}
         </div>
 
-        {/* Right Sidebar */}
-        <div className={`w-full lg:w-80 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-l ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} mt-6 lg:mt-0`}>
+        {/* Right Sidebar - Sticky */}
+        <div className={`w-full lg:w-80 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-l ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} mt-6 lg:mt-0`}>
           <div className="p-6">
             {/* Search Tips */}
             <div className="mb-8">
@@ -588,6 +624,157 @@ const SearchTutors: React.FC = () => {
                     <option value="week">This Week</option>
                   </select>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tutor Detail Modal */}
+      {showTutorModal && selectedTutor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowTutorModal(false)}></div>
+          <div className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl`}>
+            <div className="p-6">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Hồ sơ Gia sư
+                </h2>
+                <button 
+                  onClick={() => setShowTutorModal(false)}
+                  className={`p-2 rounded-full hover:bg-gray-100 ${theme === 'dark' ? 'hover:bg-gray-700' : ''}`}
+                >
+                  <CloseIcon className={theme === 'dark' ? 'text-white' : 'text-gray-900'} />
+                </button>
+              </div>
+
+              {/* Tutor Info */}
+              <div className="flex items-start space-x-6 mb-6">
+                <Avatar
+                  src={selectedTutor.avatar}
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    bgcolor: '#3b82f6',
+                    fontSize: '2.5rem',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {getInitials(selectedTutor.name)}
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {selectedTutor.name}
+                    </h3>
+                    {selectedTutor.verified && (
+                      <CheckCircleIcon className="w-6 h-6 text-blue-500" />
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-4 mb-3">
+                    <div className="flex items-center">
+                      <Star className="w-5 h-5 text-yellow-400 mr-1" />
+                      <span className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedTutor.rating?.toFixed(1) || 'N/A'}
+                      </span>
+                      <span className={`ml-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        ({selectedTutor.totalReviews || 0} đánh giá)
+                      </span>
+                    </div>
+                    <div className={`text-lg font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedTutor.hourlyRate || 0)}
+                    </div>
+                  </div>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {selectedTutor.bio}
+                  </p>
+                </div>
+              </div>
+
+              {/* Subjects */}
+              {selectedTutor.subjects && selectedTutor.subjects.length > 0 && (
+                <div className="mb-6">
+                  <h4 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Môn học
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTutor.subjects.map((sub: string, idx: number) => (
+                      <span 
+                        key={idx}
+                        className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}
+                      >
+                        {sub}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Education */}
+              {selectedTutor.education && (
+                <div className="mb-6">
+                  <h4 className={`font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Học vấn
+                  </h4>
+                  <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {selectedTutor.education}
+                  </p>
+                </div>
+              )}
+
+              {/* Experience */}
+              {selectedTutor.experience && (
+                <div className="mb-6">
+                  <h4 className={`font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Kinh nghiệm
+                  </h4>
+                  <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {selectedTutor.experience}
+                  </p>
+                </div>
+              )}
+
+              {/* Languages */}
+              {selectedTutor.languages && selectedTutor.languages.length > 0 && (
+                <div className="mb-6">
+                  <h4 className={`font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Ngôn ngữ
+                  </h4>
+                  <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {selectedTutor.languages.join(', ')}
+                  </p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3 mt-6">
+                <Button 
+                  variant="contained"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => {
+                    setShowTutorModal(false)
+                    navigate('/student/book', { state: { tutorId: selectedTutor.id } })
+                  }}
+                  disabled={!selectedTutor.verified}
+                >
+                  Đặt lịch học
+                </Button>
+                <Button 
+                  variant="outlined"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowTutorModal(false)
+                    navigate('/student/messages', { state: { tutorId: selectedTutor.id } })
+                  }}
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                  }}
+                >
+                  Nhắn tin
+                </Button>
               </div>
             </div>
           </div>

@@ -1,0 +1,1168 @@
+[
+  {
+    "id": "assign_sRHKcoD1ihY1",
+    "sessionId": "ses_DHZoQv7y7Gxo",
+    "title": "Bài tập Cơ sở dữ liệu",
+    "description": "Bài tập thực hành về Ôn tập Cơ sở dữ liệu",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Cơ sở dữ liệu",
+    "totalPoints": 89,
+    "dueDate": "2025-11-30T03:00:00.000Z",
+    "createdBy": "tut_OWtApeq1WbQN",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_-HANi-F71fJR",
+    "sessionId": "ses_dkbYXU9enR5K",
+    "title": "Bài tập Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành về Ôn tập Cấu trúc dữ liệu",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Cấu trúc dữ liệu",
+    "attachments": [
+      {
+        "fileName": "assignment.pdf",
+        "fileUrl": "https://example.com/assignments/ses_dkbYXU9enR5K.pdf",
+        "fileSize": 1013073
+      }
+    ],
+    "totalPoints": 58,
+    "dueDate": "2025-11-27T12:00:00.000Z",
+    "createdBy": "tut_fKfAVq6FIDoy",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_cWrggk7v5lvJ",
+    "sessionId": "ses_fpc7W_nrTNse",
+    "title": "Bài tập Vật lý đại cương",
+    "description": "Bài tập thực hành về Ôn tập Vật lý đại cương",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Vật lý đại cương",
+    "totalPoints": 34,
+    "dueDate": "2025-10-23T12:00:00.000Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_of2beVXNa0p1",
+    "sessionId": "ses_0gXvqX5C2L1q",
+    "title": "Bài tập Giải tích",
+    "description": "Bài tập thực hành về Ôn tập Giải tích",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Giải tích",
+    "attachments": [
+      {
+        "fileName": "assignment.pdf",
+        "fileUrl": "https://example.com/assignments/ses_0gXvqX5C2L1q.pdf",
+        "fileSize": 526302
+      }
+    ],
+    "totalPoints": 93,
+    "dueDate": "2025-10-23T05:00:00.000Z",
+    "createdBy": "tut_MhsCoIecYtJX",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_smMNeQLo7b-w",
+    "sessionId": "ses_BtrgQN6R3Zur",
+    "title": "Bài tập Tiếng Anh",
+    "description": "Bài tập thực hành về Ôn tập Tiếng Anh",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Tiếng Anh",
+    "totalPoints": 26,
+    "dueDate": "2025-10-24T12:00:00.000Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_G8FvIJ_b9brx",
+    "sessionId": "ses_DVWj_OIWn8Uy",
+    "title": "Bài tập Tiếng Anh",
+    "description": "Bài tập thực hành về Ôn tập Tiếng Anh",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Tiếng Anh",
+    "totalPoints": 42,
+    "dueDate": "2025-10-20T10:00:00.000Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_lq22U_5V_Lir",
+    "sessionId": "ses_11H61QtvshNl",
+    "title": "Bài tập Vật lý đại cương",
+    "description": "Bài tập thực hành về Ôn tập Vật lý đại cương",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Vật lý đại cương",
+    "attachments": [
+      {
+        "fileName": "assignment.pdf",
+        "fileUrl": "https://example.com/assignments/ses_11H61QtvshNl.pdf",
+        "fileSize": 332992
+      }
+    ],
+    "totalPoints": 50,
+    "dueDate": "2025-12-05T05:00:00.000Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_hyVzRFbYKFsM",
+    "sessionId": "ses_LdT4F7c68NM5",
+    "title": "Bài tập Đại số tuyến tính",
+    "description": "Bài tập thực hành về Ôn tập Đại số tuyến tính",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Đại số tuyến tính",
+    "totalPoints": 29,
+    "dueDate": "2025-11-06T05:00:00.000Z",
+    "createdBy": "tut_M5JSdOOUKd4U",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_xCJT8LF8Fcw8",
+    "sessionId": "ses_kPjRYWFEZfX-",
+    "title": "Bài tập Điện tử",
+    "description": "Bài tập thực hành về Ôn tập Điện tử",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Điện tử",
+    "totalPoints": 45,
+    "dueDate": "2025-11-10T12:00:00.000Z",
+    "createdBy": "tut_kpC5U_goDXvk",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_k8f2PzzOahYw",
+    "sessionId": "ses_fM9LotPoxn0u",
+    "title": "Bài tập Lập trình C/C++",
+    "description": "Bài tập thực hành về Ôn tập Lập trình C/C++",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Lập trình C/C++",
+    "totalPoints": 31,
+    "dueDate": "2025-10-07T10:00:00.000Z",
+    "createdBy": "tut_kpC5U_goDXvk",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_FbfMksYzILad",
+    "sessionId": "ses_w3Fw8SGBflSV",
+    "title": "Bài tập Vật lý đại cương",
+    "description": "Bài tập thực hành về Ôn tập Vật lý đại cương",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập liên quan đến Vật lý đại cương",
+    "attachments": [
+      {
+        "fileName": "assignment.pdf",
+        "fileUrl": "https://example.com/assignments/ses_w3Fw8SGBflSV.pdf",
+        "fileSize": 594086
+      }
+    ],
+    "totalPoints": 32,
+    "dueDate": "2025-11-04T05:00:00.000Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-10-31T15:07:37.463Z",
+    "updatedAt": "2025-10-31T15:07:37.491Z"
+  },
+  {
+    "id": "assign_bkgGfBu1rlOI",
+    "classId": "class_GHxUu15WpoRS",
+    "title": "Bài tập 1: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 96,
+    "dueDate": "2025-10-25T15:07:37.488Z",
+    "createdBy": "tut_MhsCoIecYtJX",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_Ha93b60Eh_iV",
+    "classId": "class_GHxUu15WpoRS",
+    "title": "Bài tập 2: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_GHxUu15WpoRS_1.pdf",
+        "fileSize": 1080669
+      }
+    ],
+    "totalPoints": 22,
+    "dueDate": "2025-11-01T15:07:37.488Z",
+    "createdBy": "tut_MhsCoIecYtJX",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_-LJWHHA3LGgC",
+    "classId": "class_GHxUu15WpoRS",
+    "title": "Bài tập 3: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "totalPoints": 46,
+    "dueDate": "2025-11-08T15:07:37.488Z",
+    "createdBy": "tut_MhsCoIecYtJX",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_akiOOaCxEPol",
+    "classId": "class_SM0q8lxJwCVI",
+    "title": "Bài tập 1: Hóa học",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 54,
+    "dueDate": "2025-11-08T15:07:37.488Z",
+    "createdBy": "tut_iQGe3z04cJLD",
+    "createdAt": "2025-09-01T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_M2Y8RwPUT5P8",
+    "classId": "class_SM0q8lxJwCVI",
+    "title": "Bài tập 2: Hóa học",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_SM0q8lxJwCVI_1.pdf",
+        "fileSize": 139396
+      }
+    ],
+    "totalPoints": 42,
+    "dueDate": "2025-11-15T15:07:37.488Z",
+    "createdBy": "tut_iQGe3z04cJLD",
+    "createdAt": "2025-09-01T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_pm42eDFb4_OU",
+    "classId": "class_SM0q8lxJwCVI",
+    "title": "Bài tập 3: Hóa học",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_SM0q8lxJwCVI_2.pdf",
+        "fileSize": 514493
+      }
+    ],
+    "totalPoints": 94,
+    "dueDate": "2025-11-22T15:07:37.488Z",
+    "createdBy": "tut_iQGe3z04cJLD",
+    "createdAt": "2025-09-01T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_URjNWCO_p6ic",
+    "classId": "class_SM0q8lxJwCVI",
+    "title": "Bài tập 4: Hóa học",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "totalPoints": 52,
+    "dueDate": "2025-11-29T15:07:37.488Z",
+    "createdBy": "tut_iQGe3z04cJLD",
+    "createdAt": "2025-09-01T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_tUCKMOUS_-t_",
+    "classId": "class_wTegwAj0skIx",
+    "title": "Bài tập 1: Cơ học kỹ thuật",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 26,
+    "dueDate": "2025-11-06T15:07:37.488Z",
+    "createdBy": "tut_iQGe3z04cJLD",
+    "createdAt": "2025-09-08T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_SFT-UcX2T9ii",
+    "classId": "class_YG5zKmClW7Sc",
+    "title": "Bài tập 1: Giải tích",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 97,
+    "dueDate": "2025-11-07T15:07:37.488Z",
+    "createdBy": "tut_jiwmW2eBp3d4",
+    "createdAt": "2025-09-05T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_N-S5RnMrHK8W",
+    "classId": "class_YG5zKmClW7Sc",
+    "title": "Bài tập 2: Giải tích",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 70,
+    "dueDate": "2025-11-14T15:07:37.488Z",
+    "createdBy": "tut_jiwmW2eBp3d4",
+    "createdAt": "2025-09-05T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_Sb1u7GXTs-xP",
+    "classId": "class_YG5zKmClW7Sc",
+    "title": "Bài tập 3: Giải tích",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_YG5zKmClW7Sc_2.pdf",
+        "fileSize": 153806
+      }
+    ],
+    "totalPoints": 76,
+    "dueDate": "2025-11-21T15:07:37.488Z",
+    "createdBy": "tut_jiwmW2eBp3d4",
+    "createdAt": "2025-09-05T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_cAE382kn82Ra",
+    "classId": "class_YG5zKmClW7Sc",
+    "title": "Bài tập 4: Giải tích",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "attachments": [
+      {
+        "fileName": "assignment_week_4.pdf",
+        "fileUrl": "https://example.com/assignments/class_YG5zKmClW7Sc_3.pdf",
+        "fileSize": 404107
+      }
+    ],
+    "totalPoints": 34,
+    "dueDate": "2025-11-28T15:07:37.488Z",
+    "createdBy": "tut_jiwmW2eBp3d4",
+    "createdAt": "2025-09-05T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_U3vxiLUQqrt5",
+    "classId": "class_r4Bc3LJpZ1ly",
+    "title": "Bài tập 1: Hệ điều hành",
+    "description": "Bài tập thực hành cho lớp C04",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 86,
+    "dueDate": "2025-11-08T15:07:37.488Z",
+    "createdBy": "tut_jiwmW2eBp3d4",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_tKYjJyg1VMZX",
+    "classId": "class_r4Bc3LJpZ1ly",
+    "title": "Bài tập 2: Hệ điều hành",
+    "description": "Bài tập thực hành cho lớp C04",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 82,
+    "dueDate": "2025-11-15T15:07:37.488Z",
+    "createdBy": "tut_jiwmW2eBp3d4",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_qc9fwbAXBFZ4",
+    "classId": "class_SFp1nZBQU0CJ",
+    "title": "Bài tập 1: Giải tích",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 85,
+    "dueDate": "2025-10-23T15:07:37.488Z",
+    "createdBy": "tut_2p_KNhI-iEIX",
+    "createdAt": "2025-09-25T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_VKBtOK1rxdyC",
+    "classId": "class_aTDOIsRDJdAk",
+    "title": "Bài tập 1: Mạng máy tính",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_aTDOIsRDJdAk_0.pdf",
+        "fileSize": 760126
+      }
+    ],
+    "totalPoints": 59,
+    "dueDate": "2025-10-19T15:07:37.488Z",
+    "createdBy": "tut_2p_KNhI-iEIX",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_4IyG2Jl6XgDF",
+    "classId": "class_aTDOIsRDJdAk",
+    "title": "Bài tập 2: Mạng máy tính",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 96,
+    "dueDate": "2025-10-26T15:07:37.488Z",
+    "createdBy": "tut_2p_KNhI-iEIX",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_xvbQMVdx6g_0",
+    "classId": "class_aTDOIsRDJdAk",
+    "title": "Bài tập 3: Mạng máy tính",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_aTDOIsRDJdAk_2.pdf",
+        "fileSize": 404908
+      }
+    ],
+    "totalPoints": 39,
+    "dueDate": "2025-11-02T15:07:37.488Z",
+    "createdBy": "tut_2p_KNhI-iEIX",
+    "createdAt": "2025-09-10T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_QgtX7yiLxjcO",
+    "classId": "class_EOYDhcuyfwio",
+    "title": "Bài tập 1: Đại số tuyến tính",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_EOYDhcuyfwio_0.pdf",
+        "fileSize": 556158
+      }
+    ],
+    "totalPoints": 21,
+    "dueDate": "2025-11-04T15:07:37.488Z",
+    "createdBy": "tut_pxQDWdvyjnan",
+    "createdAt": "2025-09-04T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_8syFC41_Nf2y",
+    "classId": "class_W8oSg6JBEMFM",
+    "title": "Bài tập 1: Giải tích",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 96,
+    "dueDate": "2025-11-14T15:07:37.488Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-09-17T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_lL0vlSMeMUbv",
+    "classId": "class_W8oSg6JBEMFM",
+    "title": "Bài tập 2: Giải tích",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_W8oSg6JBEMFM_1.pdf",
+        "fileSize": 142696
+      }
+    ],
+    "totalPoints": 78,
+    "dueDate": "2025-11-21T15:07:37.488Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-09-17T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_RlzHekZ-Gsfz",
+    "classId": "class_W8oSg6JBEMFM",
+    "title": "Bài tập 3: Giải tích",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "totalPoints": 83,
+    "dueDate": "2025-11-28T15:07:37.488Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-09-17T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_WpQHcEAIuQJz",
+    "classId": "class_W8oSg6JBEMFM",
+    "title": "Bài tập 4: Giải tích",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "totalPoints": 75,
+    "dueDate": "2025-12-05T15:07:37.488Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-09-17T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_k21cIoNMu0dH",
+    "classId": "class_yXWmQB4Devl-",
+    "title": "Bài tập 1: Tiếng Anh",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_yXWmQB4Devl-_0.pdf",
+        "fileSize": 120946
+      }
+    ],
+    "totalPoints": 53,
+    "dueDate": "2025-11-12T15:07:37.488Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-09-14T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_Qbehw1ZsfLyJ",
+    "classId": "class_yXWmQB4Devl-",
+    "title": "Bài tập 2: Tiếng Anh",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_yXWmQB4Devl-_1.pdf",
+        "fileSize": 105429
+      }
+    ],
+    "totalPoints": 24,
+    "dueDate": "2025-11-19T15:07:37.488Z",
+    "createdBy": "tut_fvnAH8e_l-lY",
+    "createdAt": "2025-09-14T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_WreFQDPhqYpr",
+    "classId": "class_oOqOMUOQaQta",
+    "title": "Bài tập 1: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 40,
+    "dueDate": "2025-11-09T15:07:37.488Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-09-22T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_bcbn3tsDTw0x",
+    "classId": "class_oOqOMUOQaQta",
+    "title": "Bài tập 2: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_oOqOMUOQaQta_1.pdf",
+        "fileSize": 650362
+      }
+    ],
+    "totalPoints": 24,
+    "dueDate": "2025-11-16T15:07:37.488Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-09-22T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_np9SsHYaoVRd",
+    "classId": "class_oOqOMUOQaQta",
+    "title": "Bài tập 3: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_oOqOMUOQaQta_2.pdf",
+        "fileSize": 252184
+      }
+    ],
+    "totalPoints": 59,
+    "dueDate": "2025-11-23T15:07:37.488Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-09-22T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_3Y4KogWT9H9X",
+    "classId": "class_7eRMLUmewvwv",
+    "title": "Bài tập 1: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_7eRMLUmewvwv_0.pdf",
+        "fileSize": 923017
+      }
+    ],
+    "totalPoints": 84,
+    "dueDate": "2025-11-06T15:07:37.488Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_HSd7dE9ThU8R",
+    "classId": "class_7eRMLUmewvwv",
+    "title": "Bài tập 2: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 40,
+    "dueDate": "2025-11-13T15:07:37.488Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_Hl7YTXx2E_yd",
+    "classId": "class_7eRMLUmewvwv",
+    "title": "Bài tập 3: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_7eRMLUmewvwv_2.pdf",
+        "fileSize": 851218
+      }
+    ],
+    "totalPoints": 80,
+    "dueDate": "2025-11-20T15:07:37.488Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_lTCRBrmd8NKX",
+    "classId": "class_7eRMLUmewvwv",
+    "title": "Bài tập 4: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "totalPoints": 63,
+    "dueDate": "2025-11-27T15:07:37.488Z",
+    "createdBy": "tut_huahc_QDbkKv",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_xEC_OQEnIfWM",
+    "classId": "class_xU58ij3_LslR",
+    "title": "Bài tập 1: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_xU58ij3_LslR_0.pdf",
+        "fileSize": 429434
+      }
+    ],
+    "totalPoints": 69,
+    "dueDate": "2025-11-06T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_O2OaR9KPXwbA",
+    "classId": "class_xU58ij3_LslR",
+    "title": "Bài tập 2: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 42,
+    "dueDate": "2025-11-13T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_Y9vm08q8X3cZ",
+    "classId": "class_xU58ij3_LslR",
+    "title": "Bài tập 3: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "totalPoints": 53,
+    "dueDate": "2025-11-20T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_R4nIJy7lA9kF",
+    "classId": "class_xU58ij3_LslR",
+    "title": "Bài tập 4: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "attachments": [
+      {
+        "fileName": "assignment_week_4.pdf",
+        "fileUrl": "https://example.com/assignments/class_xU58ij3_LslR_3.pdf",
+        "fileSize": 634214
+      }
+    ],
+    "totalPoints": 79,
+    "dueDate": "2025-11-27T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-18T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.492Z"
+  },
+  {
+    "id": "assign_r17iFGGoCYVe",
+    "classId": "class_DOxYLG2_H9oa",
+    "title": "Bài tập 1: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_DOxYLG2_H9oa_0.pdf",
+        "fileSize": 248185
+      }
+    ],
+    "totalPoints": 49,
+    "dueDate": "2025-10-22T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-28T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_83YHw9vcoSBe",
+    "classId": "class_DOxYLG2_H9oa",
+    "title": "Bài tập 2: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 28,
+    "dueDate": "2025-10-29T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-28T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_SeTinMPIkZ8s",
+    "classId": "class_DOxYLG2_H9oa",
+    "title": "Bài tập 3: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_DOxYLG2_H9oa_2.pdf",
+        "fileSize": 1072070
+      }
+    ],
+    "totalPoints": 83,
+    "dueDate": "2025-11-05T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-28T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_PS_xZkZbusOb",
+    "classId": "class_DOxYLG2_H9oa",
+    "title": "Bài tập 4: Vật lý đại cương",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "totalPoints": 25,
+    "dueDate": "2025-11-12T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-28T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_0fX9YbypVH4D",
+    "classId": "class_stjCeUlc1QYX",
+    "title": "Bài tập 1: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_stjCeUlc1QYX_0.pdf",
+        "fileSize": 986116
+      }
+    ],
+    "totalPoints": 79,
+    "dueDate": "2025-10-31T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-27T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_j4PUVbut_V_z",
+    "classId": "class_stjCeUlc1QYX",
+    "title": "Bài tập 2: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 34,
+    "dueDate": "2025-11-07T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-27T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_Nwc9030QsafI",
+    "classId": "class_stjCeUlc1QYX",
+    "title": "Bài tập 3: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_stjCeUlc1QYX_2.pdf",
+        "fileSize": 678565
+      }
+    ],
+    "totalPoints": 22,
+    "dueDate": "2025-11-14T15:07:37.488Z",
+    "createdBy": "tut_D7Q1Re4S1_wI",
+    "createdAt": "2025-09-27T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_tMxiHmQO9elW",
+    "classId": "class_H4SEgH7w3obo",
+    "title": "Bài tập 1: Hệ điều hành",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_H4SEgH7w3obo_0.pdf",
+        "fileSize": 104133
+      }
+    ],
+    "totalPoints": 30,
+    "dueDate": "2025-10-22T15:07:37.488Z",
+    "createdBy": "tut_28co6GH68MtZ",
+    "createdAt": "2025-09-16T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_KH7aaR30onYD",
+    "classId": "class_H4SEgH7w3obo",
+    "title": "Bài tập 2: Hệ điều hành",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_H4SEgH7w3obo_1.pdf",
+        "fileSize": 695866
+      }
+    ],
+    "totalPoints": 25,
+    "dueDate": "2025-10-29T15:07:37.488Z",
+    "createdBy": "tut_28co6GH68MtZ",
+    "createdAt": "2025-09-16T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_YJiRwf6MLEYJ",
+    "classId": "class_H4SEgH7w3obo",
+    "title": "Bài tập 3: Hệ điều hành",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_H4SEgH7w3obo_2.pdf",
+        "fileSize": 367348
+      }
+    ],
+    "totalPoints": 78,
+    "dueDate": "2025-11-05T15:07:37.488Z",
+    "createdBy": "tut_28co6GH68MtZ",
+    "createdAt": "2025-09-16T15:07:37.488Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_0UWyF752Oi-V",
+    "classId": "class_sVz7EajhwioQ",
+    "title": "Bài tập 1: Điện tử",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 97,
+    "dueDate": "2025-10-21T15:07:37.489Z",
+    "createdBy": "tut_kpC5U_goDXvk",
+    "createdAt": "2025-09-27T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_ofFBVkTHwRL-",
+    "classId": "class_HxSLms3SU8b6",
+    "title": "Bài tập 1: Hệ điều hành",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 24,
+    "dueDate": "2025-10-23T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-14T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_dPT3iBrteF0i",
+    "classId": "class_HxSLms3SU8b6",
+    "title": "Bài tập 2: Hệ điều hành",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_HxSLms3SU8b6_1.pdf",
+        "fileSize": 113343
+      }
+    ],
+    "totalPoints": 62,
+    "dueDate": "2025-10-30T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-14T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_kJFYDg4wEJJy",
+    "classId": "class_XasD-GNC8M-4",
+    "title": "Bài tập 1: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_XasD-GNC8M-4_0.pdf",
+        "fileSize": 771256
+      }
+    ],
+    "totalPoints": 90,
+    "dueDate": "2025-10-21T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-15T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_S8TaCzfCMpfo",
+    "classId": "class_XasD-GNC8M-4",
+    "title": "Bài tập 2: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_XasD-GNC8M-4_1.pdf",
+        "fileSize": 349074
+      }
+    ],
+    "totalPoints": 39,
+    "dueDate": "2025-10-28T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-15T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_4JilFQpU6Vrk",
+    "classId": "class_XasD-GNC8M-4",
+    "title": "Bài tập 3: Cấu trúc dữ liệu",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "attachments": [
+      {
+        "fileName": "assignment_week_3.pdf",
+        "fileUrl": "https://example.com/assignments/class_XasD-GNC8M-4_2.pdf",
+        "fileSize": 667145
+      }
+    ],
+    "totalPoints": 27,
+    "dueDate": "2025-11-04T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-15T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_61QB9ZJEKU4X",
+    "classId": "class_zaGdaTSDErHs",
+    "title": "Bài tập 1: Giải tích",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "totalPoints": 48,
+    "dueDate": "2025-11-10T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-06T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_qSsJ1P29RsOH",
+    "classId": "class_zaGdaTSDErHs",
+    "title": "Bài tập 2: Giải tích",
+    "description": "Bài tập thực hành cho lớp C03",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_zaGdaTSDErHs_1.pdf",
+        "fileSize": 648319
+      }
+    ],
+    "totalPoints": 58,
+    "dueDate": "2025-11-17T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-06T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_h3Yysw-kePzF",
+    "classId": "class_ojugypqo13bu",
+    "title": "Bài tập 1: Tiếng Anh",
+    "description": "Bài tập thực hành cho lớp C04",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_ojugypqo13bu_0.pdf",
+        "fileSize": 470261
+      }
+    ],
+    "totalPoints": 29,
+    "dueDate": "2025-11-10T15:07:37.489Z",
+    "createdBy": "tut_GDPlGtIendxp",
+    "createdAt": "2025-09-15T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_mOqILfyXg4z_",
+    "classId": "class_KC8sS4XZ-Ror",
+    "title": "Bài tập 1: Lập trình Python",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_KC8sS4XZ-Ror_0.pdf",
+        "fileSize": 842383
+      }
+    ],
+    "totalPoints": 82,
+    "dueDate": "2025-11-09T15:07:37.489Z",
+    "createdBy": "tut_r7t6RzMQA2iW",
+    "createdAt": "2025-09-21T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_nR3QM4GNzy5U",
+    "classId": "class_KC8sS4XZ-Ror",
+    "title": "Bài tập 2: Lập trình Python",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "attachments": [
+      {
+        "fileName": "assignment_week_2.pdf",
+        "fileUrl": "https://example.com/assignments/class_KC8sS4XZ-Ror_1.pdf",
+        "fileSize": 628910
+      }
+    ],
+    "totalPoints": 29,
+    "dueDate": "2025-11-16T15:07:37.489Z",
+    "createdBy": "tut_r7t6RzMQA2iW",
+    "createdAt": "2025-09-21T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_1VsfW2WAeoWH",
+    "classId": "class_KC8sS4XZ-Ror",
+    "title": "Bài tập 3: Lập trình Python",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "totalPoints": 92,
+    "dueDate": "2025-11-23T15:07:37.489Z",
+    "createdBy": "tut_r7t6RzMQA2iW",
+    "createdAt": "2025-09-21T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_FYcf4TnA6kZz",
+    "classId": "class_KC8sS4XZ-Ror",
+    "title": "Bài tập 4: Lập trình Python",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "totalPoints": 33,
+    "dueDate": "2025-11-30T15:07:37.489Z",
+    "createdBy": "tut_r7t6RzMQA2iW",
+    "createdAt": "2025-09-21T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_EuvyVWN9iKA9",
+    "classId": "class_umGBDdhFh82x",
+    "title": "Bài tập 1: Giải tích",
+    "description": "Bài tập thực hành cho lớp C02",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_umGBDdhFh82x_0.pdf",
+        "fileSize": 102801
+      }
+    ],
+    "totalPoints": 26,
+    "dueDate": "2025-10-28T15:07:37.489Z",
+    "createdBy": "tut_r7t6RzMQA2iW",
+    "createdAt": "2025-09-26T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_yl-bf_jviOzf",
+    "classId": "class_blOUbBc17GUB",
+    "title": "Bài tập 1: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 1",
+    "attachments": [
+      {
+        "fileName": "assignment_week_1.pdf",
+        "fileUrl": "https://example.com/assignments/class_blOUbBc17GUB_0.pdf",
+        "fileSize": 175989
+      }
+    ],
+    "totalPoints": 35,
+    "dueDate": "2025-10-19T15:07:37.489Z",
+    "createdBy": "tut_OWtApeq1WbQN",
+    "createdAt": "2025-09-03T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_OXCWx2gMMtzm",
+    "classId": "class_blOUbBc17GUB",
+    "title": "Bài tập 2: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 2",
+    "totalPoints": 22,
+    "dueDate": "2025-10-26T15:07:37.489Z",
+    "createdBy": "tut_OWtApeq1WbQN",
+    "createdAt": "2025-09-03T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_icJcbAsB5fDJ",
+    "classId": "class_blOUbBc17GUB",
+    "title": "Bài tập 3: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 3",
+    "totalPoints": 96,
+    "dueDate": "2025-11-02T15:07:37.489Z",
+    "createdBy": "tut_OWtApeq1WbQN",
+    "createdAt": "2025-09-03T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  },
+  {
+    "id": "assign_Hym1sUteR7_9",
+    "classId": "class_blOUbBc17GUB",
+    "title": "Bài tập 4: Toán cao cấp",
+    "description": "Bài tập thực hành cho lớp C01",
+    "instructions": "Yêu cầu: Hoàn thành các bài tập được giao trong tuần 4",
+    "totalPoints": 99,
+    "dueDate": "2025-11-09T15:07:37.489Z",
+    "createdBy": "tut_OWtApeq1WbQN",
+    "createdAt": "2025-09-03T15:07:37.489Z",
+    "updatedAt": "2025-10-31T15:07:37.493Z"
+  }
+]

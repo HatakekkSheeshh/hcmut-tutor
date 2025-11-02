@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Card, CardContent, Typography, Chip, Box } from '@mui/material'
-import { AccessTime, LocationOn, Person } from '@mui/icons-material'
-import { Session } from '../../types/calendar'
+import { AccessTime, LocationOn, Person, School as SchoolIcon, Schedule as ScheduleIcon, Event as EventIcon, Notifications as ReminderIcon } from '@mui/icons-material'
+import { Session, EventType } from '../../types/calendar'
 import { useTheme } from '../../contexts/ThemeContext'
 import { animateSessionCardHover, animateSessionCardClick } from '../../utils/calendarAnimations'
 
@@ -83,6 +83,63 @@ const SessionCard: React.FC<SessionCardProps> = ({
     }
   }
 
+  // Determine event type and display properties
+  const isClass = !!session.classId
+  const eventType: EventType = session.eventType || (isClass ? 'session' : 'session')
+  
+  // Get icon and badge label based on event type
+  const getEventIcon = () => {
+    if (isClass) return SchoolIcon
+    switch (eventType) {
+      case 'personal':
+        return EventIcon
+      case 'reminder':
+        return ReminderIcon
+      default:
+        return ScheduleIcon
+    }
+  }
+  
+  const getBadgeLabel = () => {
+    if (isClass) return 'Class'
+    switch (eventType) {
+      case 'personal':
+        return 'Personal'
+      case 'reminder':
+        return 'Reminder'
+      default:
+        return 'Session'
+    }
+  }
+  
+  const getBadgeColor = () => {
+    if (isClass) {
+      return {
+        backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)',
+        color: session.color
+      }
+    }
+    switch (eventType) {
+      case 'personal':
+        return {
+          backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)',
+          color: session.color
+        }
+      case 'reminder':
+        return {
+          backgroundColor: theme === 'dark' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(245, 158, 11, 0.1)',
+          color: session.color
+        }
+      default:
+        return {
+          backgroundColor: theme === 'dark' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)',
+          color: session.color
+        }
+    }
+  }
+  
+  const EventIconComponent = getEventIcon()
+
   return (
     <Card
       ref={cardRef}
@@ -100,11 +157,12 @@ const SessionCard: React.FC<SessionCardProps> = ({
             : '0 8px 25px rgba(0, 0, 0, 0.15)',
         },
         backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-        border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
-        borderRadius: '12px',
+        border: `2px solid ${session.color}`,
+        borderRadius: '8px',
         overflow: 'hidden',
         position: 'relative',
-        height: fullHeight ? '100%' : 'auto',
+        height: fullHeight ? '100%' : (isCompact ? 'auto' : 'auto'),
+        minHeight: fullHeight ? 'auto' : (isCompact ? '140px' : '140px'),
         display: 'flex',
         flexDirection: 'column',
         '&::before': {
@@ -112,84 +170,85 @@ const SessionCard: React.FC<SessionCardProps> = ({
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '4px',
+          width: '6px',
           height: '100%',
           backgroundColor: session.color,
         }
       }}
     >
-      <CardContent sx={{ p: isCompact ? 1.5 : 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Header with subject and status */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-          <Typography
-            variant={isCompact ? 'body2' : 'subtitle2'}
-            sx={{
-              fontWeight: 600,
-              color: theme === 'dark' ? '#ffffff' : '#111827',
-              fontSize: isCompact ? '0.875rem' : '1rem',
-              lineHeight: 1.2
-            }}
-          >
-            {session.subject}
-          </Typography>
+      <CardContent sx={{ 
+        p: isCompact ? 1.5 : 2, 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column',
+        minHeight: 0,
+        overflow: 'hidden'
+      }}>
+        {/* Header with type badge */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.75 }}>
+          <EventIconComponent sx={{ fontSize: 16, color: session.color, flexShrink: 0 }} />
           <Chip
-            label={getStatusText(session.status)}
+            label={getBadgeLabel()}
             size="small"
             sx={{
-              backgroundColor: getStatusColor(session.status),
-              color: '#ffffff',
-              fontSize: '0.75rem',
-              height: '20px',
+              ...getBadgeColor(),
+              fontSize: '0.7rem',
+              height: '18px',
+              fontWeight: 600,
+              border: `1px solid ${session.color}40`,
               '& .MuiChip-label': {
-                px: 1
+                px: 0.75
               }
             }}
           />
         </Box>
 
-        {/* Time */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <AccessTime sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280', mr: 0.5 }} />
-          <Typography
-            variant="caption"
-            sx={{
-              color: theme === 'dark' ? '#9ca3af' : '#6b7280',
-              fontSize: '0.75rem'
-            }}
-          >
-            {formatTime(session.startTime)} - {formatTime(session.endTime)}
-          </Typography>
-        </Box>
+        {/* Subject name on separate line */}
+        <Typography
+          variant={isCompact ? 'body2' : 'subtitle1'}
+          sx={{
+            fontWeight: 600,
+            color: theme === 'dark' ? '#ffffff' : '#111827',
+            fontSize: isCompact ? '0.875rem' : '1rem',
+            lineHeight: 1.4,
+            mb: 0.75,
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word'
+          }}
+        >
+          {session.subject}
+        </Typography>
 
-        {/* Location */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <LocationOn sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280', mr: 0.5 }} />
-          <Typography
-            variant="caption"
-            sx={{
-              color: theme === 'dark' ? '#9ca3af' : '#6b7280',
-              fontSize: '0.75rem'
-            }}
-          >
-            {session.location.type === 'online' ? 'Online' : session.location.address}
-          </Typography>
-        </Box>
-
-        {/* Tutor/Student */}
-        {(showTutor && session.tutor) || (showStudent && session.student) ? (
+        {/* Time and Location combined */}
+        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1, mb: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Person sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280', mr: 0.5 }} />
+            <AccessTime sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280', mr: 0.5 }} />
             <Typography
               variant="caption"
               sx={{
                 color: theme === 'dark' ? '#9ca3af' : '#6b7280',
-                fontSize: '0.75rem'
+                fontSize: '0.75rem',
+                fontWeight: 500
               }}
             >
-              {showTutor && session.tutor ? session.tutor.name : session.student?.name}
+              {formatTime(session.startTime)} - {formatTime(session.endTime)}
             </Typography>
           </Box>
-        ) : null}
+          
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <LocationOn sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280', mr: 0.5 }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                fontSize: '0.75rem',
+                fontWeight: 500
+              }}
+            >
+              {session.location.type === 'online' ? 'Online' : 'In-Person'}
+            </Typography>
+          </Box>
+        </Box>
 
         {/* Notes preview (if not compact) */}
         {!isCompact && session.notes && (

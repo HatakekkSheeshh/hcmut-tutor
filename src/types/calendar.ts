@@ -1,6 +1,9 @@
+export type EventType = 'session' | 'personal' | 'reminder'
+
 export interface Session {
   id: string
   subject: string
+  eventType?: EventType // Optional - to identify event type (session, personal, reminder)
   tutor?: {
     id: string
     name: string
@@ -24,6 +27,7 @@ export interface Session {
   color: string
   createdAt: string
   updatedAt: string
+  classId?: string // Optional - to identify if session is from a class
 }
 
 export type SessionStatus = 'scheduled' | 'completed' | 'cancelled' | 'rescheduled'

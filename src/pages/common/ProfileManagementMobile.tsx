@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -21,6 +21,8 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import api from '../../lib/api'
+import { navigateToDashboard } from '../../utils/navigation'
 
 const ProfileManagementMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
@@ -28,21 +30,71 @@ const ProfileManagementMobile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
   const [profileData, setProfileData] = useState({
-    firstName: 'John',
-    lastName: 'Smith',
-    email: 'john.smith@email.com',
-    phone: '+1 (555) 123-4567',
-    location: 'New York, NY',
-    university: 'Harvard University',
-    major: 'Computer Science',
-    graduationYear: '2024',
-    currentJob: 'Software Engineer',
-    company: 'Tech Corp',
-    bio: 'Passionate about learning and teaching. Love to help others grow in their educational journey.',
-    interests: ['Programming', 'Mathematics', 'Physics', 'Teaching'],
-    skills: ['JavaScript', 'Python', 'React', 'Node.js', 'Machine Learning']
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    location: '',
+    university: '',
+    major: '',
+    graduationYear: '',
+    currentJob: '',
+    company: '',
+    bio: '',
+    interests: [] as string[],
+    skills: [] as string[]
   })
+
+  // Load user data from backend
+  useEffect(() => {
+    loadUserProfile()
+  }, [])
+
+  const loadUserProfile = async () => {
+    try {
+      const result = await api.auth.getMe()
+      
+      if (result.success) {
+        const userData = result.data
+        setUser(userData)
+        
+        // Parse name
+        const nameParts = userData.name?.split(' ') || ['', '']
+        const firstName = nameParts[0] || ''
+        const lastName = nameParts.slice(1).join(' ') || ''
+        
+        setProfileData({
+          firstName,
+          lastName,
+          email: userData.email || '',
+          phone: userData.phone || '',
+          location: userData.location || '',
+          university: 'HCMUT',
+          major: userData.major || '',
+          graduationYear: userData.year ? `20${24 + userData.year}` : '',
+          currentJob: userData.currentJob || '',
+          company: userData.company || '',
+          bio: userData.bio || '',
+          interests: userData.interests || [],
+          skills: userData.skills || userData.subjects || []
+        })
+      } else {
+        console.error('Failed to load profile:', result.error)
+        if (result.error?.includes('xác thực')) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login')
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
 
   const handleDrawerToggle = () => {
@@ -53,6 +105,38 @@ const ProfileManagementMobile: React.FC = () => {
     toggleTheme()
   }
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: theme === 'dark' ? '#fff' : '#000'
+      }}>
+        <div>Đang tải...</div>
+      </div>
+    )
+  }
+
+  // Show error if no user
+  if (!user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: theme === 'dark' ? '#fff' : '#000'
+      }}>
+        <div>
+          <p>Không thể tải thông tin người dùng</p>
+          <Button onClick={() => navigate('/login')}>Đăng nhập lại</Button>
+        </div>
+      </div>
+    )
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -62,9 +146,53 @@ const ProfileManagementMobile: React.FC = () => {
     }))
   }
 
-  const handleSave = () => {
-    console.log('Profile saved:', profileData)
-    setIsEditing(false)
+  const handleSave = async () => {
+    if (!user) return
+    
+    try {
+      setLoading(true)
+      
+      // Combine first and last name
+      const fullName = `${profileData.firstName} ${profileData.lastName}`.trim()
+      
+      // Prepare update data
+      const updateData: any = {
+        name: fullName,
+        phone: profileData.phone,
+        bio: profileData.bio
+      }
+      
+      // Add role-specific fields
+      if (user.role === 'student') {
+        updateData.major = profileData.major
+        updateData.interests = profileData.interests
+      } else if (user.role === 'tutor') {
+        updateData.bio = profileData.bio
+        updateData.subjects = profileData.skills
+      }
+      
+      const result = await api.users.update(user.id, updateData)
+      
+      if (result.success) {
+        console.log('Profile updated successfully')
+        // Update local storage
+        const updatedUser = { ...user, ...result.data }
+        localStorage.setItem('user', JSON.stringify(updatedUser))
+        setUser(updatedUser)
+        setIsEditing(false)
+        
+        // Show success message
+        alert('Cập nhật profile thành công!')
+      } else {
+        console.error('Failed to update profile:', result.error)
+        alert('Lỗi: ' + result.error)
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      alert('Có lỗi xảy ra khi cập nhật profile')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleCancel = () => {
@@ -143,7 +271,17 @@ const ProfileManagementMobile: React.FC = () => {
         >
           <div className="text-center">
             <div className="relative inline-block mb-4">
-              <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto"></div>
+              {user?.avatar ? (
+                <img 
+                  src={user.avatar} 
+                  alt={`${profileData.firstName} ${profileData.lastName}`}
+                  className="w-24 h-24 rounded-full mx-auto object-cover"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-gray-600">
+                  {profileData.firstName?.[0]}{profileData.lastName?.[0]}
+                </div>
+              )}
               {isEditing && (
                 <button className="absolute bottom-2 right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700">
                   <CameraAlt className="w-4 h-4" />
@@ -154,7 +292,7 @@ const ProfileManagementMobile: React.FC = () => {
               {profileData.firstName} {profileData.lastName}
             </h2>
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              {profileData.currentJob} at {profileData.company}
+              {profileData.currentJob || user?.role || ''} {profileData.company ? `at ${profileData.company}` : ''}
             </p>
           </div>
 
@@ -545,7 +683,7 @@ const ProfileManagementMobile: React.FC = () => {
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <div className="grid grid-cols-2 gap-3">
                 <button 
-                  onClick={() => navigate('/student')}
+                  onClick={() => navigateToDashboard(navigate, user?.role)}
                   className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
                 >
                   <ArrowBackIcon className="w-6 h-6 text-blue-600 mb-2" />
@@ -635,7 +773,7 @@ const ProfileManagementMobile: React.FC = () => {
               <div className="flex-1 space-y-2">
                 <button 
                   onClick={() => {
-                    navigate('/student')
+                    navigateToDashboard(navigate, user?.role)
                     setMobileOpen(false)
                   }}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}

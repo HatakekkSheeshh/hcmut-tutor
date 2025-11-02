@@ -5,6 +5,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
+import api from '../../lib/api'
 import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
@@ -33,7 +34,8 @@ import {
   DarkMode as DarkModeIcon,
   Home as HomeIcon,
   Close as CloseIcon,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon,
+  Logout as LogoutIcon
 } from '@mui/icons-material'
 
 const ManagementDashboardMobile: React.FC = () => {
@@ -43,6 +45,12 @@ const ManagementDashboardMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
   const [currentTab, setCurrentTab] = useState('home')
+  
+  // User data states
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState<any[]>([])
+  const [sessions, setSessions] = useState<any[]>([])
   
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -64,6 +72,43 @@ const ManagementDashboardMobile: React.FC = () => {
   const handleThemeToggle = () => {
     toggleTheme()
     setShowThemeOptions(false)
+  }
+
+  // Load user data and system stats from backend
+  const loadUserData = async () => {
+    try {
+      setLoading(true)
+      
+      // Get current user
+      const userResult = await api.auth.getMe()
+      if (userResult.success) {
+        const userData = userResult.data
+        setUser(userData)
+        
+        // Get all users (for stats)
+        const usersResult = await api.users.list({ limit: 1000 })
+        if (usersResult.success) {
+          setUsers(usersResult.data || [])
+        }
+        
+        // Get all sessions (for stats)
+        const sessionsResult = await api.sessions.list({ limit: 1000 })
+        if (sessionsResult.success) {
+          setSessions(sessionsResult.data || [])
+        }
+      } else {
+        // If auth fails, redirect to login
+        if (userResult.error?.includes('xác thực')) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login')
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Weather API function
@@ -160,8 +205,11 @@ const ManagementDashboardMobile: React.FC = () => {
     return 'Good Evening'
   }
 
-  // useEffect for time and weather
+  // useEffect for data loading, time and weather
   useEffect(() => {
+    // Load user data and stats
+    loadUserData()
+    
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
@@ -175,13 +223,22 @@ const ManagementDashboardMobile: React.FC = () => {
     }
   }, [])
 
-  // Mock data for management
+  // Calculate stats from real data
+  const totalUsers = users.length
+  const studentCount = users.filter(u => u.role === 'student').length
+  const tutorCount = users.filter(u => u.role === 'tutor').length
+  const activeSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
+  
   const stats = [
-    { title: 'Total Users', value: '1,247', icon: <PeopleIcon /> },
-    { title: 'Active Sessions', value: '89', icon: <CheckCircleIcon /> },
-    { title: 'Pending Requests', value: '23', icon: <AutorenewIcon /> },
-    { title: 'System Health', value: '99.8%', icon: <TrendingUpIcon /> }
+    { title: 'Total Users', value: totalUsers.toString(), icon: <PeopleIcon /> },
+    { title: 'Students', value: studentCount.toString(), icon: <PersonIcon /> },
+    { title: 'Tutors', value: tutorCount.toString(), icon: <AssignmentIcon /> },
+    { title: 'Active Sessions', value: activeSessions.toString(), icon: <CheckCircleIcon /> }
   ]
+  
+  // User name and avatar from backend
+  const userName = user?.name || 'Management'
+  const avatarUrl = user?.avatar
 
   const recentRequests = [
     {
@@ -252,6 +309,21 @@ const ManagementDashboardMobile: React.FC = () => {
     { id: 'security', label: 'Security', icon: <SecurityIcon />, path: '/management/security' },
     { id: 'notifications', label: 'Notifications', icon: <NotificationsIcon />, path: '/management/notifications' }
   ]
+
+  // Show loading state
+  if (loading && !user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: theme === 'dark' ? '#fff' : '#000'
+      }}>
+        <div>Đang tải...</div>
+      </div>
+    )
+  }
 
   const bottomNavItems = [
     { id: 'home', label: 'Home', icon: <HomeIcon /> },
@@ -337,7 +409,7 @@ const ManagementDashboardMobile: React.FC = () => {
               {formatDate(currentTime)}
             </div>
             <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-              {getGreeting()}, Admin
+              {getGreeting()}, {userName}
             </div>
           </div>
 
@@ -672,20 +744,21 @@ const ManagementDashboardMobile: React.FC = () => {
       <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center mb-4">
           <Avatar
+            src={avatarUrl}
             sx={{
               width: 64,
               height: 64,
-              bgcolor: getAvatarColor('Admin User'),
+              bgcolor: getAvatarColor(userName),
               fontSize: '1.5rem',
               fontWeight: 'bold',
               mr: 3
             }}
           >
-            {getInitials('Admin User')}
+            {getInitials(userName)}
           </Avatar>
           <div>
             <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Admin User
+              {userName}
             </h4>
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               System Administrator
@@ -865,23 +938,23 @@ const ManagementDashboardMobile: React.FC = () => {
                   <div className="space-y-2">
                     <button 
                       onClick={() => {
-                        navigate('/management/users')
+                        navigate('/common/profile')
                         setMobileOpen(false)
                       }}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
-                      <PeopleIcon className="mr-3 w-4 h-4" />
-                      User Management
+                      <PersonIcon className="mr-3 w-4 h-4" />
+                      Profile
                     </button>
                     <button 
                       onClick={() => {
-                        navigate('/management/security')
+                        navigate('/common/notifications')
                         setMobileOpen(false)
                       }}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
-                      <SecurityIcon className="mr-3 w-4 h-4" />
-                      Security
+                      <NotificationsIcon className="mr-3 w-4 h-4" />
+                      Notifications
                     </button>
                     <button 
                       onClick={() => setShowThemeOptions(!showThemeOptions)}
@@ -889,6 +962,17 @@ const ManagementDashboardMobile: React.FC = () => {
                     >
                       <PaletteIcon className="mr-3 w-4 h-4" />
                       Theme
+                    </button>
+                    <button 
+                      onClick={() => {
+                        localStorage.removeItem('token')
+                        localStorage.removeItem('user')
+                        navigate('/common/login')
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
+                    >
+                      <LogoutIcon className="mr-3 w-4 h-4" />
+                      Logout
                     </button>
                   </div>
 

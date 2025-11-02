@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card'
 import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
+import api from '../../lib/api'
 import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
@@ -35,7 +36,8 @@ import {
   Bookmark as BookmarkIcon,
   CalendarMonth,
   Close as CloseIcon,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon,
+  Logout as LogoutIcon
 } from '@mui/icons-material'
 
 const StudentDashboardMobile: React.FC = () => {
@@ -45,6 +47,12 @@ const StudentDashboardMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
   const [currentTab, setCurrentTab] = useState('home')
+  
+  // User data states
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [sessions, setSessions] = useState<any[]>([])
+  const [tutors, setTutors] = useState<{ [key: string]: any }>({})
   
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -66,6 +74,68 @@ const StudentDashboardMobile: React.FC = () => {
   const handleThemeToggle = () => {
     toggleTheme()
     setShowThemeOptions(false)
+  }
+
+  // Load user data and sessions from backend
+  const loadUserData = async () => {
+    try {
+      setLoading(true)
+      
+      // Get current user
+      const userResult = await api.auth.getMe()
+      if (userResult.success) {
+        const userData = userResult.data
+        setUser(userData)
+        
+        // Get user sessions
+        const sessionsResult = await api.sessions.list({
+          studentId: userData.id,
+          limit: 100
+        })
+        
+        console.log('[Mobile] Sessions API Response:', sessionsResult)
+        
+        if (sessionsResult.data && Array.isArray(sessionsResult.data)) {
+          const sessionsData = sessionsResult.data
+          setSessions(sessionsData)
+          console.log('[Mobile] Sessions loaded:', sessionsData.length)
+          
+          // Load tutor data for each session
+          const uniqueTutorIds = [...new Set(sessionsData.map((s: any) => s.tutorId))] as string[]
+          const tutorPromises = uniqueTutorIds.map(async (tutorId: string) => {
+            try {
+              const tutorResponse = await api.users.get(tutorId)
+              if (tutorResponse.success && tutorResponse.data) {
+                return { id: tutorId, data: tutorResponse.data }
+              }
+            } catch (err) {
+              console.error(`[Mobile] Failed to load tutor ${tutorId}:`, err)
+            }
+            return null
+          })
+          
+          const tutorResults = await Promise.all(tutorPromises)
+          const tutorsMap: { [key: string]: any } = {}
+          tutorResults.forEach(result => {
+            if (result) {
+              tutorsMap[result.id] = result.data
+            }
+          })
+          setTutors(tutorsMap)
+        }
+      } else {
+        // If auth fails, redirect to login
+        if (userResult.error?.includes('xác thực')) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login')
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Weather API function
@@ -162,8 +232,11 @@ const StudentDashboardMobile: React.FC = () => {
     return 'Good Evening'
   }
 
-  // useEffect for time and weather
+  // useEffect for data loading, time and weather
   useEffect(() => {
+    // Load user data and sessions
+    loadUserData()
+    
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
@@ -177,67 +250,39 @@ const StudentDashboardMobile: React.FC = () => {
     }
   }, [])
 
-  // Mock data
+  // Calculate stats from real data
+  const totalSessions = sessions.length
+  const completedSessions = sessions.filter(s => s.status === 'completed').length
+  const upcomingSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
+  
   const stats = [
-    { title: 'Total Courses', value: '24', icon: <SchoolIcon /> },
-    { title: 'Completed', value: '18', icon: <CheckCircleIcon /> },
-    { title: 'In Progress', value: '6', icon: <AutorenewIcon /> }
+    { title: 'Total Sessions', value: totalSessions.toString(), icon: <SchoolIcon /> },
+    { title: 'Completed', value: completedSessions.toString(), icon: <CheckCircleIcon /> },
+    { title: 'Upcoming', value: upcomingSessions.toString(), icon: <AutorenewIcon /> }
   ]
+  
+  // User name and avatar from backend
+  const userName = user?.name || 'Student'
+  const avatarUrl = user?.avatar
 
-  const registeredCourses = [
-    {
-      id: 1,
-      title: 'Advanced React Patterns',
-      instructor: 'John Doe',
-      subject: 'Computer Science',
-      progress: 75,
-      duration: '2h 30m',
-      nextSession: '2024-01-15T14:00:00Z',
-      totalSessions: 12,
-      completedSessions: 9,
-      rating: 4.8,
-      status: 'active'
-    },
-    {
-      id: 2,
-      title: 'TypeScript Fundamentals',
-      instructor: 'Jane Smith',
-      subject: 'Programming',
-      progress: 45,
-      duration: '3h 15m',
-      nextSession: '2024-01-16T10:00:00Z',
-      totalSessions: 8,
-      completedSessions: 4,
-      rating: 4.9,
-      status: 'active'
-    },
-    {
-      id: 3,
-      title: 'Node.js Backend Development',
-      instructor: 'Mike Johnson',
-      subject: 'Backend Development',
-      progress: 90,
-      duration: '4h 20m',
-      nextSession: '2024-01-17T16:00:00Z',
-      totalSessions: 10,
-      completedSessions: 9,
-      rating: 4.7,
-      status: 'active'
-    }
-  ]
-
-  const mentors = [
-    { name: 'Sarah Wilson', course: 'Web Development', status: 'Online' },
-    { name: 'David Chen', course: 'Data Science', status: 'Offline' },
-    { name: 'Emily Brown', course: 'UI/UX Design', status: 'Online' },
-    { name: 'Alex Taylor', course: 'Mobile Development', status: 'Online' }
-  ]
-
-  const friends = [
-    { name: 'Alice Johnson', course: 'React Mastery' },
-    { name: 'Bob Smith', course: 'Python Basics' },
-    { name: 'Carol Davis', course: 'JavaScript ES6' }
-  ]
+  // Map sessions to course format for UI (only show upcoming/confirmed sessions)
+  const registeredCourses = sessions
+    .filter(session => session.status === 'confirmed' || session.status === 'pending')
+    .map(session => {
+      const tutor = tutors[session.tutorId]
+      return {
+        id: session.id,
+        title: session.subject,
+        instructor: tutor?.name || 'Loading...',
+        subject: session.topic || session.subject,
+        duration: `${session.duration} mins`,
+        nextSession: session.startTime,
+        rating: tutor?.rating || 4.5,
+        status: session.status === 'confirmed' ? 'active' : 'pending',
+        sessionData: session
+      }
+    })
+    .slice(0, 6)
 
   // Helper function to get initials from name
   const getInitials = (name: string) => {
@@ -279,6 +324,21 @@ const StudentDashboardMobile: React.FC = () => {
     { id: 'progress', label: 'Progress', icon: <TrendingUpIcon /> },
     { id: 'profile', label: 'Profile', icon: <PersonIcon /> }
   ]
+
+  // Show loading state
+  if (loading && !user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: theme === 'dark' ? '#fff' : '#000'
+      }}>
+        <div>Đang tải...</div>
+      </div>
+    )
+  }
 
   const renderHomeTab = () => (
     <div className="space-y-4">
@@ -357,7 +417,7 @@ const StudentDashboardMobile: React.FC = () => {
               {formatDate(currentTime)}
             </div>
             <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-              {getGreeting()}, Prashant
+              {getGreeting()}, {userName}
             </div>
           </div>
 
@@ -476,13 +536,20 @@ const StudentDashboardMobile: React.FC = () => {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <div className={`w-2 h-2 rounded-full mr-2 ${
+                    course.sessionData?.status === 'confirmed' ? 'bg-green-500' : 'bg-yellow-500'
+                  }`}></div>
                   <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {course.completedSessions}/{course.totalSessions} sessions
+                    {new Date(course.nextSession).toLocaleDateString('vi-VN', { 
+                      month: 'short', 
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
                   </p>
                 </div>
                 <div className={`text-xs font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                  {course.progress}%
+                  {course.duration}
                 </div>
               </div>
             </div>
@@ -533,13 +600,20 @@ const StudentDashboardMobile: React.FC = () => {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <div className={`w-2 h-2 rounded-full mr-2 ${
+                  course.sessionData?.status === 'confirmed' ? 'bg-green-500' : 'bg-yellow-500'
+                }`}></div>
                 <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {course.completedSessions}/{course.totalSessions} sessions
+                  {new Date(course.nextSession).toLocaleDateString('vi-VN', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </p>
               </div>
               <div className={`text-xs font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                {course.progress}%
+                {course.duration}
               </div>
             </div>
           </div>
@@ -570,44 +644,63 @@ const StudentDashboardMobile: React.FC = () => {
         </div>
       </div>
 
-      {/* Mentor List */}
+      {/* My Tutor List */}
       <div>
         <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          Your Mentors
+          My Tutor
         </h3>
         
-        <div className="space-y-3">
-          {mentors.slice(0, 3).map((mentor, index) => (
-            <div key={index} className={`flex items-center p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  bgcolor: getAvatarColor(mentor.name),
-                  fontSize: '0.875rem',
-                  fontWeight: 'bold'
-                }}
+        {Object.keys(tutors).length === 0 ? (
+          <div className="text-center py-8">
+            <PersonSearch className={`w-12 h-12 mx-auto mb-2 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-3`}>
+              No tutors yet
+            </p>
+            <button 
+              onClick={() => navigate('/student/search')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              Find Tutors
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {Object.values(tutors).slice(0, 3).map((tutor: any, index: number) => (
+              <div 
+                key={index} 
+                className={`flex items-center p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'} transition-colors cursor-pointer`}
+                onClick={() => navigate('/student/search')}
               >
-                {getInitials(mentor.name)}
-              </Avatar>
-              <div className="flex-1 ml-3">
-                <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {mentor.name}
-                </p>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {mentor.course}
-                </p>
+                <Avatar
+                  src={tutor.avatar}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: getAvatarColor(tutor.name),
+                    fontSize: '0.875rem',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {getInitials(tutor.name)}
+                </Avatar>
+                <div className="flex-1 ml-3">
+                  <p className={`font-medium text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {tutor.name}
+                  </p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {tutor.subjects?.[0] || 'Tutor'}
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <StarIcon className="w-3 h-3 text-yellow-400 mr-1" />
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {tutor.rating || 'N/A'}
+                  </span>
+                </div>
               </div>
-              <span className={`px-2 py-1 rounded-full text-xs ${
-                mentor.status === 'Online' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {mentor.status}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -618,23 +711,24 @@ const StudentDashboardMobile: React.FC = () => {
       <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center mb-4">
           <Avatar
+            src={avatarUrl}
             sx={{
               width: 64,
               height: 64,
-              bgcolor: getAvatarColor('Prashant'),
+              bgcolor: getAvatarColor(userName),
               fontSize: '1.5rem',
               fontWeight: 'bold',
               mr: 3
             }}
           >
-            {getInitials('Prashant')}
+            {getInitials(userName)}
           </Avatar>
           <div>
             <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Prashant
+              {userName}
             </h4>
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Student
+              {user?.role || 'Student'}
             </p>
           </div>
         </div>
@@ -676,38 +770,6 @@ const StudentDashboardMobile: React.FC = () => {
           <button className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white hover:bg-pink-600 transition-colors">
             <InstagramIcon className="w-5 h-5" />
           </button>
-        </div>
-      </div>
-
-      {/* Friends */}
-      <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          Friends
-        </h3>
-        <div className="space-y-3">
-          {friends.map((friend, index) => (
-            <div key={index} className="flex items-center">
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  bgcolor: getAvatarColor(friend.name),
-                  fontSize: '0.875rem',
-                  fontWeight: 'bold'
-                }}
-              >
-                {getInitials(friend.name)}
-              </Avatar>
-              <div className="ml-3">
-                <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {friend.name}
-                </p>
-                <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {friend.course}
-                </p>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
@@ -846,6 +908,17 @@ const StudentDashboardMobile: React.FC = () => {
                     >
                       <PaletteIcon className="mr-3 w-4 h-4" />
                       Theme
+                    </button>
+                    <button 
+                      onClick={() => {
+                        localStorage.removeItem('token')
+                        localStorage.removeItem('user')
+                        navigate('/common/login')
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
+                    >
+                      <LogoutIcon className="mr-3 w-4 h-4" />
+                      Logout
                     </button>
                   </div>
 

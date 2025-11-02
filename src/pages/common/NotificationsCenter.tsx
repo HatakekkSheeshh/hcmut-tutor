@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -20,6 +20,8 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import { navigateToDashboard } from '../../utils/navigation'
+import api from '../../lib/api'
 
 const NotificationsCenter: React.FC = () => {
   const { theme } = useTheme()
@@ -28,79 +30,34 @@ const NotificationsCenter: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState('all')
   const [selectedType, setSelectedType] = useState('all')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [unreadCount, setUnreadCount] = useState(0)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  const notifications = [
-    {
-      id: 1,
-      title: 'New session booking request',
-      message: 'Sarah Johnson has requested a tutoring session for Mathematics on Friday at 2:00 PM.',
-      type: 'booking',
-      priority: 'high',
-      isRead: false,
-      timestamp: '5 minutes ago',
-      sender: 'System',
-      action: 'Review Request'
-    },
-    {
-      id: 2,
-      title: 'Assignment graded',
-      message: 'Your Calculus assignment has been graded. You received 95/100 points.',
-      type: 'academic',
-      priority: 'medium',
-      isRead: false,
-      timestamp: '1 hour ago',
-      sender: 'Dr. Mike Chen',
-      action: 'View Grade'
-    },
-    {
-      id: 3,
-      title: 'Study group invitation',
-      message: 'Alice Brown has invited you to join a Physics study group.',
-      type: 'social',
-      priority: 'low',
-      isRead: true,
-      timestamp: '3 hours ago',
-      sender: 'Alice Brown',
-      action: 'Join Group'
-    },
-    {
-      id: 4,
-      title: 'System maintenance scheduled',
-      message: 'The platform will undergo maintenance on Sunday from 2:00 AM to 4:00 AM EST.',
-      type: 'system',
-      priority: 'medium',
-      isRead: true,
-      timestamp: '1 day ago',
-      sender: 'Admin',
-      action: 'View Details'
-    },
-    {
-      id: 5,
-      title: 'Payment received',
-      message: 'Payment of $150 has been received for your tutoring services.',
-      type: 'financial',
-      priority: 'high',
-      isRead: false,
-      timestamp: '2 days ago',
-      sender: 'Payment System',
-      action: 'View Transaction'
-    },
-    {
-      id: 6,
-      title: 'New forum post',
-      message: 'There\'s a new discussion in the Mathematics forum that might interest you.',
-      type: 'social',
-      priority: 'low',
-      isRead: true,
-      timestamp: '3 days ago',
-      sender: 'Community',
-      action: 'View Post'
+  // Load notifications from backend
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        setLoading(true)
+        const response = await api.notifications.list()
+        
+        if (response.success && response.data) {
+          setNotifications(response.data.data || [])
+          setUnreadCount(response.data.unreadCount || 0)
+        }
+      } catch (error) {
+        console.error('Failed to load notifications:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    loadNotifications()
+  }, [])
 
   const filterOptions = [
     { name: 'All Notifications', value: 'all' },
@@ -119,29 +76,70 @@ const NotificationsCenter: React.FC = () => {
 
   const filteredNotifications = notifications.filter(notification => {
     const matchesSearch = notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        notification.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        notification.sender.toLowerCase().includes(searchTerm.toLowerCase())
+                        notification.message.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = selectedFilter === 'all' || 
-                         (selectedFilter === 'unread' && !notification.isRead) ||
-                         (selectedFilter === 'read' && notification.isRead)
+                         (selectedFilter === 'unread' && !notification.read) ||
+                         (selectedFilter === 'read' && notification.read)
     const matchesType = selectedType === 'all' || notification.type === selectedType
     return matchesSearch && matchesFilter && matchesType
   })
 
-  const handleMarkAsRead = (notificationId: number) => {
-    console.log('Mark as read:', notificationId)
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      const response = await api.notifications.markAsRead(notificationId)
+      if (response.success) {
+        // Update local state
+        setNotifications(prev => 
+          prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+        )
+        setUnreadCount(prev => Math.max(0, prev - 1))
+      }
+    } catch (error) {
+      console.error('Failed to mark as read:', error)
+    }
   }
 
-  const handleDelete = (notificationId: number) => {
-    console.log('Delete notification:', notificationId)
+  const handleDelete = async (notificationId: string) => {
+    try {
+      const response = await api.notifications.delete(notificationId)
+      if (response.success) {
+        // Update local state
+        const deletedNotif = notifications.find(n => n.id === notificationId)
+        setNotifications(prev => prev.filter(n => n.id !== notificationId))
+        if (deletedNotif && !deletedNotif.read) {
+          setUnreadCount(prev => Math.max(0, prev - 1))
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete notification:', error)
+    }
   }
 
-  const handleMarkAllAsRead = () => {
-    console.log('Mark all as read')
+  const handleMarkAllAsRead = async () => {
+    try {
+      // Mark all unread notifications as read
+      const unreadNotifs = notifications.filter(n => !n.read)
+      await Promise.all(unreadNotifs.map(n => api.notifications.markAsRead(n.id)))
+      
+      // Update local state
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+      setUnreadCount(0)
+    } catch (error) {
+      console.error('Failed to mark all as read:', error)
+    }
   }
 
-  const handleDeleteAll = () => {
-    console.log('Delete all notifications')
+  const handleDeleteAll = async () => {
+    try {
+      // Delete all notifications
+      await Promise.all(notifications.map(n => api.notifications.delete(n.id)))
+      
+      // Update local state
+      setNotifications([])
+      setUnreadCount(0)
+    } catch (error) {
+      console.error('Failed to delete all notifications:', error)
+    }
   }
 
   const getNotificationIcon = (type: string) => {
@@ -155,18 +153,12 @@ const NotificationsCenter: React.FC = () => {
     }
   }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'low': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'booking': return 'bg-blue-100 text-blue-800'
+      case 'booking':
+      case 'session_booking': return 'bg-blue-100 text-blue-800'
+      case 'session_reminder': return 'bg-purple-100 text-purple-800'
+      case 'session_cancelled': return 'bg-red-100 text-red-800'
       case 'academic': return 'bg-purple-100 text-purple-800'
       case 'social': return 'bg-green-100 text-green-800'
       case 'system': return 'bg-gray-100 text-gray-800'
@@ -175,11 +167,26 @@ const NotificationsCenter: React.FC = () => {
     }
   }
 
+  const formatTimestamp = (isoString: string) => {
+    const date = new Date(isoString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+    return date.toLocaleDateString()
+  }
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -209,15 +216,7 @@ const NotificationsCenter: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Unread:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {notifications.filter(n => !n.isRead).length}
-                    </span>
-                  </div>
-                </div>
-                <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                  <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>High Priority:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {notifications.filter(n => n.priority === 'high').length}
+                      {unreadCount}
                     </span>
                   </div>
                 </div>
@@ -231,7 +230,7 @@ const NotificationsCenter: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 <button 
-                  onClick={() => navigate('/student')}
+                  onClick={() => navigateToDashboard(navigate)}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
@@ -441,11 +440,26 @@ const NotificationsCenter: React.FC = () => {
 
           {/* Notifications List */}
           <div className="space-y-4">
-            {filteredNotifications.map((notification) => (
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Loading notifications...
+                </p>
+              </div>
+            ) : filteredNotifications.length === 0 ? (
+              <div className="text-center py-12">
+                <Notifications className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  No notifications found
+                </p>
+              </div>
+            ) : (
+              filteredNotifications.map((notification) => (
               <Card 
                 key={notification.id} 
                 className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${
-                  !notification.isRead ? 'border-l-4 border-blue-500' : ''
+                  !notification.read ? 'border-l-4 border-blue-500' : ''
                 }`}
                 style={{
                   borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
@@ -457,7 +471,7 @@ const NotificationsCenter: React.FC = () => {
                   <div className="flex items-start space-x-4">
                     {/* Notification Icon */}
                     <div className={`p-3 rounded-full ${
-                      notification.isRead 
+                      notification.read 
                         ? 'bg-gray-100 text-gray-600' 
                         : 'bg-blue-100 text-blue-600'
                     }`}>
@@ -476,26 +490,17 @@ const NotificationsCenter: React.FC = () => {
                           </p>
                           <div className="flex items-center space-x-4 mb-3">
                             <div className="flex items-center">
-                              <Person className="w-4 h-4 text-gray-400 mr-2" />
-                              <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {notification.sender}
-                              </span>
-                            </div>
-                            <div className="flex items-center">
                               <Schedule className="w-4 h-4 text-gray-400 mr-2" />
                               <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {notification.timestamp}
+                                {formatTimestamp(notification.createdAt)}
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(notification.priority)}`}>
-                              {notification.priority}
-                            </span>
                             <span className={`px-2 py-1 text-xs rounded-full ${getTypeColor(notification.type)}`}>
-                              {notification.type}
+                              {notification.type.replace(/_/g, ' ')}
                             </span>
-                            {!notification.isRead && (
+                            {!notification.read && (
                               <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             )}
                           </div>
@@ -504,13 +509,16 @@ const NotificationsCenter: React.FC = () => {
 
                       {/* Action Buttons */}
                       <div className="flex items-center space-x-2 mt-4">
+                        {notification.link && (
                         <Button 
                           size="small" 
                           className="bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => navigate(notification.link)}
                         >
-                          {notification.action}
+                            View Details
                         </Button>
-                        {!notification.isRead && (
+                        )}
+                        {!notification.read && (
                           <Button 
                             size="small" 
                             variant="outlined"
@@ -561,7 +569,7 @@ const NotificationsCenter: React.FC = () => {
                   </div>
                 </div>
               </Card>
-            ))}
+            )))}
           </div>
         </div>
       </div>
@@ -608,7 +616,7 @@ const NotificationsCenter: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Unread:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {notifications.filter(n => !n.isRead).length}
+                        {unreadCount}
                       </span>
                     </div>
                   </div>
@@ -619,7 +627,7 @@ const NotificationsCenter: React.FC = () => {
               <div className="space-y-2">
                 <button 
                   onClick={() => {
-                    navigate('/student')
+                    navigateToDashboard(navigate)
                     setMobileOpen(false)
                   }}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}

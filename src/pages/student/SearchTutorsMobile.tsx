@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { Avatar } from '@mui/material'
+import api from '../../lib/api'
 import { 
   Search, 
   Star, 
@@ -42,6 +43,16 @@ const SearchTutorsMobile: React.FC = () => {
   const [showRatingDropdown, setShowRatingDropdown] = useState(false)
   const [showAvailabilityDropdown, setShowAvailabilityDropdown] = useState(false)
   const [activeMenu, setActiveMenu] = useState('search-tutors')
+  
+  // Backend data states
+  const [tutors, setTutors] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  
+  // Tutor detail modal state
+  const [selectedTutor, setSelectedTutor] = useState<any>(null)
+  const [showTutorModal, setShowTutorModal] = useState(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -155,7 +166,57 @@ const SearchTutorsMobile: React.FC = () => {
     return colors[index]
   }
 
-  const tutors = [
+  // Load tutors from backend
+  const loadTutors = async () => {
+    try {
+      setLoading(true)
+      
+      const params: any = {
+        page,
+        limit: 10
+      }
+      
+      // Only add subject if it's not empty
+      if (subject && subject !== '') {
+        params.subject = subject
+      }
+      
+      // Only add rating if it's not empty
+      if (rating && rating !== '') {
+        const minRating = parseFloat(rating.replace('+', ''))
+        params.minRating = minRating
+      }
+      
+      // Only add search if it's not empty
+      if (searchTerm && searchTerm.trim() !== '') {
+        params.search = searchTerm
+      }
+      
+      console.log('Loading tutors with params:', params)
+      const result = await api.tutors.list(params)
+      console.log('Tutors result:', result)
+      
+      if (result.success) {
+        setTutors(result.data || [])
+        if (result.pagination) {
+          setTotalPages(result.pagination.totalPages || 1)
+        }
+      } else {
+        console.error('Failed to load tutors:', result.error)
+      }
+    } catch (error) {
+      console.error('Error loading tutors:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Load tutors on mount and when filters change
+  useEffect(() => {
+    loadTutors()
+  }, [page, subject, rating, searchTerm])
+
+  const _mockTutors = [
     {
       id: 1,
       name: 'Dr. Sarah Johnson',
@@ -482,18 +543,42 @@ const SearchTutorsMobile: React.FC = () => {
             Available Tutors ({tutors.length})
           </h2>
           <div className="flex space-x-2">
-            <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
+            <button 
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} disabled:opacity-50`}
+            >
               <ArrowBackIcon className="w-4 h-4" />
             </button>
-            <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
+            <span className={`px-2 py-2 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              {page}/{totalPages}
+            </span>
+            <button 
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} disabled:opacity-50`}
+            >
               <ArrowForwardIcon className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Tutors List - Mobile */}
-        <div className="space-y-4">
-          {tutors.map((tutor) => (
+        {/* Loading/Empty States */}
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              Đang tải gia sư...
+            </div>
+          </div>
+        ) : tutors.length === 0 ? (
+          <div className="flex justify-center items-center py-20">
+            <div className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Không tìm thấy gia sư phù hợp
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {tutors.map((tutor) => (
             <Card
               key={tutor.id} 
               className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
@@ -507,6 +592,7 @@ const SearchTutorsMobile: React.FC = () => {
                 {/* Tutor Header */}
                 <div className="flex items-center mb-3">
                   <Avatar
+                    src={tutor.avatar}
                     sx={{
                       width: 48,
                       height: 48,
@@ -518,86 +604,77 @@ const SearchTutorsMobile: React.FC = () => {
                     {getInitials(tutor.name)}
                   </Avatar>
                   <div className="ml-3 flex-1">
-                    <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className={`font-semibold text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {tutor.name}
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {tutor.subject} • {tutor.experience} experience
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {tutor.subjects?.[0] || 'N/A'}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={`text-lg font-semibold text-blue-600`}>
-                      ${tutor.price}/hour
+                    <p className={`text-sm font-semibold text-blue-600`}>
+                      {tutor.hourlyRate ? `${(tutor.hourlyRate / 1000).toFixed(0)}K` : 'N/A'}
                     </p>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>VND/giờ</p>
                   </div>
                 </div>
 
-                {/* Rating & Reviews */}
-                <div className="mb-3">
+                {/* Rating & Status */}
+                <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <Star 
                           key={i} 
-                          className={`w-4 h-4 ${i < Math.floor(tutor.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                          className={`w-3 h-3 ${i < Math.floor(tutor.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
                         />
                       ))}
                     </div>
-                    <span className={`text-sm ml-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {tutor.rating} ({tutor.reviews} reviews)
+                    <span className={`text-xs ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {tutor.rating?.toFixed(1) || '0.0'} ({tutor.totalReviews || 0})
                     </span>
                   </div>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    tutor.verified 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {tutor.verified ? 'Verified' : 'Pending'}
+                  </span>
                 </div>
 
-                {/* Location & Availability */}
-                <div className="mb-3 space-y-1">
-                  <div className="flex items-center">
-                    <LocationOn className="w-4 h-4 text-gray-400 mr-2" />
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {tutor.location}
-                    </span>
+                {/* Bio */}
+                {tutor.bio && (
+                  <div className="mb-3">
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} line-clamp-2`}>
+                      {tutor.bio}
+                    </p>
                   </div>
-                  <div className="flex items-center">
-                    <Schedule className="w-4 h-4 text-gray-400 mr-2" />
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Next: {tutor.nextAvailable}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Status:
-                    </span>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      tutor.availability === 'Available' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {tutor.availability}
-                    </span>
-                  </div>
-                </div>
+                )}
 
-                {/* Specialties */}
-                <div className="mb-3">
-                  <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Specialties:
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    {tutor.specialties.slice(0, 3).map((specialty, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        {specialty}
-                      </span>
-                    ))}
-                    {tutor.specialties.length > 3 && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                        +{tutor.specialties.length - 3} more
-                      </span>
-                    )}
+                {/* Subjects */}
+                {tutor.subjects && tutor.subjects.length > 0 && (
+                  <div className="mb-3">
+                    <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Môn dạy:
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {tutor.subjects.slice(0, 3).map((subject: string, index: number) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
+                          {subject}
+                        </span>
+                      ))}
+                      {tutor.subjects.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          +{tutor.subjects.length - 3}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex space-x-2">
@@ -605,6 +682,10 @@ const SearchTutorsMobile: React.FC = () => {
                     size="small" 
                     variant="outlined"
                     className="flex-1"
+                    onClick={() => {
+                      setSelectedTutor(tutor)
+                      setShowTutorModal(true)
+                    }}
                     style={{
                       backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
                       color: theme === 'dark' ? '#ffffff' : '#000000',
@@ -619,21 +700,23 @@ const SearchTutorsMobile: React.FC = () => {
                       e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                     }}
                   >
-                    View Profile
+                    Xem hồ sơ
                   </Button>
                   <Button 
                     size="small" 
                     variant="contained"
-                    disabled={tutor.availability === 'Busy'}
+                    disabled={!tutor.verified}
                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => navigate('/student/book', { state: { tutorId: tutor.id } })}
                   >
-                    Book Session
+                    Đặt lịch
                   </Button>
                 </div>
               </div>
             </Card>
           ))}
         </div>
+        )}
 
         {/* Help Section - Mobile with Toggle */}
         <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -810,6 +893,159 @@ const SearchTutorsMobile: React.FC = () => {
                   ))}
                 </div>
 
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tutor Detail Modal */}
+      {showTutorModal && selectedTutor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowTutorModal(false)}></div>
+          <div className={`relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl`}>
+            <div className="p-4">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Hồ sơ Gia sư
+                </h2>
+                <button 
+                  onClick={() => setShowTutorModal(false)}
+                  className={`p-2 rounded-full hover:bg-gray-100 ${theme === 'dark' ? 'hover:bg-gray-700' : ''}`}
+                >
+                  <CloseIcon className={theme === 'dark' ? 'text-white' : 'text-gray-900'} />
+                </button>
+              </div>
+
+              {/* Tutor Info */}
+              <div className="flex items-start space-x-4 mb-4">
+                <Avatar
+                  src={selectedTutor.avatar}
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    bgcolor: '#3b82f6',
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {getInitials(selectedTutor.name)}
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {selectedTutor.name}
+                    </h3>
+                    {selectedTutor.verified && (
+                      <CheckCircleIcon className="w-5 h-5 text-blue-500" />
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="flex items-center">
+                      <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedTutor.rating?.toFixed(1) || 'N/A'}
+                      </span>
+                      <span className={`ml-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        ({selectedTutor.totalReviews || 0})
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`text-sm font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                    {(selectedTutor.hourlyRate || 0) / 1000}K VND/giờ
+                  </div>
+                </div>
+              </div>
+
+              {/* Bio */}
+              <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                {selectedTutor.bio}
+              </p>
+
+              {/* Subjects */}
+              {selectedTutor.subjects && selectedTutor.subjects.length > 0 && (
+                <div className="mb-4">
+                  <h4 className={`font-semibold text-sm mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Môn học
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTutor.subjects.map((sub: string, idx: number) => (
+                      <span 
+                        key={idx}
+                        className={`px-2 py-1 rounded-full text-xs ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}
+                      >
+                        {sub}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Education */}
+              {selectedTutor.education && (
+                <div className="mb-4">
+                  <h4 className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Học vấn
+                  </h4>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {selectedTutor.education}
+                  </p>
+                </div>
+              )}
+
+              {/* Experience */}
+              {selectedTutor.experience && (
+                <div className="mb-4">
+                  <h4 className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Kinh nghiệm
+                  </h4>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {selectedTutor.experience}
+                  </p>
+                </div>
+              )}
+
+              {/* Languages */}
+              {selectedTutor.languages && selectedTutor.languages.length > 0 && (
+                <div className="mb-4">
+                  <h4 className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Ngôn ngữ
+                  </h4>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {selectedTutor.languages.join(', ')}
+                  </p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col space-y-2 mt-4">
+                <Button 
+                  variant="contained"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => {
+                    setShowTutorModal(false)
+                    navigate('/student/book', { state: { tutorId: selectedTutor.id } })
+                  }}
+                  disabled={!selectedTutor.verified}
+                >
+                  Đặt lịch học
+                </Button>
+                <Button 
+                  variant="outlined"
+                  className="w-full"
+                  onClick={() => {
+                    setShowTutorModal(false)
+                    navigate('/student/messages', { state: { tutorId: selectedTutor.id } })
+                  }}
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                  }}
+                >
+                  Nhắn tin
+                </Button>
               </div>
             </div>
           </div>

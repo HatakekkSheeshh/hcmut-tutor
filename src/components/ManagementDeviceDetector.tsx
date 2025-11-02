@@ -8,13 +8,11 @@ import ReportsAnalytics from '../pages/management/ReportsAnalytics'
 import ReportsAnalyticsMobile from '../pages/management/ReportsAnalyticsMobile'
 import AwardCredits from '../pages/management/AwardCredits'
 import AwardCreditsMobile from '../pages/management/AwardCreditsMobile'
-import DeviceSwitch from './DeviceSwitch'
 
 const ManagementDeviceDetector: React.FC = () => {
   const location = useLocation()
   const [isMobile, setIsMobile] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [manualOverride, setManualOverride] = useState<boolean | null>(null)
 
   useEffect(() => {
     const checkDevice = () => {
@@ -22,9 +20,7 @@ const ManagementDeviceDetector: React.FC = () => {
       const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
       const isSmallScreen = window.innerWidth <= 768
       
-      if (manualOverride === null) {
-        setIsMobile(isMobileDevice || isSmallScreen)
-      }
+      setIsMobile(isMobileDevice || isSmallScreen)
       setIsLoading(false)
     }
 
@@ -34,12 +30,7 @@ const ManagementDeviceDetector: React.FC = () => {
     return () => {
       window.removeEventListener('resize', checkDevice)
     }
-  }, [manualOverride])
-
-  const handleDeviceChange = (forceMobile: boolean) => {
-    setManualOverride(forceMobile)
-    setIsMobile(forceMobile)
-  }
+  }, [])
 
   if (isLoading) {
     return (
@@ -84,15 +75,7 @@ const ManagementDeviceDetector: React.FC = () => {
 
   return (
     <div className="relative">
-      {/* Device Switch Button - Only show on desktop */}
-      {!isMobile && (
-        <div className="fixed top-4 right-4 z-50">
-          <DeviceSwitch 
-            onDeviceChange={handleDeviceChange}
-            currentDevice={isMobile ? 'mobile' : 'desktop'}
-          />
-        </div>
-      )}
+      {/* Device Switch removed as per user request */}
       
       {renderComponent()}
     </div>

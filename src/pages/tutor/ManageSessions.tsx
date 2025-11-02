@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -20,7 +20,6 @@ import {
   Chat, 
   Edit, 
   Schedule,
-  Star,
   Assignment,
   Menu as MenuIcon,
   ArrowBack as ArrowBackIcon,
@@ -28,18 +27,151 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import { sessionsAPI, usersAPI } from '../../lib/api'
 
 const ManageSessions: React.FC = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [sessions, setSessions] = useState<any[]>([])
+  const [studentsMap, setStudentsMap] = useState<Record<string, any>>({})
   const [filterStatus, setFilterStatus] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSession, setSelectedSession] = useState<any>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false)
+  const [actionSession, setActionSession] = useState<any>(null)
+  const [rejectReason, setRejectReason] = useState('')
+  const [actionLoading, setActionLoading] = useState(false)
+
+  // Load sessions and student data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Get user from localStorage
+        const userStr = localStorage.getItem('user')
+        if (!userStr) {
+          navigate('/login')
+          return
+        }
+        const userData = JSON.parse(userStr)
+        setUser(userData)
+
+        // Load sessions for this tutor (increase limit to get all sessions)
+        const sessionsResponse = await sessionsAPI.list({ tutorId: userData.id, limit: 1000 })
+        
+        console.log('Sessions response:', sessionsResponse) // Debug log
+        
+        // API returns { data: [...], pagination: {...} } structure
+        if (sessionsResponse.data && Array.isArray(sessionsResponse.data)) {
+          const sessionsData = sessionsResponse.data
+
+          // Load all unique students (support both old studentId and new studentIds array)
+          const sessionStudentIds = new Set<string>()
+          sessionsData.forEach((s: any) => {
+            if (s.studentIds && Array.isArray(s.studentIds)) {
+              s.studentIds.forEach((id: string) => sessionStudentIds.add(id))
+            } else if (s.studentId) {
+              sessionStudentIds.add(s.studentId)
+            }
+          })
+          
+          const studentsData: Record<string, any> = {}
+          await Promise.all(
+            Array.from(sessionStudentIds).map(async (studentId) => {
+              try {
+                const userResponse = await usersAPI.get(studentId)
+                // Check if response has success field or directly has data
+                const userData = userResponse.success ? userResponse.data : userResponse
+                if (userData) {
+                  studentsData[studentId] = userData
+                }
+              } catch (err) {
+                console.error(`Error loading student ${studentId}:`, err)
+              }
+            })
+          )
+
+          setStudentsMap(studentsData)
+          setSessions(sessionsData)
+        }
+      } catch (err: any) {
+        console.error('Error loading sessions:', err)
+        setError(err.message || 'Failed to load sessions')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [navigate])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  // Confirm session handler
+  const handleConfirmSession = async () => {
+    if (!actionSession) return
+    
+    try {
+      setActionLoading(true)
+      const response = await sessionsAPI.update(actionSession.id, { status: 'confirmed' })
+      
+      if (response.success) {
+        // Update local state
+        setSessions(prev => prev.map(s => 
+          s.id === actionSession.id ? { ...s, status: 'confirmed' } : s
+        ))
+        setIsConfirmDialogOpen(false)
+        setActionSession(null)
+        alert('Session confirmed successfully!')
+      } else {
+        alert('Failed to confirm session: ' + response.error)
+      }
+    } catch (error: any) {
+      console.error('Error confirming session:', error)
+      alert('Failed to confirm session')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Reject session handler
+  const handleRejectSession = async () => {
+    if (!actionSession || !rejectReason.trim()) {
+      alert('Please provide a reason for rejection')
+      return
+    }
+    
+    try {
+      setActionLoading(true)
+      const response = await sessionsAPI.cancel(actionSession.id, rejectReason)
+      
+      if (response.success) {
+        // Update local state
+        setSessions(prev => prev.map(s => 
+          s.id === actionSession.id ? { ...s, status: 'cancelled' } : s
+        ))
+        setIsRejectDialogOpen(false)
+        setActionSession(null)
+        setRejectReason('')
+        alert('Session rejected successfully!')
+      } else {
+        alert('Failed to reject session: ' + response.error)
+      }
+    } catch (error: any) {
+      console.error('Error rejecting session:', error)
+      alert('Failed to reject session')
+    } finally {
+      setActionLoading(false)
+    }
   }
 
   // Helper function to get initials from name
@@ -64,64 +196,34 @@ const ManageSessions: React.FC = () => {
     return colors[index]
   }
 
-  const sessions = [
-    {
-      id: 1,
-      student: 'John Smith',
-      subject: 'Mathematics',
-      date: '2024-01-15',
-      time: '10:00 AM',
-      duration: '60 min',
-      status: 'confirmed',
-      rating: 4.8,
-      avatar: '/api/placeholder/40/40',
-      topic: 'Calculus Derivatives',
-      notes: 'Focus on chain rule and product rule'
-    },
-    {
-      id: 2,
-      student: 'Sarah Johnson',
-      subject: 'Physics',
-      date: '2024-01-15',
-      time: '2:00 PM',
-      duration: '90 min',
-      status: 'pending',
-      rating: 4.6,
-      avatar: '/api/placeholder/40/40',
-      topic: 'Quantum Mechanics',
-      notes: 'Review wave functions and probability'
-    },
-    {
-      id: 3,
-      student: 'Mike Chen',
-      subject: 'Chemistry',
-      date: '2024-01-16',
-      time: '9:00 AM',
-      duration: '60 min',
-      status: 'completed',
-      rating: 4.9,
-      avatar: '/api/placeholder/40/40',
-      topic: 'Organic Reactions',
-      notes: 'SN1 and SN2 mechanisms'
-    },
-    {
-      id: 4,
-      student: 'Alice Brown',
-      subject: 'Mathematics',
-      date: '2024-01-16',
-      time: '3:00 PM',
-      duration: '60 min',
-      status: 'cancelled',
-      rating: 4.7,
-      avatar: '/api/placeholder/40/40',
-      topic: 'Linear Algebra',
-      notes: 'Matrix operations and determinants'
-    }
-  ]
+  // Format date and time
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  }
 
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+  }
+
+  const formatDuration = (minutes: number) => {
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60)
+      const mins = minutes % 60
+      return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
+    }
+    return `${minutes}m`
+  }
+
+  // Filter sessions
   const filteredSessions = sessions.filter(session => {
     const matchesStatus = filterStatus === 'all' || session.status === filterStatus
-    const matchesSearch = session.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    // Support both old studentId (string) and new studentIds (array)
+    const studentId = session.studentIds && session.studentIds.length > 0 ? session.studentIds[0] : session.studentId
+    const student = studentId ? studentsMap[studentId] : null
+    const studentName = student?.name || 'Unknown Student'
+    const matchesSearch = studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          session.subject.toLowerCase().includes(searchTerm.toLowerCase())
     return matchesStatus && matchesSearch
   })
@@ -138,11 +240,23 @@ const ManageSessions: React.FC = () => {
     setIsEditDialogOpen(false)
   }
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Loading sessions...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -313,15 +427,9 @@ const ManageSessions: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avg Rating:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total Duration:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {(sessions.reduce((acc, s) => acc + s.rating, 0) / sessions.length).toFixed(1)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total Hours:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {sessions.reduce((acc, s) => acc + parseInt(s.duration), 0)} min
+                      {sessions.length > 0 ? `${Math.round(sessions.reduce((acc, s) => acc + (s.duration || 0), 0) / 60)}h` : '0h'}
                     </span>
                   </div>
                 </div>
@@ -329,9 +437,29 @@ const ManageSessions: React.FC = () => {
             </div>
           </div>
 
-      {/* Sessions List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSessions.map((session) => (
+      {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Sessions List */}
+          {filteredSessions.length === 0 ? (
+            <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              <Assignment className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <h3 className="text-xl font-semibold mb-2">No sessions found</h3>
+              <p>You don't have any sessions matching the current filters.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredSessions.map((session) => {
+          // Support both old studentId (string) and new studentIds (array)
+          const studentId = session.studentIds && session.studentIds.length > 0 ? session.studentIds[0] : session.studentId
+          const student = studentId ? studentsMap[studentId] : null
+          const studentName = student?.name || 'Unknown Student'
+          
+          return (
             <Card
                 key={session.id} 
                 className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} overflow-hidden`}
@@ -349,16 +477,16 @@ const ManageSessions: React.FC = () => {
                         sx={{
                           width: 40,
                           height: 40,
-                          bgcolor: getAvatarColor(session.student),
+                          bgcolor: getAvatarColor(studentName),
                           fontSize: '1rem',
                           fontWeight: 'bold'
                         }}
                       >
-                        {getInitials(session.student)}
+                        {getInitials(studentName)}
                       </Avatar>
                       <div className="ml-3">
                         <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {session.student}
+                          {studentName}
                         </h3>
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                           {session.subject}
@@ -383,47 +511,89 @@ const ManageSessions: React.FC = () => {
                     <div className="flex items-center">
                       <Schedule className="w-4 h-4 text-gray-400 mr-2" />
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {session.date} at {session.time}
+                        {formatDate(session.startTime)} at {formatTime(session.startTime)}
                       </span>
                     </div>
                     <div className="flex items-center">
                       <Assignment className="w-4 h-4 text-gray-400 mr-2" />
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {session.topic}
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 mr-2" />
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Rating: {session.rating}
+                        {session.topic || 'No topic'}
                       </span>
                     </div>
                     <div className="flex items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Duration: {session.duration}
+                        Duration: {formatDuration(session.duration)}
                       </span>
                     </div>
+                    {session.isOnline && (
+                      <div className="flex items-center">
+                        <VideoCall className="w-4 h-4 text-blue-400 mr-2" />
+                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Online session
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Session Notes */}
-                  <div className="mb-4">
-                    <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      Notes:
-                    </p>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                      {session.notes}
-                    </p>
-                  </div>
+                  {session.notes && (
+                    <div className="mb-4">
+                      <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Notes:
+                      </p>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {session.notes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {session.description && (
+                    <div className="mb-4">
+                      <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Description:
+                      </p>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {session.description}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Action Buttons */}
-                  <div className="flex space-x-2">
-                    <Button 
-                      size="small" 
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      <VideoCall className="w-4 h-4 mr-1" />
-                    Join
-                  </Button>
+                  {session.status === 'pending' ? (
+                    // Pending session: Show Confirm/Reject buttons
+                    <div className="flex space-x-2">
+                      <Button 
+                        size="small" 
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          setActionSession(session)
+                          setIsConfirmDialogOpen(true)
+                        }}
+                      >
+                        ✓ Confirm
+                      </Button>
+                      <Button 
+                        size="small" 
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                        onClick={() => {
+                          setActionSession(session)
+                          setIsRejectDialogOpen(true)
+                        }}
+                      >
+                        ✗ Reject
+                      </Button>
+                    </div>
+                  ) : (
+                    // Confirmed/other status: Show Join/Chat buttons
+                    <div className="flex space-x-2">
+                      <Button 
+                        size="small" 
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <VideoCall className="w-4 h-4 mr-1" />
+                      Join
+                    </Button>
                     <Button 
                       size="small" 
                       variant="outlined"
@@ -445,31 +615,34 @@ const ManageSessions: React.FC = () => {
                       <Chat className="w-4 h-4 mr-1" />
                     Chat
                   </Button>
-                  <Button 
-                    size="small" 
-                    variant="outlined"
-                    onClick={() => handleEditSession(session)}
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#000000',
-                      borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                      textTransform: 'none',
-                      fontWeight: '500'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
-                    }}
-                  >
-                      <Edit className="w-4 h-4" />
-                  </Button>
-                  </div>
+                      <Button 
+                        size="small" 
+                        variant="outlined"
+                        onClick={() => handleEditSession(session)}
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                          color: theme === 'dark' ? '#ffffff' : '#000000',
+                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                          textTransform: 'none',
+                          fontWeight: '500'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Card>
-            ))}
+            )
+          })}
           </div>
+          )}
         </div>
       </div>
 
@@ -771,6 +944,122 @@ const ManageSessions: React.FC = () => {
             }}
           >
             Save Changes
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirm Session Dialog */}
+      <Dialog 
+        open={isConfirmDialogOpen} 
+        onClose={() => !actionLoading && setIsConfirmDialogOpen(false)}
+        PaperProps={{
+          style: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#000000'
+          }
+        }}
+      >
+        <DialogTitle style={{ color: theme === 'dark' ? '#ffffff' : '#000000' }}>
+          Confirm Session
+        </DialogTitle>
+        <DialogContent>
+          <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+            Are you sure you want to confirm this session with <strong>{actionSession && studentsMap[actionSession.studentId]?.name}</strong>?
+          </p>
+          {actionSession && (
+            <div className="mt-4 space-y-2">
+              <p className="text-sm"><strong>Subject:</strong> {actionSession.subject}</p>
+              <p className="text-sm"><strong>Date:</strong> {formatDate(actionSession.startTime)}</p>
+              <p className="text-sm"><strong>Time:</strong> {formatTime(actionSession.startTime)}</p>
+              <p className="text-sm"><strong>Duration:</strong> {formatDuration(actionSession.duration)}</p>
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <MuiButton 
+            onClick={() => setIsConfirmDialogOpen(false)}
+            disabled={actionLoading}
+            style={{
+              backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
+              color: theme === 'dark' ? '#ffffff' : '#000000'
+            }}
+          >
+            Cancel
+          </MuiButton>
+          <MuiButton 
+            onClick={handleConfirmSession}
+            disabled={actionLoading}
+            style={{
+              backgroundColor: '#10b981',
+              color: '#ffffff'
+            }}
+          >
+            {actionLoading ? 'Confirming...' : 'Confirm Session'}
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reject Session Dialog */}
+      <Dialog 
+        open={isRejectDialogOpen} 
+        onClose={() => !actionLoading && setIsRejectDialogOpen(false)}
+        PaperProps={{
+          style: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#000000'
+          }
+        }}
+      >
+        <DialogTitle style={{ color: theme === 'dark' ? '#ffffff' : '#000000' }}>
+          Reject Session
+        </DialogTitle>
+        <DialogContent>
+          <p className={`mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+            Please provide a reason for rejecting this session:
+          </p>
+          {actionSession && (
+            <div className="mb-4 space-y-2">
+              <p className="text-sm"><strong>Student:</strong> {studentsMap[actionSession.studentId]?.name}</p>
+              <p className="text-sm"><strong>Subject:</strong> {actionSession.subject}</p>
+              <p className="text-sm"><strong>Date:</strong> {formatDate(actionSession.startTime)}</p>
+            </div>
+          )}
+          <textarea
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            placeholder="Enter reason for rejection..."
+            rows={4}
+            className={`w-full p-3 rounded-lg border ${
+              theme === 'dark'
+                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+            } focus:outline-none focus:ring-2 focus:ring-red-500`}
+          />
+        </DialogContent>
+        <DialogActions>
+          <MuiButton 
+            onClick={() => {
+              setIsRejectDialogOpen(false)
+              setRejectReason('')
+            }}
+            disabled={actionLoading}
+            style={{
+              backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
+              color: theme === 'dark' ? '#ffffff' : '#000000'
+            }}
+          >
+            Cancel
+          </MuiButton>
+          <MuiButton 
+            onClick={handleRejectSession}
+            disabled={actionLoading || !rejectReason.trim()}
+            style={{
+              backgroundColor: '#ef4444',
+              color: '#ffffff',
+              opacity: (!rejectReason.trim() || actionLoading) ? 0.5 : 1
+            }}
+          >
+            {actionLoading ? 'Rejecting...' : 'Reject Session'}
           </MuiButton>
         </DialogActions>
       </Dialog>

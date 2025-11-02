@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import { navigateToDashboard } from '../../utils/navigation'
 
 const OnlineCommunityForumMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
@@ -498,7 +499,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <div className="grid grid-cols-2 gap-3">
                 <button 
-                  onClick={() => navigate('/student')}
+                  onClick={() => navigateToDashboard(navigate)}
                   className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
                 >
                   <ArrowBackIcon className="w-6 h-6 text-blue-600 mb-2" />
@@ -626,7 +627,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
               <div className="flex-1 space-y-2">
                 <button 
                   onClick={() => {
-                    navigate('/student')
+                    navigateToDashboard(navigate)
                     setMobileOpen(false)
                   }}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}

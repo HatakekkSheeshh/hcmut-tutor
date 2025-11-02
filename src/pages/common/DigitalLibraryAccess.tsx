@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import { navigateToDashboard } from '../../utils/navigation'
 
 const DigitalLibraryAccess: React.FC = () => {
   const { theme } = useTheme()
@@ -130,8 +131,8 @@ const DigitalLibraryAccess: React.FC = () => {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className={`w-full lg:w-60 h-auto lg:h-screen ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
+        {/* Sidebar - Sticky */}
+        <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
             {/* Logo */}
             <div className="flex items-center mb-8">
@@ -207,6 +208,13 @@ const DigitalLibraryAccess: React.FC = () => {
                 QUICK ACTIONS
               </h3>
               <div className="space-y-2">
+                <button 
+                  onClick={() => navigateToDashboard(navigate)}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
+                >
+                  <ArrowBackIcon className="mr-3 w-4 h-4" />
+                  Back to Dashboard
+                </button>
                 <button 
                   onClick={() => navigate('/common')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
@@ -583,6 +591,16 @@ const DigitalLibraryAccess: React.FC = () => {
 
               {/* Mobile Quick Actions */}
               <div className="space-y-2">
+                <button 
+                  onClick={() => {
+                    navigateToDashboard(navigate)
+                    setMobileOpen(false)
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
+                >
+                  <ArrowBackIcon className="mr-3 w-4 h-4" />
+                  Back to Dashboard
+                </button>
                 <button 
                   onClick={() => {
                     navigate('/common')
