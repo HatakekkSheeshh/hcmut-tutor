@@ -220,9 +220,16 @@ export class JSONStorage {
 
   private async readFromBlob<T>(filename: string): Promise<T[]> {
     try {
-      // List blobs to find the file
-      const { blobs } = await list({ prefix: `data/${filename}` });
+      // Try to find the file with data/ prefix first, then without
+      let { blobs } = await list({ prefix: `data/${filename}` });
       if (blobs.length === 0) {
+        // Try without prefix if not found in data/
+        const { blobs: rootBlobs } = await list({ prefix: filename });
+        blobs = rootBlobs;
+      }
+      
+      if (blobs.length === 0) {
+        console.warn(`No blobs found for ${filename}`);
         return [];
       }
       

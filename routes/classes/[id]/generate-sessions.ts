@@ -95,7 +95,6 @@ export async function generateSessionsHandler(req: AuthRequest, res: Response) {
         duration: classItem.duration,
         isOnline: classItem.isOnline,
         location: classItem.location,
-        price: classItem.price,
         notes: `Tự động tạo từ lớp ${classItem.code}`,
         createdAt: now(),
         updatedAt: now()

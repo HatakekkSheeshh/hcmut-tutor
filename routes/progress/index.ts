@@ -7,7 +7,7 @@
 
 import { Response } from 'express';
 import { storage } from '../../lib/storage.js';
-import { ProgressEntry, UserRole } from '../../lib/types.js';
+import { ProgressEntry, UserRole, Session } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
 
@@ -90,7 +90,7 @@ export async function createProgressHandler(req: AuthRequest, res: Response) {
     }
 
     // Verify the progress is for this tutor's sessions
-    const session = await storage.findById('sessions.json', progressData.sessionId);
+    const session = await storage.findById<Session>('sessions.json', progressData.sessionId);
     if (!session || session.tutorId !== currentUser.userId) {
       return res.status(403).json(
         errorResponse('Bạn chỉ có thể tạo báo cáo cho buổi học của mình')

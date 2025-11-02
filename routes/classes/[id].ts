@@ -7,7 +7,7 @@
 
 import { Response } from 'express';
 import { storage } from '../../lib/storage.js';
-import { Class, ClassStatus, Enrollment, UserRole } from '../../lib/types.js';
+import { Class, ClassStatus, Enrollment, UserRole, User } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, now } from '../../lib/utils.js';
 
@@ -30,7 +30,7 @@ export async function getClassHandler(req: any, res: Response) {
     );
 
     // Get tutor info
-    const tutor = await storage.findById('users.json', classItem.tutorId);
+    const tutor = await storage.findById<User>('users.json', classItem.tutorId);
 
     return res.json(
       successResponse({

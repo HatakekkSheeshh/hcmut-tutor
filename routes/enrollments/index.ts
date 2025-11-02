@@ -6,7 +6,7 @@
 
 import { Response } from 'express';
 import { storage } from '../../lib/storage.js';
-import { Enrollment, EnrollmentStatus, Class, ClassStatus, UserRole, Notification, NotificationType } from '../../lib/types.js';
+import { Enrollment, EnrollmentStatus, Class, ClassStatus, UserRole, Notification, NotificationType, User } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
 
@@ -90,7 +90,7 @@ export async function listEnrollmentsHandler(req: AuthRequest, res: Response) {
     const enrichedData = await Promise.all(
       result.data.map(async (enrollment) => {
         const classItem = await storage.findById<Class>('classes.json', enrollment.classId);
-        const student = await storage.findById('users.json', enrollment.studentId);
+        const student = await storage.findById<User>('users.json', enrollment.studentId);
         
         return {
           ...enrollment,
@@ -228,7 +228,7 @@ export async function createEnrollmentHandler(req: AuthRequest, res: Response) {
     await storage.create('notifications.json', notification);
 
     // Get enriched enrollment data
-    const student = await storage.findById('users.json', currentUser.userId);
+    const student = await storage.findById<User>('users.json', currentUser.userId);
 
     return res.status(201).json(
       successResponse(

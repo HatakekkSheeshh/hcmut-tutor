@@ -389,7 +389,7 @@ export async function submitQuizHandler(req: AuthRequest, res: Response) {
       gradedAnswers.push({
         questionId: question.id,
         answer: studentAnswer || '',
-        correct: question.type === 'short_answer' || question.type === 'essay' ? undefined : isCorrect,
+        correct: question.type === 'short_answer' ? undefined : isCorrect,
         points: isCorrect ? question.points : 0
       });
     }

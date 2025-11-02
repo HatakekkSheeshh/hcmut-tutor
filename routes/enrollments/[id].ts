@@ -7,7 +7,7 @@
 
 import { Response } from 'express';
 import { storage } from '../../lib/storage.js';
-import { Enrollment, EnrollmentStatus, Class, ClassStatus, UserRole } from '../../lib/types.js';
+import { Enrollment, EnrollmentStatus, Class, ClassStatus, UserRole, User } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, now } from '../../lib/utils.js';
 
@@ -36,7 +36,7 @@ export async function getEnrollmentHandler(req: AuthRequest, res: Response) {
 
     // Get class and student info
     const classItem = await storage.findById<Class>('classes.json', enrollment.classId);
-    const student = await storage.findById('users.json', enrollment.studentId);
+    const student = await storage.findById<User>('users.json', enrollment.studentId);
 
     return res.json(
       successResponse({
