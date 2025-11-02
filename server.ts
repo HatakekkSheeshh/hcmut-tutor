@@ -11,56 +11,56 @@ import { loginSchema, registerSchema, updateProfileSchema, createClassSchema, up
 import { UserRole } from './lib/types.js';
 
 // Import handlers - Auth
-import { loginHandler } from './api/auth/login.js';
-import { registerHandler } from './api/auth/register.js';
-import { meHandler } from './api/auth/me.js';
-import { refreshTokenHandler } from './api/auth/refresh.js';
-import { logoutHandler } from './api/auth/logout.js';
+import { loginHandler } from './routes/auth/login.js';
+import { registerHandler } from './routes/auth/register.js';
+import { meHandler } from './routes/auth/me.js';
+import { refreshTokenHandler } from './routes/auth/refresh.js';
+import { logoutHandler } from './routes/auth/logout.js';
 
 // Import handlers - Users
-import { listUsersHandler } from './api/users/index.js';
-import { getUserHandler, updateUserHandler, deleteUserHandler } from './api/users/[id].js';
+import { listUsersHandler } from './routes/users/index.js';
+import { getUserHandler, updateUserHandler, deleteUserHandler } from './routes/users/[id].js';
 
 // Import handlers - Tutors & Students
-import { listTutorsHandler } from './api/tutors/index.js';
-import { getTutorHandler, getTutorReviewsHandler } from './api/tutors/[id].js';
-import { getStudentHandler, getStudentSessionsHandler } from './api/students/[id].js';
+import { listTutorsHandler } from './routes/tutors/index.js';
+import { getTutorHandler, getTutorReviewsHandler } from './routes/tutors/[id].js';
+import { getStudentHandler, getStudentSessionsHandler } from './routes/students/[id].js';
 
 // Import handlers - Sessions
-import { listSessionsHandler, createSessionHandler } from './api/sessions/index.js';
-import { getSessionHandler, updateSessionHandler, cancelSessionHandler, rescheduleSessionHandler } from './api/sessions/[id].js';
+import { listSessionsHandler, createSessionHandler } from './routes/sessions/index.js';
+import { getSessionHandler, updateSessionHandler, cancelSessionHandler, rescheduleSessionHandler } from './routes/sessions/[id].js';
 
 // Import handlers - Course Contents, Quizzes, Assignments
-import { getCourseContentsHandler, createCourseContentHandler, updateCourseContentHandler, deleteCourseContentHandler } from './api/sessions/[id]/course-contents.js';
-import { getQuizzesHandler, createQuizHandler, updateQuizHandler, deleteQuizHandler, submitQuizHandler, getQuizSubmissionsHandler } from './api/sessions/[id]/quizzes.js';
-import { getAssignmentsHandler, createAssignmentHandler, updateAssignmentHandler, deleteAssignmentHandler, submitAssignmentHandler } from './api/sessions/[id]/assignments.js';
-import { getSubmissionsHandler, gradeSubmissionHandler } from './api/sessions/[id]/submissions.js';
-import { getGradesHandler, getGradesSummaryHandler } from './api/sessions/[id]/grades.js';
-import { getSessionStudentsHandler, addStudentToSessionHandler, removeStudentFromSessionHandler } from './api/sessions/[id]/students.js';
+import { getCourseContentsHandler, createCourseContentHandler, updateCourseContentHandler, deleteCourseContentHandler } from './routes/sessions/[id]/course-contents.js';
+import { getQuizzesHandler, createQuizHandler, updateQuizHandler, deleteQuizHandler, submitQuizHandler, getQuizSubmissionsHandler } from './routes/sessions/[id]/quizzes.js';
+import { getAssignmentsHandler, createAssignmentHandler, updateAssignmentHandler, deleteAssignmentHandler, submitAssignmentHandler } from './routes/sessions/[id]/assignments.js';
+import { getSubmissionsHandler, gradeSubmissionHandler } from './routes/sessions/[id]/submissions.js';
+import { getGradesHandler, getGradesSummaryHandler } from './routes/sessions/[id]/grades.js';
+import { getSessionStudentsHandler, addStudentToSessionHandler, removeStudentFromSessionHandler } from './routes/sessions/[id]/students.js';
 
 // Import handlers - Calendar & Availability
-import { getCalendarHandler } from './api/calendar/[userId].js';
-import { getAvailabilityHandler, setAvailabilityHandler, updateAvailabilityHandler } from './api/availability/index.js';
+import { getCalendarHandler } from './routes/calendar/[userId].js';
+import { getAvailabilityHandler, setAvailabilityHandler, updateAvailabilityHandler } from './routes/availability/index.js';
 
 // Import handlers - Classes & Enrollments
-import { listClassesHandler, createClassHandler } from './api/classes/index.js';
-import { getClassHandler, updateClassHandler, deleteClassHandler } from './api/classes/[id].js';
-import { generateSessionsHandler } from './api/classes/[id]/generate-sessions.js';
-import { listEnrollmentsHandler, createEnrollmentHandler } from './api/enrollments/index.js';
-import { getEnrollmentHandler, updateEnrollmentHandler, deleteEnrollmentHandler } from './api/enrollments/[id].js';
+import { listClassesHandler, createClassHandler } from './routes/classes/index.js';
+import { getClassHandler, updateClassHandler, deleteClassHandler } from './routes/classes/[id].js';
+import { generateSessionsHandler } from './routes/classes/[id]/generate-sessions.js';
+import { listEnrollmentsHandler, createEnrollmentHandler } from './routes/enrollments/index.js';
+import { getEnrollmentHandler, updateEnrollmentHandler, deleteEnrollmentHandler } from './routes/enrollments/[id].js';
 
 // Import handlers - Notifications
-import { getNotificationsHandler, markAsReadHandler, deleteNotificationHandler } from './api/notifications/index.js';
+import { getNotificationsHandler, markAsReadHandler, deleteNotificationHandler } from './routes/notifications/index.js';
 
 // Import handlers - Progress
-import { listProgressHandler, createProgressHandler, getProgressHandler } from './api/progress/index.js';
+import { listProgressHandler, createProgressHandler, getProgressHandler } from './routes/progress/index.js';
 
 // Import handlers - Evaluations
-import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, updateEvaluationHandler, deleteEvaluationHandler } from './api/evaluations/index.js';
+import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, updateEvaluationHandler, deleteEvaluationHandler } from './routes/evaluations/index.js';
 
 // Import handlers - Forum
-import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './api/forum/posts.js';
-import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './api/forum/comments.js';
+import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './routes/forum/posts.js';
+import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './routes/forum/comments.js';
 
 // Create Express app
 const app = express();
