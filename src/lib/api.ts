@@ -3,7 +3,7 @@
  * Base URL: http://localhost:3000/api or /api in production
  */
 
-const API_BASE_URL = (import.meta as any).env?.PROD ? '/api' : 'http://localhost:3000/api';
+import { API_BASE_URL } from '../env';
 
 // Helper to get token from localStorage
 const getToken = () => localStorage.getItem('token');
@@ -32,7 +32,26 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     headers
   });
 
-  const data = await response.json();
+  // Check if response is JSON
+  const contentType = response.headers.get('content-type');
+  let data;
+  
+  if (contentType && contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    // If not JSON, get text and try to parse
+    const text = await response.text();
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('⚠️ [API] Response is not JSON:', text.substring(0, 200));
+      return {
+        success: false,
+        error: `Server returned invalid response: ${response.status} ${response.statusText}`
+      };
+    }
+  }
+  
   console.log('📡 [API] Response:', {
     status: response.status,
     url,
