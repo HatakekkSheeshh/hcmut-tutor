@@ -5,7 +5,7 @@
  * Validates data integrity across all JSON files
  */
 
-import { storage } from './storage';
+import { storage } from './storage.js';
 import {
   User,
   Session,
@@ -21,7 +21,7 @@ import {
   Message,
   UserRole,
   SessionStatus
-} from './types';
+} from './types.js';
 
 interface ValidationResult {
   valid: boolean;

@@ -29,7 +29,7 @@ import {
   ApprovalStatus,
   ClassStatus,
   EnrollmentStatus
-} from './types';
+} from './types.js';
 import {
   generateId,
   generateHCMUTId,
@@ -37,7 +37,7 @@ import {
   now,
   addDays,
   randomInt
-} from './utils';
+} from './utils.js';
 
 // ===== CONSTANTS =====
 

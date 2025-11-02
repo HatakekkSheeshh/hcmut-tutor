@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken, extractToken, JWTPayload } from './utils';
-import { UserRole } from './types';
-import { errorResponse } from './utils';
+import { verifyToken, extractToken, JWTPayload } from './utils.js';
+import { UserRole } from './types.js';
+import { errorResponse } from './utils.js';
 
 /**
  * Extended Request type with user info

@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { generateAllMockData } from './mockData';
+import { generateAllMockData } from './mockData.js';
 
 /**
  * Seed database with mock data

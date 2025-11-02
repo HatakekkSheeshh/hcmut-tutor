@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { UserRole } from './types';
+import { UserRole } from './types.js';
 
 // ===== ID GENERATION =====
 

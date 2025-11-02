@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserRole, SessionStatus, NotificationType, CourseContentType } from './types';
+import { UserRole, SessionStatus, NotificationType, CourseContentType } from './types.js';
 
 // ===== AUTH SCHEMAS =====
 

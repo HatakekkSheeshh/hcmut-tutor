@@ -6,11 +6,11 @@
  */
 
 import { Request, Response } from 'express';
-import { storage } from '../lib/storage';
-import { authenticate, authorize, validateBody } from '../lib/middleware';
-import { successResponse, errorResponse, generateId, now } from '../lib/utils';
-import { loginSchema } from '../lib/schemas';
-import { User, UserRole, ApiResponse } from '../lib/types';
+import { storage } from '../lib/storage.js';
+import { authenticate, authorize, validateBody } from '../lib/middleware.js';
+import { successResponse, errorResponse, generateId, now } from '../lib/utils.js';
+import { loginSchema } from '../lib/schemas.js';
+import { User, UserRole, ApiResponse } from '../lib/types.js';
 
 // ===== EXAMPLE 1: Simple GET endpoint =====
 
