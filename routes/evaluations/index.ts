@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
-import { JSONStorage } from '../../lib/storage'
-import { AuthRequest } from '../../lib/middleware'
-import { successResponse, errorResponse } from '../../lib/utils'
-import { generateId, now } from '../../lib/utils'
-import { UserRole, Evaluation, Session } from '../../lib/types'
+import { JSONStorage } from '../../lib/storage.js'
+import { AuthRequest } from '../../lib/middleware.js'
+import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js'
+import { UserRole, Evaluation, Session } from '../../lib/types.js'
 
 const storage = new JSONStorage()
 
