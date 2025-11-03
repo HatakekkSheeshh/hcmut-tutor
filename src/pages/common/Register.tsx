@@ -6,6 +6,7 @@ import {
   Visibility,
   VisibilityOff,
   Email,
+  Menu as MenuIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
   Settings as SettingsIcon,
