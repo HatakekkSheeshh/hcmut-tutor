@@ -37,7 +37,9 @@ import {
   Class,
   Chat as ChatIcon,
   CalendarMonth,
-  Logout as LogoutIcon
+  Logout as LogoutIcon,
+  MenuBook as MenuBookIcon,
+  Forum as ForumIcon
 } from '@mui/icons-material'
 
 const StudentDashboard: React.FC = () => {
@@ -474,7 +476,11 @@ const StudentDashboard: React.FC = () => {
     { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
     { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
     { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
+    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' },
+    { id: 'profile', label: 'Profile Management', icon: <PersonIcon />, path: '/common/profile' },
+    { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
+    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' },
+    { id: 'notifications', label: 'Notifications', icon: <NotificationsIcon />, path: '/common/notifications' }
   ]
 
   // User name and avatar are now from backend

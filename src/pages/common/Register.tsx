@@ -5,12 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   Visibility,
   VisibilityOff,
-  Person,
-  Lock,
   Email,
-  School,
-  Menu as MenuIcon,
-  Notifications,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
   Settings as SettingsIcon,
@@ -260,43 +255,6 @@ const Register: React.FC = () => {
                 >
                   <Badge className="mr-3 w-4 h-4" />
                   Tutor
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div>
-              <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                QUICK ACTIONS
-              </h3>
-              <div className="space-y-2">
-                <button 
-                  onClick={() => navigate('/common/login')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Lock className="mr-3 w-4 h-4" />
-                  Back to Login
-                </button>
-                <button 
-                  onClick={() => navigate('/common/library')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <School className="mr-3 w-4 h-4" />
-                  Digital Library
-                </button>
-                <button 
-                  onClick={() => navigate('/common/forum')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <MenuIcon className="mr-3 w-4 h-4" />
-                  Community Forum
-                </button>
-                <button 
-                  onClick={() => navigate('/common/notifications')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Notifications className="mr-3 w-4 h-4" />
-                  Notifications
                 </button>
               </div>
             </div>
