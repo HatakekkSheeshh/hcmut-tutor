@@ -1,733 +1,8 @@
 [
   {
-    "id": "quizsub_iKSVjIIo3e3V",
-    "quizId": "quiz_Kst0e4klmzyZ",
-    "studentId": "stu_9u9dbyGKfJLB",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": 0
-      },
-      {
-        "questionId": "q5",
-        "answer": 0
-      },
-      {
-        "questionId": "q6",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q7",
-        "answer": 2
-      }
-    ],
-    "score": 36.099999999999994,
-    "gradedBy": "tut_IIcDx-qwF11O",
-    "submittedAt": "2025-10-28T16:55:09.931Z",
-    "gradedAt": "2025-11-01T00:32:29.066Z"
-  },
-  {
-    "id": "quizsub_bbZhL1J8PdRI",
-    "quizId": "quiz_6ZOcG7p8gZaG",
-    "studentId": "stu_BBEen0t2Ua_j",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 1
-      },
-      {
-        "questionId": "q2",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": 0
-      },
-      {
-        "questionId": "q5",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q6",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q7",
-        "answer": 0
-      }
-    ],
-    "score": 40.8,
-    "gradedBy": "tut_mwFLg7bNm4J4",
-    "submittedAt": "2025-10-31T15:23:07.726Z",
-    "gradedAt": "2025-10-30T18:58:04.049Z"
-  },
-  {
-    "id": "quizsub_5V7l8AkkDN4t",
-    "quizId": "quiz_RmRZ5SNPrLjx",
-    "studentId": "stu_6jvhTD5YtFAc",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q3",
-        "answer": 0
-      },
-      {
-        "questionId": "q4",
-        "answer": 1
-      },
-      {
-        "questionId": "q5",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q6",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 22.7,
-    "gradedBy": "tut_oG9NVXrtLgMn",
-    "submittedAt": "2025-10-28T19:06:51.592Z",
-    "gradedAt": "2025-11-01T04:04:21.589Z"
-  },
-  {
-    "id": "quizsub_xw3mLvlI1HJk",
-    "quizId": "quiz_DnjNQ4UR5VGF",
-    "studentId": "stu_l14kv7jRaJOZ",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 0
-      },
-      {
-        "questionId": "q4",
-        "answer": 0
-      }
-    ],
-    "score": 31.099999999999998,
-    "gradedBy": "tut_rmNAwCfJrAnZ",
-    "submittedAt": "2025-10-27T07:08:49.236Z",
-    "gradedAt": "2025-10-29T00:37:15.141Z"
-  },
-  {
-    "id": "quizsub_cSQRLyG6DH8h",
-    "quizId": "quiz_sv-E_7LtyOGY",
-    "studentId": "stu_F2bo6J8SkuGl",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 2
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 20.099999999999998,
-    "gradedBy": "tut_oG9NVXrtLgMn",
-    "submittedAt": "2025-10-26T04:54:44.673Z",
-    "gradedAt": "2025-11-02T06:31:21.854Z"
-  },
-  {
-    "id": "quizsub_gBv8CfWPJ2xY",
-    "quizId": "quiz_0pBDZ9Tv5bLM",
-    "studentId": "stu_TTGT1sgSQ_bk",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": 0
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 26.299999999999997,
-    "gradedBy": "tut_R3V_vbvdhVGW",
-    "submittedAt": "2025-10-25T13:24:06.032Z",
-    "gradedAt": "2025-11-04T02:52:52.692Z"
-  },
-  {
-    "id": "quizsub_h4kkfGtrFE8v",
-    "quizId": "quiz_KIKlT9kG6-WT",
-    "studentId": "stu_PNaLShPnMd3z",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 1
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 20.1,
-    "gradedBy": "tut_Rr4zr998-VZT",
-    "submittedAt": "2025-10-23T07:50:05.916Z",
-    "gradedAt": "2025-11-04T15:37:49.499Z"
-  },
-  {
-    "id": "quizsub_1iddJRU7fo1Q",
-    "quizId": "quiz_4_tWgVh9W_uh",
-    "studentId": "stu_F2bo6J8SkuGl",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": 3
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": 0
-      }
-    ],
-    "score": 25.4,
-    "submittedAt": "2025-10-28T10:01:04.819Z",
-    "gradedAt": "2025-10-27T02:40:52.933Z"
-  },
-  {
-    "id": "quizsub_jGHB4WsTUiVN",
-    "quizId": "quiz_MOosZI2CTDIV",
-    "studentId": "stu_F2bo6J8SkuGl",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 0
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 39.099999999999994,
-    "submittedAt": "2025-11-02T20:30:59.151Z",
-    "gradedAt": "2025-11-05T02:27:44.052Z"
-  },
-  {
-    "id": "quizsub_a5ZDOaxXXYbh",
-    "quizId": "quiz_MOosZI2CTDIV",
-    "studentId": "stu_z8ink_o6eMFO",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 0
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 55.099999999999994,
-    "submittedAt": "2025-10-25T07:56:05.024Z",
-    "gradedAt": "2025-10-27T07:55:46.095Z"
-  },
-  {
-    "id": "quizsub_yzI53PVocYoH",
-    "quizId": "quiz_MOosZI2CTDIV",
-    "studentId": "stu_jxqJ2t-ga4Ao",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 0
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 69.1,
-    "submittedAt": "2025-10-26T03:32:01.959Z",
-    "gradedAt": "2025-11-05T03:36:07.456Z"
-  },
-  {
-    "id": "quizsub_iihRc_mDCHaC",
-    "quizId": "quiz_FCkkgD15N_zP",
-    "studentId": "stu_F2bo6J8SkuGl",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 3
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q6",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q7",
-        "answer": 0
-      }
-    ],
-    "score": 65.6,
-    "submittedAt": "2025-10-24T03:58:10.312Z",
-    "gradedAt": "2025-10-29T14:39:16.993Z"
-  },
-  {
-    "id": "quizsub_IRA1UIT4Iqps",
-    "quizId": "quiz_UodVpTDOrwzi",
-    "studentId": "stu_RPiwaZ6eV0pi",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 0
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      },
-      {
-        "questionId": "q7",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q8",
-        "answer": 0
-      }
-    ],
-    "score": 63,
-    "submittedAt": "2025-11-03T10:24:56.390Z",
-    "gradedAt": "2025-11-01T17:40:02.075Z"
-  },
-  {
-    "id": "quizsub_9UXiR-npOl67",
-    "quizId": "quiz_UodVpTDOrwzi",
-    "studentId": "stu_DQBwPWq6sQMI",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 0
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      },
-      {
-        "questionId": "q7",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q8",
-        "answer": 0
-      }
-    ],
-    "score": 55,
-    "submittedAt": "2025-11-03T00:39:08.011Z",
-    "gradedAt": "2025-10-29T20:09:32.308Z"
-  },
-  {
-    "id": "quizsub_osbCqsreEYDa",
-    "quizId": "quiz_UodVpTDOrwzi",
-    "studentId": "stu_YC3zVYfIWltB",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 1
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      },
-      {
-        "questionId": "q7",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q8",
-        "answer": 0
-      }
-    ],
-    "score": 88,
-    "submittedAt": "2025-10-31T02:14:17.386Z",
-    "gradedAt": "2025-10-28T02:02:10.638Z"
-  },
-  {
-    "id": "quizsub_v4sN6CxbG8Zc",
-    "quizId": "quiz_UodVpTDOrwzi",
-    "studentId": "stu_6jvhTD5YtFAc",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 1
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": 0
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      },
-      {
-        "questionId": "q7",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q8",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 53,
-    "submittedAt": "2025-10-27T05:31:45.381Z",
-    "gradedAt": "2025-10-28T04:10:50.794Z"
-  },
-  {
-    "id": "quizsub_NJC89TNZJJ6F",
-    "quizId": "quiz_NvqOnTFXajhV",
-    "studentId": "stu_RPiwaZ6eV0pi",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 0
-      },
-      {
-        "questionId": "q2",
-        "answer": 0
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": 1
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      }
-    ],
-    "score": 40.8,
-    "submittedAt": "2025-10-24T01:11:24.456Z",
-    "gradedAt": "2025-11-02T07:53:45.468Z"
-  },
-  {
-    "id": "quizsub_xl7Bqg53LSdN",
-    "quizId": "quiz_NvqOnTFXajhV",
-    "studentId": "stu_DQBwPWq6sQMI",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 0
-      },
-      {
-        "questionId": "q2",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": 1
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      }
-    ],
-    "score": 28.8,
-    "submittedAt": "2025-10-31T23:10:49.148Z",
-    "gradedAt": "2025-11-02T19:12:14.757Z"
-  },
-  {
-    "id": "quizsub_pOyM93NWrpAc",
-    "quizId": "quiz_NvqOnTFXajhV",
-    "studentId": "stu_YC3zVYfIWltB",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 1
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      }
-    ],
-    "score": 38.8,
-    "submittedAt": "2025-10-26T19:26:45.060Z",
-    "gradedAt": "2025-10-28T18:47:44.666Z"
-  },
-  {
-    "id": "quizsub_5Yt-HSq4b3fU",
-    "quizId": "quiz_NvqOnTFXajhV",
-    "studentId": "stu_6jvhTD5YtFAc",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 1
-      },
-      {
-        "questionId": "q6",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 32.8,
-    "submittedAt": "2025-10-25T22:29:15.281Z",
-    "gradedAt": "2025-10-28T20:19:17.789Z"
-  },
-  {
-    "id": "quizsub_xua8cz7Lfr4Q",
-    "quizId": "quiz_pBqKMUh2WPB3",
-    "studentId": "stu_TTGT1sgSQ_bk",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 0
-      },
-      {
-        "questionId": "q2",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q3",
-        "answer": 3
-      },
-      {
-        "questionId": "q4",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q6",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q7",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q8",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q9",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 82.2,
-    "submittedAt": "2025-11-02T01:22:53.410Z",
-    "gradedAt": "2025-10-30T16:24:11.696Z"
-  },
-  {
-    "id": "quizsub_9qrtMV-SryZ2",
-    "quizId": "quiz_XUct9rjQ0Oc7",
-    "studentId": "stu_TTGT1sgSQ_bk",
+    "id": "quizsub_q5SdVG5BeAvX",
+    "quizId": "quiz_hf5JP4oUbajg",
+    "studentId": "stu_l7BbBkC4tz5Z",
     "answers": [
       {
         "questionId": "q1",
@@ -740,24 +15,17 @@
       {
         "questionId": "q3",
         "answer": 3
-      },
-      {
-        "questionId": "q4",
-        "answer": 2
-      },
-      {
-        "questionId": "q5",
-        "answer": 1
       }
     ],
-    "score": 28.2,
-    "submittedAt": "2025-10-29T11:02:01.888Z",
-    "gradedAt": "2025-11-01T16:56:18.983Z"
+    "score": 18,
+    "gradedBy": "tut_SAZDCdEtp4d5",
+    "submittedAt": "2025-11-05T17:41:59.368Z",
+    "gradedAt": "2025-11-04T04:18:04.250Z"
   },
   {
-    "id": "quizsub_HXGJgCuV5qPF",
-    "quizId": "quiz_x0y2dKTXANMx",
-    "studentId": "stu_9u9dbyGKfJLB",
+    "id": "quizsub_fmeJj1eOOy9c",
+    "quizId": "quiz_BH1ZuXy6gqS9",
+    "studentId": "stu_RATGmPd-z7u8",
     "answers": [
       {
         "questionId": "q1",
@@ -765,7 +33,162 @@
       },
       {
         "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q4",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q5",
+        "answer": 2
+      }
+    ],
+    "score": 30,
+    "gradedBy": "tut_88EyEpAvElqJ",
+    "submittedAt": "2025-11-03T10:34:17.464Z",
+    "gradedAt": "2025-11-05T13:40:02.608Z"
+  },
+  {
+    "id": "quizsub_qsnhY6hmOvkF",
+    "quizId": "quiz_HOBGW7-OS7rV",
+    "studentId": "stu_-47UcQuEG1Aq",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q2",
+        "answer": 2
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q4",
+        "answer": 1
+      },
+      {
+        "questionId": "q5",
         "answer": 0
+      }
+    ],
+    "score": 44.599999999999994,
+    "gradedBy": "tut_mQjJx63STWcF",
+    "submittedAt": "2025-10-31T08:43:09.939Z",
+    "gradedAt": "2025-11-01T12:25:13.870Z"
+  },
+  {
+    "id": "quizsub_5x_fiwzqWg6x",
+    "quizId": "quiz_h9QY3Qc4PqDm",
+    "studentId": "stu_xyHCrONyfX5i",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 0
+      },
+      {
+        "questionId": "q2",
+        "answer": 1
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      }
+    ],
+    "score": 23.6,
+    "gradedBy": "tut_NrIX8Wa7MS0G",
+    "submittedAt": "2025-10-31T04:21:36.379Z",
+    "gradedAt": "2025-10-28T10:26:30.765Z"
+  },
+  {
+    "id": "quizsub_BHJgVCz4NQQR",
+    "quizId": "quiz_Y24cxIahI_Dg",
+    "studentId": "stu_3RhgygZCqKGA",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q4",
+        "answer": 0
+      },
+      {
+        "questionId": "q5",
+        "answer": 0
+      },
+      {
+        "questionId": "q6",
+        "answer": "Wrong answer"
+      }
+    ],
+    "score": 36,
+    "gradedBy": "tut_NrIX8Wa7MS0G",
+    "submittedAt": "2025-10-29T13:13:54.747Z",
+    "gradedAt": "2025-11-04T07:46:31.548Z"
+  },
+  {
+    "id": "quizsub_W3JIExTLlBYE",
+    "quizId": "quiz_snW2vjwSLP5x",
+    "studentId": "stu_Dkzw5MfS0lmg",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q2",
+        "answer": 1
+      },
+      {
+        "questionId": "q3",
+        "answer": 0
+      },
+      {
+        "questionId": "q4",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q5",
+        "answer": 1
+      },
+      {
+        "questionId": "q6",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 19.8,
+    "gradedBy": "tut_OI2WdgyNqJEJ",
+    "submittedAt": "2025-10-30T12:53:21.662Z",
+    "gradedAt": "2025-10-31T08:25:04.464Z"
+  },
+  {
+    "id": "quizsub_MDITPJEBNQ4C",
+    "quizId": "quiz_OEaqdKmi_DIJ",
+    "studentId": "stu_abUgMaX8_8pV",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 0
+      },
+      {
+        "questionId": "q2",
+        "answer": "Wrong answer"
       },
       {
         "questionId": "q3",
@@ -781,279 +204,187 @@
       },
       {
         "questionId": "q6",
+        "answer": 1
+      }
+    ],
+    "score": 52.4,
+    "gradedBy": "tut_oBHJXQvmjPPG",
+    "submittedAt": "2025-10-27T06:01:08.920Z",
+    "gradedAt": "2025-10-31T07:23:46.857Z"
+  },
+  {
+    "id": "quizsub_6p-2-kzbidWU",
+    "quizId": "quiz_8w9kFYdLArLw",
+    "studentId": "stu_-47UcQuEG1Aq",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 2
+      },
+      {
+        "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": 0
+      },
+      {
+        "questionId": "q4",
+        "answer": 1
+      },
+      {
+        "questionId": "q5",
         "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q6",
+        "answer": 1
       },
       {
         "questionId": "q7",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q8",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 61.4,
-    "submittedAt": "2025-11-05T00:03:27.493Z",
-    "gradedAt": "2025-10-31T14:33:11.750Z"
-  },
-  {
-    "id": "quizsub_TVi8j74qFAvX",
-    "quizId": "quiz_dGRTjIT_UTW8",
-    "studentId": "stu_9u9dbyGKfJLB",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": 1
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 0
-      },
-      {
-        "questionId": "q6",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q7",
-        "answer": 1
-      },
-      {
-        "questionId": "q8",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 42.1,
-    "submittedAt": "2025-10-26T22:29:36.338Z",
-    "gradedAt": "2025-11-04T13:26:55.885Z"
-  },
-  {
-    "id": "quizsub_9L-AZb0LJDnM",
-    "quizId": "quiz_RFfEAkcEq9Jp",
-    "studentId": "stu_RPiwaZ6eV0pi",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 3
-      },
-      {
-        "questionId": "q6",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 55.099999999999994,
-    "submittedAt": "2025-10-24T14:53:10.066Z",
-    "gradedAt": "2025-11-01T16:31:13.622Z"
-  },
-  {
-    "id": "quizsub_XGkvEHVxqeYw",
-    "quizId": "quiz_RFfEAkcEq9Jp",
-    "studentId": "stu_BBEen0t2Ua_j",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": 0
-      },
-      {
-        "questionId": "q5",
-        "answer": 3
-      },
-      {
-        "questionId": "q6",
-        "answer": "Wrong answer"
-      }
-    ],
-    "score": 35.099999999999994,
-    "submittedAt": "2025-10-25T07:02:50.650Z",
-    "gradedAt": "2025-11-04T03:41:07.504Z"
-  },
-  {
-    "id": "quizsub_ZqN5c1EVxLtr",
-    "quizId": "quiz_RFfEAkcEq9Jp",
-    "studentId": "stu_sXj_LXe2YSNA",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": 0
-      },
-      {
-        "questionId": "q5",
-        "answer": 3
-      },
-      {
-        "questionId": "q6",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 28.099999999999998,
-    "submittedAt": "2025-10-28T16:32:02.316Z",
-    "gradedAt": "2025-11-05T19:47:12.710Z"
-  },
-  {
-    "id": "quizsub_KH726q3jWVob",
-    "quizId": "quiz_RFfEAkcEq9Jp",
-    "studentId": "stu_6jvhTD5YtFAc",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": 1
-      },
-      {
-        "questionId": "q3",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q6",
         "answer": "Đáp án mẫu"
       }
     ],
     "score": 52.099999999999994,
-    "submittedAt": "2025-10-31T19:52:18.271Z",
-    "gradedAt": "2025-11-04T03:26:35.001Z"
+    "gradedBy": "tut_x0-B_jiDzDIF",
+    "submittedAt": "2025-10-23T21:14:27.894Z",
+    "gradedAt": "2025-10-27T16:25:41.565Z"
   },
   {
-    "id": "quizsub_yoQ6J8ds7_5L",
-    "quizId": "quiz_ReQZlhmW3Xyq",
-    "studentId": "stu_BBEen0t2Ua_j",
+    "id": "quizsub_TWk3X-z1o2ui",
+    "quizId": "quiz_gth7x8B88Bng",
+    "studentId": "stu_3RhgygZCqKGA",
     "answers": [
       {
         "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 3
-      }
-    ],
-    "score": 74.5,
-    "submittedAt": "2025-10-26T12:21:22.146Z",
-    "gradedAt": "2025-11-04T07:09:23.549Z"
-  },
-  {
-    "id": "quizsub_1hz1xUhSRQeg",
-    "quizId": "quiz_ReQZlhmW3Xyq",
-    "studentId": "stu_6jvhTD5YtFAc",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 2
-      },
-      {
-        "questionId": "q2",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q5",
-        "answer": 3
-      }
-    ],
-    "score": 57.5,
-    "submittedAt": "2025-11-01T05:46:13.130Z",
-    "gradedAt": "2025-11-04T05:07:41.100Z"
-  },
-  {
-    "id": "quizsub_7iy_bjT8rgo1",
-    "quizId": "quiz_2bTvCgwN1Fzy",
-    "studentId": "stu_Wl1y8mOQ1kqt",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 0
-      },
-      {
-        "questionId": "q2",
-        "answer": 3
-      },
-      {
-        "questionId": "q3",
         "answer": 1
       },
       {
+        "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
         "questionId": "q4",
+        "answer": 2
+      },
+      {
+        "questionId": "q5",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q6",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q7",
+        "answer": "Wrong answer"
+      }
+    ],
+    "score": 32.3,
+    "submittedAt": "2025-11-05T08:52:22.802Z",
+    "gradedAt": "2025-11-02T03:05:27.732Z"
+  },
+  {
+    "id": "quizsub_T2KxLHu4Z-kk",
+    "quizId": "quiz_gth7x8B88Bng",
+    "studentId": "stu_l7BbBkC4tz5Z",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": 2
+      },
+      {
+        "questionId": "q4",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q5",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q6",
         "answer": 0
+      },
+      {
+        "questionId": "q7",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 16.299999999999997,
+    "submittedAt": "2025-11-01T09:29:23.462Z",
+    "gradedAt": "2025-11-03T04:29:05.849Z"
+  },
+  {
+    "id": "quizsub_z-pOZuYVzxb6",
+    "quizId": "quiz_gth7x8B88Bng",
+    "studentId": "stu_X9P40VHl5eYS",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 1
+      },
+      {
+        "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q4",
+        "answer": 2
+      },
+      {
+        "questionId": "q5",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q6",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q7",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 31.299999999999997,
+    "submittedAt": "2025-10-30T01:33:14.972Z",
+    "gradedAt": "2025-11-04T12:13:22.792Z"
+  },
+  {
+    "id": "quizsub_IgYWipi363sG",
+    "quizId": "quiz_gth7x8B88Bng",
+    "studentId": "stu_abUgMaX8_8pV",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 1
+      },
+      {
+        "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q4",
+        "answer": 2
       },
       {
         "questionId": "q5",
@@ -1068,90 +399,14 @@
         "answer": "Đáp án mẫu"
       }
     ],
-    "score": 59.099999999999994,
-    "submittedAt": "2025-10-28T11:04:52.149Z",
-    "gradedAt": "2025-10-31T18:55:13.522Z"
+    "score": 36.3,
+    "submittedAt": "2025-10-25T15:06:30.052Z",
+    "gradedAt": "2025-10-31T08:50:52.087Z"
   },
   {
-    "id": "quizsub_ZySewQGdf3v-",
-    "quizId": "quiz_2bTvCgwN1Fzy",
-    "studentId": "stu_sXj_LXe2YSNA",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q2",
-        "answer": 3
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": 0
-      },
-      {
-        "questionId": "q5",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q6",
-        "answer": 1
-      },
-      {
-        "questionId": "q7",
-        "answer": "Đáp án mẫu"
-      }
-    ],
-    "score": 24.099999999999998,
-    "submittedAt": "2025-10-24T19:32:17.230Z",
-    "gradedAt": "2025-10-31T03:43:42.143Z"
-  },
-  {
-    "id": "quizsub_nlrLdaBfocU3",
-    "quizId": "quiz_khS7XkFlIxC5",
-    "studentId": "stu_Wl1y8mOQ1kqt",
-    "answers": [
-      {
-        "questionId": "q1",
-        "answer": 0
-      },
-      {
-        "questionId": "q2",
-        "answer": "Đáp án mẫu"
-      },
-      {
-        "questionId": "q3",
-        "answer": "Wrong answer"
-      },
-      {
-        "questionId": "q4",
-        "answer": 1
-      },
-      {
-        "questionId": "q5",
-        "answer": 1
-      },
-      {
-        "questionId": "q6",
-        "answer": 0
-      },
-      {
-        "questionId": "q7",
-        "answer": 1
-      }
-    ],
-    "score": 66.4,
-    "submittedAt": "2025-10-30T20:49:41.103Z",
-    "gradedAt": "2025-10-29T10:11:10.031Z"
-  },
-  {
-    "id": "quizsub_5XGdFP-Tqo2G",
-    "quizId": "quiz_bxVutvsn3Vs3",
-    "studentId": "stu_PNaLShPnMd3z",
+    "id": "quizsub_c5AYenW3K6Rp",
+    "quizId": "quiz_bVjDsHuJNWvm",
+    "studentId": "stu_3RhgygZCqKGA",
     "answers": [
       {
         "questionId": "q1",
@@ -1163,15 +418,15 @@
       },
       {
         "questionId": "q3",
-        "answer": 0
+        "answer": "Wrong answer"
       },
       {
         "questionId": "q4",
-        "answer": 0
+        "answer": 1
       },
       {
         "questionId": "q5",
-        "answer": "Wrong answer"
+        "answer": "Đáp án mẫu"
       },
       {
         "questionId": "q6",
@@ -1179,47 +434,257 @@
       },
       {
         "questionId": "q7",
+        "answer": 0
+      },
+      {
+        "questionId": "q8",
+        "answer": 0
+      }
+    ],
+    "score": 96.5,
+    "submittedAt": "2025-10-28T10:19:23.616Z",
+    "gradedAt": "2025-11-06T05:49:42.719Z"
+  },
+  {
+    "id": "quizsub_UbXk1aHTx4tM",
+    "quizId": "quiz_bVjDsHuJNWvm",
+    "studentId": "stu_l7BbBkC4tz5Z",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 0
+      },
+      {
+        "questionId": "q2",
         "answer": 2
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q4",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q5",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q6",
+        "answer": 1
+      },
+      {
+        "questionId": "q7",
+        "answer": 0
+      },
+      {
+        "questionId": "q8",
+        "answer": 0
+      }
+    ],
+    "score": 54.5,
+    "submittedAt": "2025-10-25T01:05:28.352Z",
+    "gradedAt": "2025-10-28T23:56:48.550Z"
+  },
+  {
+    "id": "quizsub_cES5iiYtZTBe",
+    "quizId": "quiz_bVjDsHuJNWvm",
+    "studentId": "stu_xyHCrONyfX5i",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 0
+      },
+      {
+        "questionId": "q2",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q3",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q4",
+        "answer": 1
+      },
+      {
+        "questionId": "q5",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q6",
+        "answer": 1
+      },
+      {
+        "questionId": "q7",
+        "answer": 0
       },
       {
         "questionId": "q8",
         "answer": "Wrong answer"
       }
     ],
-    "score": 61.099999999999994,
-    "submittedAt": "2025-11-03T02:22:04.079Z",
-    "gradedAt": "2025-11-05T20:16:33.623Z"
+    "score": 79.5,
+    "submittedAt": "2025-10-25T05:02:45.879Z",
+    "gradedAt": "2025-10-30T18:45:40.071Z"
   },
   {
-    "id": "quizsub_MNplbxGUn7SN",
-    "quizId": "quiz_LXIQrtucppMm",
-    "studentId": "stu_PNaLShPnMd3z",
+    "id": "quizsub_QwCmM6t1r5if",
+    "quizId": "quiz_9uYJVGVCFt-u",
+    "studentId": "stu_l7BbBkC4tz5Z",
     "answers": [
       {
         "questionId": "q1",
+        "answer": 2
+      },
+      {
+        "questionId": "q2",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q3",
         "answer": 3
       },
       {
+        "questionId": "q4",
+        "answer": 0
+      },
+      {
+        "questionId": "q5",
+        "answer": 0
+      },
+      {
+        "questionId": "q6",
+        "answer": 0
+      },
+      {
+        "questionId": "q7",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q8",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 56,
+    "submittedAt": "2025-10-28T00:23:42.623Z",
+    "gradedAt": "2025-10-29T07:15:24.587Z"
+  },
+  {
+    "id": "quizsub_i4yrnm_72-3J",
+    "quizId": "quiz_9uYJVGVCFt-u",
+    "studentId": "stu_abUgMaX8_8pV",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 2
+      },
+      {
+        "questionId": "q2",
+        "answer": 3
+      },
+      {
+        "questionId": "q3",
+        "answer": 3
+      },
+      {
+        "questionId": "q4",
+        "answer": 0
+      },
+      {
+        "questionId": "q5",
+        "answer": 0
+      },
+      {
+        "questionId": "q6",
+        "answer": 0
+      },
+      {
+        "questionId": "q7",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q8",
+        "answer": "Wrong answer"
+      }
+    ],
+    "score": 56,
+    "submittedAt": "2025-10-28T14:15:01.392Z",
+    "gradedAt": "2025-10-31T00:05:00.006Z"
+  },
+  {
+    "id": "quizsub_1vDinmOUnbCo",
+    "quizId": "quiz_SbpypEPjQP1Y",
+    "studentId": "stu_3RhgygZCqKGA",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 1
+      },
+      {
         "questionId": "q2",
         "answer": "Wrong answer"
       },
       {
         "questionId": "q3",
-        "answer": "Đáp án mẫu"
+        "answer": 2
       },
       {
         "questionId": "q4",
         "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q5",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q6",
+        "answer": "Đáp án mẫu"
       }
     ],
-    "score": 39,
-    "submittedAt": "2025-11-01T06:54:35.512Z",
-    "gradedAt": "2025-11-03T09:18:30.158Z"
+    "score": 46.5,
+    "submittedAt": "2025-10-31T07:37:19.098Z",
+    "gradedAt": "2025-10-31T04:15:00.392Z"
   },
   {
-    "id": "quizsub_fnVFp2KrujpA",
-    "quizId": "quiz_W3ESRjG2gJMB",
-    "studentId": "stu_PNaLShPnMd3z",
+    "id": "quizsub_12Daz9PmJ8RS",
+    "quizId": "quiz_SbpypEPjQP1Y",
+    "studentId": "stu_KYLbumE4Eed3",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 1
+      },
+      {
+        "questionId": "q2",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q3",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q4",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q5",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q6",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 29.5,
+    "submittedAt": "2025-11-03T21:17:48.627Z",
+    "gradedAt": "2025-11-04T23:49:12.321Z"
+  },
+  {
+    "id": "quizsub_3bAWRakOKaj1",
+    "quizId": "quiz__ZPzolyNav8s",
+    "studentId": "stu_xyHCrONyfX5i",
     "answers": [
       {
         "questionId": "q1",
@@ -1227,7 +692,85 @@
       },
       {
         "questionId": "q2",
+        "answer": 0
+      },
+      {
+        "questionId": "q3",
         "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q4",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 31.9,
+    "submittedAt": "2025-11-05T23:59:51.539Z",
+    "gradedAt": "2025-10-27T09:00:22.247Z"
+  },
+  {
+    "id": "quizsub_KSt_vLQbv--S",
+    "quizId": "quiz_I9nA9FXPfNMo",
+    "studentId": "stu_ohSUYf-rFg4z",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 0
+      },
+      {
+        "questionId": "q2",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q3",
+        "answer": 1
+      },
+      {
+        "questionId": "q4",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 32.1,
+    "submittedAt": "2025-10-25T02:10:00.873Z",
+    "gradedAt": "2025-11-01T13:01:48.284Z"
+  },
+  {
+    "id": "quizsub_anW53GJD2pHz",
+    "quizId": "quiz_I9nA9FXPfNMo",
+    "studentId": "stu_RATGmPd-z7u8",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q2",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q3",
+        "answer": 1
+      },
+      {
+        "questionId": "q4",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 31.1,
+    "submittedAt": "2025-10-25T13:37:04.681Z",
+    "gradedAt": "2025-10-29T09:48:52.969Z"
+  },
+  {
+    "id": "quizsub_E2nREWuiHKP1",
+    "quizId": "quiz_I9nA9FXPfNMo",
+    "studentId": "stu_aMaHQ9JgW5pM",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": 0
+      },
+      {
+        "questionId": "q2",
+        "answer": "Wrong answer"
       },
       {
         "questionId": "q3",
@@ -1238,8 +781,42 @@
         "answer": "Đáp án mẫu"
       }
     ],
-    "score": 19.9,
-    "submittedAt": "2025-10-29T01:38:53.272Z",
-    "gradedAt": "2025-11-02T14:39:34.485Z"
+    "score": 20.1,
+    "submittedAt": "2025-10-27T07:42:10.730Z",
+    "gradedAt": "2025-10-31T19:16:17.120Z"
+  },
+  {
+    "id": "quizsub_3Y1uRBOM5moL",
+    "quizId": "quiz_aEQmqAQZ77d_",
+    "studentId": "stu_NaXGnAYGmzjy",
+    "answers": [
+      {
+        "questionId": "q1",
+        "answer": "Đáp án mẫu"
+      },
+      {
+        "questionId": "q2",
+        "answer": 2
+      },
+      {
+        "questionId": "q3",
+        "answer": 1
+      },
+      {
+        "questionId": "q4",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q5",
+        "answer": "Wrong answer"
+      },
+      {
+        "questionId": "q6",
+        "answer": "Đáp án mẫu"
+      }
+    ],
+    "score": 46,
+    "submittedAt": "2025-10-26T14:48:26.410Z",
+    "gradedAt": "2025-11-02T13:33:44.578Z"
   }
 ]

@@ -1,861 +1,868 @@
 [
   {
-    "id": "stu_TTGT1sgSQ_bk",
-    "email": "2173163@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Phan Mai Anh",
-    "hcmutId": "2537560",
+    "id": "stu_p8zzUZM5nqnx",
+    "email": "2365732@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Phan An Hoàng",
+    "hcmutId": "2500303",
     "role": "student",
-    "major": "Computer Science",
+    "major": "Mechanical Engineering",
     "year": 2,
     "interests": [
-      "Đại số tuyến tính",
-      "Cơ học kỹ thuật",
-      "Cơ sở dữ liệu"
+      "Hóa học",
+      "Xác suất thống kê",
+      "Điện tử"
+    ],
+    "preferredSubjects": [
+      "Toán cao cấp",
+      "Hệ điều hành"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan An Hoàng",
+    "phone": "0922809745",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
+  },
+  {
+    "id": "stu_CL7iuJCaQnMJ",
+    "email": "2399968@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Trần Cường Hương",
+    "hcmutId": "2551567",
+    "role": "student",
+    "major": "Computer Science",
+    "year": 1,
+    "interests": [
+      "Lập trình C/C++",
+      "Hệ điều hành",
+      "Lập trình Python",
+      "Cơ sở dữ liệu",
+      "Toán cao cấp"
     ],
     "preferredSubjects": [
       "Lập trình C/C++",
-      "Tiếng Anh",
-      "Điện tử"
+      "Đại số tuyến tính"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Mai Anh",
-    "phone": "0922132450",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần Cường Hương",
+    "phone": "0983472420",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
   },
   {
-    "id": "stu_Wl1y8mOQ1kqt",
-    "email": "2328139@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Phan Khánh Lan",
-    "hcmutId": "2541808",
+    "id": "stu_3RhgygZCqKGA",
+    "email": "2244328@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Trần Bảo Thị",
+    "hcmutId": "2566625",
     "role": "student",
-    "major": "Electrical Engineering",
+    "major": "Computer Science",
     "year": 4,
     "interests": [
-      "Cơ học kỹ thuật",
       "Toán cao cấp",
-      "Điện tử",
-      "Cấu trúc dữ liệu"
-    ],
-    "preferredSubjects": [
-      "Cơ sở dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Khánh Lan",
-    "phone": "0921308733",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
-  },
-  {
-    "id": "stu_F2bo6J8SkuGl",
-    "email": "2050566@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Phạm Nam Hoàng",
-    "hcmutId": "2550771",
-    "role": "student",
-    "major": "Mechanical Engineering",
-    "year": 3,
-    "interests": [
-      "Điện tử",
-      "Cơ học kỹ thuật",
-      "Giải tích"
-    ],
-    "preferredSubjects": [
-      "Cơ học kỹ thuật",
-      "Cơ sở dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Nam Hoàng",
-    "phone": "0941963084",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
-  },
-  {
-    "id": "stu_l14kv7jRaJOZ",
-    "email": "2383893@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Phạm Bảo Anh",
-    "hcmutId": "2518992",
-    "role": "student",
-    "major": "Civil Engineering",
-    "year": 2,
-    "interests": [
       "Đại số tuyến tính",
-      "Vật lý đại cương"
-    ],
-    "preferredSubjects": [
-      "Cơ sở dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Bảo Anh",
-    "phone": "0926102940",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
-  },
-  {
-    "id": "stu_z8ink_o6eMFO",
-    "email": "2053577@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Vũ Khánh Văn",
-    "hcmutId": "2577448",
-    "role": "student",
-    "major": "Civil Engineering",
-    "year": 2,
-    "interests": [
       "Cấu trúc dữ liệu",
-      "Tiếng Anh",
-      "Lập trình Python",
+      "Vật lý đại cương",
       "Xác suất thống kê"
     ],
     "preferredSubjects": [
-      "Tiếng Anh",
-      "Cơ học kỹ thuật",
+      "Lập trình Python",
+      "Đại số tuyến tính",
       "Giải tích"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Vũ Khánh Văn",
-    "phone": "0982232937",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần Bảo Thị",
+    "phone": "0971340852",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
   },
   {
-    "id": "stu_RPiwaZ6eV0pi",
-    "email": "2194088@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Nguyễn Hà Hương",
-    "hcmutId": "2588670",
-    "role": "student",
-    "major": "Mechanical Engineering",
-    "year": 2,
-    "interests": [
-      "Vật lý đại cương",
-      "Điện tử"
-    ],
-    "preferredSubjects": [
-      "Toán cao cấp",
-      "Lập trình Python",
-      "Vật lý đại cương"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Nguyễn Hà Hương",
-    "phone": "0974206678",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
-  },
-  {
-    "id": "stu_DQBwPWq6sQMI",
-    "email": "2350767@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Lê Khánh Lan",
-    "hcmutId": "2589795",
+    "id": "stu_ohSUYf-rFg4z",
+    "email": "2216866@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Bùi An Thị",
+    "hcmutId": "2515797",
     "role": "student",
     "major": "Civil Engineering",
-    "year": 1,
-    "interests": [
-      "Toán cao cấp",
-      "Lập trình Python",
-      "Cấu trúc dữ liệu",
-      "Vật lý đại cương"
-    ],
-    "preferredSubjects": [
-      "Đại số tuyến tính",
-      "Toán cao cấp"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê Khánh Lan",
-    "phone": "0922877551",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
-  },
-  {
-    "id": "stu_BBEen0t2Ua_j",
-    "email": "2169727@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Bùi Nam Hữu",
-    "hcmutId": "2580759",
-    "role": "student",
-    "major": "Mechanical Engineering",
-    "year": 4,
-    "interests": [
-      "Toán cao cấp",
-      "Xác suất thống kê",
-      "Đại số tuyến tính",
-      "Mạng máy tính",
-      "Cơ sở dữ liệu"
-    ],
-    "preferredSubjects": [
-      "Lập trình Python"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Nam Hữu",
-    "phone": "0939271292",
-    "createdAt": "2025-11-06T01:45:56.339Z",
-    "updatedAt": "2025-11-06T01:45:56.339Z"
-  },
-  {
-    "id": "stu_9u9dbyGKfJLB",
-    "email": "2291108@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Đặng Khánh Phương",
-    "hcmutId": "2570612",
-    "role": "student",
-    "major": "Electrical Engineering",
-    "year": 4,
-    "interests": [
-      "Xác suất thống kê",
-      "Đại số tuyến tính",
-      "Tiếng Anh",
-      "Toán cao cấp"
-    ],
-    "preferredSubjects": [
-      "Lập trình Python",
-      "Vật lý đại cương",
-      "Đại số tuyến tính"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đặng Khánh Phương",
-    "phone": "0951353734",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "stu_PNaLShPnMd3z",
-    "email": "2180081@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Bùi An Thị",
-    "hcmutId": "2543871",
-    "role": "student",
-    "major": "Computer Science",
     "year": 2,
     "interests": [
-      "Điện tử",
-      "Xác suất thống kê",
-      "Vật lý đại cương"
-    ],
-    "preferredSubjects": [
-      "Hệ điều hành",
-      "Điện tử"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi An Thị",
-    "phone": "0963847124",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "stu_YC3zVYfIWltB",
-    "email": "2296046@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Đỗ Nam Văn",
-    "hcmutId": "2538523",
-    "role": "student",
-    "major": "Computer Science",
-    "year": 3,
-    "interests": [
-      "Toán cao cấp",
-      "Vật lý đại cương",
-      "Hóa học",
-      "Tiếng Anh"
-    ],
-    "preferredSubjects": [
-      "Vật lý đại cương",
-      "Điện tử",
-      "Toán cao cấp"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ Nam Văn",
-    "phone": "0964820762",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "stu_kDhMwGlp3iNa",
-    "email": "2148895@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Phạm Bảo Hữu",
-    "hcmutId": "2510233",
-    "role": "student",
-    "major": "Computer Science",
-    "year": 1,
-    "interests": [
-      "Điện tử",
+      "Cơ học kỹ thuật",
       "Cấu trúc dữ liệu",
-      "Mạng máy tính",
-      "Giải tích"
-    ],
-    "preferredSubjects": [
-      "Toán cao cấp"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Bảo Hữu",
-    "phone": "0958210516",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "stu_7a3mf2LosPg5",
-    "email": "2188681@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Trần Mai Tuấn",
-    "hcmutId": "2530917",
-    "role": "student",
-    "major": "Mechanical Engineering",
-    "year": 3,
-    "interests": [
-      "Điện tử",
+      "Đại số tuyến tính",
       "Lập trình C/C++",
-      "Cơ sở dữ liệu",
       "Hóa học"
     ],
     "preferredSubjects": [
-      "Điện tử"
+      "Cơ học kỹ thuật",
+      "Lập trình C/C++"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần Mai Tuấn",
-    "phone": "0963183119",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi An Thị",
+    "phone": "0998248072",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
   },
   {
-    "id": "stu_aIw70AyXLZ8R",
-    "email": "2059726@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Phạm Cường Tuấn",
-    "hcmutId": "2575217",
+    "id": "stu_Dkzw5MfS0lmg",
+    "email": "2193637@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Bùi Dũng Tuấn",
+    "hcmutId": "2595572",
     "role": "student",
     "major": "Electrical Engineering",
     "year": 4,
     "interests": [
+      "Cơ học kỹ thuật",
       "Đại số tuyến tính",
-      "Lập trình C/C++",
-      "Cơ học kỹ thuật"
+      "Lập trình Python"
     ],
     "preferredSubjects": [
-      "Cơ sở dữ liệu"
+      "Cấu trúc dữ liệu"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Cường Tuấn",
-    "phone": "0984373089",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Dũng Tuấn",
+    "phone": "0976177775",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
   },
   {
-    "id": "stu_sXj_LXe2YSNA",
-    "email": "2281161@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Trần Nam Hữu",
-    "hcmutId": "2501322",
+    "id": "stu_l7BbBkC4tz5Z",
+    "email": "2183660@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Nguyễn Linh Văn",
+    "hcmutId": "2583427",
     "role": "student",
-    "major": "Computer Science",
+    "major": "Civil Engineering",
+    "year": 4,
+    "interests": [
+      "Cấu trúc dữ liệu",
+      "Vật lý đại cương",
+      "Điện tử",
+      "Toán cao cấp",
+      "Tiếng Anh"
+    ],
+    "preferredSubjects": [
+      "Điện tử",
+      "Toán cao cấp",
+      "Đại số tuyến tính"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Nguyễn Linh Văn",
+    "phone": "0988269755",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
+  },
+  {
+    "id": "stu_49hOz0co3idT",
+    "email": "2131013@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Đỗ Nam Hữu",
+    "hcmutId": "2503633",
+    "role": "student",
+    "major": "Electrical Engineering",
+    "year": 4,
+    "interests": [
+      "Cơ sở dữ liệu",
+      "Cấu trúc dữ liệu"
+    ],
+    "preferredSubjects": [
+      "Hệ điều hành"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ Nam Hữu",
+    "phone": "0914453390",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
+  },
+  {
+    "id": "stu_xyHCrONyfX5i",
+    "email": "2135263@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Đỗ An Phương",
+    "hcmutId": "2507308",
+    "role": "student",
+    "major": "Electrical Engineering",
+    "year": 4,
+    "interests": [
+      "Toán cao cấp",
+      "Đại số tuyến tính"
+    ],
+    "preferredSubjects": [
+      "Đại số tuyến tính",
+      "Tiếng Anh",
+      "Cơ học kỹ thuật"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ An Phương",
+    "phone": "0914275767",
+    "createdAt": "2025-11-06T07:51:28.808Z",
+    "updatedAt": "2025-11-06T07:51:28.808Z"
+  },
+  {
+    "id": "stu_RATGmPd-z7u8",
+    "email": "2191235@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Đỗ Mai Tuấn",
+    "hcmutId": "2553550",
+    "role": "student",
+    "major": "Civil Engineering",
+    "year": 1,
+    "interests": [
+      "Giải tích",
+      "Đại số tuyến tính",
+      "Toán cao cấp",
+      "Lập trình Python",
+      "Lập trình C/C++"
+    ],
+    "preferredSubjects": [
+      "Lập trình C/C++"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ Mai Tuấn",
+    "phone": "0976204919",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_X9P40VHl5eYS",
+    "email": "2149875@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Vũ An Minh",
+    "hcmutId": "2512146",
+    "role": "student",
+    "major": "Mechanical Engineering",
+    "year": 1,
+    "interests": [
+      "Toán cao cấp",
+      "Cơ học kỹ thuật",
+      "Điện tử",
+      "Hệ điều hành"
+    ],
+    "preferredSubjects": [
+      "Đại số tuyến tính"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Vũ An Minh",
+    "phone": "0935455680",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_KYLbumE4Eed3",
+    "email": "2210048@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Phạm Hà Lan",
+    "hcmutId": "2595455",
+    "role": "student",
+    "major": "Civil Engineering",
+    "year": 4,
+    "interests": [
+      "Giải tích",
+      "Toán cao cấp"
+    ],
+    "preferredSubjects": [
+      "Lập trình Python",
+      "Cấu trúc dữ liệu",
+      "Hệ điều hành"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Hà Lan",
+    "phone": "0947347342",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_NaXGnAYGmzjy",
+    "email": "2216125@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Lê An Lan",
+    "hcmutId": "2531925",
+    "role": "student",
+    "major": "Civil Engineering",
+    "year": 4,
+    "interests": [
+      "Cơ học kỹ thuật",
+      "Hệ điều hành",
+      "Lập trình Python"
+    ],
+    "preferredSubjects": [
+      "Cơ học kỹ thuật",
+      "Cơ sở dữ liệu",
+      "Toán cao cấp"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê An Lan",
+    "phone": "0994284285",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_hA8LNUuHA__-",
+    "email": "2331174@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Phan Nam Anh",
+    "hcmutId": "2578830",
+    "role": "student",
+    "major": "Civil Engineering",
     "year": 2,
     "interests": [
-      "Đại số tuyến tính",
+      "Mạng máy tính",
+      "Tiếng Anh",
+      "Giải tích",
+      "Cơ sở dữ liệu",
+      "Lập trình C/C++"
+    ],
+    "preferredSubjects": [
+      "Cấu trúc dữ liệu",
+      "Hóa học"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Nam Anh",
+    "phone": "0996930963",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_lRx6lob9sDDG",
+    "email": "2118136@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Phan Nam Thị",
+    "hcmutId": "2531650",
+    "role": "student",
+    "major": "Civil Engineering",
+    "year": 4,
+    "interests": [
+      "Giải tích",
       "Hóa học",
+      "Vật lý đại cương"
+    ],
+    "preferredSubjects": [
+      "Hệ điều hành"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Nam Thị",
+    "phone": "0941229682",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_aMaHQ9JgW5pM",
+    "email": "2265780@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Vũ Giang Minh",
+    "hcmutId": "2537509",
+    "role": "student",
+    "major": "Electrical Engineering",
+    "year": 2,
+    "interests": [
+      "Mạng máy tính",
+      "Đại số tuyến tính",
+      "Vật lý đại cương",
+      "Toán cao cấp"
+    ],
+    "preferredSubjects": [
+      "Toán cao cấp",
+      "Vật lý đại cương",
+      "Lập trình C/C++"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Vũ Giang Minh",
+    "phone": "0997049943",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_gWb6m9RpC3XX",
+    "email": "2099003@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Phan Mai Tuấn",
+    "hcmutId": "2508781",
+    "role": "student",
+    "major": "Mechanical Engineering",
+    "year": 4,
+    "interests": [
+      "Hệ điều hành",
+      "Giải tích",
+      "Toán cao cấp"
+    ],
+    "preferredSubjects": [
+      "Vật lý đại cương",
+      "Lập trình Python",
+      "Lập trình C/C++"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Mai Tuấn",
+    "phone": "0926922400",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_jJF_BDn9CPkw",
+    "email": "2277897@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Bùi Linh Hoàng",
+    "hcmutId": "2597818",
+    "role": "student",
+    "major": "Mechanical Engineering",
+    "year": 1,
+    "interests": [
       "Lập trình C/C++",
+      "Điện tử",
+      "Hóa học",
+      "Cơ sở dữ liệu",
+      "Xác suất thống kê"
+    ],
+    "preferredSubjects": [
+      "Toán cao cấp",
+      "Mạng máy tính"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Linh Hoàng",
+    "phone": "0911535318",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "stu_abUgMaX8_8pV",
+    "email": "2341699@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Lê Mai Minh",
+    "hcmutId": "2567211",
+    "role": "student",
+    "major": "Civil Engineering",
+    "year": 1,
+    "interests": [
+      "Đại số tuyến tính",
+      "Giải tích",
       "Cơ sở dữ liệu",
       "Mạng máy tính"
     ],
     "preferredSubjects": [
-      "Lập trình Python"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần Nam Hữu",
-    "phone": "0982555877",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "stu_6jvhTD5YtFAc",
-    "email": "2186864@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Đỗ Hà Minh",
-    "hcmutId": "2570895",
-    "role": "student",
-    "major": "Civil Engineering",
-    "year": 2,
-    "interests": [
-      "Toán cao cấp",
-      "Lập trình Python",
-      "Hệ điều hành",
-      "Mạng máy tính",
-      "Cơ học kỹ thuật"
-    ],
-    "preferredSubjects": [
-      "Mạng máy tính"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ Hà Minh",
-    "phone": "0941904574",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "stu_q4lEHtx4M2xT",
-    "email": "2281083@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Nguyễn Mai Anh",
-    "hcmutId": "2507747",
-    "role": "student",
-    "major": "Civil Engineering",
-    "year": 3,
-    "interests": [
-      "Lập trình Python",
-      "Lập trình C/C++",
       "Đại số tuyến tính",
-      "Mạng máy tính"
+      "Cơ học kỹ thuật",
+      "Điện tử"
     ],
-    "preferredSubjects": [
-      "Cơ sở dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Nguyễn Mai Anh",
-    "phone": "0913638868",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê Mai Minh",
+    "phone": "0926812477",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
   },
   {
-    "id": "stu_76aKTGf_b7S_",
-    "email": "2088707@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Bùi Cường Thị",
-    "hcmutId": "2509654",
-    "role": "student",
-    "major": "Electrical Engineering",
-    "year": 1,
-    "interests": [
-      "Toán cao cấp",
-      "Vật lý đại cương"
-    ],
-    "preferredSubjects": [
-      "Hệ điều hành",
-      "Đại số tuyến tính",
-      "Cấu trúc dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Cường Thị",
-    "phone": "0930955380",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "stu_OwFI5hTQ4gPR",
-    "email": "2152102@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Lê Mai Phương",
-    "hcmutId": "2590990",
+    "id": "stu_-47UcQuEG1Aq",
+    "email": "2021281@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Hoàng Nam Thị",
+    "hcmutId": "2583157",
     "role": "student",
     "major": "Electrical Engineering",
     "year": 4,
     "interests": [
-      "Hóa học",
+      "Toán cao cấp",
       "Vật lý đại cương",
-      "Điện tử",
       "Xác suất thống kê"
     ],
     "preferredSubjects": [
-      "Cơ sở dữ liệu"
+      "Hóa học",
+      "Giải tích"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê Mai Phương",
-    "phone": "0987056069",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Hoàng Nam Thị",
+    "phone": "0941244368",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
   },
   {
-    "id": "stu_jxqJ2t-ga4Ao",
-    "email": "2127435@hcmut.edu.vn",
-    "password": "$2b$10$Nkcc9IC8BrBRsQlSn8kBiOw0FPKUyyzXi5hcmSHo3nIMvzBdD8Bd.",
-    "name": "Phạm Dũng Minh",
-    "hcmutId": "2582995",
+    "id": "stu_1broUDQqc8WB",
+    "email": "2061887@hcmut.edu.vn",
+    "password": "$2b$10$Yh.oZuzY7sI8bZ7rTzwAyOAHGKX3v6qMPO9kx.NmHal2VmodY87la",
+    "name": "Vũ Mai Hương",
+    "hcmutId": "2599552",
     "role": "student",
-    "major": "Mechanical Engineering",
-    "year": 3,
+    "major": "Electrical Engineering",
+    "year": 2,
     "interests": [
-      "Tiếng Anh",
+      "Lập trình Python",
+      "Cấu trúc dữ liệu"
+    ],
+    "preferredSubjects": [
       "Toán cao cấp",
       "Vật lý đại cương",
       "Hệ điều hành"
     ],
-    "preferredSubjects": [
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Vũ Mai Hương",
+    "phone": "0939755428",
+    "createdAt": "2025-11-06T07:51:28.809Z",
+    "updatedAt": "2025-11-06T07:51:28.809Z"
+  },
+  {
+    "id": "tut_QAuiJWjIUx57",
+    "email": "pham.linh.huu@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Phạm Linh Hữu",
+    "hcmutId": "2565845",
+    "role": "tutor",
+    "subjects": [
+      "Đại số tuyến tính",
+      "Tiếng Anh",
+      "Điện tử",
+      "Toán cao cấp"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 9 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.7,
+    "totalSessions": 181,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Mạng máy tính"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Linh Hữu",
+    "phone": "0932429535",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_NrIX8Wa7MS0G",
+    "email": "hoang.nam.hoang@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Hoàng Nam Hoàng",
+    "hcmutId": "2501954",
+    "role": "tutor",
+    "subjects": [
+      "Đại số tuyến tính",
+      "Vật lý đại cương",
+      "Lập trình Python",
+      "Mạng máy tính"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 6 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.6,
+    "totalSessions": 100,
+    "availability": [],
+    "verified": false,
+    "credentials": [
+      "Thạc sĩ Lập trình Python"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Hoàng Nam Hoàng",
+    "phone": "0910371822",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_ZevJpYidjiUm",
+    "email": "nguyen.an.anh@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Nguyễn An Anh",
+    "hcmutId": "2580749",
+    "role": "tutor",
+    "subjects": [
+      "Mạng máy tính",
+      "Tiếng Anh",
+      "Toán cao cấp"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 5 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 3.6,
+    "totalSessions": 21,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Tiếng Anh"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Nguyễn An Anh",
+    "phone": "0988100450",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_ui0LfAc9h475",
+    "email": "pham.dung.huu@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Phạm Dũng Hữu",
+    "hcmutId": "2528768",
+    "role": "tutor",
+    "subjects": [
       "Lập trình C/C++",
       "Hóa học",
-      "Cơ học kỹ thuật"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Dũng Minh",
-    "phone": "0997228128",
-    "createdAt": "2025-11-06T01:45:56.340Z",
-    "updatedAt": "2025-11-06T01:45:56.340Z"
-  },
-  {
-    "id": "tut_SOyzJpldGCO6",
-    "email": "bui.bao.lan@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Bùi Bảo Lan",
-    "hcmutId": "2560011",
-    "role": "tutor",
-    "subjects": [
-      "Cơ học kỹ thuật",
       "Giải tích",
-      "Cơ sở dữ liệu"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 2 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.2,
-    "totalSessions": 140,
-    "availability": [],
-    "verified": true,
-    "credentials": [
-      "Thạc sĩ Đại số tuyến tính"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Bảo Lan",
-    "phone": "0916718462",
-    "createdAt": "2025-11-06T01:45:56.460Z",
-    "updatedAt": "2025-11-06T01:45:56.460Z"
-  },
-  {
-    "id": "tut_oG9NVXrtLgMn",
-    "email": "dang.dung.huong@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Đặng Dũng Hương",
-    "hcmutId": "2547421",
-    "role": "tutor",
-    "subjects": [
       "Cấu trúc dữ liệu",
-      "Cơ học kỹ thuật",
-      "Toán cao cấp",
-      "Điện tử"
+      "Vật lý đại cương"
     ],
     "bio": "Giảng viên có kinh nghiệm 4 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.5,
-    "totalSessions": 158,
-    "availability": [],
-    "verified": true,
-    "credentials": [
-      "Thạc sĩ Cấu trúc dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đặng Dũng Hương",
-    "phone": "0918969195",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_R3V_vbvdhVGW",
-    "email": "phan.cuong.tuan@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Phan Cường Tuấn",
-    "hcmutId": "2567536",
-    "role": "tutor",
-    "subjects": [
-      "Giải tích",
-      "Toán cao cấp",
-      "Cơ học kỹ thuật"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 2 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4,
-    "totalSessions": 28,
-    "availability": [],
-    "verified": true,
-    "credentials": [
-      "Thạc sĩ Hóa học"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Cường Tuấn",
-    "phone": "0923486402",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_IIcDx-qwF11O",
-    "email": "hoang.linh.huong@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Hoàng Linh Hương",
-    "hcmutId": "2555120",
-    "role": "tutor",
-    "subjects": [
-      "Cấu trúc dữ liệu",
-      "Giải tích",
-      "Đại số tuyến tính",
-      "Lập trình Python",
-      "Lập trình C/C++"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 2 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.8,
-    "totalSessions": 38,
+    "rating": 3.5,
+    "totalSessions": 147,
     "availability": [],
     "verified": true,
     "credentials": [
       "Thạc sĩ Giải tích"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Hoàng Linh Hương",
-    "phone": "0969711988",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Dũng Hữu",
+    "phone": "0979246914",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
   },
   {
-    "id": "tut_cTSqgQ51xCh7",
-    "email": "le.an.huu@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Lê An Hữu",
-    "hcmutId": "2511832",
+    "id": "tut_mQjJx63STWcF",
+    "email": "le.linh.tuan@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Lê Linh Tuấn",
+    "hcmutId": "2511138",
     "role": "tutor",
     "subjects": [
-      "Cấu trúc dữ liệu",
-      "Lập trình C/C++",
-      "Xác suất thống kê"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 8 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 3.9,
-    "totalSessions": 79,
-    "availability": [],
-    "verified": true,
-    "credentials": [
-      "Thạc sĩ Lập trình C/C++"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê An Hữu",
-    "phone": "0976738975",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_yJm3ljg_2ckR",
-    "email": "bui.ha.huong@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Bùi Hà Hương",
-    "hcmutId": "2582757",
-    "role": "tutor",
-    "subjects": [
-      "Tiếng Anh",
       "Đại số tuyến tính",
-      "Cấu trúc dữ liệu",
-      "Mạng máy tính"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 5 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 3.6,
-    "totalSessions": 32,
-    "availability": [],
-    "verified": false,
-    "credentials": [
-      "Thạc sĩ Mạng máy tính"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Hà Hương",
-    "phone": "0930316810",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_rmNAwCfJrAnZ",
-    "email": "dang.bao.thi@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Đặng Bảo Thị",
-    "hcmutId": "2576681",
-    "role": "tutor",
-    "subjects": [
-      "Lập trình Python",
-      "Hệ điều hành",
-      "Điện tử"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 9 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.2,
-    "totalSessions": 68,
-    "availability": [],
-    "verified": true,
-    "credentials": [
-      "Thạc sĩ Cơ sở dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đặng Bảo Thị",
-    "phone": "0990753244",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_w5ychAW78kKH",
-    "email": "le.bao.tuan@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Lê Bảo Tuấn",
-    "hcmutId": "2581406",
-    "role": "tutor",
-    "subjects": [
-      "Cấu trúc dữ liệu",
-      "Lập trình Python"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 4 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 3.5,
-    "totalSessions": 170,
-    "availability": [],
-    "verified": true,
-    "credentials": [
-      "Thạc sĩ Hệ điều hành"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê Bảo Tuấn",
-    "phone": "0967148776",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_icJrHBi4Rmlf",
-    "email": "tran.an.huong@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Trần An Hương",
-    "hcmutId": "2587751",
-    "role": "tutor",
-    "subjects": [
-      "Cấu trúc dữ liệu",
       "Lập trình C/C++",
-      "Xác suất thống kê"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 4 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4,
-    "totalSessions": 95,
-    "availability": [],
-    "verified": false,
-    "credentials": [
-      "Thạc sĩ Đại số tuyến tính"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần An Hương",
-    "phone": "0967756841",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_8k4AoQJHlueK",
-    "email": "pham.an.hoang@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Phạm An Hoàng",
-    "hcmutId": "2571385",
-    "role": "tutor",
-    "subjects": [
-      "Cấu trúc dữ liệu",
-      "Giải tích"
+      "Tiếng Anh"
     ],
     "bio": "Giảng viên có kinh nghiệm 10 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.2,
-    "totalSessions": 122,
+    "rating": 5,
+    "totalSessions": 176,
     "availability": [],
     "verified": false,
     "credentials": [
-      "Thạc sĩ Lập trình C/C++"
+      "Thạc sĩ Tiếng Anh"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm An Hoàng",
-    "phone": "0937429151",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê Linh Tuấn",
+    "phone": "0931780993",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
   },
   {
-    "id": "tut_qHcsLRTJtbiT",
-    "email": "tran.nam.hoang@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Trần Nam Hoàng",
-    "hcmutId": "2513440",
-    "role": "tutor",
-    "subjects": [
-      "Xác suất thống kê",
-      "Lập trình C/C++",
-      "Tiếng Anh",
-      "Mạng máy tính",
-      "Hóa học"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 6 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.1,
-    "totalSessions": 72,
-    "availability": [],
-    "verified": false,
-    "credentials": [
-      "Thạc sĩ Mạng máy tính"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần Nam Hoàng",
-    "phone": "0993075481",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_KDd_eGBQepje",
-    "email": "dang.cuong.phuong@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Đặng Cường Phương",
-    "hcmutId": "2566036",
-    "role": "tutor",
-    "subjects": [
-      "Cơ sở dữ liệu",
-      "Cơ học kỹ thuật",
-      "Lập trình C/C++",
-      "Tiếng Anh",
-      "Hóa học"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 4 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.2,
-    "totalSessions": 129,
-    "availability": [],
-    "verified": true,
-    "credentials": [
-      "Thạc sĩ Cơ sở dữ liệu"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đặng Cường Phương",
-    "phone": "0936993914",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_Rr4zr998-VZT",
-    "email": "pham.bao.thi@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Phạm Bảo Thị",
-    "hcmutId": "2538352",
-    "role": "tutor",
-    "subjects": [
-      "Tiếng Anh",
-      "Điện tử"
-    ],
-    "bio": "Giảng viên có kinh nghiệm 4 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 3.8,
-    "totalSessions": 129,
-    "availability": [],
-    "verified": false,
-    "credentials": [
-      "Thạc sĩ Vật lý đại cương"
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Bảo Thị",
-    "phone": "0928056601",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
-  },
-  {
-    "id": "tut_mwFLg7bNm4J4",
-    "email": "tran.ha.anh@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Trần Hà Anh",
-    "hcmutId": "2548998",
+    "id": "tut_OI2WdgyNqJEJ",
+    "email": "pham.dung.huu@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Phạm Dũng Hữu",
+    "hcmutId": "2508337",
     "role": "tutor",
     "subjects": [
       "Toán cao cấp",
-      "Vật lý đại cương"
+      "Giải tích"
     ],
-    "bio": "Giảng viên có kinh nghiệm 3 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 5,
-    "totalSessions": 166,
+    "bio": "Giảng viên có kinh nghiệm 5 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.3,
+    "totalSessions": 137,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Vật lý đại cương"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Dũng Hữu",
+    "phone": "0974145917",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_TNes434P5AEZ",
+    "email": "pham.an.phuong@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Phạm An Phương",
+    "hcmutId": "2529677",
+    "role": "tutor",
+    "subjects": [
+      "Hệ điều hành",
+      "Lập trình C/C++",
+      "Toán cao cấp",
+      "Giải tích"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 9 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.6,
+    "totalSessions": 102,
     "availability": [],
     "verified": true,
     "credentials": [
       "Thạc sĩ Điện tử"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần Hà Anh",
-    "phone": "0987285416",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm An Phương",
+    "phone": "0912754919",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
   },
   {
-    "id": "tut_fSQpeAyIx5pd",
-    "email": "le.cuong.van@hcmut.edu.vn",
-    "password": "$2b$10$ID9g9Xmek4yxaVa5pGfR3.vlwI179Z4kY0pFy0.jraaXDVUQ7ugC2",
-    "name": "Lê Cường Văn",
-    "hcmutId": "2559091",
+    "id": "tut_SAZDCdEtp4d5",
+    "email": "do.linh.lan@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Đỗ Linh Lan",
+    "hcmutId": "2589987",
     "role": "tutor",
     "subjects": [
-      "Giải tích",
-      "Hệ điều hành",
+      "Toán cao cấp",
       "Cơ sở dữ liệu",
-      "Cơ học kỹ thuật",
+      "Mạng máy tính",
+      "Vật lý đại cương"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 6 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.4,
+    "totalSessions": 51,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Hệ điều hành"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ Linh Lan",
+    "phone": "0916431242",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_x0-B_jiDzDIF",
+    "email": "do.giang.hoang@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Đỗ Giang Hoàng",
+    "hcmutId": "2566811",
+    "role": "tutor",
+    "subjects": [
+      "Đại số tuyến tính",
+      "Toán cao cấp",
+      "Cơ sở dữ liệu"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 6 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 3.6,
+    "totalSessions": 133,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Tiếng Anh"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ Giang Hoàng",
+    "phone": "0954129657",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_ilaeZEbNdND-",
+    "email": "le.an.thi@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Lê An Thị",
+    "hcmutId": "2527224",
+    "role": "tutor",
+    "subjects": [
+      "Cơ sở dữ liệu",
+      "Hệ điều hành"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 6 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.5,
+    "totalSessions": 47,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Giải tích"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê An Thị",
+    "phone": "0953908383",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_rFEAVqof-NxA",
+    "email": "le.linh.phuong@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Lê Linh Phương",
+    "hcmutId": "2516884",
+    "role": "tutor",
+    "subjects": [
+      "Mạng máy tính",
+      "Tiếng Anh",
       "Cấu trúc dữ liệu"
     ],
-    "bio": "Giảng viên có kinh nghiệm 5 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
-    "rating": 4.4,
-    "totalSessions": 70,
+    "bio": "Giảng viên có kinh nghiệm 4 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 3.8,
+    "totalSessions": 27,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Cấu trúc dữ liệu"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê Linh Phương",
+    "phone": "0936354081",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_FwDE7NJzIH_j",
+    "email": "vu.dung.huong@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Vũ Dũng Hương",
+    "hcmutId": "2504396",
+    "role": "tutor",
+    "subjects": [
+      "Vật lý đại cương",
+      "Lập trình Python",
+      "Giải tích",
+      "Cấu trúc dữ liệu"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 4 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.7,
+    "totalSessions": 59,
     "availability": [],
     "verified": false,
     "credentials": [
-      "Thạc sĩ Mạng máy tính"
+      "Thạc sĩ Hóa học"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lê Cường Văn",
-    "phone": "0918041892",
-    "createdAt": "2025-11-06T01:45:56.461Z",
-    "updatedAt": "2025-11-06T01:45:56.461Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Vũ Dũng Hương",
+    "phone": "0987603902",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
   },
   {
-    "id": "mgmt_wT17JPiYYzFm",
+    "id": "tut_88EyEpAvElqJ",
+    "email": "hoang.giang.huu@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Hoàng Giang Hữu",
+    "hcmutId": "2582805",
+    "role": "tutor",
+    "subjects": [
+      "Đại số tuyến tính",
+      "Vật lý đại cương",
+      "Xác suất thống kê",
+      "Hệ điều hành"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 3 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.4,
+    "totalSessions": 120,
+    "availability": [],
+    "verified": false,
+    "credentials": [
+      "Thạc sĩ Hóa học"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Hoàng Giang Hữu",
+    "phone": "0961042862",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_oBHJXQvmjPPG",
+    "email": "pham.khanh.huong@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Phạm Khánh Hương",
+    "hcmutId": "2511106",
+    "role": "tutor",
+    "subjects": [
+      "Cơ học kỹ thuật",
+      "Giải tích",
+      "Hóa học",
+      "Cấu trúc dữ liệu"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 10 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 4.5,
+    "totalSessions": 40,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Điện tử"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phạm Khánh Hương",
+    "phone": "0943943925",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "tut_0ri_8fMUaMuu",
+    "email": "phan.nam.phuong@hcmut.edu.vn",
+    "password": "$2b$10$AZ8XS21IUBu5HGjVed7AaOXKKyJj0HG45jKLzVkig5hog6VJbJAQ6",
+    "name": "Phan Nam Phương",
+    "hcmutId": "2589912",
+    "role": "tutor",
+    "subjects": [
+      "Hệ điều hành",
+      "Mạng máy tính"
+    ],
+    "bio": "Giảng viên có kinh nghiệm 5 năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.",
+    "rating": 3.7,
+    "totalSessions": 195,
+    "availability": [],
+    "verified": true,
+    "credentials": [
+      "Thạc sĩ Giải tích"
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Nam Phương",
+    "phone": "0930729433",
+    "createdAt": "2025-11-06T07:51:28.993Z",
+    "updatedAt": "2025-11-06T07:51:28.993Z"
+  },
+  {
+    "id": "mgmt_-MvZFLjvlN7m",
     "email": "admin.1@hcmut.edu.vn",
-    "password": "$2b$10$hdUudwBkKewsOHaHHtEYQ.vnjM7D.TjY9nS49ytwU0p.2ABlXrECS",
-    "name": "Vũ Giang Tuấn",
-    "hcmutId": "2573274",
+    "password": "$2b$10$GSwSlA8NOFoMHFn/TEj3qe3oJriYICDcnhGQT4GczqiD3Pu8N1wEK",
+    "name": "Đặng Hà Phương",
+    "hcmutId": "2574906",
     "role": "management",
     "department": "Student Services",
     "permissions": [
@@ -864,85 +871,85 @@
       "approve_requests",
       "view_reports"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Vũ Giang Tuấn",
-    "phone": "0989061792",
-    "createdAt": "2025-11-06T01:45:56.594Z",
-    "updatedAt": "2025-11-06T01:45:56.594Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đặng Hà Phương",
+    "phone": "0937725796",
+    "createdAt": "2025-11-06T07:51:29.184Z",
+    "updatedAt": "2025-11-06T07:51:29.184Z"
   },
   {
-    "id": "mgmt_Z5tO3JO8lIqs",
+    "id": "mgmt_qiHc5mkkHq8z",
     "email": "admin.2@hcmut.edu.vn",
-    "password": "$2b$10$hdUudwBkKewsOHaHHtEYQ.vnjM7D.TjY9nS49ytwU0p.2ABlXrECS",
-    "name": "Bùi Mai Minh",
-    "hcmutId": "2514982",
+    "password": "$2b$10$GSwSlA8NOFoMHFn/TEj3qe3oJriYICDcnhGQT4GczqiD3Pu8N1wEK",
+    "name": "Phan Hà Hoàng",
+    "hcmutId": "2532877",
     "role": "management",
-    "department": "Administration",
+    "department": "Student Services",
     "permissions": [
       "view_analytics",
       "manage_users",
       "approve_requests",
       "view_reports"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Mai Minh",
-    "phone": "0933537623",
-    "createdAt": "2025-11-06T01:45:56.594Z",
-    "updatedAt": "2025-11-06T01:45:56.594Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Hà Hoàng",
+    "phone": "0929479135",
+    "createdAt": "2025-11-06T07:51:29.184Z",
+    "updatedAt": "2025-11-06T07:51:29.184Z"
   },
   {
-    "id": "mgmt_LplEkd6X_Q6n",
+    "id": "mgmt_ta1l-bVja9Mo",
     "email": "admin.3@hcmut.edu.vn",
-    "password": "$2b$10$hdUudwBkKewsOHaHHtEYQ.vnjM7D.TjY9nS49ytwU0p.2ABlXrECS",
-    "name": "Trần Linh Phương",
-    "hcmutId": "2540419",
+    "password": "$2b$10$GSwSlA8NOFoMHFn/TEj3qe3oJriYICDcnhGQT4GczqiD3Pu8N1wEK",
+    "name": "Đỗ Mai Hương",
+    "hcmutId": "2503755",
     "role": "management",
-    "department": "Academic Affairs",
+    "department": "Student Services",
     "permissions": [
       "view_analytics",
       "manage_users",
       "approve_requests",
       "view_reports"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Trần Linh Phương",
-    "phone": "0958680236",
-    "createdAt": "2025-11-06T01:45:56.594Z",
-    "updatedAt": "2025-11-06T01:45:56.594Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Đỗ Mai Hương",
+    "phone": "0986302211",
+    "createdAt": "2025-11-06T07:51:29.184Z",
+    "updatedAt": "2025-11-06T07:51:29.184Z"
   },
   {
-    "id": "mgmt_Uk0woGlY44A-",
+    "id": "mgmt_eyZVMpmzU94w",
     "email": "admin.4@hcmut.edu.vn",
-    "password": "$2b$10$hdUudwBkKewsOHaHHtEYQ.vnjM7D.TjY9nS49ytwU0p.2ABlXrECS",
-    "name": "Bùi Nam Hữu",
-    "hcmutId": "2542336",
+    "password": "$2b$10$GSwSlA8NOFoMHFn/TEj3qe3oJriYICDcnhGQT4GczqiD3Pu8N1wEK",
+    "name": "Nguyễn Mai Minh",
+    "hcmutId": "2533300",
     "role": "management",
-    "department": "Academic Affairs",
+    "department": "Student Services",
     "permissions": [
       "view_analytics",
       "manage_users",
       "approve_requests",
       "view_reports"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bùi Nam Hữu",
-    "phone": "0920789167",
-    "createdAt": "2025-11-06T01:45:56.594Z",
-    "updatedAt": "2025-11-06T01:45:56.594Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Nguyễn Mai Minh",
+    "phone": "0948244033",
+    "createdAt": "2025-11-06T07:51:29.184Z",
+    "updatedAt": "2025-11-06T07:51:29.184Z"
   },
   {
-    "id": "mgmt_ovzfdXRXtOIg",
+    "id": "mgmt_CqdPIMUuPdEo",
     "email": "admin.5@hcmut.edu.vn",
-    "password": "$2b$10$hdUudwBkKewsOHaHHtEYQ.vnjM7D.TjY9nS49ytwU0p.2ABlXrECS",
-    "name": "Phan Mai Hữu",
-    "hcmutId": "2556877",
+    "password": "$2b$10$GSwSlA8NOFoMHFn/TEj3qe3oJriYICDcnhGQT4GczqiD3Pu8N1wEK",
+    "name": "Phan Bảo Hữu",
+    "hcmutId": "2586609",
     "role": "management",
-    "department": "IT Department",
+    "department": "Student Services",
     "permissions": [
       "view_analytics",
       "manage_users",
       "approve_requests",
       "view_reports"
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Mai Hữu",
-    "phone": "0933599775",
-    "createdAt": "2025-11-06T01:45:56.594Z",
-    "updatedAt": "2025-11-06T01:45:56.594Z"
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Phan Bảo Hữu",
+    "phone": "0983074524",
+    "createdAt": "2025-11-06T07:51:29.184Z",
+    "updatedAt": "2025-11-06T07:51:29.184Z"
   }
 ]

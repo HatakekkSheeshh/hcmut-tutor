@@ -220,21 +220,24 @@ export class JSONStorage {
 
   private async readFromBlob<T>(filename: string): Promise<T[]> {
     try {
-      // Try to find the file with data/ prefix first, then without
-      let { blobs } = await list({ prefix: `data/${filename}` });
-      if (blobs.length === 0) {
-        // Try without prefix if not found in data/
-        const { blobs: rootBlobs } = await list({ prefix: filename });
-        blobs = rootBlobs;
-      }
+      // Check both root level and data/ folder
+      const { blobs: rootBlobs } = await list({ prefix: filename });
+      const { blobs: dataBlobs } = await list({ prefix: `data/${filename}` });
       
-      if (blobs.length === 0) {
+      // Find exact match at root level first (if user uploaded files there)
+      const rootBlob = rootBlobs.find(blob => blob.pathname === filename);
+      const dataBlob = dataBlobs.find(blob => blob.pathname === `data/${filename}`);
+      
+      // Prefer root level if exists, otherwise use data/ folder
+      const targetBlob = rootBlob || dataBlob;
+      
+      if (!targetBlob) {
         console.warn(`No blobs found for ${filename}`);
         return [];
       }
       
       // Fetch the blob content
-      const response = await fetch(blobs[0].url);
+      const response = await fetch(targetBlob.url);
       const content = await response.text();
       return JSON.parse(content);
     } catch (error) {
@@ -245,9 +248,18 @@ export class JSONStorage {
 
   private async writeToBlob<T>(filename: string, data: T[]): Promise<void> {
     const content = JSON.stringify(data, null, 2);
-    await put(`data/${filename}`, content, {
+    
+    // Check if file exists at root level first
+    const { blobs: rootBlobs } = await list({ prefix: filename });
+    const existsAtRoot = rootBlobs.some(blob => blob.pathname === filename);
+    
+    // If file exists at root level, write there; otherwise write to data/ folder
+    const blobPath = existsAtRoot ? filename : `data/${filename}`;
+    
+    await put(blobPath, content, {
       access: 'public',
-      addRandomSuffix: false
+      addRandomSuffix: false,
+      allowOverwrite: true
     });
   }
 
