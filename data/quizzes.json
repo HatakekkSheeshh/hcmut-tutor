@@ -1,46 +1,30 @@
 [
   {
-    "id": "quiz_Ru9fvs68KRba",
-    "sessionId": "ses_Q1f_HBhBNNUi",
+    "id": "quiz_Kst0e4klmzyZ",
+    "sessionId": "ses_NIyDwhtFuDD-",
     "title": "Kiểm tra Đại số tuyến tính",
     "description": "Bài kiểm tra cho buổi học Ôn tập Đại số tuyến tính",
     "questions": [
       {
         "id": "q1",
         "question": "Câu hỏi 1 về Đại số tuyến tính",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
         "points": 19
       },
       {
         "id": "q2",
         "question": "Câu hỏi 2 về Đại số tuyến tính",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 16
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
       },
       {
         "id": "q3",
         "question": "Câu hỏi 3 về Đại số tuyến tính",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 7
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 14
       },
       {
         "id": "q4",
@@ -51,33 +35,141 @@
           "False"
         ],
         "correctAnswer": 0,
-        "points": 6
+        "points": 15
       },
       {
         "id": "q5",
         "question": "Câu hỏi 5 về Đại số tuyến tính",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 7
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 6
       },
       {
         "id": "q6",
         "question": "Câu hỏi 6 về Đại số tuyến tính",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
-        "points": 7
+        "points": 19
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 6
       }
     ],
-    "totalPoints": 62,
-    "duration": 30,
-    "dueDate": "2025-12-02T11:00:00.000Z",
-    "createdBy": "tut_pxQDWdvyjnan",
-    "createdAt": "2025-10-31T15:07:37.463Z",
-    "updatedAt": "2025-10-31T15:07:37.490Z"
+    "totalPoints": 87,
+    "duration": 59,
+    "dueDate": "2025-12-10T08:00:00.000Z",
+    "createdBy": "tut_IIcDx-qwF11O",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
   },
   {
-    "id": "quiz_eJpLwqq9M7P4",
-    "sessionId": "ses_689550rtQ7M5",
+    "id": "quiz_6ZOcG7p8gZaG",
+    "sessionId": "ses_fZ7c9J3pOZNq",
+    "title": "Kiểm tra Vật lý đại cương",
+    "description": "Bài kiểm tra cho buổi học Ôn tập Vật lý đại cương",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Vật lý đại cương",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 14
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Vật lý đại cương",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 11
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Vật lý đại cương",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 7
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Vật lý đại cương",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 15
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Vật lý đại cương",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 17
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Vật lý đại cương",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 13
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Vật lý đại cương",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 19
+      }
+    ],
+    "totalPoints": 96,
+    "duration": 19,
+    "dueDate": "2025-11-07T11:00:00.000Z",
+    "createdBy": "tut_mwFLg7bNm4J4",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz_RmRZ5SNPrLjx",
+    "sessionId": "ses_v3mLdI_PL1rT",
     "title": "Kiểm tra Cấu trúc dữ liệu",
     "description": "Bài kiểm tra cho buổi học Ôn tập Cấu trúc dữ liệu",
     "questions": [
@@ -90,7 +182,189 @@
           "False"
         ],
         "correctAnswer": 1,
-        "points": 19
+        "points": 16
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 17
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 7
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 6
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 5
+      }
+    ],
+    "totalPoints": 59,
+    "duration": 23,
+    "dueDate": "2025-11-14T07:00:00.000Z",
+    "createdBy": "tut_oG9NVXrtLgMn",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz_DnjNQ4UR5VGF",
+    "sessionId": "ses_dIAHt9fQdWqS",
+    "title": "Kiểm tra Điện tử",
+    "description": "Bài kiểm tra cho buổi học Ôn tập Điện tử",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Điện tử",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 17
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Điện tử",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 18
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Điện tử",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 8
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Điện tử",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 14
+      }
+    ],
+    "totalPoints": 57,
+    "duration": 47,
+    "dueDate": "2025-11-20T11:00:00.000Z",
+    "createdBy": "tut_rmNAwCfJrAnZ",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz__taOZ-vAG6DQ",
+    "sessionId": "ses_JkwHfjcFJqZn",
+    "title": "Kiểm tra Xác suất thống kê",
+    "description": "Bài kiểm tra cho buổi học Ôn tập Xác suất thống kê",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 9
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 13
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 6
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Xác suất thống kê",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 15
+      }
+    ],
+    "totalPoints": 43,
+    "duration": 50,
+    "dueDate": "2025-11-08T07:00:00.000Z",
+    "createdBy": "tut_icJrHBi4Rmlf",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz_sv-E_7LtyOGY",
+    "sessionId": "ses_kNyJ8WjzX3-E",
+    "title": "Kiểm tra Cấu trúc dữ liệu",
+    "description": "Bài kiểm tra cho buổi học Ôn tập Cấu trúc dữ liệu",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
       },
       {
         "id": "q2",
@@ -102,37 +376,19 @@
           "C",
           "D"
         ],
-        "correctAnswer": 1,
-        "points": 6
+        "correctAnswer": 2,
+        "points": 10
       },
       {
         "id": "q3",
         "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 6
-      }
-    ],
-    "totalPoints": 31,
-    "duration": 50,
-    "dueDate": "2025-12-03T04:00:00.000Z",
-    "createdBy": "tut_iQGe3z04cJLD",
-    "createdAt": "2025-10-31T15:07:37.463Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_V-Yj8hYNlC43",
-    "sessionId": "ses_DVWj_OIWn8Uy",
-    "title": "Kiểm tra Tiếng Anh",
-    "description": "Bài kiểm tra cho buổi học Ôn tập Tiếng Anh",
-    "questions": [
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 13
+      },
       {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Tiếng Anh",
+        "id": "q4",
+        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -140,34 +396,27 @@
           "C",
           "D"
         ],
-        "correctAnswer": 1,
-        "points": 18
+        "correctAnswer": 0,
+        "points": 12
       },
       {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Tiếng Anh",
+        "id": "q5",
+        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
         "points": 6
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Tiếng Anh",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 10
       }
     ],
-    "totalPoints": 34,
-    "duration": 57,
-    "dueDate": "2025-10-22T08:00:00.000Z",
-    "createdBy": "tut_huahc_QDbkKv",
-    "createdAt": "2025-10-31T15:07:37.463Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 57,
+    "duration": 45,
+    "dueDate": "2025-11-28T02:00:00.000Z",
+    "createdBy": "tut_oG9NVXrtLgMn",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
   },
   {
-    "id": "quiz_mrn8AdeeOMEC",
-    "sessionId": "ses_w4bnhIkvwNNn",
+    "id": "quiz_0pBDZ9Tv5bLM",
+    "sessionId": "ses_IE0Nh42ofe0H",
     "title": "Kiểm tra Giải tích",
     "description": "Bài kiểm tra cho buổi học Ôn tập Giải tích",
     "questions": [
@@ -182,6 +431,562 @@
           "D"
         ],
         "correctAnswer": 0,
+        "points": 17
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 17
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 7
+      }
+    ],
+    "totalPoints": 41,
+    "duration": 45,
+    "dueDate": "2025-12-13T05:00:00.000Z",
+    "createdBy": "tut_R3V_vbvdhVGW",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz_Dj0X8iL-5Mvt",
+    "sessionId": "ses_0lBTQ_UKszuE",
+    "title": "Kiểm tra Cơ sở dữ liệu",
+    "description": "Bài kiểm tra cho buổi học Ôn tập Cơ sở dữ liệu",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Cơ sở dữ liệu",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 7
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Cơ sở dữ liệu",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 11
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Cơ sở dữ liệu",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 16
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Cơ sở dữ liệu",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 13
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Cơ sở dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 10
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Cơ sở dữ liệu",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 17
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Cơ sở dữ liệu",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 5
+      }
+    ],
+    "totalPoints": 79,
+    "duration": 20,
+    "dueDate": "2025-11-12T04:00:00.000Z",
+    "createdBy": "tut_KDd_eGBQepje",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz_6wR7hJm3SHrK",
+    "sessionId": "ses_63chrLmWK73v",
+    "title": "Kiểm tra Hệ điều hành",
+    "description": "Bài kiểm tra cho buổi học Ôn tập Hệ điều hành",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Hệ điều hành",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 8
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 18
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Hệ điều hành",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 13
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Hệ điều hành",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 14
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Hệ điều hành",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 11
+      }
+    ],
+    "totalPoints": 88,
+    "duration": 52,
+    "dueDate": "2025-11-29T01:00:00.000Z",
+    "createdBy": "tut_fSQpeAyIx5pd",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz_KIKlT9kG6-WT",
+    "sessionId": "ses_tdbCMcxqTFaM",
+    "title": "Kiểm tra Điện tử",
+    "description": "Bài kiểm tra cho buổi học Ôn tập Điện tử",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Điện tử",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Điện tử",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 6
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Điện tử",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 7
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Điện tử",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 16
+      }
+    ],
+    "totalPoints": 37,
+    "duration": 31,
+    "dueDate": "2025-10-21T05:00:00.000Z",
+    "createdBy": "tut_Rr4zr998-VZT",
+    "createdAt": "2025-11-06T01:45:56.595Z",
+    "updatedAt": "2025-11-06T01:45:56.623Z"
+  },
+  {
+    "id": "quiz_4_tWgVh9W_uh",
+    "classId": "class_fusxHex_dRbG",
+    "title": "Kiểm tra tuần 1 - Cơ học kỹ thuật",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Cơ học kỹ thuật",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 18
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Cơ học kỹ thuật",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 9
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Cơ học kỹ thuật",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Cơ học kỹ thuật",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 5
+      }
+    ],
+    "totalPoints": 48,
+    "duration": 32,
+    "dueDate": "2025-10-24T01:45:56.620Z",
+    "createdBy": "tut_SOyzJpldGCO6",
+    "createdAt": "2025-09-20T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_MOosZI2CTDIV",
+    "classId": "class_fusxHex_dRbG",
+    "title": "Kiểm tra tuần 2 - Cơ học kỹ thuật",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Cơ học kỹ thuật",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 19
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Cơ học kỹ thuật",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 19
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Cơ học kỹ thuật",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 13
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Cơ học kỹ thuật",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 19
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Cơ học kỹ thuật",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 17
+      }
+    ],
+    "totalPoints": 87,
+    "duration": 34,
+    "dueDate": "2025-10-31T01:45:56.620Z",
+    "createdBy": "tut_SOyzJpldGCO6",
+    "createdAt": "2025-09-20T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_FCkkgD15N_zP",
+    "classId": "class_COiTxHUBaBL-",
+    "title": "Kiểm tra tuần 1 - Cơ học kỹ thuật",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Cơ học kỹ thuật",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 9
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Cơ học kỹ thuật",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 19
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Cơ học kỹ thuật",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 7
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Cơ học kỹ thuật",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 10
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Cơ học kỹ thuật",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 12
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Cơ học kỹ thuật",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 18
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Cơ học kỹ thuật",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 7
+      }
+    ],
+    "totalPoints": 82,
+    "duration": 62,
+    "dueDate": "2025-10-31T01:45:56.620Z",
+    "createdBy": "tut_oG9NVXrtLgMn",
+    "createdAt": "2025-09-23T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_4i8R-oxdbzbO",
+    "classId": "class_RRYRyNBdcy3Z",
+    "title": "Kiểm tra tuần 1 - Giải tích",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Giải tích",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 13
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 5
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 19
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Giải tích",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 16
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Giải tích",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 16
+      }
+    ],
+    "totalPoints": 69,
+    "duration": 42,
+    "dueDate": "2025-11-05T01:45:56.620Z",
+    "createdBy": "tut_R3V_vbvdhVGW",
+    "createdAt": "2025-09-29T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_g93RVOCTwE_u",
+    "classId": "class_RRYRyNBdcy3Z",
+    "title": "Kiểm tra tuần 2 - Giải tích",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
         "points": 12
       },
       {
@@ -193,7 +998,290 @@
           "False"
         ],
         "correctAnswer": 0,
+        "points": 17
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 11
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Giải tích",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 11
+      }
+    ],
+    "totalPoints": 51,
+    "duration": 67,
+    "dueDate": "2025-11-12T01:45:56.620Z",
+    "createdBy": "tut_R3V_vbvdhVGW",
+    "createdAt": "2025-09-29T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_UodVpTDOrwzi",
+    "classId": "class_CtCgTOB70t0z",
+    "title": "Kiểm tra tuần 1 - Toán cao cấp",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Toán cao cấp",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 9
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Toán cao cấp",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 19
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Toán cao cấp",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 15
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Toán cao cấp",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 10
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Toán cao cấp",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 5
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Toán cao cấp",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 7
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Toán cao cấp",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 18
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Toán cao cấp",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 17
+      }
+    ],
+    "totalPoints": 100,
+    "duration": 85,
+    "dueDate": "2025-11-19T01:45:56.620Z",
+    "createdBy": "tut_R3V_vbvdhVGW",
+    "createdAt": "2025-10-06T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_NvqOnTFXajhV",
+    "classId": "class_CtCgTOB70t0z",
+    "title": "Kiểm tra tuần 2 - Toán cao cấp",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Toán cao cấp",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 12
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Toán cao cấp",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 12
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Toán cao cấp",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 17
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Toán cao cấp",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 15
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Toán cao cấp",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 18
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Toán cao cấp",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 12
+      }
+    ],
+    "totalPoints": 86,
+    "duration": 31,
+    "dueDate": "2025-11-26T01:45:56.620Z",
+    "createdBy": "tut_R3V_vbvdhVGW",
+    "createdAt": "2025-10-06T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_1IopAL0n50ql",
+    "classId": "class__1vDeSX_UDz3",
+    "title": "Kiểm tra tuần 1 - Giải tích",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Giải tích",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
         "points": 14
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 8
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Giải tích",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 17
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Giải tích",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 6
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Giải tích",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 16
+      }
+    ],
+    "totalPoints": 61,
+    "duration": 88,
+    "dueDate": "2025-10-21T01:45:56.620Z",
+    "createdBy": "tut_IIcDx-qwF11O",
+    "createdAt": "2025-09-16T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_9dNxcBUivQyM",
+    "classId": "class__1vDeSX_UDz3",
+    "title": "Kiểm tra tuần 2 - Giải tích",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 13
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Giải tích",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 6
       },
       {
         "id": "q3",
@@ -206,25 +1294,11 @@
           "D"
         ],
         "correctAnswer": 1,
-        "points": 9
-      }
-    ],
-    "totalPoints": 35,
-    "duration": 29,
-    "dueDate": "2025-11-30T09:00:00.000Z",
-    "createdBy": "tut_GDPlGtIendxp",
-    "createdAt": "2025-10-31T15:07:37.463Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_hOwePLGPn46y",
-    "sessionId": "ses_yoz0wu6Vt3Ej",
-    "title": "Kiểm tra Cấu trúc dữ liệu",
-    "description": "Bài kiểm tra cho buổi học Ôn tập Cấu trúc dữ liệu",
-    "questions": [
+        "points": 15
+      },
       {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
+        "id": "q4",
+        "question": "Câu hỏi 4 về Giải tích",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -233,25 +1307,84 @@
           "D"
         ],
         "correctAnswer": 0,
+        "points": 15
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Giải tích",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 14
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Giải tích",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
         "points": 6
       },
       {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
+        "id": "q7",
+        "question": "Câu hỏi 7 về Giải tích",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
-        "points": 13
+        "points": 8
       },
       {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
+        "id": "q8",
+        "question": "Câu hỏi 8 về Giải tích",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 14
+      }
+    ],
+    "totalPoints": 91,
+    "duration": 73,
+    "dueDate": "2025-10-28T01:45:56.620Z",
+    "createdBy": "tut_IIcDx-qwF11O",
+    "createdAt": "2025-09-16T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_KjIZElVLWKS4",
+    "classId": "class_X8w82C64tV-o",
+    "title": "Kiểm tra tuần 1 - Cấu trúc dữ liệu",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 1,
-        "points": 14
+        "points": 16
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 9
       },
       {
         "id": "q4",
@@ -263,22 +1396,547 @@
           "C",
           "D"
         ],
-        "correctAnswer": 0,
-        "points": 8
+        "correctAnswer": 3,
+        "points": 5
       }
     ],
-    "totalPoints": 41,
-    "duration": 48,
-    "dueDate": "2025-10-29T02:00:00.000Z",
-    "createdBy": "tut_iQGe3z04cJLD",
-    "createdAt": "2025-10-31T15:07:37.463Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 46,
+    "duration": 82,
+    "dueDate": "2025-11-04T01:45:56.620Z",
+    "createdBy": "tut_cTSqgQ51xCh7",
+    "createdAt": "2025-09-17T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_DBRlp3snTJZr",
-    "sessionId": "ses_udkWPnNJqVMu",
-    "title": "Kiểm tra Lập trình Python",
-    "description": "Bài kiểm tra cho buổi học Ôn tập Lập trình Python",
+    "id": "quiz_pBqKMUh2WPB3",
+    "classId": "class_ipd4H4cxH7DJ",
+    "title": "Kiểm tra tuần 1 - Tiếng Anh",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 18
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 7
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 7
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 13
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 12
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 10
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 18
+      },
+      {
+        "id": "q9",
+        "question": "Câu hỏi 9 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 11
+      }
+    ],
+    "totalPoints": 104,
+    "duration": 86,
+    "dueDate": "2025-11-20T01:45:56.620Z",
+    "createdBy": "tut_yJm3ljg_2ckR",
+    "createdAt": "2025-09-21T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_XUct9rjQ0Oc7",
+    "classId": "class_ipd4H4cxH7DJ",
+    "title": "Kiểm tra tuần 2 - Tiếng Anh",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 12
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 8
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 9
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 9
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 16
+      }
+    ],
+    "totalPoints": 54,
+    "duration": 81,
+    "dueDate": "2025-11-27T01:45:56.620Z",
+    "createdBy": "tut_yJm3ljg_2ckR",
+    "createdAt": "2025-09-21T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_x0y2dKTXANMx",
+    "classId": "class_nf9lJ4loIj2V",
+    "title": "Kiểm tra tuần 1 - Đại số tuyến tính",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Đại số tuyến tính",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 11
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Đại số tuyến tính",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 18
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Đại số tuyến tính",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 19
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Đại số tuyến tính",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 9
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 5
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 19
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 5
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 12
+      }
+    ],
+    "totalPoints": 98,
+    "duration": 32,
+    "dueDate": "2025-10-21T01:45:56.620Z",
+    "createdBy": "tut_yJm3ljg_2ckR",
+    "createdAt": "2025-09-10T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_dGRTjIT_UTW8",
+    "classId": "class_nf9lJ4loIj2V",
+    "title": "Kiểm tra tuần 2 - Đại số tuyến tính",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Đại số tuyến tính",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 15
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 5
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 16
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 12
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 13
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Đại số tuyến tính",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 18
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Đại số tuyến tính",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 16
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Đại số tuyến tính",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 12
+      }
+    ],
+    "totalPoints": 107,
+    "duration": 36,
+    "dueDate": "2025-10-28T01:45:56.620Z",
+    "createdBy": "tut_yJm3ljg_2ckR",
+    "createdAt": "2025-09-10T01:45:56.620Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_RFfEAkcEq9Jp",
+    "classId": "class_Kl8ctTH4GGwE",
+    "title": "Kiểm tra tuần 1 - Lập trình Python",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Lập trình Python",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 7
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Lập trình Python",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 12
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Lập trình Python",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Lập trình Python",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 14
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Lập trình Python",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 19
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Lập trình Python",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 9
+      }
+    ],
+    "totalPoints": 77,
+    "duration": 78,
+    "dueDate": "2025-11-07T01:45:56.621Z",
+    "createdBy": "tut_rmNAwCfJrAnZ",
+    "createdAt": "2025-09-09T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_ReQZlhmW3Xyq",
+    "classId": "class_Kl8ctTH4GGwE",
+    "title": "Kiểm tra tuần 2 - Lập trình Python",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Lập trình Python",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 18
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Lập trình Python",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 13
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Lập trình Python",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 17
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Lập trình Python",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 19
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Lập trình Python",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 18
+      }
+    ],
+    "totalPoints": 85,
+    "duration": 86,
+    "dueDate": "2025-11-14T01:45:56.621Z",
+    "createdBy": "tut_rmNAwCfJrAnZ",
+    "createdAt": "2025-09-09T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_GO_iuGHXXwzU",
+    "classId": "class_oN82zu2e4Hk8",
+    "title": "Kiểm tra tuần 1 - Lập trình Python",
+    "description": "Bài kiểm tra cho lớp C02",
     "questions": [
       {
         "id": "q1",
@@ -291,11 +1949,51 @@
           "D"
         ],
         "correctAnswer": 0,
-        "points": 10
+        "points": 7
       },
       {
         "id": "q2",
         "question": "Câu hỏi 2 về Lập trình Python",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 14
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Lập trình Python",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 18
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Lập trình Python",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 16
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Lập trình Python",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 11
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Lập trình Python",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -303,12 +2001,12 @@
           "C",
           "D"
         ],
-        "correctAnswer": 0,
-        "points": 7
+        "correctAnswer": 1,
+        "points": 19
       },
       {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Lập trình Python",
+        "id": "q7",
+        "question": "Câu hỏi 7 về Lập trình Python",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -318,117 +2016,53 @@
         ],
         "correctAnswer": 2,
         "points": 17
-      }
-    ],
-    "totalPoints": 34,
-    "duration": 34,
-    "dueDate": "2025-10-31T02:00:00.000Z",
-    "createdBy": "tut_MhsCoIecYtJX",
-    "createdAt": "2025-10-31T15:07:37.463Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_7RanmkZLbXrl",
-    "sessionId": "ses_rby2tjOHTUna",
-    "title": "Kiểm tra Vật lý đại cương",
-    "description": "Bài kiểm tra cho buổi học Ôn tập Vật lý đại cương",
-    "questions": [
+      },
       {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Vật lý đại cương",
+        "id": "q8",
+        "question": "Câu hỏi 8 về Lập trình Python",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 1,
-        "points": 5
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Vật lý đại cương",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 6
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Vật lý đại cương",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 12
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Vật lý đại cương",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 12
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Vật lý đại cương",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 14
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Vật lý đại cương",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 6
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Vật lý đại cương",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 16
+        "points": 15
       }
     ],
-    "totalPoints": 71,
-    "duration": 31,
-    "dueDate": "2025-11-15T09:00:00.000Z",
-    "createdBy": "tut_D7Q1Re4S1_wI",
-    "createdAt": "2025-10-31T15:07:37.463Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 117,
+    "duration": 80,
+    "dueDate": "2025-10-27T01:45:56.621Z",
+    "createdBy": "tut_w5ychAW78kKH",
+    "createdAt": "2025-09-23T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_l9eGOVLPYTnM",
-    "classId": "class_GHxUu15WpoRS",
+    "id": "quiz_abREmS_nr9WD",
+    "classId": "class_RDO1we9E6t9m",
     "title": "Kiểm tra tuần 1 - Cấu trúc dữ liệu",
     "description": "Bài kiểm tra cho lớp C01",
     "questions": [
       {
         "id": "q1",
         "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 5
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 14
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -436,30 +2070,108 @@
           "C",
           "D"
         ],
-        "correctAnswer": 1,
-        "points": 7
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
+        "correctAnswer": 2,
         "points": 10
       },
       {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
+        "id": "q4",
+        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 14
+      }
+    ],
+    "totalPoints": 43,
+    "duration": 87,
+    "dueDate": "2025-11-15T01:45:56.621Z",
+    "createdBy": "tut_icJrHBi4Rmlf",
+    "createdAt": "2025-10-07T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_E2v9IvolbEHo",
+    "classId": "class_93GKLqf6Wnm5",
+    "title": "Kiểm tra tuần 1 - Xác suất thống kê",
+    "description": "Bài kiểm tra cho lớp C03",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Xác suất thống kê",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 11
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Xác suất thống kê",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 1,
-        "points": 14
+        "points": 12
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 18
       },
       {
         "id": "q4",
-        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
+        "question": "Câu hỏi 4 về Xác suất thống kê",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 11
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 6
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 6
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Xác suất thống kê",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -469,142 +2181,24 @@
         ],
         "correctAnswer": 1,
         "points": 15
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 12
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 18
-      }
-    ],
-    "totalPoints": 76,
-    "duration": 87,
-    "dueDate": "2025-10-25T15:07:37.488Z",
-    "createdBy": "tut_MhsCoIecYtJX",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_4qb7p7cB9yWz",
-    "classId": "class_GHxUu15WpoRS",
-    "title": "Kiểm tra tuần 2 - Cấu trúc dữ liệu",
-    "description": "Bài kiểm tra cho lớp C01",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 5
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 12
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 6
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 16
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 12
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 13
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 5
       }
     ],
     "totalPoints": 87,
-    "duration": 44,
-    "dueDate": "2025-11-01T15:07:37.488Z",
-    "createdBy": "tut_MhsCoIecYtJX",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "duration": 87,
+    "dueDate": "2025-10-25T01:45:56.621Z",
+    "createdBy": "tut_icJrHBi4Rmlf",
+    "createdAt": "2025-09-11T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_ae7VqLGwIbeL",
-    "classId": "class_GHxUu15WpoRS",
-    "title": "Kiểm tra tuần 3 - Cấu trúc dữ liệu",
-    "description": "Bài kiểm tra cho lớp C01",
+    "id": "quiz_R_vcdcNulP2r",
+    "classId": "class_93GKLqf6Wnm5",
+    "title": "Kiểm tra tuần 2 - Xác suất thống kê",
+    "description": "Bài kiểm tra cho lớp C03",
     "questions": [
       {
         "id": "q1",
-        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
+        "question": "Câu hỏi 1 về Xác suất thống kê",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -613,14 +2207,186 @@
           "D"
         ],
         "correctAnswer": 0,
+        "points": 7
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Xác suất thống kê",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
         "points": 19
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 5
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 12
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Xác suất thống kê",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 12
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 6
+      }
+    ],
+    "totalPoints": 61,
+    "duration": 87,
+    "dueDate": "2025-11-01T01:45:56.621Z",
+    "createdBy": "tut_icJrHBi4Rmlf",
+    "createdAt": "2025-09-11T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_QfaN1zkWU3QA",
+    "classId": "class_93GKLqf6Wnm5",
+    "title": "Kiểm tra tuần 3 - Xác suất thống kê",
+    "description": "Bài kiểm tra cho lớp C03",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 15
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 19
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 10
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 12
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Xác suất thống kê",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 15
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Xác suất thống kê",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 14
+      }
+    ],
+    "totalPoints": 85,
+    "duration": 34,
+    "dueDate": "2025-11-08T01:45:56.621Z",
+    "createdBy": "tut_icJrHBi4Rmlf",
+    "createdAt": "2025-09-11T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_2bTvCgwN1Fzy",
+    "classId": "class_pj3nGDG09Gwg",
+    "title": "Kiểm tra tuần 1 - Cấu trúc dữ liệu",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 15
       },
       {
         "id": "q2",
         "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 6
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 3,
+        "points": 8
       },
       {
         "id": "q3",
@@ -633,25 +2399,25 @@
           "D"
         ],
         "correctAnswer": 1,
-        "points": 5
+        "points": 16
       },
       {
         "id": "q4",
         "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 6
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 0,
-        "points": 16
+        "points": 11
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 6
       },
       {
         "id": "q6",
@@ -662,302 +2428,26 @@
           "False"
         ],
         "correctAnswer": 1,
-        "points": 17
+        "points": 6
       },
       {
         "id": "q7",
         "question": "Câu hỏi 7 về Cấu trúc dữ liệu",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
-        "points": 11
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 5
-      },
-      {
-        "id": "q9",
-        "question": "Câu hỏi 9 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 19
-      }
-    ],
-    "totalPoints": 104,
-    "duration": 39,
-    "dueDate": "2025-11-08T15:07:37.488Z",
-    "createdBy": "tut_MhsCoIecYtJX",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_HMJQz8lc_YVL",
-    "classId": "class_imEgWMlgFz8G",
-    "title": "Kiểm tra tuần 1 - Giải tích",
-    "description": "Bài kiểm tra cho lớp C03",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
         "points": 15
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 5
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 7
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Giải tích",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 17
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 11
       }
     ],
-    "totalPoints": 55,
-    "duration": 67,
-    "dueDate": "2025-10-27T15:07:37.488Z",
-    "createdBy": "tut_MhsCoIecYtJX",
-    "createdAt": "2025-09-28T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 77,
+    "duration": 35,
+    "dueDate": "2025-11-09T01:45:56.621Z",
+    "createdBy": "tut_8k4AoQJHlueK",
+    "createdAt": "2025-09-13T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_u93aaAyb-q-T",
-    "classId": "class_imEgWMlgFz8G",
-    "title": "Kiểm tra tuần 2 - Giải tích",
-    "description": "Bài kiểm tra cho lớp C03",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 5
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 16
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 14
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 13
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Giải tích",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 9
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 12
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      }
-    ],
-    "totalPoints": 105,
-    "duration": 42,
-    "dueDate": "2025-11-03T15:07:37.488Z",
-    "createdBy": "tut_MhsCoIecYtJX",
-    "createdAt": "2025-09-28T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_M6At77rsdix6",
-    "classId": "class_imEgWMlgFz8G",
-    "title": "Kiểm tra tuần 3 - Giải tích",
-    "description": "Bài kiểm tra cho lớp C03",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 18
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Giải tích",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 18
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 8
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 9
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 14
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Giải tích",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 19
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 8
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Giải tích",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 6
-      },
-      {
-        "id": "q9",
-        "question": "Câu hỏi 9 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      }
-    ],
-    "totalPoints": 118,
-    "duration": 78,
-    "dueDate": "2025-11-10T15:07:37.488Z",
-    "createdBy": "tut_MhsCoIecYtJX",
-    "createdAt": "2025-09-28T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_235tKTkUKg6o",
-    "classId": "class_wTegwAj0skIx",
+    "id": "quiz_VNOadRboRABn",
+    "classId": "class_3vcRNz_gGwxY",
     "title": "Kiểm tra tuần 1 - Cơ học kỹ thuật",
     "description": "Bài kiểm tra cho lớp C02",
     "questions": [
@@ -971,29 +2461,23 @@
           "C",
           "D"
         ],
-        "correctAnswer": 1,
-        "points": 19
+        "correctAnswer": 3,
+        "points": 18
       },
       {
         "id": "q2",
         "question": "Câu hỏi 2 về Cơ học kỹ thuật",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 16
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 14
       },
       {
         "id": "q3",
         "question": "Câu hỏi 3 về Cơ học kỹ thuật",
-        "type": "multiple_choice",
+        "type": "true_false",
         "options": [
-          "A",
-          "B",
-          "C",
-          "D"
+          "True",
+          "False"
         ],
         "correctAnswer": 0,
         "points": 6
@@ -1001,49 +2485,59 @@
       {
         "id": "q4",
         "question": "Câu hỏi 4 về Cơ học kỹ thuật",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
         "points": 13
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Cơ học kỹ thuật",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 18
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Cơ học kỹ thuật",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 14
       }
     ],
-    "totalPoints": 54,
-    "duration": 71,
-    "dueDate": "2025-11-06T15:07:37.488Z",
-    "createdBy": "tut_iQGe3z04cJLD",
-    "createdAt": "2025-09-08T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 83,
+    "duration": 35,
+    "dueDate": "2025-11-08T01:45:56.621Z",
+    "createdBy": "tut_KDd_eGBQepje",
+    "createdAt": "2025-09-13T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_n1T-ZxIB18sT",
-    "classId": "class_wTegwAj0skIx",
+    "id": "quiz_khS7XkFlIxC5",
+    "classId": "class_3vcRNz_gGwxY",
     "title": "Kiểm tra tuần 2 - Cơ học kỹ thuật",
     "description": "Bài kiểm tra cho lớp C02",
     "questions": [
       {
         "id": "q1",
         "question": "Câu hỏi 1 về Cơ học kỹ thuật",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 5
       },
       {
         "id": "q2",
         "question": "Câu hỏi 2 về Cơ học kỹ thuật",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 8
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 13
       },
       {
         "id": "q3",
@@ -1055,7 +2549,7 @@
           "C",
           "D"
         ],
-        "correctAnswer": 0,
+        "correctAnswer": 2,
         "points": 17
       },
       {
@@ -1066,8 +2560,8 @@
           "True",
           "False"
         ],
-        "correctAnswer": 0,
-        "points": 12
+        "correctAnswer": 1,
+        "points": 19
       },
       {
         "id": "q5",
@@ -1079,162 +2573,136 @@
           "C",
           "D"
         ],
-        "correctAnswer": 0,
-        "points": 11
-      }
-    ],
-    "totalPoints": 65,
-    "duration": 71,
-    "dueDate": "2025-11-13T15:07:37.488Z",
-    "createdBy": "tut_iQGe3z04cJLD",
-    "createdAt": "2025-09-08T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_ouZgbDMCf8Vs",
-    "classId": "class_Nz4Zp3DGDtL0",
-    "title": "Kiểm tra tuần 1 - Vật lý đại cương",
-    "description": "Bài kiểm tra cho lớp C01",
-    "questions": [
+        "correctAnswer": 1,
+        "points": 13
+      },
       {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Vật lý đại cương",
+        "id": "q6",
+        "question": "Câu hỏi 6 về Cơ học kỹ thuật",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
-        "correctAnswer": 1,
+        "correctAnswer": 0,
         "points": 14
       },
       {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Vật lý đại cương",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 5
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Vật lý đại cương",
+        "id": "q7",
+        "question": "Câu hỏi 7 về Cơ học kỹ thuật",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 1,
-        "points": 17
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Vật lý đại cương",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 12
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Vật lý đại cương",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Vật lý đại cương",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
         "points": 7
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Vật lý đại cương",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 13
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Vật lý đại cương",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 13
       }
     ],
-    "totalPoints": 98,
-    "duration": 73,
-    "dueDate": "2025-11-14T15:07:37.488Z",
-    "createdBy": "tut_jiwmW2eBp3d4",
-    "createdAt": "2025-09-11T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 88,
+    "duration": 30,
+    "dueDate": "2025-11-15T01:45:56.621Z",
+    "createdBy": "tut_KDd_eGBQepje",
+    "createdAt": "2025-09-13T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_08XTZLEKhBd6",
-    "classId": "class_r4Bc3LJpZ1ly",
-    "title": "Kiểm tra tuần 1 - Hệ điều hành",
-    "description": "Bài kiểm tra cho lớp C04",
+    "id": "quiz_g3KE-iIdegyP",
+    "classId": "class_dzbP3AyZuBl1",
+    "title": "Kiểm tra tuần 1 - Lập trình C/C++",
+    "description": "Bài kiểm tra cho lớp C03",
     "questions": [
       {
         "id": "q1",
-        "question": "Câu hỏi 1 về Hệ điều hành",
+        "question": "Câu hỏi 1 về Lập trình C/C++",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
-        "points": 10
+        "points": 19
       },
       {
         "id": "q2",
-        "question": "Câu hỏi 2 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Hệ điều hành",
-        "type": "multiple_choice",
+        "question": "Câu hỏi 2 về Lập trình C/C++",
+        "type": "true_false",
         "options": [
-          "A",
-          "B",
-          "C",
-          "D"
+          "True",
+          "False"
         ],
-        "correctAnswer": 3,
-        "points": 11
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 13
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 9
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
+        "correctAnswer": 0,
         "points": 12
       },
       {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Hệ điều hành",
+        "id": "q3",
+        "question": "Câu hỏi 3 về Lập trình C/C++",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 14
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Lập trình C/C++",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
+      }
+    ],
+    "totalPoints": 61,
+    "duration": 70,
+    "dueDate": "2025-11-19T01:45:56.621Z",
+    "createdBy": "tut_KDd_eGBQepje",
+    "createdAt": "2025-09-27T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_-Lma8biZaDNz",
+    "classId": "class_JwEJP46gI0j2",
+    "title": "Kiểm tra tuần 1 - Tiếng Anh",
+    "description": "Bài kiểm tra cho lớp C04",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 9
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 12
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 19
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Tiếng Anh",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -1243,318 +2711,22 @@
           "D"
         ],
         "correctAnswer": 3,
-        "points": 19
-      }
-    ],
-    "totalPoints": 91,
-    "duration": 88,
-    "dueDate": "2025-11-08T15:07:37.488Z",
-    "createdBy": "tut_jiwmW2eBp3d4",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_sbMQESPTxqiL",
-    "classId": "class_r4Bc3LJpZ1ly",
-    "title": "Kiểm tra tuần 2 - Hệ điều hành",
-    "description": "Bài kiểm tra cho lớp C04",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 9
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Hệ điều hành",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 17
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Hệ điều hành",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 5
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Hệ điều hành",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 13
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Hệ điều hành",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 11
-      }
-    ],
-    "totalPoints": 55,
-    "duration": 81,
-    "dueDate": "2025-11-15T15:07:37.488Z",
-    "createdBy": "tut_jiwmW2eBp3d4",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_K4WM83RCKWEn",
-    "classId": "class_r4Bc3LJpZ1ly",
-    "title": "Kiểm tra tuần 3 - Hệ điều hành",
-    "description": "Bài kiểm tra cho lớp C04",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Hệ điều hành",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 13
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Hệ điều hành",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 13
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 10
-      }
-    ],
-    "totalPoints": 53,
-    "duration": 38,
-    "dueDate": "2025-11-22T15:07:37.488Z",
-    "createdBy": "tut_jiwmW2eBp3d4",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_ZMozt_JPjNAG",
-    "classId": "class_aTDOIsRDJdAk",
-    "title": "Kiểm tra tuần 1 - Mạng máy tính",
-    "description": "Bài kiểm tra cho lớp C02",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Mạng máy tính",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 15
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Mạng máy tính",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 9
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Mạng máy tính",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 19
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Mạng máy tính",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 10
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Mạng máy tính",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 9
+        "points": 16
       },
       {
         "id": "q6",
-        "question": "Câu hỏi 6 về Mạng máy tính",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 15
-      }
-    ],
-    "totalPoints": 77,
-    "duration": 81,
-    "dueDate": "2025-10-19T15:07:37.488Z",
-    "createdBy": "tut_2p_KNhI-iEIX",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_M6TiHqAha0TS",
-    "classId": "class_aTDOIsRDJdAk",
-    "title": "Kiểm tra tuần 2 - Mạng máy tính",
-    "description": "Bài kiểm tra cho lớp C02",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Mạng máy tính",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 15
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Mạng máy tính",
+        "question": "Câu hỏi 6 về Tiếng Anh",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 1,
-        "points": 18
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Mạng máy tính",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 9
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Mạng máy tính",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 8
-      }
-    ],
-    "totalPoints": 50,
-    "duration": 80,
-    "dueDate": "2025-10-26T15:07:37.488Z",
-    "createdBy": "tut_2p_KNhI-iEIX",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_ardbcKsi6PcB",
-    "classId": "class_aTDOIsRDJdAk",
-    "title": "Kiểm tra tuần 3 - Mạng máy tính",
-    "description": "Bài kiểm tra cho lớp C02",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Mạng máy tính",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
         "points": 6
       },
       {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Mạng máy tính",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 5
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Mạng máy tính",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 9
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Mạng máy tính",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 9
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Mạng máy tính",
+        "id": "q7",
+        "question": "Câu hỏi 7 về Tiếng Anh",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -1564,103 +2736,63 @@
         ],
         "correctAnswer": 2,
         "points": 16
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
       }
     ],
-    "totalPoints": 45,
-    "duration": 80,
-    "dueDate": "2025-11-02T15:07:37.488Z",
-    "createdBy": "tut_2p_KNhI-iEIX",
-    "createdAt": "2025-09-10T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 110,
+    "duration": 37,
+    "dueDate": "2025-10-29T01:45:56.621Z",
+    "createdBy": "tut_KDd_eGBQepje",
+    "createdAt": "2025-09-24T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_f8RQ-VAJ7hKg",
-    "classId": "class_W3g6uGTt1ydm",
-    "title": "Kiểm tra tuần 1 - Cơ sở dữ liệu",
-    "description": "Bài kiểm tra cho lớp C03",
+    "id": "quiz_p1JTBVbveIwm",
+    "classId": "class_TL7FoP1qXDMc",
+    "title": "Kiểm tra tuần 1 - Tiếng Anh",
+    "description": "Bài kiểm tra cho lớp C01",
     "questions": [
       {
         "id": "q1",
-        "question": "Câu hỏi 1 về Cơ sở dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 13
+        "question": "Câu hỏi 1 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 5
       },
       {
         "id": "q2",
-        "question": "Câu hỏi 2 về Cơ sở dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cơ sở dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 19
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Cơ sở dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 6
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Cơ sở dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 6
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Cơ sở dữ liệu",
+        "question": "Câu hỏi 2 về Tiếng Anh",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 1,
-        "points": 19
+        "points": 12
       },
       {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Cơ sở dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 11
+        "id": "q3",
+        "question": "Câu hỏi 3 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 15
       },
       {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Cơ sở dữ liệu",
+        "id": "q4",
+        "question": "Câu hỏi 4 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 14
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Tiếng Anh",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -1668,71 +2800,138 @@
           "C",
           "D"
         ],
-        "correctAnswer": 2,
-        "points": 7
+        "correctAnswer": 0,
+        "points": 6
+      }
+    ],
+    "totalPoints": 52,
+    "duration": 64,
+    "dueDate": "2025-11-18T01:45:56.621Z",
+    "createdBy": "tut_Rr4zr998-VZT",
+    "createdAt": "2025-09-23T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_Z11E1IR2fR44",
+    "classId": "class_TL7FoP1qXDMc",
+    "title": "Kiểm tra tuần 2 - Tiếng Anh",
+    "description": "Bài kiểm tra cho lớp C01",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
       },
       {
-        "id": "q9",
-        "question": "Câu hỏi 9 về Cơ sở dữ liệu",
+        "id": "q2",
+        "question": "Câu hỏi 2 về Tiếng Anh",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 0,
-        "points": 8
+        "points": 18
+      },
+      {
+        "id": "q3",
+        "question": "Câu hỏi 3 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 15
+      },
+      {
+        "id": "q4",
+        "question": "Câu hỏi 4 về Tiếng Anh",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 6
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 7
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 13
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Tiếng Anh",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 7
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Tiếng Anh",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 11
       }
     ],
-    "totalPoints": 106,
-    "duration": 39,
-    "dueDate": "2025-10-23T15:07:37.488Z",
-    "createdBy": "tut_2p_KNhI-iEIX",
-    "createdAt": "2025-09-20T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 85,
+    "duration": 51,
+    "dueDate": "2025-11-25T01:45:56.621Z",
+    "createdBy": "tut_Rr4zr998-VZT",
+    "createdAt": "2025-09-23T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_HyxXLsKVKEMI",
-    "classId": "class_W8oSg6JBEMFM",
+    "id": "quiz_QkyUwJJu7yJ3",
+    "classId": "class_WCoKT5z_OMY2",
     "title": "Kiểm tra tuần 1 - Giải tích",
     "description": "Bài kiểm tra cho lớp C01",
     "questions": [
       {
         "id": "q1",
         "question": "Câu hỏi 1 về Giải tích",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 9
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 6
       },
       {
         "id": "q2",
         "question": "Câu hỏi 2 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 8
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 0,
+        "points": 5
       },
       {
         "id": "q3",
         "question": "Câu hỏi 3 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 16
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Giải tích",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -1741,69 +2940,52 @@
           "D"
         ],
         "correctAnswer": 0,
-        "points": 13
+        "points": 5
       },
       {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Giải tích",
+        "id": "q4",
+        "question": "Câu hỏi 4 về Giải tích",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 1,
-        "points": 16
+        "points": 6
       },
       {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Giải tích",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 13
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Giải tích",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 19
+        "id": "q5",
+        "question": "Câu hỏi 5 về Giải tích",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 11
       }
     ],
-    "totalPoints": 112,
-    "duration": 63,
-    "dueDate": "2025-11-14T15:07:37.488Z",
-    "createdBy": "tut_fvnAH8e_l-lY",
-    "createdAt": "2025-09-17T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 33,
+    "duration": 30,
+    "dueDate": "2025-10-27T01:45:56.621Z",
+    "createdBy": "tut_fSQpeAyIx5pd",
+    "createdAt": "2025-10-07T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_G8tzg_TA5eSc",
-    "classId": "class_W8oSg6JBEMFM",
+    "id": "quiz_vc13YZPX89Ei",
+    "classId": "class_WCoKT5z_OMY2",
     "title": "Kiểm tra tuần 2 - Giải tích",
     "description": "Bài kiểm tra cho lớp C01",
     "questions": [
       {
         "id": "q1",
         "question": "Câu hỏi 1 về Giải tích",
-        "type": "true_false",
+        "type": "multiple_choice",
         "options": [
-          "True",
-          "False"
+          "A",
+          "B",
+          "C",
+          "D"
         ],
-        "correctAnswer": 1,
-        "points": 17
+        "correctAnswer": 3,
+        "points": 7
       },
       {
         "id": "q2",
@@ -1814,27 +2996,25 @@
           "False"
         ],
         "correctAnswer": 0,
-        "points": 15
+        "points": 19
       },
       {
         "id": "q3",
         "question": "Câu hỏi 3 về Giải tích",
-        "type": "multiple_choice",
+        "type": "true_false",
         "options": [
-          "A",
-          "B",
-          "C",
-          "D"
+          "True",
+          "False"
         ],
-        "correctAnswer": 2,
-        "points": 13
+        "correctAnswer": 1,
+        "points": 11
       },
       {
         "id": "q4",
         "question": "Câu hỏi 4 về Giải tích",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
-        "points": 9
+        "points": 12
       },
       {
         "id": "q5",
@@ -1847,44 +3027,32 @@
           "D"
         ],
         "correctAnswer": 1,
-        "points": 19
+        "points": 5
       },
       {
         "id": "q6",
         "question": "Câu hỏi 6 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 16
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Giải tích",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 10
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Giải tích",
-        "type": "true_false",
+        "type": "multiple_choice",
         "options": [
-          "True",
-          "False"
+          "A",
+          "B",
+          "C",
+          "D"
         ],
         "correctAnswer": 0,
-        "points": 14
+        "points": 7
       }
     ],
-    "totalPoints": 113,
-    "duration": 62,
-    "dueDate": "2025-11-21T15:07:37.488Z",
-    "createdBy": "tut_fvnAH8e_l-lY",
-    "createdAt": "2025-09-17T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 61,
+    "duration": 35,
+    "dueDate": "2025-11-03T01:45:56.621Z",
+    "createdBy": "tut_fSQpeAyIx5pd",
+    "createdAt": "2025-10-07T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_RHwETZ2MBQ8r",
-    "classId": "class_W8oSg6JBEMFM",
+    "id": "quiz_uIme6sxvgr5K",
+    "classId": "class_WCoKT5z_OMY2",
     "title": "Kiểm tra tuần 3 - Giải tích",
     "description": "Bài kiểm tra cho lớp C01",
     "questions": [
@@ -1898,654 +3066,60 @@
           "C",
           "D"
         ],
-        "correctAnswer": 2,
-        "points": 17
+        "correctAnswer": 3,
+        "points": 6
       },
       {
         "id": "q2",
         "question": "Câu hỏi 2 về Giải tích",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
-        "points": 10
+        "points": 19
       },
       {
         "id": "q3",
         "question": "Câu hỏi 3 về Giải tích",
-        "type": "true_false",
+        "type": "multiple_choice",
         "options": [
-          "True",
-          "False"
+          "A",
+          "B",
+          "C",
+          "D"
         ],
-        "correctAnswer": 0,
-        "points": 9
+        "correctAnswer": 1,
+        "points": 16
       },
       {
         "id": "q4",
         "question": "Câu hỏi 4 về Giải tích",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
-        "points": 8
-      }
-    ],
-    "totalPoints": 44,
-    "duration": 83,
-    "dueDate": "2025-11-28T15:07:37.488Z",
-    "createdBy": "tut_fvnAH8e_l-lY",
-    "createdAt": "2025-09-17T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_fT-9d_yRaH2i",
-    "classId": "class_oOqOMUOQaQta",
-    "title": "Kiểm tra tuần 1 - Toán cao cấp",
-    "description": "Bài kiểm tra cho lớp C01",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Toán cao cấp",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 12
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Toán cao cấp",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 13
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Toán cao cấp",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 14
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Toán cao cấp",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
         "points": 6
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Toán cao cấp",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 12
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Toán cao cấp",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Toán cao cấp",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 16
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Toán cao cấp",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 9
       }
     ],
-    "totalPoints": 100,
-    "duration": 54,
-    "dueDate": "2025-11-09T15:07:37.488Z",
-    "createdBy": "tut_huahc_QDbkKv",
-    "createdAt": "2025-09-22T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 47,
+    "duration": 33,
+    "dueDate": "2025-11-10T01:45:56.621Z",
+    "createdBy": "tut_fSQpeAyIx5pd",
+    "createdAt": "2025-10-07T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_7VnEWIaP_zET",
-    "classId": "class_oOqOMUOQaQta",
-    "title": "Kiểm tra tuần 2 - Toán cao cấp",
-    "description": "Bài kiểm tra cho lớp C01",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Toán cao cấp",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 12
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Toán cao cấp",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 16
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Toán cao cấp",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Toán cao cấp",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 15
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Toán cao cấp",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 6
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Toán cao cấp",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Toán cao cấp",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 11
-      }
-    ],
-    "totalPoints": 95,
-    "duration": 76,
-    "dueDate": "2025-11-16T15:07:37.488Z",
-    "createdBy": "tut_huahc_QDbkKv",
-    "createdAt": "2025-09-22T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_nrWOB76y-rtS",
-    "classId": "class_stjCeUlc1QYX",
-    "title": "Kiểm tra tuần 1 - Cấu trúc dữ liệu",
-    "description": "Bài kiểm tra cho lớp C03",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 18
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 6
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 12
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 12
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 11
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 19
-      },
-      {
-        "id": "q9",
-        "question": "Câu hỏi 9 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 10
-      }
-    ],
-    "totalPoints": 123,
-    "duration": 62,
-    "dueDate": "2025-10-31T15:07:37.488Z",
-    "createdBy": "tut_D7Q1Re4S1_wI",
-    "createdAt": "2025-09-27T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_M9aAR3bxAip0",
-    "classId": "class_stjCeUlc1QYX",
-    "title": "Kiểm tra tuần 2 - Cấu trúc dữ liệu",
-    "description": "Bài kiểm tra cho lớp C03",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 5
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 18
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 10
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 10
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 18
-      }
-    ],
-    "totalPoints": 61,
-    "duration": 36,
-    "dueDate": "2025-11-07T15:07:37.488Z",
-    "createdBy": "tut_D7Q1Re4S1_wI",
-    "createdAt": "2025-09-27T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_aV6fQ3Mfu6id",
-    "classId": "class_stjCeUlc1QYX",
-    "title": "Kiểm tra tuần 3 - Cấu trúc dữ liệu",
-    "description": "Bài kiểm tra cho lớp C03",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 7
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 5
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 3,
-        "points": 6
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 2,
-        "points": 10
-      }
-    ],
-    "totalPoints": 28,
-    "duration": 72,
-    "dueDate": "2025-11-14T15:07:37.488Z",
-    "createdBy": "tut_D7Q1Re4S1_wI",
-    "createdAt": "2025-09-27T15:07:37.488Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_rJtNaHf5QZZW",
-    "classId": "class_eCuHFgMvnFdu",
-    "title": "Kiểm tra tuần 1 - Lập trình C/C++",
-    "description": "Bài kiểm tra cho lớp C01",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Lập trình C/C++",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 9
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Lập trình C/C++",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 10
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Lập trình C/C++",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 5
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Lập trình C/C++",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 8
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Lập trình C/C++",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 10
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Lập trình C/C++",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 5
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Lập trình C/C++",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 16
-      },
-      {
-        "id": "q8",
-        "question": "Câu hỏi 8 về Lập trình C/C++",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 5
-      },
-      {
-        "id": "q9",
-        "question": "Câu hỏi 9 về Lập trình C/C++",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 17
-      }
-    ],
-    "totalPoints": 85,
-    "duration": 83,
-    "dueDate": "2025-10-30T15:07:37.489Z",
-    "createdBy": "tut_kpC5U_goDXvk",
-    "createdAt": "2025-09-16T15:07:37.489Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_F52cezRhIFx7",
-    "classId": "class_eCuHFgMvnFdu",
-    "title": "Kiểm tra tuần 2 - Lập trình C/C++",
-    "description": "Bài kiểm tra cho lớp C01",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Lập trình C/C++",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 12
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Lập trình C/C++",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Lập trình C/C++",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 15
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Lập trình C/C++",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 0,
-        "points": 16
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Lập trình C/C++",
-        "type": "multiple_choice",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ],
-        "correctAnswer": 1,
-        "points": 7
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Lập trình C/C++",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 14
-      }
-    ],
-    "totalPoints": 81,
-    "duration": 62,
-    "dueDate": "2025-11-06T15:07:37.489Z",
-    "createdBy": "tut_kpC5U_goDXvk",
-    "createdAt": "2025-09-16T15:07:37.489Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_l5bJ78MCsPUf",
-    "classId": "class_HxSLms3SU8b6",
+    "id": "quiz_bxVutvsn3Vs3",
+    "classId": "class_crgrpHbBtI2v",
     "title": "Kiểm tra tuần 1 - Hệ điều hành",
-    "description": "Bài kiểm tra cho lớp C01",
+    "description": "Bài kiểm tra cho lớp C02",
     "questions": [
       {
         "id": "q1",
         "question": "Câu hỏi 1 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 8
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 14
       },
       {
         "id": "q2",
@@ -2557,112 +3131,94 @@
           "C",
           "D"
         ],
-        "correctAnswer": 0,
-        "points": 18
+        "correctAnswer": 2,
+        "points": 15
       },
       {
         "id": "q3",
         "question": "Câu hỏi 3 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 14
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 0,
+        "points": 6
       },
       {
         "id": "q4",
         "question": "Câu hỏi 4 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 5
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Hệ điều hành",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 18
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Hệ điều hành",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 6
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Hệ điều hành",
         "type": "true_false",
         "options": [
           "True",
           "False"
         ],
         "correctAnswer": 0,
-        "points": 11
+        "points": 16
+      },
+      {
+        "id": "q5",
+        "question": "Câu hỏi 5 về Hệ điều hành",
+        "type": "true_false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": 1,
+        "points": 12
+      },
+      {
+        "id": "q6",
+        "question": "Câu hỏi 6 về Hệ điều hành",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 1,
+        "points": 14
+      },
+      {
+        "id": "q7",
+        "question": "Câu hỏi 7 về Hệ điều hành",
+        "type": "multiple_choice",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "correctAnswer": 2,
+        "points": 12
+      },
+      {
+        "id": "q8",
+        "question": "Câu hỏi 8 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 8
       }
     ],
-    "totalPoints": 80,
-    "duration": 65,
-    "dueDate": "2025-10-23T15:07:37.489Z",
-    "createdBy": "tut_GDPlGtIendxp",
-    "createdAt": "2025-09-14T15:07:37.489Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 97,
+    "duration": 86,
+    "dueDate": "2025-11-05T01:45:56.621Z",
+    "createdBy": "tut_fSQpeAyIx5pd",
+    "createdAt": "2025-10-04T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   },
   {
-    "id": "quiz_daxFcQVdIpzT",
-    "classId": "class_XasD-GNC8M-4",
-    "title": "Kiểm tra tuần 1 - Cấu trúc dữ liệu",
+    "id": "quiz_LXIQrtucppMm",
+    "classId": "class_crgrpHbBtI2v",
+    "title": "Kiểm tra tuần 2 - Hệ điều hành",
     "description": "Bài kiểm tra cho lớp C02",
     "questions": [
       {
         "id": "q1",
-        "question": "Câu hỏi 1 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 12
-      },
-      {
-        "id": "q2",
-        "question": "Câu hỏi 2 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 16
-      },
-      {
-        "id": "q3",
-        "question": "Câu hỏi 3 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 18
-      },
-      {
-        "id": "q4",
-        "question": "Câu hỏi 4 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 17
-      },
-      {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Cấu trúc dữ liệu",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
-        "points": 15
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Cấu trúc dữ liệu",
+        "question": "Câu hỏi 1 về Hệ điều hành",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -2671,43 +3227,11 @@
           "D"
         ],
         "correctAnswer": 3,
-        "points": 18
-      },
-      {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Cấu trúc dữ liệu",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 19
-      }
-    ],
-    "totalPoints": 115,
-    "duration": 57,
-    "dueDate": "2025-10-21T15:07:37.489Z",
-    "createdBy": "tut_GDPlGtIendxp",
-    "createdAt": "2025-09-15T15:07:37.489Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
-  },
-  {
-    "id": "quiz_MYgmMPzVXFK_",
-    "classId": "class_KC8sS4XZ-Ror",
-    "title": "Kiểm tra tuần 1 - Lập trình Python",
-    "description": "Bài kiểm tra cho lớp C01",
-    "questions": [
-      {
-        "id": "q1",
-        "question": "Câu hỏi 1 về Lập trình Python",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 17
+        "points": 15
       },
       {
         "id": "q2",
-        "question": "Câu hỏi 2 về Lập trình Python",
+        "question": "Câu hỏi 2 về Hệ điều hành",
         "type": "multiple_choice",
         "options": [
           "A",
@@ -2715,62 +3239,71 @@
           "C",
           "D"
         ],
-        "correctAnswer": 0,
+        "correctAnswer": 2,
         "points": 7
       },
       {
         "id": "q3",
-        "question": "Câu hỏi 3 về Lập trình Python",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
-        "points": 19
+        "question": "Câu hỏi 3 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 12
       },
       {
         "id": "q4",
-        "question": "Câu hỏi 4 về Lập trình Python",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 1,
+        "question": "Câu hỏi 4 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 16
+      }
+    ],
+    "totalPoints": 50,
+    "duration": 69,
+    "dueDate": "2025-11-12T01:45:56.621Z",
+    "createdBy": "tut_fSQpeAyIx5pd",
+    "createdAt": "2025-10-04T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
+  },
+  {
+    "id": "quiz_W3ESRjG2gJMB",
+    "classId": "class_crgrpHbBtI2v",
+    "title": "Kiểm tra tuần 3 - Hệ điều hành",
+    "description": "Bài kiểm tra cho lớp C02",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Câu hỏi 1 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
+        "points": 9
+      },
+      {
+        "id": "q2",
+        "question": "Câu hỏi 2 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
         "points": 12
       },
       {
-        "id": "q5",
-        "question": "Câu hỏi 5 về Lập trình Python",
-        "type": "short_answer",
-        "correctAnswer": "Đáp án mẫu",
-        "points": 15
-      },
-      {
-        "id": "q6",
-        "question": "Câu hỏi 6 về Lập trình Python",
+        "id": "q3",
+        "question": "Câu hỏi 3 về Hệ điều hành",
         "type": "short_answer",
         "correctAnswer": "Đáp án mẫu",
         "points": 12
       },
       {
-        "id": "q7",
-        "question": "Câu hỏi 7 về Lập trình Python",
-        "type": "true_false",
-        "options": [
-          "True",
-          "False"
-        ],
-        "correctAnswer": 0,
+        "id": "q4",
+        "question": "Câu hỏi 4 về Hệ điều hành",
+        "type": "short_answer",
+        "correctAnswer": "Đáp án mẫu",
         "points": 10
       }
     ],
-    "totalPoints": 92,
-    "duration": 60,
-    "dueDate": "2025-11-09T15:07:37.489Z",
-    "createdBy": "tut_r7t6RzMQA2iW",
-    "createdAt": "2025-09-21T15:07:37.489Z",
-    "updatedAt": "2025-10-31T15:07:37.491Z"
+    "totalPoints": 43,
+    "duration": 70,
+    "dueDate": "2025-11-19T01:45:56.621Z",
+    "createdBy": "tut_fSQpeAyIx5pd",
+    "createdAt": "2025-10-04T01:45:56.621Z",
+    "updatedAt": "2025-11-06T01:45:56.624Z"
   }
 ]

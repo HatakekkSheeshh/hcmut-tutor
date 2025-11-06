@@ -165,6 +165,14 @@ async function seed() {
     );
     console.log(`✅ Created ${mockData.assignmentSubmissions.length} assignment submissions`);
 
+    // Write session requests
+    await writeFile(
+      join(dataDir, 'session-requests.json'),
+      JSON.stringify(mockData.sessionRequests, null, 2),
+      'utf-8'
+    );
+    console.log(`✅ Created ${mockData.sessionRequests.length} session requests`);
+
     // Create empty messages file
     await writeFile(
       join(dataDir, 'messages.json'),
@@ -210,6 +218,7 @@ async function seed() {
     console.log(`   - Grades: ${mockData.grades.length}`);
     console.log(`   - Quiz Submissions: ${mockData.quizSubmissions.length}`);
     console.log(`   - Assignment Submissions: ${mockData.assignmentSubmissions.length}`);
+    console.log(`   - Session Requests: ${mockData.sessionRequests.length}`);
     console.log(`   - Evaluations: ${mockData.evaluations.length}`);
     console.log(`   - Progress Entries: ${mockData.progress.length}`);
     console.log(`   - Library Resources: ${mockData.library.length}`);

@@ -336,8 +336,12 @@ const StudentDashboard: React.FC = () => {
   ]
 
   // Map sessions to course format for UI (only show upcoming/confirmed sessions)
+  // Filter out class sessions (sessions with classId) - those belong to My Classes section
   const sessionsCourses = sessions
-    .filter(session => session.status === 'confirmed' || session.status === 'pending')
+    .filter(session => 
+      (session.status === 'confirmed' || session.status === 'pending') &&
+      !session.classId // Only show individual sessions, not class sessions
+    )
     .map(session => {
       const tutor = tutors[session.tutorId]
       return {
@@ -353,6 +357,8 @@ const StudentDashboard: React.FC = () => {
         sessionData: session // Keep original session data for reference
       }
     })
+    .sort((a, b) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
+    .slice(0, 6) // Limit to 6 items for display
 
   // Map classes to course format
   const classesCourses = enrollments
@@ -372,9 +378,6 @@ const StudentDashboard: React.FC = () => {
         classData: classItem // Keep original class data for reference
       }
     })
-
-  // Combine and sort by date
-  const registeredCourses = [...sessionsCourses, ...classesCourses]
     .sort((a, b) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
     .slice(0, 6) // Limit to 6 items for display
 
@@ -477,10 +480,8 @@ const StudentDashboard: React.FC = () => {
     { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
     { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
     { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' },
-    { id: 'profile', label: 'Profile Management', icon: <PersonIcon />, path: '/common/profile' },
     { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
-    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' },
-    { id: 'notifications', label: 'Notifications', icon: <NotificationsIcon />, path: '/common/notifications' }
+    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' }
   ]
 
   // User name and avatar are now from backend
@@ -835,7 +836,7 @@ const StudentDashboard: React.FC = () => {
               </div>
             </div>
 
-            {registeredCourses.length === 0 ? (
+            {sessionsCourses.length === 0 ? (
               <div className="text-center py-12">
                 <SchoolIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
                 <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -853,11 +854,11 @@ const StudentDashboard: React.FC = () => {
               </div>
             ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-              {registeredCourses.map((course) => (
+              {sessionsCourses.map((course) => (
                 <div 
                   key={course.id}
                   className="cursor-pointer transition-all duration-200 hover:shadow-lg h-full"
-                  onClick={() => navigate(course.type === 'class' ? `/student/class/${course.id}` : `/student/session/${course.id}`)}
+                  onClick={() => navigate(`/student/session/${course.id}`)}
                 >
                   <Card 
                     className={`overflow-hidden h-full flex flex-col rounded-lg border ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-750 border-gray-700' : 'bg-white hover:bg-gray-50 border-gray-200'}`}
@@ -874,11 +875,11 @@ const StudentDashboard: React.FC = () => {
                     {/* Status Badge */}
                     <div className="absolute top-4 right-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        course.type === 'session' && (course as any).sessionData?.status === 'confirmed' 
+                        (course as any).type === 'session' && (course as any).sessionData?.status === 'confirmed' 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {course.type === 'session' && (course as any).sessionData?.status === 'confirmed' ? 'Confirmed' : course.type === 'class' ? 'Active' : 'Pending'}
+                        {(course as any).type === 'session' && (course as any).sessionData?.status === 'confirmed' ? 'Confirmed' : (course as any).type === 'class' ? 'Active' : 'Pending'}
                       </span>
                     </div>
                   </div>
@@ -918,7 +919,7 @@ const StudentDashboard: React.FC = () => {
                           Type
                         </p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {course.type === 'class' 
+                          {(course as any).type === 'class' 
                             ? ((course as any).classData?.isOnline ? 'Online' : 'In-Person')
                             : ((course as any).sessionData?.isOnline ? 'Online' : 'In-Person')}
                         </p>
@@ -928,7 +929,7 @@ const StudentDashboard: React.FC = () => {
                     <div className="flex items-center justify-between mt-auto">
                       <div className="flex items-center">
                         <div className={`w-2 h-2 rounded-full mr-2 ${
-                          course.type === 'class' || (course.type === 'session' && (course as any).sessionData?.status === 'confirmed') ? 'bg-green-500' : 'bg-yellow-500'
+                          (course as any).type === 'class' || ((course as any).type === 'session' && (course as any).sessionData?.status === 'confirmed') ? 'bg-green-500' : 'bg-yellow-500'
                         }`}></div>
                         <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                           {new Date(course.nextSession).toLocaleDateString('vi-VN', { 

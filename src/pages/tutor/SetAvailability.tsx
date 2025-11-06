@@ -652,7 +652,24 @@ const SetAvailability: React.FC = () => {
                   <Button 
                     onClick={handleSaveAvailability}
                     disabled={saving || loading}
-                    className={`${saving ? 'bg-gray-500' : 'bg-green-600 hover:bg-green-700'} text-white`}
+                    className={`${saving ? 'bg-gray-500' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                    style={{
+                      backgroundColor: saving || loading 
+                        ? '#6b7280' 
+                        : theme === 'dark' ? '#2563eb' : '#2563eb',
+                      color: '#ffffff',
+                      border: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!saving && !loading) {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1d4ed8' : '#1d4ed8'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!saving && !loading) {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#2563eb' : '#2563eb'
+                      }
+                    }}
                   >
                     <Save className="w-4 h-4 mr-2" />
                     {saving ? 'Saving...' : 'Save Changes'}
@@ -661,6 +678,17 @@ const SetAvailability: React.FC = () => {
                   <Button 
                     onClick={() => setCreateClassDialogOpen(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#2563eb' : '#2563eb',
+                      color: '#ffffff',
+                      border: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1d4ed8' : '#1d4ed8'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#2563eb' : '#2563eb'
+                    }}
                   >
                     <Add className="w-4 h-4 mr-2" />
                     Create New Class

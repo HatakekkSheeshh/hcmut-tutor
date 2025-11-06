@@ -7,7 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import { config } from './lib/config.js';
 import { authenticate, authorize, validateBody, errorHandler } from './lib/middleware.js';
-import { loginSchema, registerSchema, updateProfileSchema, createClassSchema, updateClassSchema, createEnrollmentSchema, updateEnrollmentSchema } from './lib/schemas.js';
+import { loginSchema, registerSchema, updateProfileSchema, createClassSchema, updateClassSchema, createEnrollmentSchema, updateEnrollmentSchema, createSessionRequestSchema, approveSessionRequestSchema, rejectSessionRequestSchema } from './lib/schemas.js';
 import { UserRole } from './lib/types.js';
 
 // Import handlers - Auth
@@ -61,6 +61,10 @@ import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, 
 // Import handlers - Forum
 import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './routes/forum/posts.js';
 import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './routes/forum/comments.js';
+
+// Import handlers - Session Requests
+import { listSessionRequestsHandler, createSessionRequestHandler } from './routes/session-requests/index.js';
+import { getSessionRequestHandler, approveSessionRequestHandler, rejectSessionRequestHandler, withdrawSessionRequestHandler } from './routes/session-requests/[id].js';
 
 // Create Express app
 const app = express();
@@ -212,6 +216,15 @@ app.post('/api/forum/posts/:id/like', authenticate, likePostHandler);
 app.get('/api/forum/posts/:id/comments', getCommentsHandler);
 app.post('/api/forum/posts/:id/comments', authenticate, createCommentHandler);
 app.delete('/api/forum/comments/:id', authenticate, deleteCommentHandler);
+
+// ===== SESSION REQUESTS ROUTES =====
+
+app.get('/api/session-requests', authenticate, listSessionRequestsHandler);
+app.post('/api/session-requests', authenticate, validateBody(createSessionRequestSchema), createSessionRequestHandler);
+app.get('/api/session-requests/:id', authenticate, getSessionRequestHandler);
+app.put('/api/session-requests/:id/approve', authenticate, validateBody(approveSessionRequestSchema), approveSessionRequestHandler);
+app.put('/api/session-requests/:id/reject', authenticate, validateBody(rejectSessionRequestSchema), rejectSessionRequestHandler);
+app.delete('/api/session-requests/:id', authenticate, withdrawSessionRequestHandler);
 
 // ===== ERROR HANDLING =====
 

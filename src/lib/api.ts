@@ -109,6 +109,7 @@ export const sessionsAPI = {
     status?: string;
     startDate?: string;
     endDate?: string;
+    classId?: string;
     page?: number;
     limit?: number;
   }) {
@@ -739,6 +740,72 @@ export const enrollmentsAPI = {
   }
 };
 
+// ===== SESSION REQUESTS =====
+
+export const sessionRequestsAPI = {
+  async list(params?: {
+    status?: string;
+    type?: 'cancel' | 'reschedule';
+    tutorId?: string;
+    studentId?: string;
+    classId?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const query = params ? '?' + new URLSearchParams(params as any).toString() : '';
+    return fetchAPI(`/session-requests${query}`);
+  },
+
+  async create(data: {
+    sessionId: string;
+    type: 'cancel' | 'reschedule';
+    reason: string;
+    preferredStartTime?: string;
+    preferredEndTime?: string;
+  }) {
+    return fetchAPI('/session-requests', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async get(id: string) {
+    return fetchAPI(`/session-requests/${id}`);
+  },
+
+  async approve(id: string, data: {
+    responseMessage?: string;
+    newStartTime?: string;
+    newEndTime?: string;
+  }) {
+    return fetchAPI(`/session-requests/${id}/approve`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async reject(id: string, data: {
+    responseMessage?: string;
+  }) {
+    return fetchAPI(`/session-requests/${id}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async withdraw(id: string) {
+    return fetchAPI(`/session-requests/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
+  async delete(id: string) {
+    return fetchAPI(`/session-requests/${id}`, {
+      method: 'DELETE'
+    });
+  }
+};
+
 // ===== EXPORT ALL =====
 
 export const api = {
@@ -760,7 +827,8 @@ export const api = {
   grades: gradesAPI,
   sessionStudents: sessionStudentsAPI,
   classes: classesAPI,
-  enrollments: enrollmentsAPI
+  enrollments: enrollmentsAPI,
+  sessionRequests: sessionRequestsAPI
 };
 
 export default api;

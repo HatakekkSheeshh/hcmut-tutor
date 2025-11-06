@@ -18,8 +18,7 @@ export const registerSchema = z.object({
   major: z.string().optional(),
   year: z.number().min(1).max(6).optional(),
   subjects: z.array(z.string()).optional(),
-  bio: z.string().optional(),
-  hourlyRate: z.number().positive().optional()
+  bio: z.string().optional()
 });
 
 export const updateProfileSchema = z.object({
@@ -34,7 +33,6 @@ export const updateProfileSchema = z.object({
   // Tutor fields
   subjects: z.array(z.string()).optional(),
   bio: z.string().optional(),
-  hourlyRate: z.number().positive().optional(),
   credentials: z.array(z.string()).optional()
 });
 
@@ -72,6 +70,40 @@ export const rescheduleSessionSchema = z.object({
 
 export const cancelSessionSchema = z.object({
   reason: z.string().min(10, 'Please provide a reason (min 10 characters)')
+});
+
+// ===== SESSION REQUEST SCHEMAS =====
+
+export const createSessionRequestSchema = z.object({
+  sessionId: z.string().min(1, 'Session ID is required'),
+  type: z.enum(['cancel', 'reschedule'], {
+    required_error: 'Request type is required',
+    invalid_type_error: 'Request type must be either cancel or reschedule'
+  }),
+  reason: z.string().min(10, 'Reason must be at least 10 characters'),
+  preferredStartTime: z.string().datetime('Invalid preferred start time format').optional(),
+  preferredEndTime: z.string().datetime('Invalid preferred end time format').optional()
+}).refine(
+  (data) => {
+    if (data.type === 'reschedule') {
+      return !!data.preferredStartTime && !!data.preferredEndTime;
+    }
+    return true;
+  },
+  {
+    message: 'Preferred start time and end time are required for reschedule requests',
+    path: ['preferredStartTime']
+  }
+);
+
+export const approveSessionRequestSchema = z.object({
+  responseMessage: z.string().optional(),
+  newStartTime: z.string().datetime('Invalid new start time format').optional(),
+  newEndTime: z.string().datetime('Invalid new end time format').optional()
+});
+
+export const rejectSessionRequestSchema = z.object({
+  responseMessage: z.string().optional()
 });
 
 // ===== AVAILABILITY SCHEMAS =====
@@ -243,7 +275,6 @@ export const reviewApprovalSchema = z.object({
 export const searchTutorsSchema = z.object({
   subject: z.string().optional(),
   minRating: z.number().min(0).max(5).optional(),
-  maxPrice: z.number().positive().optional(),
   availability: z.enum(['today', 'tomorrow', 'this-week', 'next-week']).optional(),
   location: z.string().optional(),
   isOnline: z.boolean().optional(),
@@ -410,4 +441,7 @@ export type CreateClassInput = z.infer<typeof createClassSchema>;
 export type UpdateClassInput = z.infer<typeof updateClassSchema>;
 export type CreateEnrollmentInput = z.infer<typeof createEnrollmentSchema>;
 export type UpdateEnrollmentInput = z.infer<typeof updateEnrollmentSchema>;
+export type CreateSessionRequestInput = z.infer<typeof createSessionRequestSchema>;
+export type ApproveSessionRequestInput = z.infer<typeof approveSessionRequestSchema>;
+export type RejectSessionRequestInput = z.infer<typeof rejectSessionRequestSchema>;
 

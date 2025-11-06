@@ -102,6 +102,12 @@ const BookSessionMobile: React.FC = () => {
   const [enrollDialogOpen, setEnrollDialogOpen] = useState(false)
   const [enrolling, setEnrolling] = useState(false)
   
+  // Class selection step (0: select tutor, 1: view classes)
+  const [classSelectionStep, setClassSelectionStep] = useState<0 | 1>(0)
+  const [selectedClassTutor, setSelectedClassTutor] = useState<any>(null)
+  const [classTutorPage, setClassTutorPage] = useState(1)
+  const classTutorsPerPage = 6
+  
   // Dropdown states removed - using MUI components now
   
   // Filter options
@@ -207,15 +213,24 @@ const BookSessionMobile: React.FC = () => {
     return colors[index]
   }
 
-  // Load classes when in class mode
+  // Load tutors and data when in class mode
   useEffect(() => {
     if (bookingMode === 'class') {
       loadAvailableSubjects()
       loadAvailableTutors()
-      loadClasses()
       loadMyEnrollments()
+      // Reset class selection when switching to class mode
+      setClassSelectionStep(0)
+      setSelectedClassTutor(null)
     }
-  }, [bookingMode, classFilters])
+  }, [bookingMode])
+
+  // Load classes when tutor is selected in class mode
+  useEffect(() => {
+    if (bookingMode === 'class' && classSelectionStep === 1 && selectedClassTutor) {
+      loadClasses()
+    }
+  }, [bookingMode, classSelectionStep, selectedClassTutor])
 
   // Load available subjects and start times from all classes in database
   const loadAvailableSubjects = async () => {
@@ -277,9 +292,12 @@ const BookSessionMobile: React.FC = () => {
         limit: 100, // Load up to 100 classes (or all if less than 100)
         page: 1
       }
+      // If tutor is selected, filter by tutor
+      if (selectedClassTutor) {
+        params.tutorId = selectedClassTutor.id
+      }
       if (classFilters.subject) params.subject = classFilters.subject
       if (classFilters.day) params.day = classFilters.day
-      if (classFilters.tutorId) params.tutorId = classFilters.tutorId
       if (classFilters.status) params.status = classFilters.status
       
       const response = await api.classes.list(params)
@@ -861,7 +879,7 @@ const BookSessionMobile: React.FC = () => {
                           ? theme === 'dark' ? 'text-blue-300' : 'text-blue-700'
                           : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                       }`}>
-                        {tutor.subjects?.[0] || 'N/A'} • {(tutor.hourlyRate || 0) / 1000}K VND/giờ
+                        {tutor.subjects?.[0] || 'N/A'}
                       </p>
                       <div className="flex flex-wrap gap-1 mb-2">
                         {(tutor.subjects || []).slice(0, 3).map((subject: string, index: number) => (
@@ -1544,16 +1562,6 @@ const BookSessionMobile: React.FC = () => {
               {sessionType || 'Not selected'}
             </span>
           </div>
-          <div className="border-t pt-2 mt-3">
-            <div className="flex justify-between">
-              <span className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Total:
-              </span>
-              <span className={`text-lg font-semibold text-blue-600`}>
-                ${selectedTutorData?.price || 0}.00
-              </span>
-            </div>
-          </div>
         </div>
       </div>
     )
@@ -1923,366 +1931,209 @@ const BookSessionMobile: React.FC = () => {
         ) : (
           /* Classes Browsing Content */
           <div className="space-y-4">
-            {/* Filters - Compact with MUI Accordion */}
-            <div ref={filterCardRef}>
-              <Accordion 
-                defaultExpanded={false}
-                sx={{
-                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                  border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
-                  borderRadius: '12px',
-                  boxShadow: 'none',
-                  '&:before': {
-                    display: 'none'
-                  },
-                  '&.Mui-expanded': {
-                    margin: 0
-                  }
+            {classSelectionStep === 0 ? (
+              // Step 1: Select Tutor
+              <Card 
+                className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-5 rounded-xl shadow-md`}
+                style={{
+                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
                 }}
               >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />}
-                  sx={{
-                    px: 2,
-                    py: 1.5,
-                    minHeight: 56,
-                    '&.Mui-expanded': {
-                      minHeight: 56
-                    }
-                  }}
-                >
-                  <div className="flex items-center gap-2 flex-1">
-                    <FilterListIcon sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: 20 }} />
-                    <h3 className={`text-base font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Filter Classes
-                    </h3>
-                    {(() => {
-                      const activeCount = [
-                        classFilters.subject,
-                        classFilters.tutorId,
-                        classFilters.day,
-                        classFilters.startTime,
-                        classFilters.minRating,
-                        classFilters.status,
-                        classFilters.isOnline
-                      ].filter(Boolean).length + (classFilters.availableOnly ? 1 : 0)
-                      return activeCount > 0 ? (
-                        <Chip 
-                          label={activeCount} 
-                          size="small" 
-                          sx={{ 
-                            height: 20, 
-                            fontSize: '0.7rem',
-                            backgroundColor: theme === 'dark' ? '#2563eb' : '#3b82f6',
-                            color: '#ffffff'
-                          }} 
-                        />
-                      ) : null
-                    })()}
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Choose a Tutor
+                  </h2>
+                  {availableTutors.length > classTutorsPerPage && (
+                    <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {classTutorPage}/{Math.ceil(availableTutors.length / classTutorsPerPage)}
+                    </span>
+                  )}
       </div>
-                </AccordionSummary>
-                <AccordionDetails sx={{ px: 2, pb: 2, pt: 1 }}>
+                {availableTutors.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading tutors...</p>
+                  </div>
+                ) : (
+                  <>
               <div className="space-y-3">
-                {/* Subject Autocomplete */}
-                <Autocomplete
-                  options={availableSubjects}
-                  value={classFilters.subject || null}
-                  onChange={(_, newValue) => {
-                    setClassFilters({...classFilters, subject: newValue || ''})
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Subject"
-                      size="small"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#111827'
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme === 'dark' ? '#9ca3af' : '#6b7280'
-                        }
-                      }}
-                    />
-                  )}
+                      {(() => {
+                        const startIndex = (classTutorPage - 1) * classTutorsPerPage
+                        const endIndex = startIndex + classTutorsPerPage
+                        const currentTutors = availableTutors.slice(startIndex, endIndex)
+                        
+                        return currentTutors.map((tutor) => (
+                          <div
+                            key={tutor.id}
+                            className={`tutor-card-item p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                              selectedClassTutor?.id === tutor.id
+                                ? `border-blue-500 ${theme === 'dark' ? 'bg-blue-900/30 shadow-lg' : 'bg-blue-50 shadow-lg'}`
+                                : `${theme === 'dark' ? 'border-gray-600 hover:border-gray-500 bg-gray-800' : 'border-gray-200 hover:border-gray-300 bg-white'} shadow-sm`
+                            }`}
+                            onClick={(e) => {
+                              const card = e.currentTarget
+                              gsap.to(card, {
+                                scale: 0.97,
+                                duration: 0.1,
+                                ease: 'power2.out',
+                                yoyo: true,
+                                repeat: 1,
+                                onComplete: () => {
+                                  setSelectedClassTutor(tutor)
+                                  setClassSelectionStep(1)
+                                  gsap.to(card, {
+                                    scale: 1,
+                                    boxShadow: '0 10px 30px rgba(59, 130, 246, 0.3)',
+                                    duration: 0.3,
+                                    ease: 'power2.out'
+                                  })
+                                }
+                              })
+                            }}
+                          >
+                            <div className="flex items-start">
+                              <Avatar
+                                src={tutor.avatar}
                   sx={{
-                    '& .MuiAutocomplete-popper': {
-                      zIndex: 9999
-                    }
+                                  width: 48,
+                                  height: 48,
+                                  bgcolor: getAvatarColor(tutor.name),
+                                  fontSize: '1rem',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {getInitials(tutor.name)}
+                              </Avatar>
+                              <div className="ml-3 flex-1">
+                                <div className="flex items-start justify-between mb-1">
+                                  <h3 className={`font-semibold text-sm ${
+                                    selectedClassTutor?.id === tutor.id
+                                      ? theme === 'dark' ? 'text-blue-200' : 'text-blue-900'
+                                      : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                                  }`}>
+                                    {tutor.name}
+                                  </h3>
+                                  <div className="flex items-center">
+                                    <Star className="w-3 h-3 text-yellow-400 mr-1" />
+                                    <span className={`text-xs font-medium ${
+                                      selectedClassTutor?.id === tutor.id
+                                        ? theme === 'dark' ? 'text-blue-300' : 'text-blue-700'
+                                        : theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                                    }`}>
+                                      {tutor.rating?.toFixed(1) || 'N/A'}
+                                    </span>
+                                  </div>
+                                </div>
+                                <p className={`text-xs mb-2 ${
+                                  selectedClassTutor?.id === tutor.id
+                                    ? theme === 'dark' ? 'text-blue-300' : 'text-blue-700'
+                                    : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                  {tutor.subjects?.[0] || 'N/A'}
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                  {(tutor.subjects || []).slice(0, 3).map((subject: string, index: number) => (
+                                    <span
+                                      key={index}
+                                      className={`px-2 py-1 text-xs rounded-full ${
+                                        selectedClassTutor?.id === tutor.id && theme === 'dark'
+                                          ? 'bg-blue-800 text-blue-200'
+                                          : selectedClassTutor?.id === tutor.id
+                                          ? 'bg-blue-100 text-blue-800'
+                                          : theme === 'dark'
+                                          ? 'bg-gray-700 text-gray-300'
+                                          : 'bg-blue-100 text-blue-800'
+                                      }`}
+                                    >
+                                      {subject}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      })()}
+                    </div>
+                    
+                    {/* Pagination Controls */}
+                    {availableTutors.length > classTutorsPerPage && (
+                      <div className="flex items-center justify-center gap-2 mt-4">
+                        <Button
+                          onClick={() => setClassTutorPage(prev => Math.max(1, prev - 1))}
+                          disabled={classTutorPage === 1}
+                          style={{
+                            backgroundColor: classTutorPage === 1 ? (theme === 'dark' ? '#374151' : '#e5e7eb') : '#2563eb',
+                            color: classTutorPage === 1 ? (theme === 'dark' ? '#6b7280' : '#9ca3af') : '#ffffff',
+                            textTransform: 'none',
+                            padding: '6px 12px',
+                            fontSize: '14px',
+                            minWidth: '70px'
+                          }}
+                        >
+                          Trước
+                        </Button>
+                        <span className={`px-3 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {classTutorPage}/{Math.ceil(availableTutors.length / classTutorsPerPage)}
+                        </span>
+                        <Button
+                          onClick={() => setClassTutorPage(prev => Math.min(Math.ceil(availableTutors.length / classTutorsPerPage), prev + 1))}
+                          disabled={classTutorPage >= Math.ceil(availableTutors.length / classTutorsPerPage)}
+                          style={{
+                            backgroundColor: classTutorPage >= Math.ceil(availableTutors.length / classTutorsPerPage) ? (theme === 'dark' ? '#374151' : '#e5e7eb') : '#2563eb',
+                            color: classTutorPage >= Math.ceil(availableTutors.length / classTutorsPerPage) ? (theme === 'dark' ? '#6b7280' : '#9ca3af') : '#ffffff',
+                            textTransform: 'none',
+                            padding: '6px 12px',
+                            fontSize: '14px',
+                            minWidth: '70px'
+                          }}
+                        >
+                          Sau
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </Card>
+            ) : (
+              // Step 2: View Classes of Selected Tutor
+              <>
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-5 rounded-xl shadow-md`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
                   }}
-                />
-
-                {/* Tutor Autocomplete */}
-                <Autocomplete
-                  options={availableTutors}
-                  value={availableTutors.find(t => t.id === classFilters.tutorId) || null}
-                  onChange={(_, newValue) => {
-                    setClassFilters({...classFilters, tutorId: newValue?.id || ''})
-                  }}
-                  getOptionLabel={(option) => `${option.name} ${option.rating ? `(${option.rating.toFixed(1)}⭐)` : ''}`}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Tutor"
-                      size="small"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#111827'
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme === 'dark' ? '#9ca3af' : '#6b7280'
-                        }
-                      }}
-                    />
-                  )}
-                  sx={{
-                    '& .MuiAutocomplete-popper': {
-                      zIndex: 9999
-                    }
-                  }}
-                />
-
-                {/* Day Select */}
-                <FormControl fullWidth size="small">
-                  <InputLabel sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>Day</InputLabel>
-                  <Select
-                    value={classFilters.day || ''}
-                    onChange={(e) => setClassFilters({...classFilters, day: e.target.value})}
-                    label="Day"
-                    sx={{
-                      backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#111827',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6'
-                      }
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#111827',
-                          maxHeight: 300
-                        }
-                      }
-                    }}
-                  >
-                    {dayOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {/* Start Time Select */}
-                <FormControl fullWidth size="small">
-                  <InputLabel sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>Start Time</InputLabel>
-                  <Select
-                    value={classFilters.startTime || ''}
-                    onChange={(e) => setClassFilters({...classFilters, startTime: e.target.value})}
-                    label="Start Time"
-                    sx={{
-                      backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#111827',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6'
-                      }
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#111827',
-                          maxHeight: 300
-                        }
-                      }
-                    }}
-                  >
-                    <MenuItem value="">All Times</MenuItem>
-                    {(availableStartTimes.length > 0 ? availableStartTimes : defaultStartTimes).map((time) => (
-                      <MenuItem key={time} value={time}>
-                        {time}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {/* Min Rating Select */}
-                <FormControl fullWidth size="small">
-                  <InputLabel sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>Min Rating</InputLabel>
-                  <Select
-                    value={classFilters.minRating || ''}
-                    onChange={(e) => setClassFilters({...classFilters, minRating: e.target.value})}
-                    label="Min Rating"
-                    sx={{
-                      backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#111827',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6'
-                      }
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#111827'
-                        }
-                      }
-                    }}
-                  >
-                    {minRatingOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {/* Status Select */}
-                <FormControl fullWidth size="small">
-                  <InputLabel sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>Status</InputLabel>
-                  <Select
-                    value={classFilters.status || ''}
-                    onChange={(e) => setClassFilters({...classFilters, status: e.target.value})}
-                    label="Status"
-                    sx={{
-                      backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#111827',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6'
-                      }
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#111827'
-                        }
-                      }
-                    }}
-                  >
-                    {statusOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {/* Type Select */}
-                <FormControl fullWidth size="small">
-                  <InputLabel sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>Type</InputLabel>
-                  <Select
-                    value={classFilters.isOnline || ''}
-                    onChange={(e) => setClassFilters({...classFilters, isOnline: e.target.value})}
-                    label="Type"
-                    sx={{
-                      backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#111827',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6'
-                      }
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#111827'
-                        }
-                      }
-                    }}
-                  >
-                    {typeOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {/* Available Only Checkbox */}
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={classFilters.availableOnly}
-                      onChange={(e) => setClassFilters({...classFilters, availableOnly: e.target.checked})}
-                      sx={{
-                        color: theme === 'dark' ? '#9ca3af' : '#6b7280',
-                        '&.Mui-checked': {
-                          color: '#3b82f6'
-                        }
-                      }}
-                    />
-                  }
-                  label="Available Only (Not Full)"
-                  sx={{
-                    color: theme === 'dark' ? '#ffffff' : '#111827',
-                    '& .MuiFormControlLabel-label': {
-                      fontSize: '0.875rem'
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => setClassFilters({
-                    subject: '',
-                    day: '',
-                    tutorId: '',
-                    startTime: '',
-                    minRating: '',
-                    status: '',
-                    isOnline: '',
-                    availableOnly: true
-                  })}
-                  className={`w-full px-4 py-2 rounded-lg border ${
-                    theme === 'dark'
-                      ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                      : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
                 >
-                  Clear All Filters
-                </button>
-              </div>
-                </AccordionDetails>
-              </Accordion>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        Classes by {selectedClassTutor?.name || 'Tutor'}
+                      </h2>
+                      <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Select a class to enroll
+                      </p>
+                    </div>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => {
+                        setClassSelectionStep(0)
+                        setSelectedClassTutor(null)
+                      }}
+                      style={{
+                          backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                        textTransform: 'none',
+                        fontSize: '12px',
+                        padding: '4px 8px'
+                      }}
+                    >
+                      ← Change
+                    </Button>
             </div>
 
-            {/* Available Classes */}
-            <div>
-              <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Available Classes
-              </h3>
               {classesLoading ? (
                 <div className="text-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -2301,24 +2152,12 @@ const BookSessionMobile: React.FC = () => {
                 >
                   <ClassIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
                   <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    No classes available
+                        No classes available for this tutor
                   </p>
                 </Card>
               ) : (
                 <div className="space-y-4">
-                  {classes.filter((cls) => {
-                    // Client-side filtering for minRating, startTime, isOnline
-                    if (classFilters.minRating && cls.tutor?.rating && parseFloat(cls.tutor.rating) < parseFloat(classFilters.minRating)) {
-                      return false
-                    }
-                    if (classFilters.startTime && cls.startTime !== classFilters.startTime) {
-                      return false
-                    }
-                    if (classFilters.isOnline !== '' && cls.isOnline !== (classFilters.isOnline === 'true')) {
-                      return false
-                    }
-                    return true
-                  }).map((cls) => {
+                      {classes.map((cls) => {
                     const isEnrolled = myEnrollments.some(e => e.classId === cls.id && e.status === 'active')
                     const isFull = cls.currentEnrollment >= cls.maxStudents
                     
@@ -2380,12 +2219,6 @@ const BookSessionMobile: React.FC = () => {
                             <p className={`text-sm mb-2 font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
                               {cls.subject}
                             </p>
-                            {cls.tutor?.name && (
-                              <p className={`text-xs mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <Person className="w-3 h-3 inline mr-1" />
-                                Tutor: {cls.tutor.name}
-                              </p>
-                            )}
                             {cls.description && (
                               <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                 {cls.description}
@@ -2434,7 +2267,9 @@ const BookSessionMobile: React.FC = () => {
                   })}
                 </div>
               )}
-            </div>
+                </Card>
+              </>
+            )}
 
             {/* My Enrollments */}
             {myEnrollments.length > 0 && (
@@ -2493,16 +2328,15 @@ const BookSessionMobile: React.FC = () => {
 
                         {enrollment.status === 'active' && (
                           <Button
-                            onClick={() => handleCancelEnrollment(enrollment.id)}
+                            onClick={() => navigate(`/student/class/${enrollment.classId}`)}
                             fullWidth
-                            variant="outlined"
                             style={{
-                              color: theme === 'dark' ? '#ef4444' : '#dc2626',
-                              borderColor: theme === 'dark' ? '#ef4444' : '#dc2626',
+                              backgroundColor: '#2563eb',
+                              color: '#ffffff',
                               textTransform: 'none'
                             }}
                           >
-                            Cancel Enrollment
+                            View Class LMS
                           </Button>
                         )}
                       </Card>

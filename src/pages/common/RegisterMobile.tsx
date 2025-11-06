@@ -394,35 +394,6 @@ const RegisterMobile: React.FC = () => {
                 </button>
               </div>
 
-              <div className="space-y-2">
-                <button
-                  onClick={() => {
-                    navigate('/common/login')
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`w-full text-left px-4 py-3 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
-                >
-                  Back to Login
-                </button>
-                <button
-                  onClick={() => {
-                    navigate('/common/library')
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`w-full text-left px-4 py-3 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
-                >
-                  Digital Library
-                </button>
-                <button
-                  onClick={() => {
-                    navigate('/common/forum')
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`w-full text-left px-4 py-3 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
-                >
-                  Community Forum
-                </button>
-              </div>
             </div>
           </div>
         </div>

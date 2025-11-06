@@ -39,6 +39,11 @@ import Button from '../../components/ui/Button'
 import CourseTab from '../../components/session/CourseTab'
 import GradesTab from '../../components/session/GradesTab'
 import CompetenciesTab from '../../components/session/CompetenciesTab'
+import RequestDialog from '../../components/session/RequestDialog'
+import {
+  Cancel as CancelIcon,
+  Schedule as RescheduleIcon
+} from '@mui/icons-material'
 
 const SessionDetail: React.FC = () => {
   const { id } = useParams()
@@ -47,6 +52,8 @@ const SessionDetail: React.FC = () => {
   const location = useLocation()
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false)
   const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false)
+  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false)
+  const [requestType, setRequestType] = useState<'cancel' | 'reschedule'>('cancel')
   const [rating, setRating] = useState(0)
   const [feedback, setFeedback] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -59,12 +66,15 @@ const SessionDetail: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [session, setSession] = useState<any>(null)
   const [classData, setClassData] = useState<any>(null)
+  const [classSessions, setClassSessions] = useState<any[]>([]) // Sessions của class
+  const [upcomingClassSession, setUpcomingClassSession] = useState<any>(null) // Session sắp tới nhất của class
   const [tutor, setTutor] = useState<any>(null)
   const [mySessions, setMySessions] = useState<any[]>([])
   const [myClasses, setMyClasses] = useState<any[]>([])
   const [sessionsLoading, setSessionsLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [isTutor, setIsTutor] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -179,10 +189,148 @@ const SessionDetail: React.FC = () => {
             setClassData(classResponse.data)
             console.log('Class data loaded:', classResponse.data)
             
-            // Check if current user is tutor
+            // Load sessions of this class
             const userStr = localStorage.getItem('user')
+            const user = userStr ? JSON.parse(userStr) : null
+            const userId = user?.id || user?.userId
+            
+            if (userId) {
+              // Load sessions of this class for the current student
+              const sessionsResponse = await api.sessions.list({
+                classId: id,
+                studentId: userId,
+                page: 1,
+                limit: 100
+              })
+              
+              console.log('📦 [Class Sessions Response]:', sessionsResponse)
+              
+              // Handle response - API returns {data: Array, pagination: {...}} directly (no success wrapper)
+              let classSess: any[] = []
+              
+              // API returns {data: [...], pagination: {...}} format
+              if (sessionsResponse && sessionsResponse.data && Array.isArray(sessionsResponse.data)) {
+                classSess = sessionsResponse.data
+                console.log(`📚 Initial sessions found with classId filter: ${classSess.length}`)
+              } else {
+                console.warn('⚠️ Unexpected response format or no data:', sessionsResponse)
+              }
+              
+              // If no sessions found with classId filter, try loading all student sessions and filter manually
+              if (classSess.length === 0) {
+                console.log('⚠️ No sessions found with classId filter, trying to load all student sessions...')
+                const allSessionsResponse = await api.sessions.list({
+                  studentId: userId,
+                  page: 1,
+                  limit: 200
+                })
+                
+                console.log('📦 [All Sessions Response]:', allSessionsResponse)
+                
+                // Handle same response format
+                let allSess: any[] = []
+                if (allSessionsResponse && allSessionsResponse.data && Array.isArray(allSessionsResponse.data)) {
+                  allSess = allSessionsResponse.data
+                  
+                  // Filter sessions by matching tutorId and subject (since classId might not be set)
+                  classSess = allSess.filter((s: any) => {
+                    const matchesClass = s.classId === id || 
+                      (s.tutorId === classResponse.data.tutorId && 
+                       s.subject === classResponse.data.subject &&
+                       s.studentIds?.includes(userId))
+                    return matchesClass
+                  })
+                  console.log(`✅ Found ${classSess.length} sessions for class by tutorId/subject match`)
+                }
+              }
+              
+              setClassSessions(classSess)
+              
+              if (classSess.length > 0) {
+                // Find the next upcoming session (confirmed or pending, not cancelled, in the future)
+                const now = new Date()
+                let upcoming = classSess
+                  .filter((s: any) => {
+                    // Must include this student
+                    if (!s.studentIds?.includes(userId)) return false
+                    // Must have valid status
+                    if (s.status !== 'confirmed' && s.status !== 'pending') return false
+                    // Must not be cancelled
+                    if (s.status === 'cancelled') return false
+                    // Must be in the future
+                    return new Date(s.startTime) >= now
+                  })
+                  .sort((a: any, b: any) => 
+                    new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+                  )[0] // Get the earliest upcoming session
+                
+                // If no upcoming session found, try to find any valid session (even if in past but not completed)
+                if (!upcoming) {
+                  upcoming = classSess
+                    .filter((s: any) => {
+                      if (!s.studentIds?.includes(userId)) return false
+                      return (s.status === 'confirmed' || s.status === 'pending') && s.status !== 'cancelled'
+                    })
+                    .sort((a: any, b: any) => 
+                      new Date(b.startTime).getTime() - new Date(a.startTime).getTime() // Most recent first
+                    )[0] // Get the most recent valid session
+                }
+                
+                if (upcoming) {
+                  console.log('✅ Found session for class cancel/reschedule:', {
+                    id: upcoming.id,
+                    status: upcoming.status,
+                    classId: upcoming.classId || 'no classId',
+                    subject: upcoming.subject,
+                    startTime: upcoming.startTime,
+                    studentIds: upcoming.studentIds
+                  })
+                  setUpcomingClassSession(upcoming)
+                  // Also set as session for compatibility with handlers
+                  setSession(upcoming)
+                } else if (classSess.length > 0) {
+                  // If no valid session found, use any session from class as fallback
+                  // This allows cancel/reschedule even if all sessions are completed/cancelled
+                  const fallbackSession = classSess
+                    .filter((s: any) => s.studentIds?.includes(userId))
+                    .sort((a: any, b: any) => 
+                      new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+                    )[0]
+                  
+                  if (fallbackSession) {
+                    console.log('⚠️ Using fallback session for class cancel/reschedule:', {
+                      id: fallbackSession.id,
+                      status: fallbackSession.status,
+                      startTime: fallbackSession.startTime
+                    })
+                    setUpcomingClassSession(fallbackSession)
+                    setSession(fallbackSession)
+                  }
+                } else {
+                  console.warn('⚠️ No valid session found for class:', {
+                    classId: id,
+                    totalSessions: classSess.length,
+                    sessions: classSess.map((s: any) => ({
+                      id: s.id,
+                      status: s.status,
+                      subject: s.subject,
+                      startTime: s.startTime,
+                      hasStudent: s.studentIds?.includes(userId)
+                    }))
+                  })
+                  // Clear session state if no valid session found
+                  setUpcomingClassSession(null)
+                  setSession(null)
+                }
+              } else {
+                console.warn('⚠️ No sessions found for class:', id)
+                setUpcomingClassSession(null)
+                setSession(null)
+              }
+            }
+            
+            // Check if current user is tutor
             if (userStr) {
-              const user = JSON.parse(userStr)
               const isUserTutor = classResponse.data.tutorId === (user.id || user.userId)
               console.log('👤 [ClassDetail] User check:', {
                 currentUserId: user.id || user.userId,
@@ -252,7 +400,7 @@ const SessionDetail: React.FC = () => {
     }
 
     loadData()
-  }, [id, isClassView])
+  }, [id, isClassView, refreshTrigger])
 
   // Format date and time
   const formatDateTime = (isoString: string) => {
@@ -325,6 +473,55 @@ const SessionDetail: React.FC = () => {
     // In a real app, this would submit feedback to the backend
     console.log('Feedback submitted:', { rating, feedback })
     setIsFeedbackDialogOpen(false)
+  }
+
+  const handleRequestCancel = () => {
+    if (isClassView) {
+      // For class view, use upcoming session if available, otherwise create a session object from class info
+      if (upcomingClassSession) {
+        setRequestType('cancel')
+        setIsRequestDialogOpen(true)
+      } else if (classData) {
+        // Create a virtual session from class info to allow cancel/reschedule requests
+        // This allows students to request cancel/reschedule even if no specific session exists yet
+        setRequestType('cancel')
+        setIsRequestDialogOpen(true)
+      } else {
+        alert('Không thể tạo yêu cầu. Vui lòng thử lại sau.')
+      }
+    } else {
+      // For individual session
+      if (!session) return
+      setRequestType('cancel')
+      setIsRequestDialogOpen(true)
+    }
+  }
+
+  const handleRequestReschedule = () => {
+    if (isClassView) {
+      // For class view, use upcoming session if available, otherwise create a session object from class info
+      if (upcomingClassSession) {
+        setRequestType('reschedule')
+        setIsRequestDialogOpen(true)
+      } else if (classData) {
+        // Create a virtual session from class info to allow cancel/reschedule requests
+        setRequestType('reschedule')
+        setIsRequestDialogOpen(true)
+      } else {
+        alert('Không thể tạo yêu cầu. Vui lòng thử lại sau.')
+      }
+    } else {
+      // For individual session
+      if (!session) return
+      setRequestType('reschedule')
+      setIsRequestDialogOpen(true)
+    }
+  }
+
+  const handleRequestSuccess = () => {
+    setIsRequestDialogOpen(false)
+    // Trigger refresh by updating a state that useEffect depends on
+    setRefreshTrigger(prev => prev + 1)
   }
 
   const renderInformationTab = () => {
@@ -513,6 +710,73 @@ const SessionDetail: React.FC = () => {
               >
                 Join Video Call
               </Button>
+              {/* Show buttons for individual sessions OR upcoming class session */}
+              {(() => {
+                if (isClassView) {
+                  // For class view: show buttons if class is active
+                  // We don't require upcomingClassSession because we can create request based on class info
+                  const classIsActive = classData?.status === 'active'
+                  
+                  console.log('🏫 [Class View] Check buttons:', {
+                    classIsActive,
+                    hasUpcomingSession: !!upcomingClassSession,
+                    sessionId: upcomingClassSession?.id,
+                    status: upcomingClassSession?.status,
+                    classStatus: classData?.status,
+                    classSessionsCount: classSessions.length,
+                    shouldShow: classIsActive
+                  })
+                  return classIsActive
+                } else {
+                  // For individual session view
+                  return !!(session && (session.status === 'confirmed' || session.status === 'pending'))
+                }
+              })() && (
+                <>
+                  <Button 
+                    fullWidth 
+                    variant="outlined" 
+                    startIcon={<RescheduleIcon />}
+                    onClick={handleRequestReschedule}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#000000',
+                      borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                      textTransform: 'none',
+                      fontWeight: '500'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                    }}
+                  >
+                    Request Reschedule
+                  </Button>
+                  <Button 
+                    fullWidth 
+                    variant="outlined" 
+                    startIcon={<CancelIcon />}
+                    onClick={handleRequestCancel}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                      color: '#ef4444',
+                      borderColor: '#ef4444',
+                      textTransform: 'none',
+                      fontWeight: '500'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#fef2f2'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                    }}
+                  >
+                    Request Cancel
+                  </Button>
+                </>
+              )}
               <Button 
                 fullWidth 
                 variant="outlined" 
@@ -600,14 +864,6 @@ const SessionDetail: React.FC = () => {
                   {getStatusLabel(data.status)}
                     </span>
                   </div>
-              {!isClassView && data.price && (
-              <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Price:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      ${data.price}
-                    </span>
-                  </div>
-              )}
               <div className="flex justify-between items-center">
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{isClassView ? 'Code' : 'Type'}:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -1092,6 +1348,69 @@ const SessionDetail: React.FC = () => {
           </MuiButton>
         </DialogActions>
       </Dialog>
+
+      {/* Request Dialog */}
+      {/* Show for individual sessions OR class */}
+      {((!isClassView && session && (session.status === 'confirmed' || session.status === 'pending')) ||
+        (isClassView && classData && isRequestDialogOpen)) && (() => {
+          // Determine session object for RequestDialog
+          let sessionForRequest: {
+            id: string
+            subject: string
+            startTime: string
+            endTime: string
+            classId?: string
+            tutorId?: string
+          } | null = null
+
+          if (isClassView && upcomingClassSession) {
+            sessionForRequest = {
+              id: upcomingClassSession.id,
+              subject: upcomingClassSession.subject || classData?.subject || '',
+              startTime: upcomingClassSession.startTime,
+              endTime: upcomingClassSession.endTime,
+              classId: upcomingClassSession.classId || classData?.id,
+              tutorId: upcomingClassSession.tutorId || classData?.tutorId || session?.tutorId
+            }
+          } else if (isClassView && classData) {
+            // Create a virtual session from class info for request
+            sessionForRequest = {
+              id: `class_${classData.id}_next_session`,
+              subject: classData.subject,
+              startTime: new Date().toISOString(), // Placeholder - will be updated when session is created
+              endTime: new Date(Date.now() + (classData.duration || 120) * 60000).toISOString(),
+              classId: classData.id,
+              tutorId: classData.tutorId
+            }
+          } else if (session) {
+            sessionForRequest = {
+              id: session.id,
+              subject: session.subject,
+              startTime: session.startTime,
+              endTime: session.endTime,
+              classId: session.classId,
+              tutorId: session.tutorId
+            }
+          }
+
+          // Only render if we have a valid session
+          if (!sessionForRequest) return null
+
+          return (
+            <RequestDialog
+              open={isRequestDialogOpen}
+              onClose={() => setIsRequestDialogOpen(false)}
+              session={sessionForRequest}
+              type={requestType}
+              classInfo={(isClassView ? classData : (session?.classId && classData)) ? {
+                id: classData.id,
+                code: classData.code,
+                subject: classData.subject
+              } : undefined}
+              onSuccess={handleRequestSuccess}
+            />
+          )
+        })()}
     </div>
   )
 }

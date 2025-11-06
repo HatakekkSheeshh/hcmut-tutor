@@ -29,9 +29,19 @@ const SearchTutors: React.FC = () => {
   
   // Backend data states
   const [tutors, setTutors] = useState<any[]>([])
+  const [allTutors, setAllTutors] = useState<any[]>([]) // Store all tutors for filtering
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  
+  // Filter dropdown states
+  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false)
+  const [showRatingDropdown, setShowRatingDropdown] = useState(false)
+  const [showAvailabilityDropdown, setShowAvailabilityDropdown] = useState(false)
+  
+  // Subjects from backend
+  const [subjects, setSubjects] = useState<string[]>([])
+  const [availabilityData, setAvailabilityData] = useState<any[]>([])
   
   // Tutor detail modal state
   const [selectedTutor, setSelectedTutor] = useState<any>(null)
@@ -109,12 +119,168 @@ const SearchTutors: React.FC = () => {
     }
   }
 
-  // Load tutors on mount and when filters change
+  // Load all subjects and availability data
   useEffect(() => {
-    loadTutors()
-  }, [page, subject, rating, searchTerm])
+    const loadFilterData = async () => {
+      try {
+        // Load all tutors to extract unique subjects
+        const result = await api.tutors.list({ limit: 1000 })
+        if (result.success && result.data) {
+          const allTutorsData = result.data
+          setAllTutors(allTutorsData)
+          
+          // Extract unique subjects from all tutors
+          const uniqueSubjects = new Set<string>()
+          allTutorsData.forEach((tutor: any) => {
+            if (tutor.subjects && Array.isArray(tutor.subjects)) {
+              tutor.subjects.forEach((sub: string) => uniqueSubjects.add(sub))
+            }
+          })
+          setSubjects(Array.from(uniqueSubjects).sort())
+        }
+        
+        // Load availability data by fetching for each tutor
+        // This is not ideal but works for now
+        const availabilityPromises = allTutors.map(async (tutor: any) => {
+          try {
+            const availResult = await fetch(`/api/availability/${tutor.id}`)
+            if (availResult.ok) {
+              const availData = await availResult.json()
+              if (availData.success && availData.data) {
+                return availData.data
+              }
+            }
+          } catch (error) {
+            console.error(`Failed to load availability for tutor ${tutor.id}:`, error)
+          }
+          return null
+        })
+        
+        const availabilityResults = await Promise.all(availabilityPromises)
+        const validAvailability = availabilityResults.filter((avail: any) => avail !== null)
+        setAvailabilityData(validAvailability)
+      } catch (error) {
+        console.error('Error loading filter data:', error)
+      }
+    }
+    
+    loadFilterData()
+  }, [])
 
-  const subjects = ['Toán cao cấp', 'Vật lý đại cương', 'Hóa học', 'Sinh học', 'Lập trình', 'Tiếng Anh']
+  // Filter and load tutors based on filters
+  useEffect(() => {
+    const filterAndLoadTutors = async () => {
+      if (availability && availabilityData.length > 0 && allTutors.length > 0) {
+        setLoading(true)
+        // Filter tutors who have availability on the selected day
+        const tutorsWithAvailability = allTutors.filter((tutor: any) => {
+          const tutorAvailability = availabilityData.find((avail: any) => avail.tutorId === tutor.id)
+          if (!tutorAvailability || !tutorAvailability.timeSlots) return false
+          
+          return tutorAvailability.timeSlots.some((slot: any) => slot.day === availability)
+        })
+        
+        // Apply other filters (subject, rating, search)
+        let filtered = tutorsWithAvailability
+        
+        if (subject) {
+          filtered = filtered.filter((tutor: any) => 
+            tutor.subjects && tutor.subjects.includes(subject)
+          )
+        }
+        
+        if (rating) {
+          const minRating = parseFloat(rating.replace('+', ''))
+          filtered = filtered.filter((tutor: any) => (tutor.rating || 0) >= minRating)
+        }
+        
+        if (searchTerm && searchTerm.trim()) {
+          const searchLower = searchTerm.toLowerCase()
+          filtered = filtered.filter((tutor: any) =>
+            tutor.name.toLowerCase().includes(searchLower) ||
+            tutor.email.toLowerCase().includes(searchLower) ||
+            (tutor.subjects && tutor.subjects.some((s: string) => s.toLowerCase().includes(searchLower)))
+          )
+        }
+        
+        // Paginate
+        const pageNum = page || 1
+        const limitNum = 10
+        const startIndex = (pageNum - 1) * limitNum
+        const endIndex = startIndex + limitNum
+        const paginatedTutors = filtered.slice(startIndex, endIndex)
+        
+        setTutors(paginatedTutors)
+        setTotalPages(Math.ceil(filtered.length / limitNum))
+        setLoading(false)
+      } else if (!availability || availabilityData.length === 0 || allTutors.length === 0) {
+        // No availability filter or data not loaded yet, use normal API call
+    loadTutors()
+      }
+    }
+    
+    filterAndLoadTutors()
+  }, [availability, availabilityData, allTutors, subject, rating, searchTerm, page])
+
+  // Day of week options
+  const dayOptions = [
+    { value: '', label: 'Tất cả các ngày' },
+    { value: 'monday', label: 'Thứ Hai' },
+    { value: 'tuesday', label: 'Thứ Ba' },
+    { value: 'wednesday', label: 'Thứ Tư' },
+    { value: 'thursday', label: 'Thứ Năm' },
+    { value: 'friday', label: 'Thứ Sáu' },
+    { value: 'saturday', label: 'Thứ Bảy' },
+    { value: 'sunday', label: 'Chủ Nhật' }
+  ]
+
+  const subjectOptions = [
+    { value: '', label: 'Tất cả môn học' },
+    ...subjects.map(sub => ({ value: sub, label: sub }))
+  ]
+
+  const ratingOptions = [
+    { value: '', label: 'Bất kỳ rating' },
+    { value: '4+', label: '4+ Sao' },
+    { value: '4.5+', label: '4.5+ Sao' },
+    { value: '5', label: '5 Sao' }
+  ]
+
+  const getSelectedSubject = () => {
+    return subjectOptions.find(option => option.value === subject) || subjectOptions[0]
+  }
+
+  const getSelectedRating = () => {
+    return ratingOptions.find(option => option.value === rating) || ratingOptions[0]
+  }
+
+  const getSelectedAvailability = () => {
+    return dayOptions.find(option => option.value === availability) || dayOptions[0]
+  }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      
+      if (showSubjectDropdown && !target.closest('.subject-dropdown-container')) {
+        setShowSubjectDropdown(false)
+      }
+      
+      if (showRatingDropdown && !target.closest('.rating-dropdown-container')) {
+        setShowRatingDropdown(false)
+      }
+      
+      if (showAvailabilityDropdown && !target.closest('.availability-dropdown-container')) {
+        setShowAvailabilityDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showSubjectDropdown, showRatingDropdown, showAvailabilityDropdown])
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -137,63 +303,191 @@ const SearchTutors: React.FC = () => {
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 SEARCH FILTERS
               </h3>
-              <div className="space-y-4">
-                <div>
+              <div className="space-y-4 overflow-visible">
+                {/* Subject Dropdown */}
+                <div className="relative subject-dropdown-container">
                   <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Subject
+                    Môn học
                   </label>
-                  <select
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg ${
+                  <button
+                    onClick={() => setShowSubjectDropdown(!showSubjectDropdown)}
+                    className={`w-full px-3 py-2 border rounded-xl flex items-center justify-between transition-all duration-200 ${
                       theme === 'dark'
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-900'
+                        ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+                        : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
                     } focus:outline-none focus:ring-2 focus:ring-blue-500`}
               >
-                    <option value="">All Subjects</option>
-                {subjects.map((sub) => (
-                      <option key={sub} value={sub}>{sub}</option>
-                    ))}
-                  </select>
+                    <div className="flex items-center">
+                      <span className="font-medium">{getSelectedSubject().label}</span>
+                    </div>
+                    <div className={`transform transition-transform duration-200 ${showSubjectDropdown ? 'rotate-180' : ''}`}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {showSubjectDropdown && (
+                    <div className="absolute top-full left-0 right-0 z-[9999] mt-1">
+                      <div className={`rounded-xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto ${
+                        theme === 'dark' 
+                          ? 'bg-gray-700 border-gray-600' 
+                          : 'bg-white border-gray-200'
+                      }`}>
+                        {subjectOptions.map((option, index) => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setSubject(option.value)
+                              setShowSubjectDropdown(false)
+                            }}
+                            className={`w-full px-4 py-3 text-left flex items-center transition-colors duration-150 ${
+                              option.value === subject
+                                ? theme === 'dark'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-blue-100 text-blue-700'
+                                : theme === 'dark'
+                                  ? 'text-gray-300 hover:bg-gray-600'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                            } ${index !== subjectOptions.length - 1 ? 'border-b border-gray-200 dark:border-gray-600' : ''}`}
+                          >
+                            <span className="font-medium">{option.label}</span>
+                            {option.value === subject && (
+                              <div className="ml-auto">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+                        ))}
                 </div>
-                <div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Rating Dropdown */}
+                <div className="relative rating-dropdown-container">
                   <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     Rating
                   </label>
-                  <select
-                value={rating}
-                onChange={(e) => setRating(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg ${
+                  <button
+                    onClick={() => setShowRatingDropdown(!showRatingDropdown)}
+                    className={`w-full px-3 py-2 border rounded-xl flex items-center justify-between transition-all duration-200 ${
                       theme === 'dark'
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-900'
+                        ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+                        : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
                     } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   >
-                    <option value="">Any Rating</option>
-                    <option value="4+">4+ Stars</option>
-                    <option value="4.5+">4.5+ Stars</option>
-                    <option value="5">5 Stars</option>
-                  </select>
+                    <div className="flex items-center">
+                      <span className="font-medium">{getSelectedRating().label}</span>
                 </div>
-                <div>
+                    <div className={`transform transition-transform duration-200 ${showRatingDropdown ? 'rotate-180' : ''}`}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {showRatingDropdown && (
+                    <div className="absolute top-full left-0 right-0 z-[9999] mt-1">
+                      <div className={`rounded-xl shadow-xl border overflow-hidden ${
+                        theme === 'dark' 
+                          ? 'bg-gray-700 border-gray-600' 
+                          : 'bg-white border-gray-200'
+                      }`}>
+                        {ratingOptions.map((option, index) => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setRating(option.value)
+                              setShowRatingDropdown(false)
+                            }}
+                            className={`w-full px-4 py-3 text-left flex items-center transition-colors duration-150 ${
+                              option.value === rating
+                                ? theme === 'dark'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-blue-100 text-blue-700'
+                                : theme === 'dark'
+                                  ? 'text-gray-300 hover:bg-gray-600'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                            } ${index !== ratingOptions.length - 1 ? 'border-b border-gray-200 dark:border-gray-600' : ''}`}
+                          >
+                            <span className="font-medium">{option.label}</span>
+                            {option.value === rating && (
+                              <div className="ml-auto">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Availability Dropdown - Day of Week */}
+                <div className="relative availability-dropdown-container">
                   <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Availability
+                    Thứ trong tuần
                   </label>
-                  <select
-                value={availability}
-                onChange={(e) => setAvailability(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg ${
+                  <button
+                    onClick={() => setShowAvailabilityDropdown(!showAvailabilityDropdown)}
+                    className={`w-full px-3 py-2 border rounded-xl flex items-center justify-between transition-all duration-200 ${
                       theme === 'dark'
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-900'
+                        ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+                        : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
                     } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   >
-                    <option value="">Any Time</option>
-                    <option value="available">Available Now</option>
-                    <option value="today">Today</option>
-                    <option value="week">This Week</option>
-                  </select>
+                    <div className="flex items-center">
+                      <span className="font-medium">{getSelectedAvailability().label}</span>
+                </div>
+                    <div className={`transform transition-transform duration-200 ${showAvailabilityDropdown ? 'rotate-180' : ''}`}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {showAvailabilityDropdown && (
+                    <div className="absolute top-full left-0 right-0 z-[9999] mt-1">
+                      <div className={`rounded-xl shadow-xl border overflow-hidden ${
+                        theme === 'dark' 
+                          ? 'bg-gray-700 border-gray-600' 
+                          : 'bg-white border-gray-200'
+                      }`}>
+                        {dayOptions.map((option, index) => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setAvailability(option.value)
+                              setShowAvailabilityDropdown(false)
+                            }}
+                            className={`w-full px-4 py-3 text-left flex items-center transition-colors duration-150 ${
+                              option.value === availability
+                                ? theme === 'dark'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-blue-100 text-blue-700'
+                                : theme === 'dark'
+                                  ? 'text-gray-300 hover:bg-gray-600'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                            } ${index !== dayOptions.length - 1 ? 'border-b border-gray-200 dark:border-gray-600' : ''}`}
+                          >
+                            <span className="font-medium">{option.label}</span>
+                            {option.value === availability && (
+                              <div className="ml-auto">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -339,7 +633,7 @@ const SearchTutors: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Rating & Price */}
+                  {/* Rating */}
                   <div className="mb-4">
                     <div className="flex items-center mb-2">
                       <div className="flex items-center">
@@ -354,9 +648,6 @@ const SearchTutors: React.FC = () => {
                         {tutor.rating?.toFixed(1) || '0.0'} ({tutor.totalReviews || 0} reviews)
                       </span>
                     </div>
-                    <p className={`text-lg font-semibold text-blue-600`}>
-                      {tutor.hourlyRate ? `${tutor.hourlyRate.toLocaleString('vi-VN')} VND` : 'Liên hệ'}/giờ
-                    </p>
                   </div>
 
                   {/* Bio & Info */}
@@ -394,15 +685,27 @@ const SearchTutors: React.FC = () => {
                     <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                         Môn dạy:
                     </p>
-                    <div className="flex flex-wrap gap-1">
-                        {tutor.subjects.map((subject: string, index: number) => (
+                    <div className="flex flex-col gap-1.5" style={{ minHeight: '72px' }}>
+                      {Array.from({ length: 3 }).map((_, rowIndex) => {
+                        const startIndex = rowIndex * 2
+                        const rowSubjects = tutor.subjects.slice(startIndex, startIndex + 2)
+                        return (
+                          <div key={rowIndex} className="flex gap-1 min-h-[20px]">
+                            {rowSubjects.map((subject: string, colIndex: number) => (
                         <span
-                          key={index}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                                key={startIndex + colIndex}
+                                className={`px-2 py-1 text-xs rounded-full ${
+                                  theme === 'dark' 
+                                    ? 'bg-blue-900 text-blue-200' 
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}
                         >
                             {subject}
                         </span>
                       ))}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                   )}
@@ -681,9 +984,6 @@ const SearchTutors: React.FC = () => {
                       <span className={`ml-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                         ({selectedTutor.totalReviews || 0} đánh giá)
                       </span>
-                    </div>
-                    <div className={`text-lg font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedTutor.hourlyRate || 0)}
                     </div>
                   </div>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>

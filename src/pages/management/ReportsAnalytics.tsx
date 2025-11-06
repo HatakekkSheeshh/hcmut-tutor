@@ -57,8 +57,7 @@ const ReportsAnalytics: React.FC = () => {
     overview: {
       totalUsers: 1247,
       activeUsers: 892,
-      totalSessions: 3456,
-      revenue: 45678
+      totalSessions: 3456
     },
     userGrowth: [
       { month: 'Jan', users: 120, growth: 5.2 },
@@ -126,14 +125,6 @@ const ReportsAnalytics: React.FC = () => {
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Sessions:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {analyticsData.overview.totalSessions.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-                <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                  <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Revenue:</span>
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      ${analyticsData.overview.revenue.toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -235,7 +226,6 @@ const ReportsAnalytics: React.FC = () => {
                       <option value="all">All Metrics</option>
                       <option value="users">User Analytics</option>
                       <option value="sessions">Session Analytics</option>
-                      <option value="revenue">Revenue Analytics</option>
                     </select>
                   </div>
                 </div>
@@ -286,7 +276,7 @@ const ReportsAnalytics: React.FC = () => {
           </div>
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card 
               className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
               style={{
@@ -352,29 +342,6 @@ const ReportsAnalytics: React.FC = () => {
                 </div>
                 <div className="text-3xl text-purple-600">
                   <Schedule />
-                </div>
-              </div>
-            </Card>
-
-            <Card 
-              className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-              style={{
-                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                boxShadow: 'none !important'
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    ${analyticsData.overview.revenue.toLocaleString()}
-                  </p>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Revenue
-                  </p>
-                </div>
-                <div className="text-3xl text-yellow-600">
-                  <Star />
                 </div>
               </div>
             </Card>

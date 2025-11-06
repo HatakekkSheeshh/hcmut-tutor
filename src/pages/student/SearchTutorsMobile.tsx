@@ -46,9 +46,14 @@ const SearchTutorsMobile: React.FC = () => {
   
   // Backend data states
   const [tutors, setTutors] = useState<any[]>([])
+  const [allTutors, setAllTutors] = useState<any[]>([]) // Store all tutors for filtering
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  
+  // Subjects from backend
+  const [subjects, setSubjects] = useState<string[]>([])
+  const [availabilityData, setAvailabilityData] = useState<any[]>([])
   
   // Tutor detail modal state
   const [selectedTutor, setSelectedTutor] = useState<any>(null)
@@ -94,31 +99,79 @@ const SearchTutorsMobile: React.FC = () => {
     }
   }, [showSubjectDropdown, showRatingDropdown, showAvailabilityDropdown])
 
-  // Subjects list
-  const subjects = [
-    'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 
-    'History', 'Geography', 'Computer Science', 'Economics', 'Psychology'
+  // Load all subjects and availability data
+  useEffect(() => {
+    const loadFilterData = async () => {
+      try {
+        // Load all tutors to extract unique subjects
+        const result = await api.tutors.list({ limit: 1000 })
+        if (result.success && result.data) {
+          const allTutorsData = result.data
+          setAllTutors(allTutorsData)
+          
+          // Extract unique subjects from all tutors
+          const uniqueSubjects = new Set<string>()
+          allTutorsData.forEach((tutor: any) => {
+            if (tutor.subjects && Array.isArray(tutor.subjects)) {
+              tutor.subjects.forEach((sub: string) => uniqueSubjects.add(sub))
+            }
+          })
+          setSubjects(Array.from(uniqueSubjects).sort())
+          
+          // Load availability data by fetching for each tutor
+          const availabilityPromises = allTutorsData.map(async (tutor: any) => {
+            try {
+              const availResult = await fetch(`/api/availability/${tutor.id}`)
+              if (availResult.ok) {
+                const availData = await availResult.json()
+                if (availData.success && availData.data) {
+                  return availData.data
+                }
+              }
+            } catch (error) {
+              console.error(`Failed to load availability for tutor ${tutor.id}:`, error)
+            }
+            return null
+          })
+          
+          const availabilityResults = await Promise.all(availabilityPromises)
+          const validAvailability = availabilityResults.filter(avail => avail !== null)
+          setAvailabilityData(validAvailability)
+        }
+      } catch (error) {
+        console.error('Error loading filter data:', error)
+      }
+    }
+    
+    loadFilterData()
+  }, [])
+
+  // Day of week options
+  const dayOptions = [
+    { value: '', label: 'Tất cả các ngày' },
+    { value: 'monday', label: 'Thứ Hai' },
+    { value: 'tuesday', label: 'Thứ Ba' },
+    { value: 'wednesday', label: 'Thứ Tư' },
+    { value: 'thursday', label: 'Thứ Năm' },
+    { value: 'friday', label: 'Thứ Sáu' },
+    { value: 'saturday', label: 'Thứ Bảy' },
+    { value: 'sunday', label: 'Chủ Nhật' }
   ]
 
   // Filter options
   const subjectOptions = [
-    { value: '', label: 'All Subjects' },
+    { value: '', label: 'Tất cả môn học' },
     ...subjects.map(sub => ({ value: sub, label: sub }))
   ]
 
   const ratingOptions = [
-    { value: '', label: 'Any Rating' },
-    { value: '4+', label: '4+ Stars' },
-    { value: '4.5+', label: '4.5+ Stars' },
-    { value: '5', label: '5 Stars' }
+    { value: '', label: 'Bất kỳ rating' },
+    { value: '4+', label: '4+ Sao' },
+    { value: '4.5+', label: '4.5+ Sao' },
+    { value: '5', label: '5 Sao' }
   ]
 
-  const availabilityOptions = [
-    { value: '', label: 'Any Time' },
-    { value: 'available', label: 'Available Now' },
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'This Week' }
-  ]
+  const availabilityOptions = dayOptions
 
   const getSelectedSubject = () => {
     return subjectOptions.find(option => option.value === subject) || subjectOptions[0]
@@ -211,10 +264,60 @@ const SearchTutorsMobile: React.FC = () => {
     }
   }
 
-  // Load tutors on mount and when filters change
+  // Filter and load tutors based on filters
   useEffect(() => {
+    const filterAndLoadTutors = async () => {
+      if (availability && availabilityData.length > 0 && allTutors.length > 0) {
+        setLoading(true)
+        // Filter tutors who have availability on the selected day
+        const tutorsWithAvailability = allTutors.filter((tutor: any) => {
+          const tutorAvailability = availabilityData.find((avail: any) => avail.tutorId === tutor.id)
+          if (!tutorAvailability || !tutorAvailability.timeSlots) return false
+          
+          return tutorAvailability.timeSlots.some((slot: any) => slot.day === availability)
+        })
+        
+        // Apply other filters (subject, rating, search)
+        let filtered = tutorsWithAvailability
+        
+        if (subject) {
+          filtered = filtered.filter((tutor: any) => 
+            tutor.subjects && tutor.subjects.includes(subject)
+          )
+        }
+        
+        if (rating) {
+          const minRating = parseFloat(rating.replace('+', ''))
+          filtered = filtered.filter((tutor: any) => (tutor.rating || 0) >= minRating)
+        }
+        
+        if (searchTerm && searchTerm.trim()) {
+          const searchLower = searchTerm.toLowerCase()
+          filtered = filtered.filter((tutor: any) =>
+            tutor.name.toLowerCase().includes(searchLower) ||
+            tutor.email.toLowerCase().includes(searchLower) ||
+            (tutor.subjects && tutor.subjects.some((s: string) => s.toLowerCase().includes(searchLower)))
+          )
+        }
+        
+        // Paginate
+        const pageNum = page || 1
+        const limitNum = 10
+        const startIndex = (pageNum - 1) * limitNum
+        const endIndex = startIndex + limitNum
+        const paginatedTutors = filtered.slice(startIndex, endIndex)
+        
+        setTutors(paginatedTutors)
+        setTotalPages(Math.ceil(filtered.length / limitNum))
+        setLoading(false)
+      } else if (!availability || availabilityData.length === 0 || allTutors.length === 0) {
+        // No availability filter or data not loaded yet, use normal API call
     loadTutors()
-  }, [page, subject, rating, searchTerm])
+      }
+    }
+    
+    filterAndLoadTutors()
+  }, [availability, availabilityData, allTutors, subject, rating, searchTerm, page])
 
   const _mockTutors = [
     {
@@ -223,7 +326,6 @@ const SearchTutorsMobile: React.FC = () => {
       subject: 'Mathematics',
       rating: 4.9,
       reviews: 127,
-      price: 50,
       experience: '8 years',
       location: 'New York, NY',
       availability: 'Available',
@@ -237,7 +339,6 @@ const SearchTutorsMobile: React.FC = () => {
       subject: 'Physics',
       rating: 4.8,
       reviews: 89,
-      price: 45,
       experience: '12 years',
       location: 'San Francisco, CA',
       availability: 'Available',
@@ -251,7 +352,6 @@ const SearchTutorsMobile: React.FC = () => {
       subject: 'Chemistry',
       rating: 4.7,
       reviews: 156,
-      price: 55,
       experience: '6 years',
       location: 'Boston, MA',
       availability: 'Busy',
@@ -265,7 +365,6 @@ const SearchTutorsMobile: React.FC = () => {
       subject: 'Biology',
       rating: 4.9,
       reviews: 203,
-      price: 48,
       experience: '10 years',
       location: 'Chicago, IL',
       availability: 'Available',
@@ -373,7 +472,7 @@ const SearchTutorsMobile: React.FC = () => {
 
                 {showSubjectDropdown && (
                   <div className="absolute top-full left-0 right-0 z-[9999] mt-1">
-                    <div className={`rounded-xl shadow-xl border overflow-hidden ${
+                    <div className={`rounded-xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto ${
                       theme === 'dark' 
                         ? 'bg-gray-700 border-gray-600' 
                         : 'bg-white border-gray-200'
@@ -610,12 +709,6 @@ const SearchTutorsMobile: React.FC = () => {
                     <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                       {tutor.subjects?.[0] || 'N/A'}
                     </p>
-                  </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-semibold text-blue-600`}>
-                      {tutor.hourlyRate ? `${(tutor.hourlyRate / 1000).toFixed(0)}K` : 'N/A'}
-                    </p>
-                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>VND/giờ</p>
                   </div>
                 </div>
 
@@ -951,9 +1044,6 @@ const SearchTutorsMobile: React.FC = () => {
                         ({selectedTutor.totalReviews || 0})
                       </span>
                     </div>
-                  </div>
-                  <div className={`text-sm font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                    {(selectedTutor.hourlyRate || 0) / 1000}K VND/giờ
                   </div>
                 </div>
               </div>

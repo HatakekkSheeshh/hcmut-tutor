@@ -20,6 +20,8 @@ export enum NotificationType {
   SESSION_REMINDER = 'session_reminder',
   SESSION_CANCELLED = 'session_cancelled',
   SESSION_RESCHEDULED = 'session_rescheduled',
+  SESSION_CANCEL_REQUEST = 'session_cancel_request',
+  SESSION_RESCHEDULE_REQUEST = 'session_reschedule_request',
   NEW_MESSAGE = 'new_message',
   EVALUATION_REQUEST = 'evaluation_request',
   SYSTEM = 'system'
@@ -29,6 +31,18 @@ export enum ApprovalStatus {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected'
+}
+
+export enum RequestType {
+  CANCEL = 'cancel',
+  RESCHEDULE = 'reschedule'
+}
+
+export enum RequestStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  WITHDRAWN = 'withdrawn'
 }
 
 // ===== USER ENTITIES =====
@@ -60,7 +74,6 @@ export interface Tutor extends BaseUser {
   bio?: string;
   rating: number;
   totalSessions: number;
-  hourlyRate?: number;
   availability: string[]; // array of time slots
   verified: boolean;
   credentials?: string[];
@@ -90,7 +103,6 @@ export interface Session {
   location?: string;
   isOnline: boolean;
   meetingLink?: string;
-  price?: number;
   notes?: string;
   classId?: string; // Link to Class for recurring sessions
   createdAt: string;
@@ -322,7 +334,6 @@ export interface TutorPerformance {
   totalSessions: number;
   completedSessions: number;
   averageRating: number;
-  totalEarnings?: number;
   studentCount: number;
   subjects: string[];
   responseTime?: number; // average in minutes
@@ -334,7 +345,6 @@ export interface SystemAnalytics {
   totalStudents: number;
   totalTutors: number;
   totalSessions: number;
-  revenue?: number;
   growthRate: {
     users: number; // percentage
     sessions: number;
@@ -385,7 +395,6 @@ export interface PaginatedResponse<T> {
 export interface SearchFilters {
   subject?: string;
   minRating?: number;
-  maxPrice?: number;
   availability?: string; // 'today', 'tomorrow', 'this-week'
   location?: string;
   isOnline?: boolean;
@@ -529,5 +538,23 @@ export interface GradeSummary {
   earnedPoints: number;
   percentage: number;
   grades: Grade[];
+}
+
+// ===== SESSION REQUESTS =====
+
+export interface SessionRequest {
+  id: string;
+  sessionId: string;
+  studentId: string;
+  tutorId: string;
+  classId?: string; // Optional - copy from session.classId to distinguish class session vs individual
+  type: RequestType; // cancel or reschedule
+  status: RequestStatus;
+  reason: string; // reason from student
+  preferredStartTime?: string; // for reschedule
+  preferredEndTime?: string; // for reschedule
+  responseMessage?: string; // response from tutor
+  createdAt: string;
+  updatedAt: string;
 }
 

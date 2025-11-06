@@ -73,7 +73,6 @@ export async function registerHandler(req: Request, res: Response) {
           bio: additionalData.bio,
           rating: 0,
           totalSessions: 0,
-          hourlyRate: additionalData.hourlyRate,
           availability: [],
           verified: false,
           credentials: additionalData.credentials || [],

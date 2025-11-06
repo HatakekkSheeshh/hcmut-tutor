@@ -37,7 +37,9 @@ import {
   CalendarMonth,
   Close as CloseIcon,
   ChevronRight as ChevronRightIcon,
-  Logout as LogoutIcon
+  Logout as LogoutIcon,
+  MenuBook as MenuBookIcon,
+  Forum as ForumIcon
 } from '@mui/icons-material'
 
 const StudentDashboardMobile: React.FC = () => {
@@ -52,6 +54,8 @@ const StudentDashboardMobile: React.FC = () => {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [sessions, setSessions] = useState<any[]>([])
+  const [enrollments, setEnrollments] = useState<any[]>([])
+  const [classes, setClasses] = useState<{ [key: string]: any }>({})
   const [tutors, setTutors] = useState<{ [key: string]: any }>({})
   
   // Time and weather states
@@ -87,13 +91,20 @@ const StudentDashboardMobile: React.FC = () => {
         const userData = userResult.data
         setUser(userData)
         
-        // Get user sessions
-        const sessionsResult = await api.sessions.list({
+        // Get user sessions and enrollments
+        const [sessionsResult, enrollmentsResult] = await Promise.all([
+          api.sessions.list({
           studentId: userData.id,
           limit: 100
+          }),
+          api.enrollments.list({
+            studentId: userData.id,
+            status: 'active'
         })
+        ])
         
         console.log('[Mobile] Sessions API Response:', sessionsResult)
+        console.log('[Mobile] Enrollments API Response:', enrollmentsResult)
         
         if (sessionsResult.data && Array.isArray(sessionsResult.data)) {
           const sessionsData = sessionsResult.data
@@ -115,12 +126,70 @@ const StudentDashboardMobile: React.FC = () => {
           })
           
           const tutorResults = await Promise.all(tutorPromises)
-          const tutorsMap: { [key: string]: any } = {}
+          let tutorsMap: { [key: string]: any } = {}
           tutorResults.forEach(result => {
             if (result) {
               tutorsMap[result.id] = result.data
             }
           })
+          
+          // Load enrollments and classes
+          if (enrollmentsResult.success && enrollmentsResult.data && Array.isArray(enrollmentsResult.data)) {
+            const enrollmentsData = enrollmentsResult.data
+            setEnrollments(enrollmentsData)
+            console.log('[Mobile] Enrollments loaded:', enrollmentsData.length)
+
+            // Load class details for each enrollment
+            const uniqueClassIds = [...new Set(enrollmentsData.map((e: any) => e.classId))] as string[]
+            const classPromises = uniqueClassIds.map(async (classId: string) => {
+              try {
+                const classResponse = await api.classes.get(classId)
+                if (classResponse.success && classResponse.data) {
+                  return { id: classId, data: classResponse.data }
+                }
+              } catch (err) {
+                console.error(`[Mobile] Failed to load class ${classId}:`, err)
+              }
+              return null
+            })
+
+            const classResults = await Promise.all(classPromises)
+            const classesMap: { [key: string]: any } = {}
+            const classTutorIds: string[] = []
+            
+            classResults.forEach(result => {
+              if (result) {
+                classesMap[result.id] = result.data
+                if (result.data.tutorId && !tutorsMap[result.data.tutorId]) {
+                  classTutorIds.push(result.data.tutorId)
+                }
+              }
+            })
+            setClasses(classesMap)
+
+            // Load tutors for classes if needed
+            if (classTutorIds.length > 0) {
+              const classTutorPromises = classTutorIds.map(async (tutorId: string) => {
+                try {
+                  const tutorResponse = await api.users.get(tutorId)
+                  if (tutorResponse.success && tutorResponse.data) {
+                    return { id: tutorId, data: tutorResponse.data }
+                  }
+                } catch (err) {
+                  console.error(`[Mobile] Failed to load tutor ${tutorId}:`, err)
+                }
+                return null
+              })
+
+              const classTutorResults = await Promise.all(classTutorPromises)
+              classTutorResults.forEach(result => {
+                if (result) {
+                  tutorsMap[result.id] = result.data
+                }
+              })
+            }
+          }
+          
           setTutors(tutorsMap)
         }
       } else {
@@ -252,12 +321,12 @@ const StudentDashboardMobile: React.FC = () => {
 
   // Calculate stats from real data
   const totalSessions = sessions.length
-  const completedSessions = sessions.filter(s => s.status === 'completed').length
+  const totalClasses = enrollments.length
   const upcomingSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
   
   const stats = [
     { title: 'Total Sessions', value: totalSessions.toString(), icon: <SchoolIcon /> },
-    { title: 'Completed', value: completedSessions.toString(), icon: <CheckCircleIcon /> },
+    { title: 'Enrolled Classes', value: totalClasses.toString(), icon: <CheckCircleIcon /> },
     { title: 'Upcoming', value: upcomingSessions.toString(), icon: <AutorenewIcon /> }
   ]
   
@@ -266,8 +335,12 @@ const StudentDashboardMobile: React.FC = () => {
   const avatarUrl = user?.avatar
 
   // Map sessions to course format for UI (only show upcoming/confirmed sessions)
+  // Filter out class sessions (sessions with classId) - those belong to My Classes section
   const registeredCourses = sessions
-    .filter(session => session.status === 'confirmed' || session.status === 'pending')
+    .filter(session => 
+      (session.status === 'confirmed' || session.status === 'pending') &&
+      !session.classId // Only show individual sessions, not class sessions
+    )
     .map(session => {
       const tutor = tutors[session.tutorId]
       return {
@@ -315,7 +388,9 @@ const StudentDashboardMobile: React.FC = () => {
     { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
     { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
     { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
+    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' },
+    { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
+    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' }
   ]
 
   const bottomNavItems = [
@@ -501,7 +576,10 @@ const StudentDashboardMobile: React.FC = () => {
           <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             My Courses
           </h2>
-          <button className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+          <button 
+            onClick={() => setCurrentTab('courses')}
+            className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+          >
             See All
           </button>
         </div>
@@ -559,17 +637,40 @@ const StudentDashboardMobile: React.FC = () => {
     </div>
   )
 
+  // Map classes to course format
+  const classesCourses = enrollments
+    .map(enrollment => {
+      const classItem = classes[enrollment.classId]
+      const tutor = classItem ? tutors[classItem.tutorId] : null
+      return {
+        id: enrollment.classId,
+        type: 'class' as const,
+        title: classItem?.subject || 'Loading...',
+        instructor: tutor?.name || 'Loading...',
+        subject: `${classItem?.code || 'N/A'} - ${classItem?.day || ''}`,
+        duration: `${classItem?.duration || 0} mins`,
+        nextSession: classItem?.semesterStart || new Date().toISOString(),
+        rating: tutor?.rating || 4.5,
+        status: classItem?.status === 'active' ? 'active' : 'inactive',
+        classData: classItem
+      }
+    })
+    .sort((a, b) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
+
   const renderCoursesTab = () => (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div>
         <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
           All Courses
         </h2>
-        <button className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-          Filter
-        </button>
       </div>
 
+      {/* Sessions Section */}
+      {registeredCourses.length > 0 && (
+        <div>
+          <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Sessions
+          </h3>
       <div className="space-y-3">
         {registeredCourses.map((course) => (
           <div 
@@ -619,6 +720,79 @@ const StudentDashboardMobile: React.FC = () => {
           </div>
         ))}
       </div>
+        </div>
+      )}
+
+      {/* Classes Section */}
+      {classesCourses.length > 0 && (
+        <div>
+          <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Classes
+          </h3>
+          <div className="space-y-3">
+            {classesCourses.map((course) => (
+              <div 
+                key={course.id}
+                className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                onClick={() => navigate(`/student/class/${course.id}`)}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {course.title}
+                  </h3>
+                  <div className="flex items-center flex-shrink-0 ml-2">
+                    <StarIcon className="w-3 h-3 text-yellow-400 mr-1" />
+                    <span className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {course.rating}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="mb-2">
+                  <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {course.instructor}
+                  </p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {course.subject}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      course.status === 'active' ? 'bg-green-500' : 'bg-gray-500'
+                    }`}></div>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {new Date(course.nextSession).toLocaleDateString('vi-VN', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                  <div className={`text-xs font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                    {course.duration}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {registeredCourses.length === 0 && classesCourses.length === 0 && (
+        <div className="text-center py-12">
+          <SchoolIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+          <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            No Courses Yet
+          </h3>
+          <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            You don't have any courses yet.
+          </p>
+        </div>
+      )}
     </div>
   )
 
@@ -772,6 +946,25 @@ const StudentDashboardMobile: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Logout Button */}
+      <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <button
+          onClick={() => {
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            navigate('/common/login')
+          }}
+          className={`w-full flex items-center justify-center px-4 py-3 rounded-lg text-white font-medium transition-colors ${
+            theme === 'dark' 
+              ? 'bg-red-600 hover:bg-red-700' 
+              : 'bg-red-600 hover:bg-red-700'
+          }`}
+        >
+          <LogoutIcon className="mr-2 w-5 h-5" />
+          Logout
+        </button>
+      </div>
     </div>
   )
 
@@ -838,10 +1031,9 @@ const StudentDashboardMobile: React.FC = () => {
       {mobileOpen && (
         <div className="fixed inset-0 z-50">
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={handleDrawerToggle}></div>
-          <div className={`fixed left-0 top-0 h-full w-80 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl`}>
-            <div className="p-6">
-              {/* Mobile Header */}
-              <div className="flex items-center justify-between mb-8">
+          <div className={`fixed left-0 top-0 h-full w-80 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl flex flex-col`}>
+            {/* Mobile Header - Fixed */}
+            <div className={`flex items-center justify-between p-6 flex-shrink-0 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
                 <div className="flex items-center">
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
                     <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-8 h-8" />
@@ -858,6 +1050,9 @@ const StudentDashboardMobile: React.FC = () => {
                 </button>
               </div>
 
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-6">
               {/* Mobile Navigation */}
               <div className="space-y-2">
                 {menuItems.map((item) => (
@@ -946,6 +1141,7 @@ const StudentDashboardMobile: React.FC = () => {
                       </div>
                     </div>
                   )}
+                </div>
                 </div>
               </div>
             </div>

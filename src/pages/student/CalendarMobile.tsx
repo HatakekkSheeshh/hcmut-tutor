@@ -60,8 +60,6 @@ const CalendarMobile: React.FC = () => {
   const [weekSessions, setWeekSessions] = useState<{[key: string]: Session[]}>({})
   const [viewMode, setViewMode] = useState<'week' | 'day'>('week')
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
-  const [touchStart, setTouchStart] = useState<number | null>(null)
-  const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [tutors, setTutors] = useState<{[key: string]: any}>({})
   const [subjects, setSubjects] = useState<string[]>([])
@@ -311,31 +309,6 @@ const CalendarMobile: React.FC = () => {
     })
     setWeekSessions(groupedSessions)
   }, [currentWeek, filters, sessions, classes, tutors])
-
-  // Touch handlers for swipe gestures
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null)
-    setTouchStart(e.targetTouches[0].clientX)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
-    
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
-
-    if (isLeftSwipe) {
-      handleNextWeek()
-    }
-    if (isRightSwipe) {
-      handlePreviousWeek()
-    }
-  }
 
   // Navigation handlers
   const handlePreviousWeek = () => {
@@ -587,9 +560,6 @@ const CalendarMobile: React.FC = () => {
       <div 
         ref={containerRef}
         className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {/* Header */}
         <div className={`sticky top-0 z-40 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -717,7 +687,7 @@ const CalendarMobile: React.FC = () => {
                   borderRadius: '12px',
                   p: 0.5,
                   '& .MuiToggleButton-root': {
-                    color: `${theme === 'dark' ? '#e5e7eb' : '#111827'} !important`,
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
                     border: 'none',
                     textTransform: 'none',
                     fontWeight: 600,
@@ -725,14 +695,18 @@ const CalendarMobile: React.FC = () => {
                     backgroundColor: 'transparent',
                     fontSize: '0.75rem',
                     px: 2,
-                    py: 0.5
+                    py: 0.5,
+                    transition: 'all 0.2s ease'
                   },
                   '& .MuiToggleButton-root:hover': {
                     backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6'
                   },
                   '& .MuiToggleButton-root.Mui-selected': {
-                    backgroundColor: theme === 'dark' ? '#1e40af' : '#3b82f6',
-                    color: '#ffffff !important'
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff !important',
+                    '&:hover': {
+                      backgroundColor: '#1d4ed8'
+                    }
                   }
                 }}
               >

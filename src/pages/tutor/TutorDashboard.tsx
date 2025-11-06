@@ -447,10 +447,8 @@ const TutorDashboard: React.FC = () => {
     { id: 'progress', label: 'Track Progress', icon: <BarChartIcon />, path: '/tutor/track-progress' },
     { id: 'cancel-reschedule', label: 'Cancel/Reschedule', icon: <AutorenewIcon />, path: '/tutor/cancel-reschedule' },
     { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/tutor/messages' },
-    { id: 'profile', label: 'Profile Management', icon: <PersonIcon />, path: '/common/profile' },
     { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
-    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' },
-    { id: 'notifications', label: 'Notifications', icon: <NotificationsIcon />, path: '/common/notifications' }
+    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' }
   ]
 
   return (

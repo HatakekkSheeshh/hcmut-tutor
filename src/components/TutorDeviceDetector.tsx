@@ -13,7 +13,9 @@ import SetAvailabilityMobile from '../pages/tutor/SetAvailabilityMobile'
 import TrackStudentProgress from '../pages/tutor/TrackStudentProgress'
 import TrackStudentProgressMobile from '../pages/tutor/TrackStudentProgressMobile'
 import TutorSessionDetail from '../pages/tutor/TutorSessionDetail'
+import TutorSessionDetailMobile from '../pages/tutor/TutorSessionDetailMobile'
 import TutorLMS from '../pages/tutor/TutorLMS'
+import TutorLMSMobile from '../pages/tutor/TutorLMSMobile'
 
 const TutorDeviceDetector: React.FC = () => {
   const location = useLocation()
@@ -63,7 +65,7 @@ const TutorDeviceDetector: React.FC = () => {
         return <ManageSessionsMobile />
       }
       if (location.pathname === '/tutor/lms') {
-        return <TutorLMS />
+        return <TutorLMSMobile />
       }
       if (location.pathname === '/tutor/messages') {
         return <MessagesMobile />
@@ -72,7 +74,7 @@ const TutorDeviceDetector: React.FC = () => {
         return <TrackStudentProgressMobile />
       }
       if (location.pathname.startsWith('/tutor/session/') || location.pathname.startsWith('/tutor/class/')) {
-        return <TutorSessionDetail />
+        return <TutorSessionDetailMobile />
       }
       return <TutorDashboardMobile />
     }

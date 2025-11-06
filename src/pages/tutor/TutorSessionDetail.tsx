@@ -613,7 +613,7 @@ const TutorSessionDetail: React.FC = () => {
               </button>
               <NavigateNextIcon sx={{ fontSize: 16, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
               <button
-                onClick={() => navigate('/tutor/lms')}
+                onClick={() => navigate(isClassView ? '/tutor/lms?view=classes' : '/tutor/lms')}
                 className={`text-sm hover:underline ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'}`}
               >
                 {isClassView ? 'My Classes' : 'My Sessions'}

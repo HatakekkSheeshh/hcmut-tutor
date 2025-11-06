@@ -325,70 +325,124 @@ const QuizResultsView: React.FC = () => {
                 </div>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {submissions.map((submission) => {
                   const student = students[submission.studentId]
                   const studentName = student?.name || 'Unknown Student'
-                  const percentage = (submission.score || 0) / quiz.totalPoints * 100
+                  const score = parseFloat((submission.score || 0).toFixed(2))
+                  const percentage = (score / quiz.totalPoints) * 100
+                  const formattedPercentage = parseFloat(percentage.toFixed(2))
                   
                   return (
                     <Card
                       key={submission.id}
-                      className={`border ${theme === 'dark' ? '!bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 cursor-pointer hover:shadow-lg transition-shadow`}
+                      className={`border ${theme === 'dark' ? '!bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 cursor-pointer hover:shadow-lg transition-all hover:border-blue-500`}
                       style={{ boxShadow: 'none' }}
                       onClick={() => handleViewDetails(submission)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 flex-1">
+                      {/* Student Info Header */}
+                      <div className="flex items-start justify-between mb-4 relative">
+                        <div className="flex items-center gap-3 flex-1 min-w-0 pr-2">
                           <Avatar
                             sx={{
                               width: 48,
                               height: 48,
                               bgcolor: getAvatarColor(studentName),
-                              fontSize: '1.2rem',
-                              fontWeight: 'bold'
+                              fontSize: '1.1rem',
+                              fontWeight: 'bold',
+                              flexShrink: 0,
+                              '@media (min-width: 1024px)': {
+                                width: 56,
+                                height: 56,
+                                fontSize: '1.25rem'
+                              }
                             }}
                           >
                             {getInitials(studentName)}
                           </Avatar>
-                          <div className="flex-1">
-                            <h3 className={`text-lg font-semibold mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          <div className="flex-1 min-w-0">
+                            <h3 className={`text-sm lg:text-lg font-semibold mb-1 break-words ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               {studentName}
                             </h3>
-                            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              Submitted: {new Date(submission.submittedAt).toLocaleString()}
+                            <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} truncate`}>
+                              {student?.email || 'No email'}
+                            </p>
+                            <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                              {new Date(submission.submittedAt).toLocaleDateString('vi-VN', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <div className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                              {submission.score || 0} / {quiz.totalPoints}
+                        {/* Status Indicator */}
+                        <div 
+                          className="w-1 h-12 lg:h-16 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: getGradeColor(percentage) }}
+                        />
+                      </div>
+
+                      {/* Score Section */}
+                      <div className={`p-3 lg:p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
+                        <div className="grid grid-cols-3 gap-2 lg:gap-3 mb-3">
+                          <div className="text-center">
+                            <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Score</p>
+                            <p className={`text-lg lg:text-2xl font-bold mb-0.5 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {score.toFixed(2)}
+                            </p>
+                            <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                              / {quiz.totalPoints}
+                            </p>
+                          </div>
+                          <div className="text-center">
+                            <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Percentage</p>
+                            <p 
+                              className={`text-lg lg:text-2xl font-bold break-words`}
+                              style={{ color: getGradeColor(percentage) }}
+                            >
+                              {formattedPercentage.toFixed(2)}%
+                            </p>
+                          </div>
+                          <div className="text-center">
+                            <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Grade</p>
+                            <div className="flex justify-center">
+                              <Chip 
+                                label={getGradeLabel(percentage)}
+                                size="small"
+                                sx={{ 
+                                  backgroundColor: getGradeColor(percentage), 
+                                  color: 'white',
+                                  fontSize: '0.75rem',
+                                  height: '24px',
+                                  fontWeight: 'bold',
+                                  '@media (min-width: 1024px)': {
+                                    fontSize: '0.875rem',
+                                    height: '28px'
+                                  }
+                                }}
+                              />
                             </div>
-                            <Chip 
-                              label={`${percentage.toFixed(1)}% (${getGradeLabel(percentage)})`}
-                              size="small"
-                              sx={{ 
-                                backgroundColor: getGradeColor(percentage), 
-                                color: 'white',
-                                fontSize: '0.75rem',
-                                height: '24px',
-                                marginTop: '4px'
-                              }}
-                            />
                           </div>
                         </div>
-                      </div>
-                      <div className="mt-4">
+                        {/* Progress Bar */}
                         <LinearProgress 
                           variant="determinate" 
                           value={percentage}
                           sx={{ 
-                            height: 8, 
-                            borderRadius: 4,
-                            backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb'
+                            height: 8,
+                            '@media (min-width: 1024px)': {
+                              height: 10
+                            },
+                            borderRadius: 5,
+                            backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                            '& .MuiLinearProgress-bar': {
+                              backgroundColor: getGradeColor(percentage),
+                              borderRadius: 5
+                            }
                           }}
-                          style={{ backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb' }}
                         />
                       </div>
                     </Card>
@@ -452,17 +506,23 @@ const QuizResultsView: React.FC = () => {
 
                 {/* Score Summary */}
                 <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center mb-4">
                     <div>
                       <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Score</p>
-                      <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {selectedSubmission.score || 0} / {quiz.totalPoints}
+                      <p className={`text-xl lg:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {parseFloat((selectedSubmission.score || 0).toFixed(2))}
+                      </p>
+                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                        / {quiz.totalPoints}
                       </p>
                     </div>
                     <div>
                       <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Percentage</p>
-                      <p className={`text-2xl font-bold`} style={{ color: getGradeColor(percentage) }}>
-                        {percentage.toFixed(1)}%
+                      <p 
+                        className={`text-xl lg:text-2xl font-bold`} 
+                        style={{ color: getGradeColor(percentage) }}
+                      >
+                        {parseFloat(percentage.toFixed(2))}%
                       </p>
                     </div>
                     <div>
@@ -472,7 +532,7 @@ const QuizResultsView: React.FC = () => {
                         sx={{ 
                           backgroundColor: getGradeColor(percentage), 
                           color: 'white',
-                          fontSize: '1rem',
+                          fontSize: '0.875rem',
                           height: '32px',
                           fontWeight: 'bold'
                         }}
@@ -485,10 +545,11 @@ const QuizResultsView: React.FC = () => {
                       value={percentage}
                       sx={{ 
                         height: 10, 
-                        borderRadius: 4,
+                        borderRadius: 5,
                         backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
                         '& .MuiLinearProgress-bar': {
-                          backgroundColor: getGradeColor(percentage)
+                          backgroundColor: getGradeColor(percentage),
+                          borderRadius: 5
                         }
                       }}
                     />

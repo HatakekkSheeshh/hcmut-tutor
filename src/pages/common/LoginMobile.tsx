@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -8,12 +9,9 @@ import {
   Facebook,
   Apple,
   Security,
-  Person,
   Lock,
   Email,
-  School,
   Menu as MenuIcon,
-  Notifications,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
   Close as CloseIcon,
@@ -23,7 +21,7 @@ import {
   Cloud as CloudIcon,
   Thunderstorm as ThunderstormIcon,
   AcUnit as AcUnitIcon,
-  ArrowForward as ArrowForwardIcon
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -31,8 +29,16 @@ import '../../styles/weather-animations.css'
 import api from '../../lib/api'
 
 const LoginMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
   const [showPassword, setShowPassword] = useState(false)
   const [loginMethod, setLoginMethod] = useState('email') // 'email' or 'sso'
   const [formData, setFormData] = useState({
@@ -41,7 +47,6 @@ const LoginMobile: React.FC = () => {
     rememberMe: false
   })
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [showHelp, setShowHelp] = useState(false)
   
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -233,10 +238,10 @@ const LoginMobile: React.FC = () => {
             </div>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Welcome Back
+                {t('login.title')}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Sign in to your account
+                {t('login.subtitle').split('.')[0]}
               </p>
             </div>
           </div>
@@ -387,7 +392,7 @@ const LoginMobile: React.FC = () => {
             }`}
           >
             <Email className="w-4 h-4 mr-2 inline" />
-            Email Login
+            {t('login.emailLogin')}
           </button>
           <button
             onClick={() => setLoginMethod('sso')}
@@ -400,7 +405,7 @@ const LoginMobile: React.FC = () => {
             }`}
           >
             <Security className="w-4 h-4 mr-2 inline" />
-            SSO Login
+            {t('login.ssoLogin')}
           </button>
         </div>
 
@@ -417,7 +422,7 @@ const LoginMobile: React.FC = () => {
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Email Address
+                  {t('login.emailLabel')}
                 </label>
                 <div className="relative">
                   <input
@@ -431,7 +436,7 @@ const LoginMobile: React.FC = () => {
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                     } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    placeholder="Enter your email"
+                    placeholder={t('login.emailPlaceholder')}
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <Email className="w-5 h-5 text-gray-400" />
@@ -441,7 +446,7 @@ const LoginMobile: React.FC = () => {
 
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Password
+                  {t('login.passwordLabel')}
                 </label>
                 <div className="relative">
                   <input
@@ -455,7 +460,7 @@ const LoginMobile: React.FC = () => {
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                     } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    placeholder="Enter your password"
+                    placeholder={t('login.passwordPlaceholder')}
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <Lock className="w-5 h-5 text-gray-400" />
@@ -480,14 +485,14 @@ const LoginMobile: React.FC = () => {
                     className="mr-2"
                   />
                   <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Remember me
+                    {t('login.rememberMe')}
                   </span>
                 </label>
                 <button
                   type="button"
                   className={`text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
                 >
-                  Forgot password?
+                  {t('login.forgotPassword')}
                 </button>
               </div>
 
@@ -517,17 +522,17 @@ const LoginMobile: React.FC = () => {
                   e.currentTarget.style.backgroundColor = theme === 'dark' ? '#2563eb' : '#3b82f6'
                 }}
               >
-                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                {loading ? t('login.loggingIn') : t('login.loginButton')}
               </Button>
             </form>
           ) : (
             <div className="space-y-4">
               <div className="text-center">
                 <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Single Sign-On
+                  {t('login.ssoLogin')}
                 </h3>
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Choose your preferred SSO provider
+                  {currentLang === 'vi' ? 'Chọn nhà cung cấp SSO của bạn' : 'Choose your preferred SSO provider'}
                 </p>
               </div>
 
@@ -566,74 +571,16 @@ const LoginMobile: React.FC = () => {
 
           <div className="mt-6 text-center">
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Don't have an account?{' '}
+              {t('login.noAccount')}{' '}
               <button 
                 onClick={() => navigate('/common/register')}
                 className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
               >
-                Sign up here
+                {t('login.signUp')}
               </button>
             </p>
           </div>
         </Card>
-
-        {/* Help Section - Mobile with Toggle */}
-        <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <button 
-            onClick={() => setShowHelp(!showHelp)}
-            className={`w-full flex items-center justify-between p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
-          >
-            <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Need Help?
-            </h3>
-            <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
-              <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-            </div>
-          </button>
-          
-          {showHelp && (
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => navigate('/common/profile')}
-                  className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
-                >
-                  <Person className="w-6 h-6 text-blue-600 mb-2" />
-                  <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Profile
-                  </span>
-                </button>
-                <button 
-                  onClick={() => navigate('/common/library')}
-                  className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
-                >
-                  <School className="w-6 h-6 text-green-600 mb-2" />
-                  <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Library
-                  </span>
-                </button>
-                <button 
-                  onClick={() => navigate('/common/forum')}
-                  className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
-                >
-                  <MenuIcon className="w-6 h-6 text-purple-600 mb-2" />
-                  <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Forum
-                  </span>
-                </button>
-                <button 
-                  onClick={() => navigate('/common/notifications')}
-                  className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
-                >
-                  <Notifications className="w-6 h-6 text-orange-600 mb-2" />
-                  <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Notifications
-                  </span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Mobile Drawer */}
@@ -678,7 +625,7 @@ const LoginMobile: React.FC = () => {
                     }`}
                   >
                     <Email className="mr-3 w-4 h-4" />
-                    Email Login
+                    {t('login.emailLogin')}
                   </button>
                   <button 
                     onClick={() => {
@@ -692,53 +639,9 @@ const LoginMobile: React.FC = () => {
                     }`}
                   >
                     <Security className="mr-3 w-4 h-4" />
-                    SSO Login
+                    {t('login.ssoLogin')}
                   </button>
                 </div>
-              </div>
-
-              {/* Mobile Quick Actions */}
-              <div className="flex-1 space-y-2">
-                <button 
-                  onClick={() => {
-                    navigate('/common/profile')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Person className="mr-3 w-4 h-4" />
-                  Profile Management
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/library')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <School className="mr-3 w-4 h-4" />
-                  Digital Library
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/forum')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <MenuIcon className="mr-3 w-4 h-4" />
-                  Community Forum
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/notifications')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Notifications className="mr-3 w-4 h-4" />
-                  Notifications
-                </button>
               </div>
 
               {/* Mobile Settings */}
@@ -747,6 +650,13 @@ const LoginMobile: React.FC = () => {
                   SETTINGS
                 </h3>
                 <div className="space-y-2">
+                  <button 
+                    onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  >
+                    <LanguageIcon className="mr-3 w-4 h-4" />
+                    {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
+                  </button>
                   <button 
                     onClick={handleThemeToggle}
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}

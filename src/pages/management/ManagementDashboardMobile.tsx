@@ -35,7 +35,9 @@ import {
   Home as HomeIcon,
   Close as CloseIcon,
   ChevronRight as ChevronRightIcon,
-  Logout as LogoutIcon
+  Logout as LogoutIcon,
+  MenuBook as MenuBookIcon,
+  Forum as ForumIcon
 } from '@mui/icons-material'
 
 const ManagementDashboardMobile: React.FC = () => {
@@ -307,7 +309,10 @@ const ManagementDashboardMobile: React.FC = () => {
     { id: 'user-management', label: 'User Management', icon: <PeopleIcon />, path: '/management/users' },
     { id: 'system-settings', label: 'System Settings', icon: <SettingsIcon />, path: '/management/settings' },
     { id: 'security', label: 'Security', icon: <SecurityIcon />, path: '/management/security' },
-    { id: 'notifications', label: 'Notifications', icon: <NotificationsIcon />, path: '/management/notifications' }
+    { id: 'notifications', label: 'Notifications', icon: <NotificationsIcon />, path: '/management/notifications' },
+    { id: 'profile', label: 'Profile Management', icon: <PersonIcon />, path: '/common/profile' },
+    { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
+    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' }
   ]
 
   // Show loading state

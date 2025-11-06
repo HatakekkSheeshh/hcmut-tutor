@@ -222,11 +222,19 @@ const TakeAssignment: React.FC = () => {
                   fullWidth
                   onClick={handleSubmit}
                   disabled={submitting || (!content && !fileUrl)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   sx={{
                     textTransform: 'none',
                     fontWeight: 500,
-                    padding: '10px'
+                    padding: '10px',
+                    backgroundColor: theme === 'dark' ? '#2563eb' : '#2563eb',
+                    color: '#ffffff',
+                    '&:hover': {
+                      backgroundColor: theme === 'dark' ? '#1d4ed8' : '#1d4ed8'
+                    },
+                    '&:disabled': {
+                      backgroundColor: theme === 'dark' ? '#1e3a8a' : '#93c5fd',
+                      color: theme === 'dark' ? '#9ca3af' : '#ffffff'
+                    }
                   }}
                 >
                   {submitting ? 'Submitting...' : 'Submit Assignment'}
@@ -265,13 +273,20 @@ const TakeAssignment: React.FC = () => {
             <div className="lg:hidden mb-4">
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className={`p-2 rounded-lg ${
+                className={`p-2 rounded-lg transition-colors ${
                   theme === 'dark' 
-                    ? 'bg-gray-800 hover:bg-gray-700' 
-                    : 'bg-white hover:bg-gray-100'
-                } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
+                    ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' 
+                    : 'bg-white hover:bg-gray-100 border-gray-200'
+                } border`}
+                style={{
+                  backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                  borderColor: theme === 'dark' ? '#4b5563' : '#e5e7eb'
+                }}
               >
-                <MenuIcon className="w-6 h-6" />
+                <MenuIcon 
+                  className="w-6 h-6" 
+                  sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}
+                />
               </button>
             </div>
 

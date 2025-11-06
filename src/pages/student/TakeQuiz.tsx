@@ -12,7 +12,12 @@ import {
   TextField,
   LinearProgress,
   Chip,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@mui/material'
 import {
   NavigateBefore as NavigateBeforeIcon,
@@ -39,6 +44,7 @@ const TakeQuiz: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false)
 
   useEffect(() => {
     loadQuiz()
@@ -101,7 +107,21 @@ const TakeQuiz: React.FC = () => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }))
   }
 
+  const handleSubmitClick = () => {
+    const totalQuestions = quiz?.questions?.length || 0
+    const answeredCount = Object.keys(answers).length
+    
+    // If not all questions are answered, show confirmation dialog
+    if (answeredCount < totalQuestions) {
+      setShowSubmitConfirm(true)
+    } else {
+      // If all answered, submit directly
+      handleSubmit()
+    }
+  }
+
   const handleSubmit = async () => {
+    setShowSubmitConfirm(false)
     try {
       setSubmitting(true)
       
@@ -274,26 +294,36 @@ const TakeQuiz: React.FC = () => {
                     Questions
                   </h3>
                   <div className="grid grid-cols-5 gap-2">
-                    {quiz.questions?.map((q: any, index: number) => (
-                      <button
-                        key={q.id}
-                        onClick={() => goToQuestion(index)}
-                        className={`
-                          aspect-square rounded text-xs font-medium
-                          transition-colors border
-                          ${index === currentQuestionIndex
-                            ? theme === 'dark' ? 'bg-blue-600 text-white border-blue-600' : 'bg-blue-600 text-white border-blue-600'
-                            : answers[q.id]
-                            ? theme === 'dark' ? 'bg-gray-700 text-green-400 border-gray-600' : 'bg-gray-100 text-green-600 border-gray-300'
-                            : theme === 'dark'
-                            ? 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
-                            : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
-                          }
-                        `}
-                      >
-                        {index + 1}
-                      </button>
-                    ))}
+                    {quiz.questions?.map((q: any, index: number) => {
+                      const isAnswered = answers[q.id] && answers[q.id].trim() !== ''
+                      const isCurrent = index === currentQuestionIndex
+                      
+                      return (
+                        <button
+                          key={q.id}
+                          onClick={() => goToQuestion(index)}
+                          className={`
+                            aspect-square rounded text-xs font-medium
+                            transition-colors border-2
+                            ${isCurrent
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-lg'
+                              : isAnswered
+                              ? theme === 'dark' 
+                                ? 'bg-green-600/30 text-green-400 border-green-500 hover:bg-green-600/40' 
+                                : 'bg-green-100 text-green-700 border-green-500 hover:bg-green-200'
+                              : theme === 'dark'
+                              ? 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
+                              : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
+                            }
+                          `}
+                          style={{
+                            fontWeight: isAnswered ? 600 : 500
+                          }}
+                        >
+                          {index + 1}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
               </>
@@ -333,13 +363,21 @@ const TakeQuiz: React.FC = () => {
                 <Button 
                   variant="contained" 
                   fullWidth
-                  onClick={handleSubmit}
+                  onClick={handleSubmitClick}
                   disabled={submitting || answeredCount === 0}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   sx={{
                     textTransform: 'none',
                     fontWeight: 500,
-                    padding: '10px'
+                    padding: '10px',
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                    '&:hover': {
+                      backgroundColor: '#1d4ed8'
+                    },
+                    '&:disabled': {
+                      backgroundColor: theme === 'dark' ? '#1e3a8a' : '#93c5fd',
+                      color: theme === 'dark' ? '#9ca3af' : '#ffffff'
+                    }
                   }}
                 >
                   {submitting ? 'Submitting...' : 'Submit Quiz'}
@@ -548,24 +586,50 @@ const TakeQuiz: React.FC = () => {
                     Question {currentQuestionIndex + 1} of {totalQuestions}
                   </span>
 
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={nextQuestion}
-                    disabled={currentQuestionIndex === totalQuestions - 1}
-                    endIcon={<NavigateNextIcon />}
-                    sx={{
-                      backgroundColor: '#3b82f6',
-                      '&:hover': { backgroundColor: '#2563eb' },
-                      borderRadius: '10px',
-                      padding: '12px 24px',
-                      textTransform: 'none',
-                      fontSize: '16px',
-                      fontWeight: 600
-                    }}
-                  >
-                    Next
-                  </Button>
+                  {currentQuestionIndex === totalQuestions - 1 ? (
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={handleSubmitClick}
+                      disabled={submitting || answeredCount === 0}
+                      sx={{
+                        backgroundColor: '#2563eb',
+                        color: '#ffffff',
+                        '&:hover': { 
+                          backgroundColor: '#1d4ed8'
+                        },
+                        '&:disabled': {
+                          backgroundColor: theme === 'dark' ? '#1e3a8a' : '#93c5fd',
+                          color: theme === 'dark' ? '#9ca3af' : '#ffffff'
+                        },
+                        borderRadius: '10px',
+                        padding: '12px 24px',
+                        textTransform: 'none',
+                        fontSize: '16px',
+                        fontWeight: 600
+                      }}
+                    >
+                      {submitting ? 'Submitting...' : 'Submit Quiz'}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={nextQuestion}
+                      endIcon={<NavigateNextIcon />}
+                      sx={{
+                        backgroundColor: '#3b82f6',
+                        '&:hover': { backgroundColor: '#2563eb' },
+                        borderRadius: '10px',
+                        padding: '12px 24px',
+                        textTransform: 'none',
+                        fontSize: '16px',
+                        fontWeight: 600
+                      }}
+                    >
+                      Next
+                    </Button>
+                  )}
                 </div>
               </div>
             ) : (
@@ -634,6 +698,56 @@ const TakeQuiz: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Submit Confirmation Dialog */}
+      <Dialog
+        open={showSubmitConfirm}
+        onClose={() => setShowSubmitConfirm(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
+          Confirm Submission
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
+            You have answered {answeredCount} out of {totalQuestions} questions. 
+            Are you sure you want to submit your quiz now? 
+            {totalQuestions - answeredCount > 0 && (
+              <span className="font-semibold">
+                {' '}You still have {totalQuestions - answeredCount} unanswered question{totalQuestions - answeredCount > 1 ? 's' : ''}.
+              </span>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setShowSubmitConfirm(false)}
+            sx={{
+              color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+              textTransform: 'none',
+              fontWeight: 500
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            sx={{
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              '&:hover': {
+                backgroundColor: '#1d4ed8'
+              },
+              textTransform: 'none',
+              fontWeight: 500
+            }}
+          >
+            Yes, Submit Quiz
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

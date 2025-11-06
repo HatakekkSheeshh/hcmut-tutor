@@ -13,7 +13,9 @@ import {
   Palette as PaletteIcon,
   Close as CloseIcon,
   Badge,
-  PersonAdd
+  PersonAdd,
+  Person,
+  Lock as LockIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -634,7 +636,7 @@ const Register: React.FC = () => {
                       placeholder="Create a password"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <Lock className="w-5 h-5 text-gray-400" />
+                      <LockIcon className="w-5 h-5 text-gray-400" />
                     </div>
                     <button
                       type="button"
@@ -703,7 +705,7 @@ const Register: React.FC = () => {
                       placeholder="Confirm your password"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <Lock className="w-5 h-5 text-gray-400" />
+                      <LockIcon className="w-5 h-5 text-gray-400" />
                     </div>
                     <button
                       type="button"
@@ -843,50 +845,6 @@ const Register: React.FC = () => {
                     Tutor
                   </button>
                 </div>
-              </div>
-
-              {/* Mobile Quick Actions */}
-              <div className="space-y-2">
-                <button 
-                  onClick={() => {
-                    navigate('/common/login')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Lock className="mr-3 w-4 h-4" />
-                  Back to Login
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/library')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <School className="mr-3 w-4 h-4" />
-                  Digital Library
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/forum')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <MenuIcon className="mr-3 w-4 h-4" />
-                  Community Forum
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/notifications')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Notifications className="mr-3 w-4 h-4" />
-                  Notifications
-                </button>
               </div>
             </div>
           </div>

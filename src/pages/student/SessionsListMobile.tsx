@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import api from '../../lib/api'
 import { 
@@ -22,21 +22,42 @@ import {
   Dashboard as DashboardIcon,
   PersonSearch,
   Class,
+  Class as ClassIcon,
   SmartToy as SmartToyIcon,
   Chat as ChatIcon,
   BarChart as BarChartIcon,
-  Star
+  Star,
+  Group as GroupIcon,
+  AccessTime
 } from '@mui/icons-material'
+import { Tabs, Tab, Box } from '@mui/material'
 
 const SessionsListMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  
+  // Check URL params for initial tab
+  const initialTab = searchParams.get('view') === 'classes' ? 1 : 0
+  const [currentTab, setCurrentTab] = useState(initialTab) // 0: Sessions, 1: Classes
   const [sessions, setSessions] = useState<any[]>([])
+  const [enrollments, setEnrollments] = useState<any[]>([])
+  const [classes, setClasses] = useState<{ [key: string]: any }>({})
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [tutors, setTutors] = useState<{ [key: string]: any }>({})
   const [activeMenu, setActiveMenu] = useState('session-detail')
+
+  // Sync tab with URL params
+  useEffect(() => {
+    const view = searchParams.get('view')
+    if (view === 'classes') {
+      setCurrentTab(1)
+    } else {
+      setCurrentTab(0)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -125,6 +146,51 @@ const SessionsListMobile: React.FC = () => {
     loadSessions()
   }, [navigate])
 
+  // Load enrolled classes
+  useEffect(() => {
+    const loadEnrollments = async () => {
+      try {
+        const userStr = localStorage.getItem('user')
+        if (!userStr) return
+        
+        const user = JSON.parse(userStr)
+        const response = await api.enrollments.list({ studentId: user.id || user.userId })
+        
+        if (response.success && response.data && Array.isArray(response.data)) {
+          console.log('[Mobile] Enrollments found:', response.data.length)
+          setEnrollments(response.data)
+          
+          // Load class details for each enrollment
+          const uniqueClassIds = [...new Set(response.data.map((e: any) => e.classId))] as string[]
+          const classPromises = uniqueClassIds.map(async (classId: string) => {
+            try {
+              const classResponse = await api.classes.get(classId)
+              if (classResponse.success && classResponse.data) {
+                return { id: classId, data: classResponse.data }
+              }
+            } catch (err) {
+              console.error(`[Mobile] Failed to load class ${classId}:`, err)
+            }
+            return null
+          })
+          
+          const classResults = await Promise.all(classPromises)
+          const classesMap: { [key: string]: any } = {}
+          classResults.forEach(result => {
+            if (result) {
+              classesMap[result.id] = result.data
+            }
+          })
+          setClasses(classesMap)
+        }
+      } catch (error) {
+        console.error('[Mobile] Failed to load enrollments:', error)
+      }
+    }
+
+    loadEnrollments()
+  }, [])
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -171,12 +237,24 @@ const SessionsListMobile: React.FC = () => {
     return session.status === filter
   })
 
+  const filteredEnrollments = enrollments.filter(enrollment => {
+    if (filter === 'all') return true
+    return enrollment.status === filter
+  })
+
   const stats = {
     total: sessions.length,
     pending: sessions.filter(s => s.status === 'pending').length,
     confirmed: sessions.filter(s => s.status === 'confirmed').length,
     completed: sessions.filter(s => s.status === 'completed').length,
     cancelled: sessions.filter(s => s.status === 'cancelled').length
+  }
+
+  const classStats = {
+    total: enrollments.length,
+    active: enrollments.filter(e => e.status === 'active').length,
+    completed: enrollments.filter(e => e.status === 'completed').length,
+    dropped: enrollments.filter(e => e.status === 'dropped').length
   }
 
   const handleDrawerToggle = () => {
@@ -210,10 +288,13 @@ const SessionsListMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                My Sessions
+                {currentTab === 0 ? 'My Sessions' : 'My Classes'}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''}
+                {currentTab === 0 
+                  ? `${filteredSessions.length} session${filteredSessions.length !== 1 ? 's' : ''}`
+                  : `${filteredEnrollments.length} class${filteredEnrollments.length !== 1 ? 'es' : ''} enrolled`
+                }
               </p>
             </div>
           </div>
@@ -235,24 +316,68 @@ const SessionsListMobile: React.FC = () => {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="px-4 pt-4">
+        <Box sx={{ borderBottom: 1, borderColor: theme === 'dark' ? '#374151' : 'divider', mb: 3 }}>
+          <Tabs 
+            value={currentTab} 
+            onChange={(_: React.SyntheticEvent, newValue: number) => {
+              setCurrentTab(newValue)
+              navigate(newValue === 0 ? '/student/session' : '/student/session?view=classes', { replace: true })
+            }}
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{
+              '& .MuiTab-root': {
+                color: theme === 'dark' ? '#9ca3af' : 'inherit',
+                '&.Mui-selected': {
+                  color: theme === 'dark' ? '#3b82f6' : 'primary.main'
+                }
+              }
+            }}
+          >
+            <Tab 
+              icon={<Schedule sx={{ fontSize: 20 }} />} 
+              label="Sessions" 
+              iconPosition="start"
+              sx={{ textTransform: 'none', fontWeight: 600, minWidth: 0, px: 1 }}
+            />
+            <Tab 
+              icon={<ClassIcon sx={{ fontSize: 20 }} />} 
+              label="Classes" 
+              iconPosition="start"
+              sx={{ textTransform: 'none', fontWeight: 600, minWidth: 0, px: 1 }}
+            />
+          </Tabs>
+        </Box>
+      </div>
+
       {/* Quick Stats */}
-      <div className="p-4">
+      <div className="p-4 pt-0">
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
             <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total</p>
-            <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.total}</p>
+            <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              {currentTab === 0 ? stats.total : classStats.total}
+            </p>
           </div>
           <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
-            <p className={`text-xs mb-1 text-green-500`}>Confirmed</p>
-            <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.confirmed}</p>
+            <p className={`text-xs mb-1 text-green-500`}>
+              {currentTab === 0 ? 'Confirmed' : 'Active'}
+            </p>
+            <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              {currentTab === 0 ? stats.confirmed : classStats.active}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="px-4 pb-4">
-        {/* Sessions List */}
-        {filteredSessions.length === 0 ? (
+        {/* Tab Content */}
+        {currentTab === 0 ? (
+          /* Sessions List */
+          filteredSessions.length === 0 ? (
           <div className="text-center py-12">
             <Schedule className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
             <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -328,6 +453,94 @@ const SessionsListMobile: React.FC = () => {
               </div>
             ))}
           </div>
+          )
+        ) : (
+          /* Classes List */
+          filteredEnrollments.length === 0 ? (
+            <div className="text-center py-12">
+              <ClassIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+              <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                No classes enrolled
+              </h3>
+              <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                You haven't enrolled in any classes yet.
+              </p>
+              <button
+                onClick={() => navigate('/student/book')}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+              >
+                Browse Classes
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredEnrollments.map((enrollment) => {
+                const classData = classes[enrollment.classId]
+                if (!classData) return null
+
+                return (
+                  <div
+                    key={enrollment.id}
+                    onClick={() => navigate(`/student/class/${enrollment.classId}`)}
+                    className={`p-4 rounded-lg border active:scale-98 transition-all ${
+                      theme === 'dark' 
+                        ? 'bg-gray-800 border-gray-700' 
+                        : 'bg-white border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center flex-1">
+                        <CheckCircle className={`w-4 h-4 mr-2 ${
+                          enrollment.status === 'active' ? 'text-green-500' :
+                          enrollment.status === 'completed' ? 'text-blue-500' :
+                          'text-gray-500'
+                        }`} />
+                        <h3 className={`text-base font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {classData.code} - {classData.subject}
+                        </h3>
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        enrollment.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                        enrollment.status === 'completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                      }`}>
+                        {enrollment.status}
+                      </span>
+                    </div>
+
+                    {classData.description && (
+                      <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {classData.description}
+                      </p>
+                    )}
+
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <CalendarToday className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Every {classData.day.charAt(0).toUpperCase() + classData.day.slice(1)} • {classData.startTime} - {classData.endTime}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center">
+                        <AccessTime className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {classData.duration} minutes per session
+                        </p>
+                      </div>
+
+                      <div className="flex items-center">
+                        <GroupIcon className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {classData.currentEnrollment} / {classData.maxStudents} students enrolled
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )
         )}
       </div>
 

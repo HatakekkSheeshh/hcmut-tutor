@@ -181,7 +181,11 @@ const Calendar: React.FC = () => {
         // Process sessions
         if (sessionsResponse.data && Array.isArray(sessionsResponse.data)) {
           allSessionsData = sessionsResponse.data
-          allStudentIds = [...allStudentIds, ...allSessionsData.map((s: any) => s.studentId)]
+          // Extract studentIds from array (sessions have studentIds array, not single studentId)
+          const sessionStudentIds = allSessionsData
+            .map((s: any) => s.studentIds || (s.studentId ? [s.studentId] : []))
+            .flat()
+          allStudentIds = [...allStudentIds, ...sessionStudentIds]
         }
         
         // Process classes
@@ -218,19 +222,25 @@ const Calendar: React.FC = () => {
         ])] as string[]
         
         // Transform sessions to calendar format
-        const transformedSessions: Session[] = allSessionsData.map((s: any) => ({
+        const transformedSessions: Session[] = allSessionsData.map((s: any) => {
+          // Get first student from studentIds array (1-1 sessions)
+          const studentId = Array.isArray(s.studentIds) && s.studentIds.length > 0 
+            ? s.studentIds[0] 
+            : s.studentId || null
+          
+          return {
           id: s.id,
           subject: s.subject,
           eventType: 'session' as const,
-          student: studentsMap[s.studentId] ? {
-            id: s.studentId,
-            name: studentsMap[s.studentId].name,
-            avatar: studentsMap[s.studentId].avatar
-          } : {
-            id: s.studentId,
+            student: studentId && studentsMap[studentId] ? {
+              id: studentId,
+              name: studentsMap[studentId].name,
+              avatar: studentsMap[studentId].avatar || ''
+            } : studentId ? {
+              id: studentId,
             name: 'Loading...',
             avatar: ''
-          },
+            } : undefined,
           date: new Date(s.startTime).toISOString().split('T')[0],
           startTime: new Date(s.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
           endTime: new Date(s.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
@@ -244,7 +254,8 @@ const Calendar: React.FC = () => {
           color: '#3b82f6', // Blue color for individual sessions
           createdAt: s.createdAt,
           updatedAt: s.updatedAt
-        }))
+          }
+        })
         
         setSessions(transformedSessions)
         setStudents(studentsMap)

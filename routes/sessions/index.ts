@@ -21,6 +21,7 @@ export async function listSessionsHandler(req: AuthRequest, res: Response) {
       status,
       startDate,
       endDate,
+      classId,
       page = '1',
       limit = '10'
     } = req.query;
@@ -46,6 +47,17 @@ export async function listSessionsHandler(req: AuthRequest, res: Response) {
 
       // Filter by tutorId
       if (tutorId && session.tutorId !== tutorId) return false;
+
+      // Filter by classId
+      if (classId) {
+        if (classId === 'null' || classId === 'undefined') {
+          // Filter for individual sessions (no classId)
+          if (session.classId) return false;
+        } else {
+          // Filter for specific class sessions
+          if (session.classId !== classId) return false;
+        }
+      }
 
       // Filter by status
       if (status && session.status !== status) return false;
@@ -248,7 +260,6 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       isOnline: sessionData.isOnline ?? true,
       meetingLink: sessionData.meetingLink,
       location: sessionData.location,
-      price: sessionData.price,
       notes: sessionData.notes || '',
       classId: sessionData.classId,
       createdAt: now(),

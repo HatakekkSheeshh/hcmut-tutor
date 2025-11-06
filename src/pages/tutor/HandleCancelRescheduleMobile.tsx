@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { api } from '../../lib/api'
 import { 
   Typography, 
   TextField,
@@ -9,7 +10,14 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Avatar
+  Avatar,
+  Tabs,
+  Tab,
+  Chip,
+  Box,
+  Alert,
+  IconButton,
+  Grid
 } from '@mui/material'
 import { 
   Dashboard as DashboardIcon,
@@ -28,24 +36,41 @@ import {
   ChevronRight as ChevronRightIcon,
   FilterList as FilterListIcon,
   LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon
+  DarkMode as DarkModeIcon,
+  Refresh as RefreshIcon,
+  Delete as DeleteIcon,
+  Person as PersonIcon,
+  School as SchoolIcon,
+  Event as EventIcon,
+  AutoAwesome
 } from '@mui/icons-material'
+import { DatePicker, TimePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { enUS } from 'date-fns/locale'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 
 const HandleCancelRescheduleMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
-  const [filterType, setFilterType] = useState('all')
+  const [tabValue, setTabValue] = useState(0) // 0: All, 1: Sessions, 2: Classes
+  const [filterType, setFilterType] = useState('all') // all, cancel, reschedule
+  const [statusFilter, setStatusFilter] = useState('all') // all, pending, approved, rejected
   const [selectedRequest, setSelectedRequest] = useState<any>(null)
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [actionType, setActionType] = useState('')
   const [reason, setReason] = useState('')
   const [newDate, setNewDate] = useState('')
   const [newTime, setNewTime] = useState('')
+  const [newDateValue, setNewDateValue] = useState<Date | null>(null)
+  const [newTimeValue, setNewTimeValue] = useState<Date | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+  const [requests, setRequests] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [refreshing, setRefreshing] = useState(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -55,35 +80,6 @@ const HandleCancelRescheduleMobile: React.FC = () => {
     toggleTheme()
   }
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      
-      if (showFilterDropdown && !target.closest('.filter-dropdown-container')) {
-        setShowFilterDropdown(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showFilterDropdown])
-
-  // Filter options
-  const filterOptions = [
-    { value: 'all', label: 'All Requests' },
-    { value: 'cancel', label: 'Cancellation' },
-    { value: 'reschedule', label: 'Reschedule' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'rejected', label: 'Rejected' }
-  ]
-
-  const getSelectedFilter = () => {
-    return filterOptions.find(option => option.value === filterType) || filterOptions[0]
-  }
 
   // Helper function to get initials from name
   const getInitials = (name: string) => {
@@ -107,99 +103,308 @@ const HandleCancelRescheduleMobile: React.FC = () => {
     return colors[index]
   }
 
-  const requests = [
-    {
-      id: 1,
-      student: 'John Smith',
-      subject: 'Mathematics',
-      originalDate: '2024-01-15',
-      originalTime: '10:00 AM',
-      requestType: 'cancel',
-      reason: 'Family emergency',
-      requestDate: '2024-01-14',
-      status: 'pending',
-      avatar: '/api/placeholder/40/40',
-      sessionId: 'SES-001',
-      urgency: 'high'
-    },
-    {
-      id: 2,
-      student: 'Sarah Johnson',
-      subject: 'Physics',
-      originalDate: '2024-01-16',
-      originalTime: '2:00 PM',
-      requestType: 'reschedule',
-      reason: 'Conflicting exam',
-      requestDate: '2024-01-15',
-      status: 'pending',
-      avatar: '/api/placeholder/40/40',
-      sessionId: 'SES-002',
-      urgency: 'medium',
-      preferredDate: '2024-01-17',
-      preferredTime: '3:00 PM'
-    },
-    {
-      id: 3,
-      student: 'Mike Chen',
-      subject: 'Chemistry',
-      originalDate: '2024-01-18',
-      originalTime: '9:00 AM',
-      requestType: 'cancel',
-      reason: 'Illness',
-      requestDate: '2024-01-17',
-      status: 'approved',
-      avatar: '/api/placeholder/40/40',
-      sessionId: 'SES-003',
-      urgency: 'high'
-    },
-    {
-      id: 4,
-      student: 'Alice Brown',
-      subject: 'Mathematics',
-      originalDate: '2024-01-19',
-      originalTime: '3:00 PM',
-      requestType: 'reschedule',
-      reason: 'Schedule conflict',
-      requestDate: '2024-01-18',
-      status: 'rejected',
-      avatar: '/api/placeholder/40/40',
-      sessionId: 'SES-004',
-      urgency: 'low'
-    }
-  ]
+  // Load requests from API
+  useEffect(() => {
+    loadRequests()
+  }, [tabValue, filterType, statusFilter])
 
-  const filteredRequests = requests.filter(request => {
-    if (filterType === 'all') return true
-    return request.requestType === filterType || request.status === filterType
+  const loadRequests = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const params: any = { page: 1, limit: 100 }
+      
+      // Filter by type (cancel/reschedule)
+      if (filterType !== 'all') {
+          params.type = filterType
+        }
+      
+      // Filter by status
+      if (statusFilter !== 'all') {
+        params.status = statusFilter
+      }
+
+      const response = await api.sessionRequests.list(params)
+      if (response.success) {
+        // Transform API data to match UI format
+        const transformedRequests = await Promise.all(
+          response.data.map(async (req: any) => {
+            // Fetch student info if needed
+            let studentName = 'Unknown Student'
+            try {
+              const studentRes = await api.users.get(req.studentId)
+              if (studentRes.success) {
+                studentName = studentRes.data.name
+              }
+            } catch (e) {
+              console.error('Failed to fetch student:', e)
+            }
+
+            // Backend returns 'session' field, not 'sessionDetails'
+            const session = req.session || req.sessionDetails || {}
+            
+            // Fetch session data if not available in request
+            let sessionData = session
+            if (!session.startTime && req.sessionId) {
+              try {
+                const sessionRes = await api.sessions.get(req.sessionId)
+                if (sessionRes.success && sessionRes.data) {
+                  sessionData = sessionRes.data
+                }
+              } catch (e) {
+                console.error('Failed to fetch session:', e)
+              }
+            }
+            
+            // Get start time - try multiple sources
+            const startTime = sessionData.startTime || session.startTime || req.sessionDetails?.startTime
+            const endTime = sessionData.endTime || session.endTime || req.sessionDetails?.endTime
+            
+            // Validate date before creating Date object
+            let originalStart: Date
+            let originalEnd: Date
+            
+            if (startTime && !isNaN(new Date(startTime).getTime())) {
+              originalStart = new Date(startTime)
+            } else {
+              // Fallback: use current date if no valid start time
+              console.warn('Invalid startTime for session:', req.sessionId, 'startTime:', startTime)
+              originalStart = new Date()
+            }
+            
+            if (endTime && !isNaN(new Date(endTime).getTime())) {
+              originalEnd = new Date(endTime)
+            } else {
+              // Fallback: use current date + 1 hour if no valid end time
+              originalEnd = new Date(originalStart.getTime() + 60 * 60 * 1000)
+            }
+            
+            // Fetch class info if request has classId
+            let classInfo = null
+            if (req.classId) {
+              try {
+                const classRes = await api.classes.get(req.classId)
+                if (classRes.success) {
+                  classInfo = {
+                    id: classRes.data.id,
+                    code: classRes.data.code,
+                    subject: classRes.data.subject
+                  }
+                }
+              } catch (e) {
+                console.error('Failed to fetch class:', e)
+              }
+            }
+
+            return {
+              id: req.id,
+              student: studentName,
+              subject: sessionData.subject || session.subject || 'Unknown Subject',
+              originalDate: originalStart.toLocaleDateString('vi-VN'),
+              originalTime: originalStart.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+              requestType: req.type,
+              reason: req.reason,
+              requestDate: new Date(req.createdAt).toLocaleDateString('vi-VN'),
+              status: req.status,
+      avatar: '/api/placeholder/40/40',
+              sessionId: req.sessionId,
+              urgency: getUrgency(req.createdAt, originalStart),
+              preferredDate: req.preferredStartTime 
+                ? new Date(req.preferredStartTime).toLocaleDateString('vi-VN')
+                : undefined,
+              preferredTime: req.preferredStartTime
+                ? new Date(req.preferredStartTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+                : undefined,
+              classId: req.classId,
+              classInfo: classInfo,
+              rawData: req
+            }
+          })
+        )
+        
+        // Filter by tab (All, Sessions only, Classes only)
+        let filtered = transformedRequests
+        if (tabValue === 1) {
+          // Sessions only - no classId
+          filtered = transformedRequests.filter(r => !r.classId)
+        } else if (tabValue === 2) {
+          // Classes only - has classId
+          filtered = transformedRequests.filter(r => r.classId)
+        }
+        
+        setRequests(filtered)
+      } else {
+        setError(response.error || 'Failed to load requests')
+      }
+    } catch (err: any) {
+      console.error('Error loading requests:', err)
+      setError(err.message || 'Failed to load requests')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getUrgency = (createdAt: string, sessionStart: Date): 'high' | 'medium' | 'low' => {
+    const hoursUntilSession = (sessionStart.getTime() - new Date(createdAt).getTime()) / (1000 * 60 * 60)
+    if (hoursUntilSession < 24) return 'high'
+    if (hoursUntilSession < 72) return 'medium'
+    return 'low'
+  }
+
+  // Filter requests by status
+  const filteredRequests = requests.filter(req => {
+    if (statusFilter === 'all') return true
+    return req.status === statusFilter
   })
 
   const handleAction = (request: any, type: string) => {
     setSelectedRequest(request)
     setActionType(type)
     setIsActionDialogOpen(true)
+    setError('')
+    setNewDate('')
+    setNewTime('')
+    setNewDateValue(null)
+    setNewTimeValue(null)
+    
+    // If approving reschedule request and student has preferred time, pre-fill it
+    if (type === 'approve' && request.requestType === 'reschedule' && request.rawData?.preferredStartTime) {
+      const preferredDate = new Date(request.rawData.preferredStartTime)
+      setNewDateValue(preferredDate)
+      setNewTimeValue(preferredDate)
+      setNewDate(preferredDate.toISOString().split('T')[0])
+      const hours = preferredDate.getHours().toString().padStart(2, '0')
+      const minutes = preferredDate.getMinutes().toString().padStart(2, '0')
+      setNewTime(`${hours}:${minutes}`)
+    }
   }
 
-  const handleSubmitAction = () => {
-    // In a real app, this would process the action
-    console.log('Action submitted:', {
-      request: selectedRequest,
-      action: actionType,
-      reason,
-      newDate,
-      newTime
+  const handleUseStudentPreferredTime = () => {
+    if (!selectedRequest?.rawData?.preferredStartTime) return
+    
+    const preferredDate = new Date(selectedRequest.rawData.preferredStartTime)
+    setNewDateValue(preferredDate)
+    setNewTimeValue(preferredDate)
+    setNewDate(preferredDate.toISOString().split('T')[0])
+    const hours = preferredDate.getHours().toString().padStart(2, '0')
+    const minutes = preferredDate.getMinutes().toString().padStart(2, '0')
+    setNewTime(`${hours}:${minutes}`)
+  }
+
+  const handleSubmitAction = async () => {
+    if (!selectedRequest || !selectedRequest.rawData) return
+
+    setRefreshing(true)
+    try {
+      if (actionType === 'approve') {
+        let newStartTime, newEndTime
+        if (selectedRequest.rawData.type === 'reschedule') {
+          // Use picker values if available, otherwise use text inputs
+          if (newDateValue && newTimeValue) {
+            const combinedDate = new Date(newDateValue)
+            combinedDate.setHours(newTimeValue.getHours(), newTimeValue.getMinutes(), 0, 0)
+            newStartTime = combinedDate.toISOString()
+          } else if (newDate && newTime) {
+          const dateTimeStr = `${newDate}T${newTime}:00`
+          newStartTime = new Date(dateTimeStr).toISOString()
+        } else if (selectedRequest.rawData.preferredStartTime) {
+            // Fallback to student's preferred time
+          newStartTime = selectedRequest.rawData.preferredStartTime
+          } else {
+            setError('Vui lòng chọn ngày và giờ mới cho buổi học')
+            setRefreshing(false)
+            return
+          }
+          
+          // Calculate duration and end time
+          const session = selectedRequest.rawData.session || selectedRequest.rawData.sessionDetails || {}
+          const originalStart = session.startTime ? new Date(session.startTime) : new Date(selectedRequest.rawData.preferredStartTime)
+          const originalEnd = session.endTime ? new Date(session.endTime) : new Date(selectedRequest.rawData.preferredEndTime)
+          const duration = originalEnd.getTime() - originalStart.getTime()
+          newEndTime = new Date(new Date(newStartTime).getTime() + duration).toISOString()
+        }
+
+        const response = await api.sessionRequests.approve(selectedRequest.rawData.id, {
+          responseMessage: reason || undefined,
+          newStartTime,
+          newEndTime
     })
+
+        if (response.success) {
+          await loadRequests()
     setIsActionDialogOpen(false)
     setReason('')
     setNewDate('')
     setNewTime('')
+          setError('')
+        } else {
+          setError(response.error || 'Failed to approve request')
+        }
+      } else if (actionType === 'reject') {
+        const response = await api.sessionRequests.reject(selectedRequest.rawData.id, {
+          responseMessage: reason || undefined
+        })
+
+        if (response.success) {
+          await loadRequests()
+          setIsActionDialogOpen(false)
+          setReason('')
+          setError('')
+        } else {
+          setError(response.error || 'Failed to reject request')
+        }
+      }
+    } catch (err: any) {
+      console.error('Error submitting action:', err)
+      setError(err.message || 'Failed to submit action')
+    } finally {
+      setRefreshing(false)
+    }
   }
 
-  const stats = [
-    { title: 'Pending', value: requests.filter(r => r.status === 'pending').length, color: 'yellow' },
-    { title: 'Approved', value: requests.filter(r => r.status === 'approved').length, color: 'green' },
-    { title: 'Rejected', value: requests.filter(r => r.status === 'rejected').length, color: 'red' },
-    { title: 'Total', value: requests.length, color: 'blue' }
-  ]
+  const handleDeleteRequest = async () => {
+    if (!selectedRequest || !selectedRequest.rawData) return
+
+    setRefreshing(true)
+    setError('')
+    try {
+      const response = await api.sessionRequests.delete(selectedRequest.rawData.id)
+      if (response.success) {
+        await loadRequests()
+        setIsDeleteDialogOpen(false)
+        setSelectedRequest(null)
+      } else {
+        setError(response.error || 'Failed to delete request')
+      }
+    } catch (err: any) {
+      console.error('Error deleting request:', err)
+      setError(err.message || 'Failed to delete request')
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  const handleDeleteClick = (request: any) => {
+    setSelectedRequest(request)
+    setIsDeleteDialogOpen(true)
+    setError('')
+  }
+
+  const stats = {
+    total: requests.length,
+    pending: requests.filter(r => r.status === 'pending').length,
+    approved: requests.filter(r => r.status === 'approved').length,
+    rejected: requests.filter(r => r.status === 'rejected').length,
+    sessions: requests.filter(r => !r.classId).length,
+    classes: requests.filter(r => r.classId).length
+  }
+
+  // Clear error when dialog closes
+  useEffect(() => {
+    if (!isActionDialogOpen) {
+      setError('')
+    }
+  }, [isActionDialogOpen])
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/tutor' },
@@ -233,6 +438,13 @@ const HandleCancelRescheduleMobile: React.FC = () => {
           </div>
           <div className="flex items-center space-x-2">
             <button
+              onClick={loadRequests}
+              disabled={loading || refreshing}
+              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} disabled:opacity-50`}
+            >
+              <RefreshIcon className="w-5 h-5" />
+            </button>
+            <button
               onClick={() => setShowFilters(!showFilters)}
               className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
@@ -258,9 +470,7 @@ const HandleCancelRescheduleMobile: React.FC = () => {
       <div className="p-4 pb-20">
         {/* Stats Cards - Mobile Grid */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          {stats.map((stat, index) => (
             <Card 
-              key={index} 
               className={`p-3 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
               style={{
                 borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
@@ -269,145 +479,295 @@ const HandleCancelRescheduleMobile: React.FC = () => {
               }}
             >
               <div className="text-center">
-                <div className={`text-2xl font-bold mb-1 ${
-                  stat.color === 'yellow' ? 'text-yellow-500' :
-                  stat.color === 'green' ? 'text-green-500' :
-                  stat.color === 'red' ? 'text-red-500' :
-                  'text-blue-500'
-                }`}>
-                  {stat.value}
+              <div className="text-2xl font-bold mb-1 text-yellow-500">
+                {stats.pending}
                 </div>
                 <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {stat.title}
+                Pending
                 </p>
               </div>
             </Card>
-          ))}
+          <Card 
+            className={`p-3 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+            style={{
+              borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+              boxShadow: 'none !important'
+            }}
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold mb-1 text-green-500">
+                {stats.approved}
+              </div>
+              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Approved
+              </p>
+            </div>
+          </Card>
+          <Card 
+            className={`p-3 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+            style={{
+              borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+              boxShadow: 'none !important'
+            }}
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold mb-1 text-red-500">
+                {stats.rejected}
+              </div>
+              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Rejected
+              </p>
+            </div>
+          </Card>
+          <Card 
+            className={`p-3 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+            style={{
+              borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+              boxShadow: 'none !important'
+            }}
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold mb-1 text-blue-500">
+                {stats.total}
+              </div>
+              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Total
+              </p>
+            </div>
+          </Card>
         </div>
+
+        {/* Tabs for Session/Class Selection */}
+        <Box sx={{ 
+          borderBottom: 1, 
+          borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+          mb: 3
+        }}>
+          <Tabs
+            value={tabValue}
+            onChange={(e, newValue) => setTabValue(newValue)}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              '& .MuiTab-root': {
+                color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                minHeight: 40,
+                '&.Mui-selected': {
+                  color: theme === 'dark' ? '#3b82f6' : '#2563eb',
+                  fontWeight: 600
+                }
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: theme === 'dark' ? '#3b82f6' : '#2563eb',
+                height: 3
+              }
+            }}
+          >
+            <Tab 
+              icon={<EventIcon sx={{ fontSize: 18 }} />} 
+              iconPosition="start"
+              label={`All (${stats.total})`}
+            />
+            <Tab 
+              icon={<PersonIcon sx={{ fontSize: 18 }} />} 
+              iconPosition="start"
+              label={`Sessions (${stats.sessions})`}
+            />
+            <Tab 
+              icon={<SchoolIcon sx={{ fontSize: 18 }} />} 
+              iconPosition="start"
+              label={`Classes (${stats.classes})`}
+            />
+          </Tabs>
+        </Box>
 
         {/* Filters Section - Mobile with Toggle */}
         {showFilters && (
           <Card
-            className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 mb-4 overflow-visible`}
+            className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 mb-4`}
             style={{
               borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
               backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-              boxShadow: 'none !important',
-              overflow: 'visible'
+              boxShadow: 'none !important'
             }}
           >
             <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               Filters
             </h3>
-            <div className="space-y-3 overflow-visible">
-              <div className="relative filter-dropdown-container">
-                {/* Custom Filter Dropdown Button */}
-                <button
-                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                  className={`w-full px-3 py-2 border rounded-xl flex items-center justify-between transition-all duration-200 ${
-                    theme === 'dark'
-                      ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                      : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            <div className="space-y-4">
+              {/* Type Filter */}
+              <div>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mb: 1.5,
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                    fontWeight: 500
+                  }}
                 >
-                  <div className="flex items-center">
-                    <span className="font-medium">{getSelectedFilter().label}</span>
+                  Type:
+                </Typography>
+                <div className="flex flex-wrap gap-2">
+                  <Chip
+                    label="All"
+                    onClick={() => setFilterType('all')}
+                    size="small"
+                    sx={{
+                      backgroundColor: filterType === 'all' 
+                        ? (theme === 'dark' ? '#3b82f6' : '#2563eb')
+                        : 'transparent',
+                      color: filterType === 'all'
+                        ? '#ffffff'
+                        : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      border: '1px solid'
+                    }}
+                  />
+                  <Chip
+                    label="Cancel"
+                    onClick={() => setFilterType('cancel')}
+                    size="small"
+                    sx={{
+                      backgroundColor: filterType === 'cancel' 
+                        ? (theme === 'dark' ? '#ef4444' : '#dc2626')
+                        : 'transparent',
+                      color: filterType === 'cancel'
+                        ? '#ffffff'
+                        : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      border: '1px solid'
+                    }}
+                  />
+                  <Chip
+                    label="Reschedule"
+                    onClick={() => setFilterType('reschedule')}
+                    size="small"
+                    sx={{
+                      backgroundColor: filterType === 'reschedule' 
+                        ? (theme === 'dark' ? '#f59e0b' : '#d97706')
+                        : 'transparent',
+                      color: filterType === 'reschedule'
+                        ? '#ffffff'
+                        : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      border: '1px solid'
+                    }}
+                  />
                   </div>
-                  <div className={`transform transition-transform duration-200 ${showFilterDropdown ? 'rotate-180' : ''}`}>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
                   </div>
-                </button>
 
-                {/* Custom Filter Dropdown Options */}
-                {showFilterDropdown && (
-                  <div className="absolute top-full left-0 right-0 z-[9999] mt-1">
-                    <div className={`rounded-xl shadow-xl border overflow-hidden ${
-                      theme === 'dark' 
-                        ? 'bg-gray-700 border-gray-600' 
-                        : 'bg-white border-gray-200'
-                    }`}>
-                      {filterOptions.map((option, index) => (
-                        <button
-                          key={option.value}
-                          onClick={() => {
-                            setFilterType(option.value)
-                            setShowFilterDropdown(false)
-                          }}
-                          className={`w-full px-4 py-3 text-left flex items-center transition-colors duration-150 ${
-                            option.value === filterType
-                              ? theme === 'dark'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-blue-100 text-blue-700'
-                              : theme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50'
-                          } ${index !== filterOptions.length - 1 ? 'border-b border-gray-200 dark:border-gray-600' : ''}`}
-                        >
-                          <span className="font-medium">{option.label}</span>
-                          {option.value === filterType && (
-                            <div className="ml-auto">
-                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* Status Filter */}
+              <div>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mb: 1.5,
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                    fontWeight: 500
+                  }}
+                >
+                  Status:
+                </Typography>
               <div className="flex flex-wrap gap-2">
-                <span className={`px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full`}>
-                  Pending: {requests.filter(r => r.status === 'pending').length}
-                </span>
-                <span className={`px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full`}>
-                  Approved: {requests.filter(r => r.status === 'approved').length}
-                </span>
-                <span className={`px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full`}>
-                  Rejected: {requests.filter(r => r.status === 'rejected').length}
-                </span>
+                  <Chip
+                    label="All"
+                    onClick={() => setStatusFilter('all')}
+                    size="small"
+                    sx={{
+                      backgroundColor: statusFilter === 'all' 
+                        ? (theme === 'dark' ? '#3b82f6' : '#2563eb')
+                        : 'transparent',
+                      color: statusFilter === 'all'
+                        ? '#ffffff'
+                        : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      border: '1px solid'
+                    }}
+                  />
+                  <Chip
+                    label="Pending"
+                    onClick={() => setStatusFilter('pending')}
+                    size="small"
+                    sx={{
+                      backgroundColor: statusFilter === 'pending' 
+                        ? (theme === 'dark' ? '#f59e0b' : '#fef3c7')
+                        : 'transparent',
+                      color: statusFilter === 'pending'
+                        ? (theme === 'dark' ? '#ffffff' : '#92400e')
+                        : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      border: '1px solid'
+                    }}
+                  />
+                  <Chip
+                    label="Approved"
+                    onClick={() => setStatusFilter('approved')}
+                    size="small"
+                    sx={{
+                      backgroundColor: statusFilter === 'approved' 
+                        ? (theme === 'dark' ? '#10b981' : '#d1fae5')
+                        : 'transparent',
+                      color: statusFilter === 'approved'
+                        ? (theme === 'dark' ? '#ffffff' : '#065f46')
+                        : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      border: '1px solid'
+                    }}
+                  />
+                  <Chip
+                    label="Rejected"
+                    onClick={() => setStatusFilter('rejected')}
+                    size="small"
+                    sx={{
+                      backgroundColor: statusFilter === 'rejected' 
+                        ? (theme === 'dark' ? '#ef4444' : '#fee2e2')
+                        : 'transparent',
+                      color: statusFilter === 'rejected'
+                        ? (theme === 'dark' ? '#ffffff' : '#991b1b')
+                        : (theme === 'dark' ? '#9ca3af' : '#6b7280'),
+                      borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                      border: '1px solid'
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </Card>
         )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <Button 
-            className="bg-green-600 hover:bg-green-700 text-white"
-            onClick={() => {
-              // Handle bulk approve
-              console.log('Bulk approve all pending')
-            }}
-          >
-            <CheckCircle className="w-4 h-4 mr-2" />
-            Approve All
-          </Button>
-          <Button 
-            variant="outlined"
-            style={{
-              backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-              color: theme === 'dark' ? '#ffffff' : '#dc2626',
-              borderColor: theme === 'dark' ? '#000000' : '#dc2626',
-              textTransform: 'none',
-              fontWeight: '500'
-            }}
-            onClick={() => {
-              // Handle bulk reject
-              console.log('Bulk reject all pending')
-            }}
-          >
-            <Cancel className="w-4 h-4 mr-2" />
-            Reject All
-          </Button>
-        </div>
+        {/* Error Message */}
+        {error && (
+          <div className={`mb-4 p-4 rounded-lg ${theme === 'dark' ? 'bg-red-900/20 border border-red-800' : 'bg-red-50 border border-red-200'}`}>
+            <p className={`text-sm ${theme === 'dark' ? 'text-red-300' : 'text-red-800'}`}>
+              {error}
+            </p>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        )}
 
         {/* Requests List */}
+        {!loading && (
         <div className="space-y-4">
-          {filteredRequests.map((request) => (
+            {filteredRequests.length === 0 ? (
+              <div className="text-center py-12">
+                <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Không có yêu cầu nào.
+                </p>
+              </div>
+            ) : (
+              filteredRequests.map((request) => (
             <Card 
               key={request.id} 
               className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}
@@ -438,6 +798,9 @@ const HandleCancelRescheduleMobile: React.FC = () => {
                     </h3>
                     <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                       {request.subject} • {request.sessionId}
+                      {request.classInfo && (
+                        <span className="ml-1">• Lớp: {request.classInfo.code}</span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -453,7 +816,7 @@ const HandleCancelRescheduleMobile: React.FC = () => {
               </div>
 
               {/* Request Type and Urgency */}
-              <div className="flex space-x-2 mb-3">
+              <div className="flex flex-wrap gap-2 mb-3">
                 <span className={`px-2 py-1 text-xs rounded-full ${
                   request.requestType === 'cancel' 
                     ? 'bg-red-100 text-red-800' 
@@ -461,6 +824,23 @@ const HandleCancelRescheduleMobile: React.FC = () => {
                 }`}>
                   {request.requestType}
                 </span>
+                {request.classId ? (
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    theme === 'dark' 
+                      ? 'bg-blue-900/30 text-blue-300' 
+                      : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    Class Session
+                  </span>
+                ) : (
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 text-gray-300' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}>
+                    Individual
+                  </span>
+                )}
                 <span className={`px-2 py-1 text-xs rounded-full ${
                   request.urgency === 'high' 
                     ? 'bg-red-100 text-red-800' 
@@ -535,6 +915,7 @@ const HandleCancelRescheduleMobile: React.FC = () => {
                     </Button>
                   </>
                 ) : (
+                  <>
                   <Button 
                     size="small" 
                     variant="outlined"
@@ -546,15 +927,30 @@ const HandleCancelRescheduleMobile: React.FC = () => {
                       textTransform: 'none',
                       fontWeight: '500'
                     }}
+                      onClick={() => handleAction(request, 'view')}
                   >
                     <Info className="w-4 h-4 mr-1" />
                     View Details
                   </Button>
+                    <IconButton
+                      onClick={() => handleDeleteClick(request)}
+                      sx={{
+                        color: theme === 'dark' ? '#ef4444' : '#dc2626',
+                        '&:hover': {
+                          backgroundColor: theme === 'dark' ? '#7f1d1d' : '#fee2e2'
+                        }
+                      }}
+                    >
+                      <DeleteIcon sx={{ fontSize: 20 }} />
+                    </IconButton>
+                  </>
                 )}
               </div>
             </Card>
-          ))}
+            ))
+            )}
         </div>
+        )}
       </div>
 
       {/* Mobile Drawer */}
@@ -606,16 +1002,38 @@ const HandleCancelRescheduleMobile: React.FC = () => {
                   REQUEST STATS
                 </h3>
                 <div className="space-y-3">
-                  {stats.map((stat, index) => (
-                    <div key={index} className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                       <div className="flex justify-between items-center">
-                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{stat.title}:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Pending:</span>
                         <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {stat.value}
+                        {stats.pending}
                         </span>
                       </div>
                     </div>
-                  ))}
+                  <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex justify-between items-center">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Approved:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {stats.approved}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex justify-between items-center">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Rejected:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {stats.rejected}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex justify-between items-center">
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total:</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {stats.total}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -646,44 +1064,242 @@ const HandleCancelRescheduleMobile: React.FC = () => {
       )}
 
       {/* Action Dialog */}
-      <Dialog open={isActionDialogOpen} onClose={() => setIsActionDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
+      <Dialog 
+        open={isActionDialogOpen} 
+        onClose={() => setIsActionDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#111827'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          color: theme === 'dark' ? '#ffffff' : '#111827',
+          borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`
+        }}>
           {actionType === 'approve' ? 'Approve Request' : 'Reject Request'}
         </DialogTitle>
-        <DialogContent>
-          <div className="space-y-4 mt-4">
+        <DialogContent sx={{ pt: 3 }}>
+          <div className="space-y-4">
             <div>
-              <Typography variant="body1" gutterBottom>
+              <Typography variant="body1" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 1 }}>
                 Student: {selectedRequest?.student}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
                 Session: {selectedRequest?.subject} - {selectedRequest?.originalDate} at {selectedRequest?.originalTime}
               </Typography>
             </div>
 
+            {error && (
+              <Alert severity="error" sx={{ 
+                backgroundColor: theme === 'dark' ? '#7f1d1d' : '#fee2e2',
+                color: theme === 'dark' ? '#fca5a5' : '#991b1b'
+              }}>
+                  {error}
+              </Alert>
+            )}
+
             {actionType === 'approve' && selectedRequest?.requestType === 'reschedule' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <TextField
-                    fullWidth
-                    label="New Date"
-                    type="date"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </div>
-                <div>
-                  <TextField
-                    fullWidth
-                    label="New Time"
-                    type="time"
-                    value={newTime}
-                    onChange={(e) => setNewTime(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </div>
-              </div>
+              <Box>
+                {/* Student's Preferred Time Info */}
+                {selectedRequest?.rawData?.preferredStartTime && (
+                  <Alert 
+                    severity="info" 
+                    sx={{ 
+                      mb: 2,
+                      backgroundColor: theme === 'dark' ? '#1e3a5f' : '#dbeafe',
+                      color: theme === 'dark' ? '#dbeafe' : '#1e40af',
+                      '& .MuiAlert-icon': {
+                        color: theme === 'dark' ? '#60a5fa' : '#3b82f6'
+                      }
+                    }}
+                    action={
+                      <MuiButton
+                        size="small"
+                        onClick={handleUseStudentPreferredTime}
+                        startIcon={<AutoAwesome />}
+                        sx={{
+                          color: theme === 'dark' ? '#60a5fa' : '#3b82f6',
+                          textTransform: 'none',
+                          fontWeight: 600
+                        }}
+                      >
+                        Dùng thời gian này
+                      </MuiButton>
+                    }
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                      Thời gian học sinh mong muốn:
+                    </Typography>
+                    <Typography variant="body2">
+                      {new Date(selectedRequest.rawData.preferredStartTime).toLocaleDateString('vi-VN', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })} lúc {new Date(selectedRequest.rawData.preferredStartTime).toLocaleTimeString('vi-VN', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </Typography>
+                  </Alert>
+                )}
+
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                    mb: 2,
+                    fontWeight: 600
+                  }}
+                >
+                  Chọn ngày và giờ mới cho buổi học
+                </Typography>
+
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enUS}>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <DatePicker
+                        label="Ngày mới"
+                        value={newDateValue}
+                        onChange={(newValue) => {
+                          setNewDateValue(newValue)
+                          if (newValue) {
+                            setNewDate(newValue.toISOString().split('T')[0])
+                          } else {
+                            setNewDate('')
+                          }
+                        }}
+                        minDate={new Date()}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            required: true,
+                            sx: {
+                              '& .MuiOutlinedInput-root': {
+                                color: theme === 'dark' ? '#ffffff' : '#111827',
+                                '& fieldset': {
+                                  borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                                },
+                                '&:hover fieldset': {
+                                  borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
+                                },
+                                '&.Mui-focused fieldset': {
+                                  borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                                }
+                              },
+                              '& .MuiInputLabel-root': {
+                                color: theme === 'dark' ? '#d1d5db' : '#374151',
+                                '&.Mui-focused': {
+                                  color: theme === 'dark' ? '#ffffff' : '#111827'
+                                }
+                              },
+                              '& .MuiSvgIcon-root': {
+                                color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                              }
+                            }
+                          },
+                          popper: {
+                            sx: {
+                              '& .MuiPaper-root': {
+                                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+                                borderRadius: '12px',
+                                '& .MuiPickersCalendarHeader-root': {
+                                  color: theme === 'dark' ? '#ffffff' : '#111827',
+                                  '& .MuiIconButton-root': {
+                                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                                  }
+                                },
+                                '& .MuiDayCalendar-weekContainer': {
+                                  '& .MuiPickersDay-root': {
+                                    color: theme === 'dark' ? '#ffffff' : '#111827',
+                                    '&.Mui-selected': {
+                                      backgroundColor: theme === 'dark' ? '#3b82f6' : '#2563eb',
+                                      color: '#ffffff',
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TimePicker
+                        label="Giờ mới"
+                        value={newTimeValue}
+                        onChange={(newValue) => {
+                          setNewTimeValue(newValue)
+                          if (newValue) {
+                            const hours = newValue.getHours().toString().padStart(2, '0')
+                            const minutes = newValue.getMinutes().toString().padStart(2, '0')
+                            setNewTime(`${hours}:${minutes}`)
+                          } else {
+                            setNewTime('')
+                          }
+                        }}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            required: true,
+                            sx: {
+                              '& .MuiOutlinedInput-root': {
+                                color: theme === 'dark' ? '#ffffff' : '#111827',
+                                '& fieldset': {
+                                  borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                                },
+                                '&:hover fieldset': {
+                                  borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
+                                },
+                                '&.Mui-focused fieldset': {
+                                  borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                                }
+                              },
+                              '& .MuiInputLabel-root': {
+                                color: theme === 'dark' ? '#d1d5db' : '#374151',
+                                '&.Mui-focused': {
+                                  color: theme === 'dark' ? '#ffffff' : '#111827'
+                                }
+                              },
+                              '& .MuiSvgIcon-root': {
+                                color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                              }
+                            }
+                          },
+                          popper: {
+                            sx: {
+                              '& .MuiPaper-root': {
+                                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+                                borderRadius: '12px',
+                                '& .MuiTimePickerToolbar-root': {
+                                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                  color: theme === 'dark' ? '#ffffff' : '#111827',
+                                },
+                                '& .MuiTimeClock-root': {
+                                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                },
+                                '& .MuiMultiSectionDigitalClockSection-item': {
+                                  color: theme === 'dark' ? '#ffffff !important' : '#111827 !important',
+                                  '&.Mui-selected': {
+                                    backgroundColor: theme === 'dark' ? '#3b82f6 !important' : '#2563eb !important',
+                                    color: '#ffffff !important',
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </LocalizationProvider>
+              </Box>
             )}
 
             <div>
@@ -699,18 +1315,138 @@ const HandleCancelRescheduleMobile: React.FC = () => {
                     ? 'Message to send to student about approval...'
                     : 'Reason for rejection...'
                 }
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#111827',
+                    '& fieldset': {
+                      borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                  }
+                }}
               />
             </div>
           </div>
         </DialogContent>
-        <DialogActions>
-          <MuiButton onClick={() => setIsActionDialogOpen(false)}>Cancel</MuiButton>
+        <DialogActions sx={{ 
+          p: 3, 
+          pt: 2,
+          borderTop: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`
+        }}>
+          <MuiButton 
+            onClick={() => setIsActionDialogOpen(false)} 
+            disabled={refreshing}
+            sx={{
+              color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+            }}
+          >
+            Cancel
+          </MuiButton>
           <MuiButton 
             onClick={handleSubmitAction} 
             variant="contained"
-            color={actionType === 'approve' ? 'success' : 'error'}
+            disabled={refreshing}
+            sx={{
+              backgroundColor: actionType === 'approve' 
+                ? (theme === 'dark' ? '#10b981' : '#059669')
+                : (theme === 'dark' ? '#ef4444' : '#dc2626'),
+              color: '#ffffff',
+              '&:hover': {
+                backgroundColor: actionType === 'approve' 
+                  ? (theme === 'dark' ? '#059669' : '#047857')
+                  : (theme === 'dark' ? '#dc2626' : '#b91c1c')
+              }
+            }}
           >
-            {actionType === 'approve' ? 'Approve' : 'Reject'}
+            {refreshing ? 'Processing...' : (actionType === 'approve' ? 'Approve' : 'Reject')}
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog 
+        open={isDeleteDialogOpen} 
+        onClose={() => setIsDeleteDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#111827'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          color: theme === 'dark' ? '#ffffff' : '#111827',
+          borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`
+        }}>
+          Xóa yêu cầu đã xử lý
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Typography variant="body1" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 2 }}>
+            Bạn có chắc chắn muốn xóa yêu cầu này không?
+          </Typography>
+          {selectedRequest && (
+            <Box sx={{ 
+              p: 2, 
+              borderRadius: 1, 
+              backgroundColor: theme === 'dark' ? '#111827' : '#f9fafb',
+              mb: 2
+            }}>
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#d1d5db' : '#4b5563', mb: 1 }}>
+                <strong>Student:</strong> {selectedRequest.student}
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#d1d5db' : '#4b5563', mb: 1 }}>
+                <strong>Subject:</strong> {selectedRequest.subject}
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#d1d5db' : '#4b5563', mb: 1 }}>
+                <strong>Type:</strong> {selectedRequest.requestType}
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#d1d5db' : '#4b5563' }}>
+                <strong>Status:</strong> {selectedRequest.status}
+              </Typography>
+            </Box>
+          )}
+        {error && (
+            <Alert severity="error" sx={{ 
+              backgroundColor: theme === 'dark' ? '#7f1d1d' : '#fee2e2',
+              color: theme === 'dark' ? '#fca5a5' : '#991b1b'
+            }}>
+              {error}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ 
+          p: 3, 
+          pt: 2,
+          borderTop: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`
+        }}>
+          <MuiButton 
+            onClick={() => setIsDeleteDialogOpen(false)} 
+            disabled={refreshing}
+            sx={{
+              color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+            }}
+          >
+            Hủy
+          </MuiButton>
+          <MuiButton 
+            onClick={handleDeleteRequest} 
+            variant="contained"
+            disabled={refreshing}
+            startIcon={<DeleteIcon />}
+            sx={{
+              backgroundColor: theme === 'dark' ? '#ef4444' : '#dc2626',
+              color: '#ffffff',
+              '&:hover': {
+                backgroundColor: theme === 'dark' ? '#dc2626' : '#b91c1c'
+              }
+            }}
+          >
+            {refreshing ? 'Đang xóa...' : 'Xóa'}
           </MuiButton>
         </DialogActions>
       </Dialog>
@@ -719,3 +1455,4 @@ const HandleCancelRescheduleMobile: React.FC = () => {
 }
 
 export default HandleCancelRescheduleMobile
+

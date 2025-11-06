@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material'
 import { Session } from '../../types/calendar'
 import { useTheme } from '../../contexts/ThemeContext'
+import RequestDialog from '../session/RequestDialog'
 
 interface SessionDetailModalProps {
   open: boolean
@@ -52,6 +53,10 @@ const SessionDetailModal: React.FC<SessionDetailModalProps> = ({
 }) => {
   const { theme } = useTheme()
   const modalRef = useRef<HTMLDivElement>(null)
+  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false)
+  const [requestType, setRequestType] = useState<'cancel' | 'reschedule'>('cancel')
+  const [sessionData, setSessionData] = useState<any>(null)
+  const [classInfo, setClassInfo] = useState<any>(null)
 
   useEffect(() => {
     if (open && modalRef.current) {
@@ -125,17 +130,56 @@ const SessionDetailModal: React.FC<SessionDetailModalProps> = ({
   }
 
   const handleCancel = () => {
+    // If onCancel provided (tutor), use it directly
+    // If not (student), open request dialog
     if (onCancel) {
       onCancel(session)
+      onClose()
+    } else {
+      // Student: open request dialog
+      setRequestType('cancel')
+      // Convert Session type to request dialog format
+      const sessionObj: any = {
+        id: session.id,
+        subject: session.subject,
+        startTime: session.date + 'T' + session.startTime,
+        endTime: session.date + 'T' + session.endTime,
+        classId: (session as any).classId
+      }
+      setSessionData(sessionObj)
+      setClassInfo((session as any).classInfo)
+      setIsRequestDialogOpen(true)
     }
-    onClose()
   }
 
   const handleReschedule = () => {
+    // If onReschedule provided (tutor), use it directly
+    // If not (student), open request dialog
     if (onReschedule) {
       onReschedule(session)
+      onClose()
+    } else {
+      // Student: open request dialog
+      setRequestType('reschedule')
+      // Convert Session type to request dialog format
+      const sessionObj: any = {
+        id: session.id,
+        subject: session.subject,
+        startTime: session.date + 'T' + session.startTime,
+        endTime: session.date + 'T' + session.endTime,
+        classId: (session as any).classId
+      }
+      setSessionData(sessionObj)
+      setClassInfo((session as any).classInfo)
+      setIsRequestDialogOpen(true)
     }
+  }
+
+  const handleRequestSuccess = () => {
+    setIsRequestDialogOpen(false)
     onClose()
+    // Dialog will show success message, parent component can refresh if needed
+    // No need to reload entire page
   }
 
   const handleJoin = () => {
@@ -416,6 +460,22 @@ const SessionDetailModal: React.FC<SessionDetailModalProps> = ({
           </Button>
         </Box>
       </DialogActions>
+
+      {/* Request Dialog for Students */}
+      {sessionData && (
+        <RequestDialog
+          open={isRequestDialogOpen}
+          onClose={() => {
+            setIsRequestDialogOpen(false)
+            setSessionData(null)
+            setClassInfo(null)
+          }}
+          session={sessionData}
+          type={requestType}
+          classInfo={classInfo}
+          onSuccess={handleRequestSuccess}
+        />
+      )}
     </Dialog>
   )
 }

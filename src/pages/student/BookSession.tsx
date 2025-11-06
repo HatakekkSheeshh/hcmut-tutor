@@ -63,6 +63,12 @@ const BookSession: React.FC = () => {
   const [enrollDialogOpen, setEnrollDialogOpen] = useState(false)
   const [enrolling, setEnrolling] = useState(false)
   
+  // Class selection step (0: select tutor, 1: view classes)
+  const [classSelectionStep, setClassSelectionStep] = useState<0 | 1>(0)
+  const [selectedClassTutor, setSelectedClassTutor] = useState<any>(null)
+  const [classTutorPage, setClassTutorPage] = useState(1)
+  const classTutorsPerPage = 6
+  
   // Booking result states
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [bookingError, setBookingError] = useState('')
@@ -84,15 +90,24 @@ const BookSession: React.FC = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  // Load classes when in class mode
+  // Load tutors and data when in class mode
   useEffect(() => {
     if (bookingMode === 'class') {
       loadAvailableSubjects()
       loadAvailableTutors()
-      loadClasses()
       loadMyEnrollments()
+      // Reset class selection when switching to class mode
+      setClassSelectionStep(0)
+      setSelectedClassTutor(null)
     }
-  }, [bookingMode, classFilters])
+  }, [bookingMode])
+
+  // Load classes when tutor is selected in class mode
+  useEffect(() => {
+    if (bookingMode === 'class' && classSelectionStep === 1 && selectedClassTutor) {
+      loadClasses()
+    }
+  }, [bookingMode, classSelectionStep, selectedClassTutor])
 
   // Load available subjects and start times from all classes in database
   const loadAvailableSubjects = async () => {
@@ -154,9 +169,12 @@ const BookSession: React.FC = () => {
         limit: 100, // Load up to 100 classes (or all if less than 100)
         page: 1
       }
+      // If tutor is selected, filter by tutor
+      if (selectedClassTutor) {
+        params.tutorId = selectedClassTutor.id
+      }
       if (classFilters.subject) params.subject = classFilters.subject
       if (classFilters.day) params.day = classFilters.day
-      if (classFilters.tutorId) params.tutorId = classFilters.tutorId
       if (classFilters.status) params.status = classFilters.status
       
       const response = await api.classes.list(params)
@@ -552,7 +570,7 @@ const BookSession: React.FC = () => {
                             ? 'text-blue-700'
                             : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                         }`}>
-                            {tutor.subjects?.[0] || 'N/A'} • {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tutor.hourlyRate || 0)}
+                            {tutor.subjects?.[0] || 'N/A'}
                         </p>
                       </div>
                     </div>
@@ -1512,402 +1530,434 @@ const BookSession: React.FC = () => {
           </>
           ) : (
             /* Classes Browsing Content */
-            <div className="space-y-8">
-              {/* Filters */}
-              <Card 
-                className={`p-6 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                style={{
-                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                  boxShadow: 'none !important'
-                }}
-              >
-                <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Filter Classes
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Subject
-                    </label>
-                    <select
-                      value={classFilters.subject}
-                      onChange={(e) => setClassFilters({...classFilters, subject: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-lg ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
-                      <option value="">All Subjects</option>
-                      {availableSubjects.map((subject) => (
-                        <option key={subject} value={subject}>
-                          {subject}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Tutor
-                    </label>
-                    <select
-                      value={classFilters.tutorId}
-                      onChange={(e) => setClassFilters({...classFilters, tutorId: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-lg ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
-                      <option value="">All Tutors</option>
-                      {availableTutors.map((tutor) => (
-                        <option key={tutor.id} value={tutor.id}>
-                          {tutor.name} {tutor.rating ? `(${tutor.rating.toFixed(1)}⭐)` : ''}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Day
-                    </label>
-                    <select
-                      value={classFilters.day}
-                      onChange={(e) => setClassFilters({...classFilters, day: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-lg ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
-                      <option value="">All Days</option>
-                      <option value="monday">Monday</option>
-                      <option value="tuesday">Tuesday</option>
-                      <option value="wednesday">Wednesday</option>
-                      <option value="thursday">Thursday</option>
-                      <option value="friday">Friday</option>
-                      <option value="saturday">Saturday</option>
-                      <option value="sunday">Sunday</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Start Time
-                    </label>
-                    <select
-                      value={classFilters.startTime}
-                      onChange={(e) => setClassFilters({...classFilters, startTime: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-lg ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
-                      <option value="">All Times</option>
-                      {availableStartTimes.length > 0 ? (
-                        availableStartTimes.map((time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        ))
+            <>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2">
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  {classSelectionStep === 0 ? (
+                    // Step 1: Select Tutor
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          Choose a Tutor
+                        </h2>
+                        {availableTutors.length > classTutorsPerPage && (
+                          <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Page {classTutorPage} of {Math.ceil(availableTutors.length / classTutorsPerPage)}
+                          </span>
+                        )}
+                      </div>
+                      {availableTutors.length === 0 ? (
+                        <div className="text-center py-8">
+                          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading tutors...</p>
+                        </div>
                       ) : (
-                        ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'].map((time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        ))
+                        <>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            {(() => {
+                              const startIndex = (classTutorPage - 1) * classTutorsPerPage
+                              const endIndex = startIndex + classTutorsPerPage
+                              const currentTutors = availableTutors.slice(startIndex, endIndex)
+                              
+                              return currentTutors.map((tutor) => (
+                                <div
+                                  key={tutor.id}
+                                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                    selectedClassTutor?.id === tutor.id
+                                      ? 'border-blue-500 bg-blue-100'
+                                      : `${theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-200 hover:border-gray-300'}`
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedClassTutor(tutor)
+                                    setClassSelectionStep(1)
+                                  }}
+                                >
+                                  <div className="flex items-center mb-3">
+                                    <Avatar
+                                      src={tutor.avatar}
+                                      sx={{
+                                        width: 56,
+                                        height: 56,
+                                        bgcolor: getAvatarColor(tutor.name),
+                                        fontSize: '1.25rem',
+                                        fontWeight: 'bold'
+                                      }}
+                                    >
+                                      {getInitials(tutor.name)}
+                                    </Avatar>
+                                    <div className="ml-3">
+                                      <h3 className={`font-semibold ${
+                                        selectedClassTutor?.id === tutor.id
+                                          ? 'text-blue-900'
+                                          : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                                      }`}>
+                                        {tutor.name}
+                                      </h3>
+                                      <p className={`text-sm ${
+                                        selectedClassTutor?.id === tutor.id
+                                          ? 'text-blue-700'
+                                          : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                                      }`}>
+                                        {tutor.subjects?.[0] || 'N/A'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {(tutor.subjects || []).slice(0, 3).map((subject: string, index: number) => (
+                                      <span
+                                        key={index}
+                                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                                      >
+                                        {subject}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))
+                            })()}
+                          </div>
+                          
+                          {/* Pagination Controls */}
+                          {availableTutors.length > classTutorsPerPage && (
+                            <div className="flex items-center justify-center gap-2 mt-6">
+                              <Button
+                                onClick={() => setClassTutorPage(prev => Math.max(1, prev - 1))}
+                                disabled={classTutorPage === 1}
+                                style={{
+                                  backgroundColor: classTutorPage === 1 ? (theme === 'dark' ? '#374151' : '#e5e7eb') : '#2563eb',
+                                  color: classTutorPage === 1 ? (theme === 'dark' ? '#6b7280' : '#9ca3af') : '#ffffff',
+                                  textTransform: 'none',
+                                  padding: '8px 16px'
+                                }}
+                              >
+                                Previous
+                              </Button>
+                              <span className={`px-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                {classTutorPage} / {Math.ceil(availableTutors.length / classTutorsPerPage)}
+                              </span>
+                              <Button
+                                onClick={() => setClassTutorPage(prev => Math.min(Math.ceil(availableTutors.length / classTutorsPerPage), prev + 1))}
+                                disabled={classTutorPage >= Math.ceil(availableTutors.length / classTutorsPerPage)}
+                                style={{
+                                  backgroundColor: classTutorPage >= Math.ceil(availableTutors.length / classTutorsPerPage) ? (theme === 'dark' ? '#374151' : '#e5e7eb') : '#2563eb',
+                                  color: classTutorPage >= Math.ceil(availableTutors.length / classTutorsPerPage) ? (theme === 'dark' ? '#6b7280' : '#9ca3af') : '#ffffff',
+                                  textTransform: 'none',
+                                  padding: '8px 16px'
+                                }}
+                              >
+                                Next
+                              </Button>
+                            </div>
+                          )}
+                        </>
                       )}
-                    </select>
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Min Rating
-                    </label>
-                    <select
-                      value={classFilters.minRating}
-                      onChange={(e) => setClassFilters({...classFilters, minRating: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-lg ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
-                      <option value="">All Ratings</option>
-                      <option value="4.5">4.5⭐ and above</option>
-                      <option value="4.0">4.0⭐ and above</option>
-                      <option value="3.5">3.5⭐ and above</option>
-                      <option value="3.0">3.0⭐ and above</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Status
-                    </label>
-                    <select
-                      value={classFilters.status}
-                      onChange={(e) => setClassFilters({...classFilters, status: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-lg ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
-                      <option value="">All Status</option>
-                      <option value="active">Active</option>
-                      <option value="full">Full</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Type
-                    </label>
-                    <select
-                      value={classFilters.isOnline}
-                      onChange={(e) => setClassFilters({...classFilters, isOnline: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-lg ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    >
-                      <option value="">All Types</option>
-                      <option value="true">Online</option>
-                      <option value="false">In-Person</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center">
-                    <label className="flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={classFilters.availableOnly}
-                        onChange={(e) => setClassFilters({...classFilters, availableOnly: e.target.checked})}
-                        className="mr-2 w-4 h-4"
-                      />
-                      <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Available Only (Not Full)
-                      </span>
-                    </label>
-                  </div>
-                  <div>
-                    <button
-                      onClick={() => setClassFilters({
-                        subject: '',
-                        day: '',
-                        tutorId: '',
-                        startTime: '',
-                        minRating: '',
-                        status: '',
-                        isOnline: '',
-                        availableOnly: true
-                      })}
-                      className={`w-full px-4 py-2 rounded-lg border ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                          : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
-                    >
-                      Clear All Filters
-                    </button>
-                  </div>
-                </div>
-              </Card>
+                    </div>
+                  ) : (
+                    // Step 2: View Classes of Selected Tutor
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <div>
+                          <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            Classes by {selectedClassTutor?.name || 'Tutor'}
+                          </h2>
+                          <p className={`text-sm mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Select a class to enroll
+                          </p>
+                        </div>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => {
+                            setClassSelectionStep(0)
+                            setSelectedClassTutor(null)
+                          }}
+                          style={{
+                            backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                            color: theme === 'dark' ? '#ffffff' : '#000000',
+                            borderColor: theme === 'dark' ? '#6b7280' : '#d1d5db',
+                            textTransform: 'none',
+                          }}
+                        >
+                          ← Change Tutor
+                        </Button>
+                      </div>
+                      
+                      {classesLoading ? (
+                        <div className="text-center py-12">
+                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                          <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Loading classes...
+                          </p>
+                        </div>
+                      ) : classes.length === 0 ? (
+                        <Card 
+                          className={`p-12 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} text-center`}
+                          style={{
+                            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                            boxShadow: 'none !important'
+                          }}
+                        >
+                          <ClassIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+                          <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            No classes available for this tutor
+                          </p>
+                        </Card>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {classes.map((cls) => {
+                            const isEnrolled = myEnrollments.some(e => e.classId === cls.id && e.status === 'active')
+                            const isFull = cls.currentEnrollment >= cls.maxStudents
+                            
+                            return (
+                              <Card
+                                key={cls.id}
+                                className={`p-4 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                                style={{
+                                  borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                                  backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                  boxShadow: 'none !important'
+                                }}
+                              >
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                        {cls.code}
+                                      </h4>
+                                      {isEnrolled && (
+                                        <Chip 
+                                          label="Enrolled" 
+                                          size="small"
+                                          color="success"
+                                        />
+                                      )}
+                                      {isFull && !isEnrolled && (
+                                        <Chip 
+                                          label="Full" 
+                                          size="small"
+                                          color="warning"
+                                        />
+                                      )}
+                                    </div>
+                                    <p className={`text-sm mb-2 font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                                      {cls.subject}
+                                    </p>
+                                    {cls.description && (
+                                      <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {cls.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
 
-              {/* Available Classes */}
-              <div>
-                <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Available Classes
-                </h3>
-                {classesLoading ? (
-                  <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Loading classes...
-                    </p>
-                  </div>
-                ) : classes.length === 0 ? (
+                                <div className="space-y-2 mb-4">
+                                  <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <CalendarToday className="w-4 h-4" />
+                                    <span>{cls.day.charAt(0).toUpperCase() + cls.day.slice(1)}</span>
+                                  </div>
+                                  <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <AccessTime className="w-4 h-4" />
+                                    <span>{cls.startTime} - {cls.endTime} ({cls.duration} min)</span>
+                                  </div>
+                                  <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <GroupIcon className="w-4 h-4" />
+                                    <span>{cls.currentEnrollment || 0} / {cls.maxStudents} students</span>
+                                  </div>
+                                  <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <EventIcon className="w-4 h-4" />
+                                    <span>{new Date(cls.semesterStart).toLocaleDateString()} - {new Date(cls.semesterEnd).toLocaleDateString()}</span>
+                                  </div>
+                                </div>
+
+                                <Button
+                                  onClick={() => {
+                                    setSelectedClass(cls)
+                                    setEnrollDialogOpen(true)
+                                  }}
+                                  disabled={isEnrolled || isFull}
+                                  fullWidth
+                                  style={{
+                                    backgroundColor: isEnrolled || isFull ? '#9ca3af' : '#2563eb',
+                                    color: '#ffffff',
+                                    textTransform: 'none'
+                                  }}
+                                >
+                                  {isEnrolled ? 'Already Enrolled' : isFull ? 'Class Full' : 'Enroll Now'}
+                                </Button>
+                              </Card>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Card>
+              </div>
+
+              {/* Sidebar Content */}
+              <div className="space-y-6">
+                {/* Selected Tutor Summary */}
+                {selectedClassTutor && (
                   <Card 
-                    className={`p-12 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} text-center`}
+                    className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
                     style={{
                       borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
                       backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
                       boxShadow: 'none !important'
                     }}
                   >
-                    <ClassIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
-                    <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      No classes available
-                    </p>
+                    <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Selected Tutor
+                    </h3>
+                    <div className="flex items-center mb-4">
+                      <Avatar
+                        src={selectedClassTutor.avatar}
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          bgcolor: getAvatarColor(selectedClassTutor.name),
+                          fontSize: '1rem',
+                          fontWeight: 'bold',
+                          mr: 2
+                        }}
+                      >
+                        {getInitials(selectedClassTutor.name)}
+                      </Avatar>
+                      <div>
+                        <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {selectedClassTutor.name}
+                        </p>
+                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {selectedClassTutor.subjects?.[0] || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                    {selectedClassTutor.subjects && selectedClassTutor.subjects.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {selectedClassTutor.subjects.slice(0, 5).map((subject: string, index: number) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                          >
+                            {subject}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </Card>
+                )}
+
+                {/* Help Section */}
+                <Card 
+                  className={`border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Need Help?
+                  </h3>
+                  <div className="space-y-3">
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <ChatIcon className="mr-3 w-4 h-4" />
+                      Contact Support
+                    </button>
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <VideoCallIcon className="mr-3 w-4 h-4" />
+                      Video Tutorial
+                    </button>
+                    <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                      <LocationOnIcon className="mr-3 w-4 h-4" />
+                      Find Centers
+                    </button>
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+            {/* My Enrollments Section - Full Width Below */}
+            {myEnrollments.length > 0 && (
+              <div className="mt-8">
+                <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  My Enrolled Classes
+                </h3>
+                {enrollmentsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {classes.map((cls) => {
-                      const isEnrolled = myEnrollments.some(e => e.classId === cls.id && e.status === 'active')
-                      const isFull = cls.currentEnrollment >= cls.maxStudents
-                      
-                      return (
-                        <Card
-                          key={cls.id}
-                          className={`p-4 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                          style={{
-                            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                            boxShadow: 'none !important'
-                          }}
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                  {cls.code}
-                                </h4>
-                                {isEnrolled && (
-                                  <Chip 
-                                    label="Enrolled" 
-                                    size="small"
-                                    color="success"
-                                  />
-                                )}
-                                {isFull && !isEnrolled && (
-                                  <Chip 
-                                    label="Full" 
-                                    size="small"
-                                    color="warning"
-                                  />
-                                )}
-                              </div>
-                              <p className={`text-sm mb-2 font-medium ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                                {cls.subject}
-                              </p>
-                              {cls.tutor?.name && (
-                                <p className={`text-xs mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                  <Person className="w-3 h-3 inline mr-1" />
-                                  Tutor: {cls.tutor.name}
-                                </p>
-                              )}
-                              {cls.description && (
-                                <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                  {cls.description}
-                                </p>
-                              )}
-                            </div>
+                    {myEnrollments.map((enrollment) => (
+                      <Card
+                        key={enrollment.id}
+                        className={`p-4 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                        style={{
+                          borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                          backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                          boxShadow: 'none !important'
+                        }}
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {enrollment.class?.code}
+                            </h4>
+                            <p className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                              {enrollment.class?.subject}
+                            </p>
                           </div>
-
-                          <div className="space-y-2 mb-4">
-                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              <CalendarToday className="w-4 h-4" />
-                              <span>{cls.day.charAt(0).toUpperCase() + cls.day.slice(1)}</span>
-                            </div>
-                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              <AccessTime className="w-4 h-4" />
-                              <span>{cls.startTime} - {cls.endTime} ({cls.duration} min)</span>
-                            </div>
-                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              <GroupIcon className="w-4 h-4" />
-                              <span>{cls.currentEnrollment || 0} / {cls.maxStudents} students</span>
-                            </div>
-                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              <EventIcon className="w-4 h-4" />
-                              <span>{new Date(cls.semesterStart).toLocaleDateString()} - {new Date(cls.semesterEnd).toLocaleDateString()}</span>
-                            </div>
+                          <Chip 
+                            label={enrollment.status} 
+                            size="small"
+                            color={enrollment.status === 'active' ? 'success' : 'default'}
+                          />
+                        </div>
+                        
+                        <div className="space-y-2 mb-4">
+                          <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <CalendarToday className="w-4 h-4" />
+                            <span>{enrollment.class?.day}</span>
                           </div>
+                          <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <AccessTime className="w-4 h-4" />
+                            <span>{enrollment.class?.startTime} - {enrollment.class?.endTime}</span>
+                          </div>
+                          <div className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                            Enrolled: {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                          </div>
+                        </div>
 
+                        {enrollment.status === 'active' && (
                           <Button
-                            onClick={() => {
-                              setSelectedClass(cls)
-                              setEnrollDialogOpen(true)
-                            }}
-                            disabled={isEnrolled || isFull}
+                            onClick={() => navigate(`/student/class/${enrollment.classId}`)}
                             fullWidth
                             style={{
-                              backgroundColor: isEnrolled || isFull ? '#9ca3af' : '#2563eb',
+                              backgroundColor: '#2563eb',
                               color: '#ffffff',
                               textTransform: 'none'
                             }}
                           >
-                            {isEnrolled ? 'Already Enrolled' : isFull ? 'Class Full' : 'Enroll Now'}
+                            View Class LMS
                           </Button>
-                        </Card>
-                      )
-                    })}
+                        )}
+                      </Card>
+                    ))}
                   </div>
                 )}
               </div>
-
-              {/* My Enrollments */}
-              {myEnrollments.length > 0 && (
-                <div>
-                  <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    My Enrolled Classes
-                  </h3>
-                  {enrollmentsLoading ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {myEnrollments.map((enrollment) => (
-                        <Card
-                          key={enrollment.id}
-                          className={`p-4 border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                          style={{
-                            borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                            boxShadow: 'none !important'
-                          }}
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h4 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                {enrollment.class?.code}
-                              </h4>
-                              <p className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                                {enrollment.class?.subject}
-                              </p>
-                            </div>
-                            <Chip 
-                              label={enrollment.status} 
-                              size="small"
-                              color={enrollment.status === 'active' ? 'success' : 'default'}
-                            />
-                          </div>
-                          
-                          <div className="space-y-2 mb-4">
-                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              <CalendarToday className="w-4 h-4" />
-                              <span>{enrollment.class?.day}</span>
-                            </div>
-                            <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              <AccessTime className="w-4 h-4" />
-                              <span>{enrollment.class?.startTime} - {enrollment.class?.endTime}</span>
-                            </div>
-                            <div className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                              Enrolled: {new Date(enrollment.enrolledAt).toLocaleDateString()}
-                            </div>
-                          </div>
-
-                          {enrollment.status === 'active' && (
-                            <Button
-                              onClick={() => handleCancelEnrollment(enrollment.id)}
-                              fullWidth
-                              variant="outlined"
-                              style={{
-                                color: theme === 'dark' ? '#ef4444' : '#dc2626',
-                                borderColor: theme === 'dark' ? '#ef4444' : '#dc2626',
-                                textTransform: 'none'
-                              }}
-                            >
-                              Cancel Enrollment
-                            </Button>
-                          )}
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            )}
+            </>
           )}
         </div>
       </div>

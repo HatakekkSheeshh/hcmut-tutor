@@ -28,7 +28,10 @@ import {
   NotificationType,
   ApprovalStatus,
   ClassStatus,
-  EnrollmentStatus
+  EnrollmentStatus,
+  SessionRequest,
+  RequestType,
+  RequestStatus
 } from './types.js';
 import {
   generateId,
@@ -152,7 +155,6 @@ export const generateTutors = async (count: number = 15): Promise<Tutor[]> => {
       bio: `Giảng viên có kinh nghiệm ${randomInt(2, 10)} năm trong lĩnh vực giảng dạy. Tận tâm và nhiệt huyết với công việc.`,
       rating: randomInt(35, 50) / 10,
       totalSessions: randomInt(20, 200),
-      hourlyRate: randomInt(100, 300) * 1000,
       availability: [],
       verified: Math.random() > 0.3,
       credentials: [`Thạc sĩ ${randomItem(SUBJECTS)}`],
@@ -235,7 +237,6 @@ export const generateSessions = (
       duration,
       isOnline: Math.random() > 0.3,
       meetingLink: Math.random() > 0.3 ? `https://meet.google.com/${generateId()}` : undefined,
-      price: tutor.hourlyRate ? tutor.hourlyRate * (duration / 60) : undefined,
       notes: '',
       createdAt: now(),
       updatedAt: now()
@@ -980,6 +981,104 @@ const generateQuizSubmissions = (quizzes: Quiz[], sessions: Session[], enrollmen
 };
 
 /**
+ * Generate session requests (cancel/reschedule)
+ */
+export const generateSessionRequests = (
+  sessions: Session[],
+  count: number = 25
+): SessionRequest[] => {
+  const requests: SessionRequest[] = [];
+  const types: RequestType[] = [RequestType.CANCEL, RequestType.RESCHEDULE];
+  const statuses: RequestStatus[] = [
+    RequestStatus.PENDING,
+    RequestStatus.APPROVED,
+    RequestStatus.REJECTED
+  ];
+
+  // Filter sessions that can have requests (confirmed or pending status, not in the past)
+  const eligibleSessions = sessions.filter(session => {
+    const isEligibleStatus = session.status === SessionStatus.CONFIRMED || 
+                            session.status === SessionStatus.PENDING;
+    const sessionDate = new Date(session.startTime);
+    const now = new Date();
+    // Allow past sessions for testing, but prefer future ones
+    return isEligibleStatus && sessionDate >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  });
+
+  if (eligibleSessions.length === 0) {
+    return requests;
+  }
+
+  // Mix between individual sessions (no classId) and class sessions (with classId)
+  const individualSessions = eligibleSessions.filter(s => !s.classId);
+  const classSessions = eligibleSessions.filter(s => s.classId);
+
+  const targetCount = Math.min(count, eligibleSessions.length * 0.5); // ~50% of eligible sessions
+
+  for (let i = 0; i < targetCount; i++) {
+    // Mix: 60% individual, 40% class sessions
+    const useClassSession = classSessions.length > 0 && Math.random() < 0.4;
+    const sessionPool = useClassSession ? classSessions : individualSessions;
+    
+    if (sessionPool.length === 0) continue;
+
+    const session = randomItem(sessionPool);
+    const studentId = randomItem(session.studentIds);
+    const type = randomItem(types);
+    const status = randomItem(statuses);
+    
+    // For reschedule, generate preferred times
+    let preferredStartTime: string | undefined;
+    let preferredEndTime: string | undefined;
+    
+    if (type === RequestType.RESCHEDULE) {
+      const originalStart = new Date(session.startTime);
+      const daysOffset = randomInt(1, 7); // 1-7 days later
+      preferredStartTime = addDays(originalStart, daysOffset).toISOString();
+      
+      const originalEnd = new Date(session.endTime);
+      preferredEndTime = addDays(originalEnd, daysOffset).toISOString();
+    }
+
+    const reasons = [
+      'Có việc đột xuất cần xử lý',
+      'Sức khỏe không tốt, cần nghỉ ngơi',
+      'Lịch học trùng với kỳ thi khác',
+      'Có việc gia đình cần giải quyết',
+      'Cần thời gian ôn tập thêm trước buổi học',
+      'Xung đột với công việc part-time',
+      'Cần điều chỉnh lịch học cho phù hợp hơn'
+    ];
+
+    const request: SessionRequest = {
+      id: generateId('req'),
+      sessionId: session.id,
+      studentId: studentId,
+      tutorId: session.tutorId,
+      classId: session.classId, // Copy from session to distinguish class vs individual
+      type: type,
+      status: status,
+      reason: randomItem(reasons),
+      preferredStartTime: preferredStartTime,
+      preferredEndTime: preferredEndTime,
+      responseMessage: status === RequestStatus.APPROVED || status === RequestStatus.REJECTED
+        ? status === RequestStatus.APPROVED
+          ? 'Yêu cầu của bạn đã được chấp nhận.'
+          : 'Rất tiếc, yêu cầu này không thể được chấp nhận do lịch trình đã được sắp xếp.'
+        : undefined,
+      createdAt: addDays(new Date(), randomInt(-14, 0)).toISOString(),
+      updatedAt: status !== RequestStatus.PENDING 
+        ? addDays(new Date(), randomInt(-7, 0)).toISOString()
+        : addDays(new Date(), randomInt(-14, 0)).toISOString()
+    };
+
+    requests.push(request);
+  }
+
+  return requests;
+};
+
+/**
  * Generate assignment submissions
  */
 const generateAssignmentSubmissions = (assignments: Assignment[], sessions: Session[], enrollments: Enrollment[]) => {
@@ -1072,6 +1171,12 @@ export const generateAllMockData = async () => {
   const quizSubmissions = generateQuizSubmissions(quizzes, sessions, enrollments);
   const assignmentSubmissions = generateAssignmentSubmissions(assignments, sessions, enrollments);
 
+  // Generate session requests (include both individual and class sessions)
+  const allSessions = [...sessions]; // Individual sessions already generated
+  // Note: Class sessions would be generated separately via generate-sessions endpoint
+  // For seed data, we'll use individual sessions and some sessions with classId
+  const sessionRequests = generateSessionRequests(allSessions, 25);
+
   return {
     users: allUsers,
     sessions,
@@ -1089,7 +1194,8 @@ export const generateAllMockData = async () => {
     assignments,
     grades,
     quizSubmissions,
-    assignmentSubmissions
+    assignmentSubmissions,
+    sessionRequests
   };
 };
 

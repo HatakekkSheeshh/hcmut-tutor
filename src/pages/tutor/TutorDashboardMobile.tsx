@@ -38,7 +38,11 @@ import {
   CalendarMonth,
   Close as CloseIcon,
   ChevronRight as ChevronRightIcon,
-  Logout as LogoutIcon
+  Logout as LogoutIcon,
+  MenuBook as MenuBookIcon,
+  Forum as ForumIcon,
+  School as SchoolIcon,
+  PersonSearch
 } from '@mui/icons-material'
 
 const TutorDashboardMobile: React.FC = () => {
@@ -53,6 +57,7 @@ const TutorDashboardMobile: React.FC = () => {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [sessions, setSessions] = useState<any[]>([])
+  const [classes, setClasses] = useState<any[]>([])
   const [students, setStudents] = useState<{ [key: string]: any }>({})
   
   // Time and weather states
@@ -88,13 +93,19 @@ const TutorDashboardMobile: React.FC = () => {
         const userData = userResult.data
         setUser(userData)
         
-        // Get tutor sessions
-        const sessionsResult = await api.sessions.list({
-          tutorId: userData.id,
-          limit: 100
-        })
+        // Get tutor sessions and classes in parallel
+        const [sessionsResult, classesResult] = await Promise.all([
+          api.sessions.list({
+            tutorId: userData.id,
+            limit: 100
+          }),
+          api.classes.list({
+            tutorId: userData.id,
+            limit: 100
+          })
+        ])
         
-        // API returns { data: [...], pagination: {...} }
+        // Process sessions
         if (sessionsResult && sessionsResult.data) {
           const sessionsData = sessionsResult.data || []
           setSessions(sessionsData)
@@ -109,7 +120,78 @@ const TutorDashboardMobile: React.FC = () => {
             }
           })
           
-          const studentPromises = Array.from(sessionStudentIds).map(async (studentId: string) => {
+          // Process classes
+          if (classesResult && classesResult.success && classesResult.data) {
+            const classesData = classesResult.data || []
+            setClasses(classesData)
+            
+            // Get enrollments for all classes to collect student IDs
+            const classEnrollmentsPromises = classesData.map(async (classItem: any) => {
+              try {
+                const enrollmentsRes = await api.enrollments.list({ classId: classItem.id, status: 'active' })
+                if (enrollmentsRes.success && enrollmentsRes.data) {
+                  return enrollmentsRes.data.map((e: any) => e.studentId)
+                }
+              } catch (err) {
+                console.error(`Failed to load enrollments for class ${classItem.id}:`, err)
+              }
+              return []
+            })
+            
+            const classEnrollmentsResults = await Promise.all(classEnrollmentsPromises)
+            classEnrollmentsResults.forEach(studentIds => {
+              studentIds.forEach((id: string) => sessionStudentIds.add(id))
+            })
+          }
+          
+          // Fetch student data for all unique student IDs
+          const uniqueStudentIds = Array.from(sessionStudentIds)
+          const studentPromises = uniqueStudentIds.map(async (studentId: string) => {
+            try {
+              const studentResponse = await api.users.get(studentId)
+              if (studentResponse.success && studentResponse.data) {
+                return { id: studentId, data: studentResponse.data }
+              }
+            } catch (err) {
+              console.error(`Failed to load student ${studentId}:`, err)
+            }
+            return null
+          })
+          
+          const studentResults = await Promise.all(studentPromises)
+          const studentsMap: { [key: string]: any } = {}
+          studentResults.forEach(result => {
+            if (result) {
+              studentsMap[result.id] = result.data
+            }
+          })
+          setStudents(studentsMap)
+        } else if (classesResult && classesResult.success && classesResult.data) {
+          // If no sessions but has classes
+          const classesData = classesResult.data || []
+          setClasses(classesData)
+          
+          // Get enrollments for all classes
+          const classEnrollmentsPromises = classesData.map(async (classItem: any) => {
+            try {
+              const enrollmentsRes = await api.enrollments.list({ classId: classItem.id, status: 'active' })
+              if (enrollmentsRes.success && enrollmentsRes.data) {
+                return enrollmentsRes.data.map((e: any) => e.studentId)
+              }
+            } catch (err) {
+              console.error(`Failed to load enrollments for class ${classItem.id}:`, err)
+            }
+            return []
+          })
+          
+          const classEnrollmentsResults = await Promise.all(classEnrollmentsPromises)
+          const allStudentIds = new Set<string>()
+          classEnrollmentsResults.forEach(studentIds => {
+            studentIds.forEach((id: string) => allStudentIds.add(id))
+          })
+          
+          // Fetch student data
+          const studentPromises = Array.from(allStudentIds).map(async (studentId: string) => {
             try {
               const studentResponse = await api.users.get(studentId)
               if (studentResponse.success && studentResponse.data) {
@@ -281,15 +363,31 @@ const TutorDashboardMobile: React.FC = () => {
 
   // Calculate stats from real data
   const totalSessions = sessions.length
+  const totalClasses = classes.length
   const upcomingCount = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
-  const uniqueStudents = new Set(sessions.map(s => s.studentId)).size
+  const activeClasses = classes.filter(c => c.status === 'active').length
+  
+  // Count unique students from both sessions and classes
+  const sessionStudentIds = new Set<string>()
+  sessions.forEach((s: any) => {
+    if (s.studentIds && Array.isArray(s.studentIds)) {
+      s.studentIds.forEach((id: string) => sessionStudentIds.add(id))
+    } else if (s.studentId) {
+      sessionStudentIds.add(s.studentId)
+    }
+  })
+  
+  // Get unique students from classes (will be loaded async, so approximate for now)
+  const totalEnrolledStudents = classes.reduce((sum, c) => sum + (c.currentEnrollment || 0), 0)
+  const uniqueStudents = Math.max(sessionStudentIds.size, totalEnrolledStudents)
+  
   const tutorRating = user?.rating || 0
   
   const stats = [
     { title: 'Total Students', value: uniqueStudents.toString(), icon: <PeopleIcon /> },
-    { title: 'Total Sessions', value: totalSessions.toString(), icon: <CheckCircleIcon /> },
-    { title: 'Rating', value: tutorRating.toFixed(1), icon: <StarIcon /> },
-    { title: 'Upcoming', value: upcomingCount.toString(), icon: <TrendingUpIcon /> }
+    { title: 'Total Classes', value: totalClasses.toString(), icon: <CheckCircleIcon /> },
+    { title: 'Total Sessions', value: totalSessions.toString(), icon: <ScheduleIcon /> },
+    { title: 'Rating', value: tutorRating.toFixed(1), icon: <StarIcon /> }
   ]
   
   // User name and avatar from backend
@@ -327,10 +425,13 @@ const TutorDashboardMobile: React.FC = () => {
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/tutor' },
     { id: 'availability', label: 'Set Availability', icon: <ScheduleIcon />, path: '/tutor/availability' },
     { id: 'sessions', label: 'Manage Sessions', icon: <AssignmentIcon />, path: '/tutor/sessions' },
+    { id: 'lms', label: 'LMS Management', icon: <SchoolIcon />, path: '/tutor/lms' },
     { id: 'calendar', label: 'Teaching Calendar', icon: <CalendarMonth />, path: '/tutor/calendar' },
     { id: 'progress', label: 'Track Progress', icon: <BarChartIcon />, path: '/tutor/track-progress' },
     { id: 'cancel-reschedule', label: 'Cancel/Reschedule', icon: <AutorenewIcon />, path: '/tutor/cancel-reschedule' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/tutor/messages' }
+    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/tutor/messages' },
+    { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
+    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' }
   ]
 
   // Show loading state
@@ -634,6 +735,93 @@ const TutorDashboardMobile: React.FC = () => {
         </div>
       </div>
 
+      {/* My Classes Section */}
+      {classes.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              My Classes
+            </h2>
+            <button 
+              onClick={() => navigate('/tutor/lms')}
+              className={`text-sm ${theme === 'dark' ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-500'}`}
+            >
+              Manage Classes
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {classes.slice(0, 3).map((classItem) => {
+              const statusColor = classItem.status === 'active' 
+                ? 'bg-green-100 text-green-800' 
+                : classItem.status === 'full'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-gray-100 text-gray-800'
+              
+              return (
+                <div
+                  key={classItem.id}
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/tutor/class/${classItem.id}`)}
+                >
+                  <div
+                    className={`p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'} transition-colors`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className={`font-semibold text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {classItem.code}
+                      </h3>
+                      <span className={`px-2 py-1 rounded-full text-xs capitalize ${statusColor}`}>
+                        {classItem.status}
+                      </span>
+                    </div>
+                    <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {classItem.subject}
+                    </p>
+                    <p className={`text-xs mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {classItem.day} • {classItem.startTime} - {classItem.endTime}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <PeopleIcon className={`w-3 h-3 mr-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {classItem.currentEnrollment || 0} / {classItem.maxStudents} students
+                        </span>
+                      </div>
+                      <Button 
+                        size="small" 
+                        variant="outlined"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate(`/tutor/class/${classItem.id}`)
+                        }}
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                          color: theme === 'dark' ? '#ffffff' : '#000000',
+                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                          textTransform: 'none',
+                          fontWeight: '500',
+                          fontSize: '0.75rem',
+                          padding: '4px 8px'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Past Sessions */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -721,107 +909,279 @@ const TutorDashboardMobile: React.FC = () => {
 
   const renderSessionsTab = () => (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div>
         <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          All Sessions
+          All Sessions & Classes
         </h2>
-        <button className={`text-sm ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>
-          Filter
-        </button>
       </div>
 
-      <div className="space-y-3">
-        {upcomingSessions.length === 0 ? (
-          <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            No upcoming sessions
-          </div>
-        ) : (
-          upcomingSessions.map((session) => {
-            // Support both old studentId (string) and new studentIds (array)
-            const studentIds = session.studentIds && Array.isArray(session.studentIds) 
-              ? session.studentIds 
-              : session.studentId 
-                ? [session.studentId] 
-                : []
-            const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
-            const sessionDate = new Date(session.startTime)
-            const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
-            const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-            
-            return (
-              <div 
-                key={session.id}
-                className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {firstStudent?.name || 'Loading...'}
-                  </h3>
-                  <span className={`px-2 py-1 rounded-full text-xs capitalize ${
-                    session.status === 'confirmed' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {session.status}
-                  </span>
-                </div>
-                
-                <div className="mb-2">
-                  <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {session.subject}
-                  </p>
-                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {formattedDate} at {formattedTime} • {session.duration} mins
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+      {/* Upcoming Sessions Section */}
+      {upcomingSessions.length > 0 && (
+        <div>
+          <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Upcoming Sessions
+          </h3>
+          <div className="space-y-3">
+            {upcomingSessions.map((session) => {
+              // Support both old studentId (string) and new studentIds (array)
+              const studentIds = session.studentIds && Array.isArray(session.studentIds) 
+                ? session.studentIds 
+                : session.studentId 
+                  ? [session.studentId] 
+                  : []
+              const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
+              const studentCount = studentIds.length
+              const sessionDate = new Date(session.startTime)
+              const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
+              const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+              
+              return (
+                <div 
+                  key={session.id}
+                  className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} cursor-pointer`}
+                  onClick={() => navigate(`/tutor/session/${session.id}`)}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {studentCount > 1 
+                        ? `${firstStudent?.name || 'Loading...'} + ${studentCount - 1} more`
+                        : firstStudent?.name || 'Loading...'}
+                    </h3>
+                    <span className={`px-2 py-1 rounded-full text-xs capitalize ${
+                      session.status === 'confirmed' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {session.status}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {session.subject}
+                    </p>
                     <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      Session #{session.id?.slice(-4)}
+                      {formattedDate} at {formattedTime} • {session.duration} mins
                     </p>
                   </div>
-              <div className="flex space-x-1">
-                <Button 
-                  size="small" 
-                  variant="outlined"
-                  startIcon={<VideoCallIcon />}
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                    color: theme === 'dark' ? '#ffffff' : '#000000',
-                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                    textTransform: 'none',
-                    fontWeight: '500',
-                    fontSize: '0.75rem',
-                    padding: '4px 8px'
-                  }}
-                >
-                  Join
-                </Button>
-                <Button 
-                  size="small" 
-                  variant="outlined"
-                  startIcon={<ChatIcon />}
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                    color: theme === 'dark' ? '#ffffff' : '#000000',
-                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                    textTransform: 'none',
-                    fontWeight: '500',
-                    fontSize: '0.75rem',
-                    padding: '4px 8px'
-                  }}
-                >
-                  Message
-                </Button>
-              </div>
-            </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Session #{session.id?.slice(-4)}
+                      </p>
+                    </div>
+                    <div className="flex space-x-1">
+                      <Button 
+                        size="small" 
+                        variant="outlined"
+                        startIcon={<VideoCallIcon />}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                        }}
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                          color: theme === 'dark' ? '#ffffff' : '#000000',
+                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                          textTransform: 'none',
+                          fontWeight: '500',
+                          fontSize: '0.75rem',
+                          padding: '4px 8px'
+                        }}
+                      >
+                        Join
+                      </Button>
+                      <Button 
+                        size="small" 
+                        variant="outlined"
+                        startIcon={<ChatIcon />}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate('/tutor/messages')
+                        }}
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                          color: theme === 'dark' ? '#ffffff' : '#000000',
+                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                          textTransform: 'none',
+                          fontWeight: '500',
+                          fontSize: '0.75rem',
+                          padding: '4px 8px'
+                        }}
+                      >
+                        Message
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
-            )
-          })
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Past Sessions Section */}
+      {pastSessions.length > 0 && (
+        <div>
+          <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Past Sessions
+          </h3>
+          <div className="space-y-3">
+            {pastSessions.map((session) => {
+              // Support both old studentId (string) and new studentIds (array)
+              const studentIds = session.studentIds && Array.isArray(session.studentIds) 
+                ? session.studentIds 
+                : session.studentId 
+                  ? [session.studentId] 
+                  : []
+              const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
+              const studentCount = studentIds.length
+              const sessionDate = new Date(session.startTime)
+              const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
+              const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+              
+              return (
+                <div 
+                  key={session.id}
+                  className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} cursor-pointer`}
+                  onClick={() => navigate(`/tutor/session/${session.id}`)}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {studentCount > 1 
+                        ? `${firstStudent?.name || 'Loading...'} + ${studentCount - 1} more`
+                        : firstStudent?.name || 'Loading...'}
+                    </h3>
+                    <span className={`px-2 py-1 rounded-full text-xs capitalize ${
+                      session.status === 'completed' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {session.status}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {session.subject}
+                    </p>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {formattedDate} at {formattedTime} • {session.duration} mins
+                    </p>
+                  </div>
+
+                  <Button 
+                    size="small" 
+                    variant="outlined"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/tutor/session/${session.id}`)
+                    }}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#000000',
+                      borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                      textTransform: 'none',
+                      fontWeight: '500',
+                      fontSize: '0.75rem',
+                      padding: '4px 8px',
+                      width: '100%'
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Classes Section */}
+      {classes.length > 0 && (
+        <div>
+          <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            My Classes
+          </h3>
+          <div className="space-y-3">
+            {classes.map((classItem) => {
+              const statusColor = classItem.status === 'active' 
+                ? 'bg-green-100 text-green-800' 
+                : classItem.status === 'full'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-gray-100 text-gray-800'
+              
+              return (
+                <div 
+                  key={classItem.id}
+                  className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} cursor-pointer`}
+                  onClick={() => navigate(`/tutor/class/${classItem.id}`)}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {classItem.code}
+                    </h3>
+                    <span className={`px-2 py-1 rounded-full text-xs capitalize ${statusColor}`}>
+                      {classItem.status}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {classItem.subject}
+                    </p>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {classItem.day} • {classItem.startTime} - {classItem.endTime}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <PeopleIcon className={`w-3 h-3 mr-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {classItem.currentEnrollment || 0} / {classItem.maxStudents} students
+                      </p>
+                    </div>
+                    <Button 
+                      size="small" 
+                      variant="outlined"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/tutor/class/${classItem.id}`)
+                      }}
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                        textTransform: 'none',
+                        fontWeight: '500',
+                        fontSize: '0.75rem',
+                        padding: '4px 8px'
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {upcomingSessions.length === 0 && pastSessions.length === 0 && classes.length === 0 && (
+        <div className="text-center py-12">
+          <ScheduleIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+          <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            No Sessions or Classes Yet
+          </h3>
+          <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            You don't have any sessions or classes yet.
+          </p>
+        </div>
+      )}
     </div>
   )
 
@@ -845,6 +1205,62 @@ const TutorDashboardMobile: React.FC = () => {
             ></div>
           ))}
         </div>
+      </div>
+
+      {/* My Students List */}
+      <div>
+        <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+          My Students
+        </h3>
+        
+        {Object.keys(students).length === 0 ? (
+          <div className="text-center py-8">
+            <PeopleIcon className={`w-12 h-12 mx-auto mb-2 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
+            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-3`}>
+              No students yet
+            </p>
+            <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+              Students will appear here once they book sessions or enroll in your classes
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {Object.values(students).map((student: any, index: number) => (
+              <div 
+                key={student.id || index} 
+                className={`flex items-center p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'} transition-colors cursor-pointer`}
+                onClick={() => navigate('/tutor/sessions')}
+              >
+                <Avatar
+                  src={student.avatar}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: getAvatarColor(student.name),
+                    fontSize: '0.875rem',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {getInitials(student.name)}
+                </Avatar>
+                <div className="flex-1 ml-3">
+                  <p className={`font-medium text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {student.name}
+                  </p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {student.email || 'Student'}
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <StarIcon className="w-3 h-3 text-yellow-400 mr-1" />
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {student.rating || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -937,6 +1353,25 @@ const TutorDashboardMobile: React.FC = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Logout Button */}
+      <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <button
+          onClick={() => {
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            navigate('/common/login')
+          }}
+          className={`w-full flex items-center justify-center px-4 py-3 rounded-lg text-white font-medium transition-colors ${
+            theme === 'dark' 
+              ? 'bg-red-600 hover:bg-red-700' 
+              : 'bg-red-600 hover:bg-red-700'
+          }`}
+        >
+          <LogoutIcon className="mr-2 w-5 h-5" />
+          Logout
+        </button>
       </div>
     </div>
   )

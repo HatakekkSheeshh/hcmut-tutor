@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { gsap } from 'gsap'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
@@ -16,7 +17,8 @@ import {
   DarkMode as DarkModeIcon,
   Settings as SettingsIcon,
   Palette as PaletteIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -25,8 +27,16 @@ import BallControls from '../../components/BallControls'
 import api from '../../lib/api'
 
 const Login: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme, setTheme } = useTheme()
   const navigate = useNavigate()
+  
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
   const [showPassword, setShowPassword] = useState(false)
   const [loginMethod, setLoginMethod] = useState('email') // 'email' or 'sso'
   const [formData, setFormData] = useState({
@@ -239,7 +249,7 @@ const Login: React.FC = () => {
                   }`}
                 >
                   <Email className="mr-3 w-4 h-4" />
-                  Email Login
+                  {t('login.emailLogin')}
                 </button>
                 <button 
                   onClick={() => setLoginMethod('sso')}
@@ -250,7 +260,7 @@ const Login: React.FC = () => {
                   }`}
                 >
                   <Security className="mr-3 w-4 h-4" />
-                  SSO Login
+                  {t('login.ssoLogin')}
                 </button>
               </div>
             </div>
@@ -319,6 +329,16 @@ const Login: React.FC = () => {
               >
                 {theme === 'dark' ? <LightModeIcon className="w-6 h-6 text-yellow-400" /> : theme === 'neo-brutalism' ? <DarkModeIcon className="w-6 h-6 text-black" /> : <DarkModeIcon className="w-6 h-6" />}
               </button>
+
+              {/* Mobile Language Toggle */}
+              <button
+                onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : theme === 'neo-brutalism' ? 'bg-orange-400 hover:bg-orange-500' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : theme === 'neo-brutalism' ? 'border-4 border-black' : 'border-gray-200'} transition-colors`}
+                style={theme === 'neo-brutalism' ? { boxShadow: '4px 4px 0px #000000' } : {}}
+                title="Switch Language"
+              >
+                <LanguageIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-gray-400' : theme === 'neo-brutalism' ? 'text-black' : 'text-gray-600'}`} />
+              </button>
             </div>
           </div>
 
@@ -327,15 +347,24 @@ const Login: React.FC = () => {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
               <div className="flex-shrink-0">
                 <h1 className={`text-2xl lg:text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Welcome Back
+                  {t('login.title')}
                 </h1>
                 <p className={`text-base lg:text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Sign in to your account to continue learning
+                  {t('login.subtitle')}
                 </p>
               </div>
               
               {/* Control Buttons */}
               <div className="hidden lg:flex items-center space-x-2 flex-shrink-0">
+                {/* Language Toggle */}
+                <button
+                  onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+                  className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : theme === 'neo-brutalism' ? 'bg-orange-400 hover:bg-orange-500' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : theme === 'neo-brutalism' ? 'border-4 border-black' : 'border-gray-200'} transition-colors`}
+                  style={theme === 'neo-brutalism' ? { boxShadow: '4px 4px 0px #000000' } : {}}
+                  title="Switch Language"
+                >
+                  <LanguageIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : theme === 'neo-brutalism' ? 'text-black' : 'text-gray-600'}`} />
+                </button>
                 {/* Ball Toggle */}
                 <button
                   onClick={() => setShowBall(!showBall)}
@@ -498,7 +527,7 @@ const Login: React.FC = () => {
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div>
                     <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : theme === 'neo-brutalism' ? 'text-black' : 'text-gray-900'}`}>
-                      Email Address
+                      {t('login.emailLabel')}
                     </label>
                     <div className="relative">
                       <input
@@ -523,7 +552,7 @@ const Login: React.FC = () => {
                           borderRadius: '8px',
                           boxShadow: 'none'
                         }}
-                        placeholder="Enter your email"
+                        placeholder={t('login.emailPlaceholder')}
                       />
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                         <Email className="w-5 h-5 text-gray-400" />
@@ -533,7 +562,7 @@ const Login: React.FC = () => {
 
                   <div>
                     <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : theme === 'neo-brutalism' ? 'text-black' : 'text-gray-900'}`}>
-                      Password
+                      {t('login.passwordLabel')}
                     </label>
                     <div className="relative">
                       <input
@@ -558,7 +587,7 @@ const Login: React.FC = () => {
                           borderRadius: '8px',
                           boxShadow: 'none'
                         }}
-                        placeholder="Enter your password"
+                        placeholder={t('login.passwordPlaceholder')}
                       />
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                         <Lock className="w-5 h-5 text-gray-400" />
@@ -583,14 +612,14 @@ const Login: React.FC = () => {
                         className="mr-2"
                       />
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Remember me
+                        {t('login.rememberMe')}
                       </span>
                     </label>
                     <button
                       type="button"
                       className={`text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
                     >
-                      Forgot password?
+                      {t('login.forgotPassword')}
                     </button>
                   </div>
 
@@ -619,7 +648,7 @@ const Login: React.FC = () => {
                       textTransform: 'none'
                     }}
                   >
-                    {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                    {loading ? t('login.loggingIn') : t('login.loginButton')}
                   </Button>
                 </form>
               ) : (
@@ -679,12 +708,12 @@ const Login: React.FC = () => {
 
               <div className="mt-6 text-center">
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Don't have an account?{' '}
+                  {t('login.noAccount')}{' '}
                   <button 
                     onClick={() => navigate('/common/register')}
                     className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
                   >
-                    Sign up here
+                    {t('login.signUp')}
                   </button>
                 </p>
               </div>
@@ -735,7 +764,7 @@ const Login: React.FC = () => {
                     }`}
                   >
                     <Email className="mr-3 w-4 h-4" />
-                    Email Login
+                    {t('login.emailLogin')}
                   </button>
                   <button 
                     onClick={() => {
@@ -749,53 +778,9 @@ const Login: React.FC = () => {
                     }`}
                   >
                     <Security className="mr-3 w-4 h-4" />
-                    SSO Login
+                    {t('login.ssoLogin')}
                   </button>
                 </div>
-              </div>
-
-              {/* Mobile Quick Actions */}
-              <div className="space-y-2">
-                <button 
-                  onClick={() => {
-                    navigate('/common/profile')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Person className="mr-3 w-4 h-4" />
-                  Profile Management
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/library')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <School className="mr-3 w-4 h-4" />
-                  Digital Library
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/forum')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <MenuIcon className="mr-3 w-4 h-4" />
-                  Community Forum
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common/notifications')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <Notifications className="mr-3 w-4 h-4" />
-                  Notifications
-                </button>
               </div>
             </div>
           </div>

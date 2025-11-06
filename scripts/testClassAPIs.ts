@@ -47,8 +47,7 @@ async function testCreateClass() {
         maxStudents: 30,
         semesterStart: '2025-11-01T00:00:00.000Z',
         semesterEnd: '2026-02-28T23:59:59.999Z',
-        isOnline: true,
-        price: 200000
+        isOnline: true
       },
       {
         headers: { Authorization: `Bearer ${tutorToken}` }

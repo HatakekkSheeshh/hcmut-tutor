@@ -91,8 +91,7 @@ const ReportsAnalyticsMobile: React.FC = () => {
     overview: {
       totalUsers: 1247,
       activeUsers: 892,
-      totalSessions: 3456,
-      revenue: 45678
+      totalSessions: 3456
     },
     userGrowth: [
       { month: 'Jan', users: 120, growth: 5.2 },
@@ -179,12 +178,6 @@ const ReportsAnalyticsMobile: React.FC = () => {
                 <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Sessions</div>
               </div>
             </div>
-            <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-              <div className="text-center">
-                <div className="text-xl font-bold text-yellow-600 mb-1">${analyticsData.overview.revenue.toLocaleString()}</div>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Revenue</div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -254,8 +247,7 @@ const ReportsAnalyticsMobile: React.FC = () => {
                     {[
                       { value: 'all', label: 'All Metrics' },
                       { value: 'users', label: 'Users' },
-                      { value: 'sessions', label: 'Sessions' },
-                      { value: 'revenue', label: 'Revenue' }
+                      { value: 'sessions', label: 'Sessions' }
                     ].map((metric) => (
                       <button
                         key={metric.value}
@@ -636,14 +628,6 @@ const ReportsAnalyticsMobile: React.FC = () => {
                         <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Sessions:</span>
                         <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {analyticsData.overview.totalSessions.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                    <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <div className="flex justify-between items-center">
-                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Revenue:</span>
-                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          ${analyticsData.overview.revenue.toLocaleString()}
                         </span>
                       </div>
                     </div>

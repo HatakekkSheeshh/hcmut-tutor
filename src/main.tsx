@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import App from './App.tsx'
 import './index.css'
 import './styles/calendar.css'
+import './i18n/config' // Initialize i18n
 
 // MUI Theme - Luxury Black & White
 const muiTheme = createTheme({
