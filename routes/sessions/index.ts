@@ -268,11 +268,11 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
 
     await storage.create('sessions.json', newSession);
 
-    // Create notification
+    // Create notification - batch create for class-based sessions
     if (isClassBased) {
-      // Notify all enrolled students
-      for (const studentId of studentIds) {
-        const notification: Notification = {
+      // Notify all enrolled students - batch create
+      if (studentIds.length > 0) {
+        const notifications: Notification[] = studentIds.map(studentId => ({
           id: generateId('notif'),
           userId: studentId,
           type: NotificationType.SESSION_BOOKING,
@@ -281,11 +281,11 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
           read: false,
           link: `/sessions/${newSession.id}`,
           createdAt: now()
-        };
-        await storage.create('notifications.json', notification);
+        }));
+        await storage.createMany('notifications.json', notifications);
       }
     } else {
-      // Notify tutor
+      // Notify tutor (single notification, no need for batch)
       const notification: Notification = {
         id: generateId('notif'),
         userId: tutorId,

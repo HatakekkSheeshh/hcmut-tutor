@@ -553,6 +553,7 @@ export interface SessionRequest {
   reason: string; // reason from student
   preferredStartTime?: string; // for reschedule
   preferredEndTime?: string; // for reschedule
+  alternativeSessionId?: string; // For class reschedule - selected alternative session ID
   responseMessage?: string; // response from tutor
   createdAt: string;
   updatedAt: string;

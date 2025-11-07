@@ -1,4 +1,4 @@
-import { put, list, del } from '@vercel/blob';
+import { put, del, list } from '@vercel/blob';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -59,6 +59,32 @@ export class JSONStorage {
   }
 
   /**
+   * Tìm nhiều items theo danh sách IDs (batch loading)
+   * Tránh việc gọi read() nhiều lần trong vòng lặp
+   */
+  async findByIds<T extends { id: string }>(
+    filename: string,
+    ids: string[]
+  ): Promise<Map<string, T>> {
+    if (ids.length === 0) {
+      return new Map();
+    }
+    
+    // Chỉ đọc file một lần thay vì nhiều lần
+    const data = await this.read<T>(filename);
+    const idSet = new Set(ids);
+    const result = new Map<string, T>();
+    
+    for (const item of data) {
+      if (idSet.has(item.id)) {
+        result.set(item.id, item);
+      }
+    }
+    
+    return result;
+  }
+
+  /**
    * Tìm nhiều items theo điều kiện
    */
   async find<T = any>(
@@ -86,6 +112,34 @@ export class JSONStorage {
     data.push(item);
     await this.write(filename, data);
     return item;
+  }
+
+  /**
+   * Thêm nhiều items cùng lúc (batch create)
+   * Tối ưu hơn việc gọi create() nhiều lần trong vòng lặp
+   */
+  async createMany<T extends { id: string }>(
+    filename: string,
+    items: T[]
+  ): Promise<T[]> {
+    if (items.length === 0) {
+      return [];
+    }
+
+    const data = await this.read<T>(filename);
+    
+    // Kiểm tra duplicate IDs
+    const existingIds = new Set(data.map(item => item.id));
+    const duplicateIds = items.filter(item => existingIds.has(item.id));
+    
+    if (duplicateIds.length > 0) {
+      throw new Error(`Items with IDs ${duplicateIds.map(i => i.id).join(', ')} already exist`);
+    }
+
+    // Thêm tất cả items cùng lúc
+    data.push(...items);
+    await this.write(filename, data);
+    return items;
   }
 
   /**
@@ -220,26 +274,36 @@ export class JSONStorage {
 
   private async readFromBlob<T>(filename: string): Promise<T[]> {
     try {
-      // Check both root level and data/ folder
-      const { blobs: rootBlobs } = await list({ prefix: filename });
-      const { blobs: dataBlobs } = await list({ prefix: `data/${filename}` });
+      // Use fixed path data/${filename} - only list once with exact prefix
+      // This reduces blob operations from 2-3 per read to just 1 list operation
+      const blobPath = `data/${filename}`;
       
-      // Find exact match at root level first (if user uploaded files there)
-      const rootBlob = rootBlobs.find(blob => blob.pathname === filename);
-      const dataBlob = dataBlobs.find(blob => blob.pathname === `data/${filename}`);
+      // List with exact path to find the blob (more efficient than listing all)
+      const { blobs } = await list({ prefix: blobPath });
       
-      // Prefer root level if exists, otherwise use data/ folder
-      const targetBlob = rootBlob || dataBlob;
+      // Find exact match
+      const targetBlob = blobs.find(blob => blob.pathname === blobPath);
       
-      if (!targetBlob) {
-        console.warn(`No blobs found for ${filename}`);
-        return [];
+      if (targetBlob) {
+        // Fetch the blob content
+        const response = await fetch(targetBlob.url);
+        const content = await response.text();
+        return JSON.parse(content);
       }
       
-      // Fetch the blob content
-      const response = await fetch(targetBlob.url);
-      const content = await response.text();
-      return JSON.parse(content);
+      // If not found at data/, try root level (backward compatibility)
+      const { blobs: rootBlobs } = await list({ prefix: filename });
+      const rootBlob = rootBlobs.find(blob => blob.pathname === filename);
+      
+      if (rootBlob) {
+        const response = await fetch(rootBlob.url);
+        const content = await response.text();
+        return JSON.parse(content);
+      }
+      
+      // File doesn't exist, return empty array
+      console.warn(`No blob found for ${filename} at ${blobPath} or root`);
+      return [];
     } catch (error) {
       console.error(`Blob read error for ${filename}:`, error);
       return [];
@@ -249,12 +313,9 @@ export class JSONStorage {
   private async writeToBlob<T>(filename: string, data: T[]): Promise<void> {
     const content = JSON.stringify(data, null, 2);
     
-    // Check if file exists at root level first
-    const { blobs: rootBlobs } = await list({ prefix: filename });
-    const existsAtRoot = rootBlobs.some(blob => blob.pathname === filename);
-    
-    // If file exists at root level, write there; otherwise write to data/ folder
-    const blobPath = existsAtRoot ? filename : `data/${filename}`;
+    // Always use data/${filename} path - no need to check/list
+    // This reduces blob operations from 2 per write to just 1
+    const blobPath = `data/${filename}`;
     
     await put(blobPath, content, {
       access: 'public',
@@ -265,9 +326,12 @@ export class JSONStorage {
 
   /**
    * List all JSON files
+   * Note: This still uses list() but is rarely called
+   * Consider caching or removing if not needed
    */
   async listFiles(): Promise<string[]> {
     if (this.useBlob) {
+      // Only use list when absolutely necessary (this is an advanced operation)
       const { blobs } = await list({ prefix: 'data/' });
       return blobs.map((blob) => blob.pathname.replace('data/', ''));
     } else {

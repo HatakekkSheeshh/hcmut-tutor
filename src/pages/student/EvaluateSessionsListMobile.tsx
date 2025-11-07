@@ -490,7 +490,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
               <div className="flex items-center justify-between mb-8 flex-shrink-0">
                 <div className="flex items-center">
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
-                    <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-8 h-8" />
+                    <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
                   </div>
                   <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     HCMUT

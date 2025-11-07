@@ -82,16 +82,22 @@ export const createSessionRequestSchema = z.object({
   }),
   reason: z.string().min(10, 'Reason must be at least 10 characters'),
   preferredStartTime: z.string().datetime('Invalid preferred start time format').optional(),
-  preferredEndTime: z.string().datetime('Invalid preferred end time format').optional()
+  preferredEndTime: z.string().datetime('Invalid preferred end time format').optional(),
+  alternativeSessionId: z.string().optional() // For class reschedule - selected alternative class/session ID
 }).refine(
   (data) => {
     if (data.type === 'reschedule') {
+      // If alternativeSessionId is provided (class reschedule), preferredStartTime/EndTime are not required
+      if (data.alternativeSessionId) {
+        return true;
+      }
+      // Otherwise, preferredStartTime and preferredEndTime are required
       return !!data.preferredStartTime && !!data.preferredEndTime;
     }
     return true;
   },
   {
-    message: 'Preferred start time and end time are required for reschedule requests',
+    message: 'Preferred start time and end time are required for reschedule requests (unless alternative session/class is selected)',
     path: ['preferredStartTime']
   }
 );

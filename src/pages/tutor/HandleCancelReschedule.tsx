@@ -207,6 +207,80 @@ const HandleCancelReschedule: React.FC = () => {
               }
             }
 
+            // Fetch alternative session/class info if exists (for class reschedule)
+            let alternativeSession = null
+            if (req.alternativeSessionId) {
+              try {
+                // Check if alternative is a class (starts with 'class_') or a session
+                const isAlternativeClass = req.alternativeSessionId.startsWith('class_')
+                
+                if (isAlternativeClass) {
+                  // Fetch alternative class
+                  const altClassRes = await api.classes.get(req.alternativeSessionId)
+                  if (altClassRes.success && altClassRes.data) {
+                    const altClass = altClassRes.data
+                    
+                    // Calculate next occurrence of this class
+                    const dayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+                      .indexOf(altClass.day.toLowerCase())
+                    
+                    let nextStartTime: Date | null = null
+                    if (dayIndex !== -1) {
+                      const today = new Date()
+                      const currentDay = today.getDay()
+                      const mappedDay = currentDay === 0 ? 6 : currentDay - 1 // Map Sunday to 6
+                      let daysUntil = (dayIndex - mappedDay + 7) % 7
+                      if (daysUntil === 0) daysUntil = 7 // If today, get next week
+                      nextStartTime = new Date(today)
+                      nextStartTime.setDate(today.getDate() + daysUntil)
+                      const [hours, minutes] = altClass.startTime.split(':').map(Number)
+                      nextStartTime.setHours(hours, minutes, 0, 0)
+                    }
+
+                    // Calculate end time
+                    let nextEndTime: Date | null = null
+                    if (nextStartTime) {
+                      nextEndTime = new Date(nextStartTime.getTime() + altClass.duration * 60000)
+                    }
+
+                    alternativeSession = {
+                      id: altClass.id,
+                      subject: altClass.subject,
+                      startTime: nextStartTime ? nextStartTime.toISOString() : new Date().toISOString(),
+                      endTime: nextEndTime ? nextEndTime.toISOString() : new Date().toISOString(),
+                      duration: altClass.duration,
+                      isOnline: altClass.isOnline || false,
+                      location: altClass.location,
+                      classId: altClass.id,
+                      classInfo: {
+                        id: altClass.id,
+                        code: altClass.code,
+                        subject: altClass.subject,
+                        day: altClass.day
+                      }
+                    }
+                  }
+                } else {
+                  // Fetch alternative session
+                  const altSessionRes = await api.sessions.get(req.alternativeSessionId)
+                  if (altSessionRes.success && altSessionRes.data) {
+                    alternativeSession = {
+                      id: altSessionRes.data.id,
+                      subject: altSessionRes.data.subject,
+                      startTime: altSessionRes.data.startTime,
+                      endTime: altSessionRes.data.endTime,
+                      duration: altSessionRes.data.duration,
+                      isOnline: altSessionRes.data.isOnline,
+                      location: altSessionRes.data.location,
+                      classId: altSessionRes.data.classId
+                    }
+                  }
+                }
+              } catch (e) {
+                console.error('Failed to fetch alternative session/class:', e)
+              }
+            }
+
             return {
               id: req.id,
               student: studentName,
@@ -228,7 +302,10 @@ const HandleCancelReschedule: React.FC = () => {
                 : undefined,
               classId: req.classId,
               classInfo: classInfo,
-              rawData: req
+              rawData: {
+                ...req,
+                alternativeSession: alternativeSession
+              }
             }
           })
         )
@@ -302,9 +379,16 @@ const HandleCancelReschedule: React.FC = () => {
     setRefreshing(true)
     try {
       if (actionType === 'approve') {
-        let newStartTime, newEndTime
+        let newStartTime, newEndTime, alternativeSessionId
+        
         if (selectedRequest.rawData.type === 'reschedule') {
-          // Use picker values if available, otherwise use text inputs
+          // For class reschedule with alternative session
+          if (selectedRequest.rawData.classId && selectedRequest.rawData.alternativeSessionId) {
+            // Use the alternative session ID that student selected
+            alternativeSessionId = selectedRequest.rawData.alternativeSessionId
+            // No need for newStartTime/newEndTime when using alternative session
+          } else {
+            // Regular reschedule - use picker values if available, otherwise use text inputs
           if (newDateValue && newTimeValue) {
             const combinedDate = new Date(newDateValue)
             combinedDate.setHours(newTimeValue.getHours(), newTimeValue.getMinutes(), 0, 0)
@@ -327,12 +411,14 @@ const HandleCancelReschedule: React.FC = () => {
           const originalEnd = session.endTime ? new Date(session.endTime) : new Date(selectedRequest.rawData.preferredEndTime)
           const duration = originalEnd.getTime() - originalStart.getTime()
           newEndTime = new Date(new Date(newStartTime).getTime() + duration).toISOString()
+          }
         }
 
         const response = await api.sessionRequests.approve(selectedRequest.rawData.id, {
           responseMessage: reason || undefined,
           newStartTime,
-          newEndTime
+          newEndTime,
+          alternativeSessionId
     })
 
         if (response.success) {
@@ -418,7 +504,7 @@ const HandleCancelReschedule: React.FC = () => {
             {/* Logo */}
             <div className="flex items-center mb-8">
               <div className="w-10 h-10 flex items-center justify-center mr-3">
-                <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-10 h-10" />
+                <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-10 h-10" />
               </div>
               <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 HCMUT
@@ -810,7 +896,7 @@ const HandleCancelReschedule: React.FC = () => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center">
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
-                    <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-8 h-8" />
+                    <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
                   </div>
                   <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     HCMUT
@@ -908,6 +994,69 @@ const HandleCancelReschedule: React.FC = () => {
 
             {actionType === 'approve' && selectedRequest?.requestType === 'reschedule' && (
               <Box>
+                {/* Alternative Session Info for Class Reschedule */}
+                {selectedRequest?.rawData?.classId && selectedRequest?.rawData?.alternativeSessionId ? (
+                  <Alert 
+                    severity="success" 
+                    sx={{ 
+                      mb: 2,
+                      backgroundColor: theme === 'dark' ? '#064e3b' : '#d1fae5',
+                      color: theme === 'dark' ? '#a7f3d0' : '#065f46',
+                      '& .MuiAlert-icon': {
+                        color: theme === 'dark' ? '#10b981' : '#059669'
+                      }
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                      Học sinh đã chọn buổi học thay thế:
+                    </Typography>
+                    {selectedRequest?.rawData?.alternativeSession ? (
+                      <>
+                        <Typography variant="body2" sx={{ mb: 0.5 }}>
+                          <strong>{selectedRequest.rawData.alternativeSession.subject || 'Buổi học thay thế'}</strong>
+                          {selectedRequest.rawData.alternativeSession.classInfo?.code && (
+                            <Chip 
+                              label={`Lớp: ${selectedRequest.rawData.alternativeSession.classInfo.code}`}
+                              size="small"
+                              sx={{ 
+                                ml: 1,
+                                backgroundColor: theme === 'dark' ? '#1e40af' : '#3b82f6',
+                                color: '#ffffff',
+                                fontSize: '0.7rem',
+                                height: '20px'
+                              }}
+                            />
+                          )}
+                        </Typography>
+                        <Typography variant="body2">
+                          lúc {selectedRequest.rawData.alternativeSession.startTime 
+                            ? new Date(selectedRequest.rawData.alternativeSession.startTime).toLocaleString('vi-VN', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : 'Đang tải...'}
+                        </Typography>
+                        {selectedRequest.rawData.alternativeSession.duration && (
+                          <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+                            Thời lượng: {selectedRequest.rawData.alternativeSession.duration} phút
+                          </Typography>
+                        )}
+                      </>
+                    ) : (
+                      <Typography variant="body2">
+                        Đang tải thông tin...
+                      </Typography>
+                    )}
+                    <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                      Khi approve, học sinh sẽ được chuyển sang buổi học này và bị xóa khỏi buổi học ban đầu.
+                    </Typography>
+                  </Alert>
+                ) : (
+                  <>
                 {/* Student's Preferred Time Info */}
                 {selectedRequest?.rawData?.preferredStartTime && (
                   <Alert 
@@ -962,7 +1111,11 @@ const HandleCancelReschedule: React.FC = () => {
                 >
                   Chọn ngày và giờ mới cho buổi học
                 </Typography>
+                  </>
+                )}
 
+                {/* Only show date/time pickers if not using alternative session */}
+                {!(selectedRequest?.rawData?.classId && selectedRequest?.rawData?.alternativeSessionId) && (
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enUS}>
                   <Grid container spacing={2}>
                     <Grid size={{ xs: 12, sm: 6 }}>
@@ -1287,6 +1440,7 @@ const HandleCancelReschedule: React.FC = () => {
                     </Grid>
                   </Grid>
                 </LocalizationProvider>
+                )}
               </Box>
             )}
 

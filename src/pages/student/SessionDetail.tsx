@@ -919,7 +919,7 @@ const SessionDetail: React.FC = () => {
             {/* Logo */}
             <div className="flex items-center mb-8">
               <div className="w-10 h-10 flex items-center justify-center mr-3">
-                <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-10 h-10" />
+                <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-10 h-10" />
               </div>
               <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 HCMUT
@@ -1177,7 +1177,7 @@ const SessionDetail: React.FC = () => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center">
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
-                    <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-8 h-8" />
+                    <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
                   </div>
                   <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     HCMUT
@@ -1365,12 +1365,12 @@ const SessionDetail: React.FC = () => {
 
           if (isClassView && upcomingClassSession) {
             sessionForRequest = {
-              id: upcomingClassSession.id,
+            id: upcomingClassSession.id,
               subject: upcomingClassSession.subject || classData?.subject || '',
-              startTime: upcomingClassSession.startTime,
-              endTime: upcomingClassSession.endTime,
-              classId: upcomingClassSession.classId || classData?.id,
-              tutorId: upcomingClassSession.tutorId || classData?.tutorId || session?.tutorId
+            startTime: upcomingClassSession.startTime,
+            endTime: upcomingClassSession.endTime,
+            classId: upcomingClassSession.classId || classData?.id,
+            tutorId: upcomingClassSession.tutorId || classData?.tutorId || session?.tutorId
             }
           } else if (isClassView && classData) {
             // Create a virtual session from class info for request
@@ -1384,12 +1384,12 @@ const SessionDetail: React.FC = () => {
             }
           } else if (session) {
             sessionForRequest = {
-              id: session.id,
-              subject: session.subject,
-              startTime: session.startTime,
-              endTime: session.endTime,
-              classId: session.classId,
-              tutorId: session.tutorId
+            id: session.id,
+            subject: session.subject,
+            startTime: session.startTime,
+            endTime: session.endTime,
+            classId: session.classId,
+            tutorId: session.tutorId
             }
           }
 
@@ -1401,14 +1401,14 @@ const SessionDetail: React.FC = () => {
               open={isRequestDialogOpen}
               onClose={() => setIsRequestDialogOpen(false)}
               session={sessionForRequest}
-              type={requestType}
-              classInfo={(isClassView ? classData : (session?.classId && classData)) ? {
-                id: classData.id,
-                code: classData.code,
-                subject: classData.subject
-              } : undefined}
-              onSuccess={handleRequestSuccess}
-            />
+          type={requestType}
+          classInfo={(isClassView ? classData : (session?.classId && classData)) ? {
+            id: classData.id,
+            code: classData.code,
+            subject: classData.subject
+          } : undefined}
+          onSuccess={handleRequestSuccess}
+        />
           )
         })()}
     </div>

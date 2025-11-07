@@ -84,6 +84,11 @@ const RequestDialog: React.FC<RequestDialogProps> = ({
   const [selectedDateForSlot, setSelectedDateForSlot] = useState<string>('') // Selected date for slot selection
   const [calendarWeekStart, setCalendarWeekStart] = useState<Date>(new Date()) // Start date of current week in calendar
 
+  // Alternative sessions for class reschedule
+  const [alternativeSessions, setAlternativeSessions] = useState<any[]>([])
+  const [loadingAlternatives, setLoadingAlternatives] = useState(false)
+  const [selectedAlternative, setSelectedAlternative] = useState<string | null>(null)
+
   const handleClose = () => {
     setReason('')
     setPreferredDate('')
@@ -97,13 +102,53 @@ const RequestDialog: React.FC<RequestDialogProps> = ({
     setSelectedSlot(null)
     setSelectedDateForSlot('')
     setCalendarWeekStart(new Date())
+    setAlternativeSessions([])
+    setSelectedAlternative(null)
     onClose()
   }
 
-  // Load available slots when dialog opens for reschedule
+  // Load alternative sessions for class reschedule
+  useEffect(() => {
+    const loadAlternatives = async () => {
+      if (!open || type !== 'reschedule' || !classInfo) {
+        setAlternativeSessions([])
+        return
+      }
+
+      try {
+        setLoadingAlternatives(true)
+        const params: any = {}
+        
+        // Use classId if available, otherwise use sessionId
+        if (classInfo.id) {
+          params.classId = classInfo.id
+        } else if (session.id) {
+          params.sessionId = session.id
+        }
+
+        const response = await api.sessionRequests.getAlternatives(params)
+        
+        if (response.success && response.data?.alternatives) {
+          setAlternativeSessions(response.data.alternatives)
+        } else {
+          setAlternativeSessions([])
+        }
+      } catch (err) {
+        console.error('Failed to load alternative sessions:', err)
+        setAlternativeSessions([])
+      } finally {
+        setLoadingAlternatives(false)
+      }
+    }
+
+    loadAlternatives()
+  }, [open, type, classInfo, session.id])
+
+  // Load available slots when dialog opens for reschedule (for individual sessions)
   useEffect(() => {
     const loadAvailableSlots = async () => {
-      if (!open || type !== 'reschedule' || !session.tutorId) {
+      // Skip if this is a class reschedule (we use alternatives instead)
+      if (!open || type !== 'reschedule' || !session.tutorId || classInfo) {
         setAvailableSlots([])
         return
       }
@@ -297,6 +342,43 @@ const RequestDialog: React.FC<RequestDialogProps> = ({
     }
 
     if (type === 'reschedule') {
+      // For class reschedule, check if alternative session is selected
+      if (classInfo) {
+        if (!selectedAlternative) {
+          setError('Vui lòng chọn buổi học thay thế')
+          return
+        }
+
+        // For class reschedule with alternative session
+        setLoading(true)
+        try {
+          const requestData: any = {
+            sessionId: session.id,
+            type: 'reschedule',
+            reason: reason,
+            alternativeSessionId: selectedAlternative // Send selected alternative session ID
+          };
+          // Don't include preferredStartTime/preferredEndTime for class reschedule with alternative
+          
+          const response = await api.sessionRequests.create(requestData)
+          
+          if (response.success) {
+            setSuccessMessage('Yêu cầu đổi lịch đã được gửi thành công! Gia sư sẽ xem xét và phản hồi sớm.')
+            setShowSuccessSnackbar(true)
+            setLoading(false)
+            return
+          } else {
+            setError(response.error || 'Có lỗi xảy ra khi tạo yêu cầu')
+          }
+        } catch (err: any) {
+          setError(err.message || 'Có lỗi xảy ra khi tạo yêu cầu')
+        } finally {
+          setLoading(false)
+        }
+        return
+      }
+
+      // For individual session reschedule, use existing logic
       // If slot is selected, use its ISO string directly to avoid timezone issues
       let preferredStartTime: Date
       if (selectedSlot) {
@@ -520,7 +602,143 @@ const RequestDialog: React.FC<RequestDialogProps> = ({
           {/* Preferred Date/Time for Reschedule */}
           {type === 'reschedule' && (
             <div className="space-y-4">
-              {/* Available Slots Selection */}
+              {/* Alternative Sessions for Class Reschedule */}
+              {classInfo ? (
+                <>
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                      mb: 2,
+                      fontWeight: 600
+                    }}
+                  >
+                    Chọn buổi học thay thế (cùng môn học, cùng gia sư, khác ngày)
+                  </Typography>
+                  
+                  {loadingAlternatives ? (
+                    <Box display="flex" justifyContent="center" py={4}>
+                      <CircularProgress size={40} />
+                    </Box>
+                  ) : alternativeSessions.length > 0 ? (
+                    <Grid container spacing={2}>
+                      {alternativeSessions.map((altSession: any) => (
+                        <Grid size={{ xs: 12, sm: 6 }} key={altSession.id}>
+                          <Card
+                            sx={{
+                              border: selectedAlternative === altSession.id
+                                ? `2px solid ${theme === 'dark' ? '#3b82f6' : '#2563eb'}`
+                                : `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+                              backgroundColor: selectedAlternative === altSession.id
+                                ? theme === 'dark' ? '#1e3a5f' : '#dbeafe'
+                                : theme === 'dark' ? '#1f2937' : '#ffffff',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              '&:hover': {
+                                backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
+                                borderColor: theme === 'dark' ? '#3b82f6' : '#2563eb'
+                              }
+                            }}
+                            onClick={() => {
+                              setSelectedAlternative(altSession.id)
+                              setError('')
+                            }}
+                          >
+                            <CardContent>
+                              <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    color: theme === 'dark' ? '#ffffff' : '#111827',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  {altSession.subject}
+                                </Typography>
+                                {altSession.classInfo && (
+                                  <Chip
+                                    label={altSession.classInfo.code}
+                                    size="small"
+                                    sx={{
+                                      backgroundColor: theme === 'dark' ? '#3b82f6' : '#dbeafe',
+                                      color: theme === 'dark' ? '#ffffff' : '#1e40af',
+                                      fontSize: '0.7rem'
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                              
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: theme === 'dark' ? '#d1d5db' : '#374151',
+                                  mb: 1
+                                }}
+                              >
+                                {new Date(altSession.startTime).toLocaleString('vi-VN', {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </Typography>
+                              
+                              <Box display="flex" alignItems="center" gap={2} mt={1}>
+                                <Box display="flex" alignItems="center" gap={0.5}>
+                                  <AccessTime sx={{ fontSize: '0.875rem', color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                                    }}
+                                  >
+                                    {altSession.duration} phút
+                                  </Typography>
+                                </Box>
+                                
+                                <Box display="flex" alignItems="center" gap={0.5}>
+                                  <EventAvailable sx={{ fontSize: '0.875rem', color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                                    }}
+                                  >
+                                    {altSession.availableSlots} chỗ trống
+                                  </Typography>
+                                </Box>
+                              </Box>
+                              
+                              {altSession.isOnline && (
+                                <Chip
+                                  label="Online"
+                                  size="small"
+                                  sx={{
+                                    mt: 1,
+                                    backgroundColor: theme === 'dark' ? '#10b981' : '#d1fae5',
+                                    color: theme === 'dark' ? '#ffffff' : '#065f46',
+                                    fontSize: '0.7rem'
+                                  }}
+                                />
+                              )}
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Alert severity="info">
+                      Không tìm thấy buổi học thay thế phù hợp. Vui lòng liên hệ gia sư để được hỗ trợ.
+                    </Alert>
+                  )}
+                </Box>
+                </>
+              ) : (
+                <>
+                {/* Available Slots Selection for Individual Sessions */}
               {loadingSlots ? (
                 <Box display="flex" justifyContent="center" py={4}>
                   <CircularProgress size={40} />
@@ -932,6 +1150,8 @@ const RequestDialog: React.FC<RequestDialogProps> = ({
                 <Alert severity="info">
                   Không có thời gian trống trong 14 ngày tới. Vui lòng nhập thời gian mong muốn thủ công bên dưới.
                 </Alert>
+                )}
+                </>
               )}
 
               {/* Manual Date/Time Input */}
@@ -1291,7 +1511,12 @@ const RequestDialog: React.FC<RequestDialogProps> = ({
         <MuiButton
           onClick={handleSubmit}
           variant="contained"
-          disabled={loading || !reason.trim() || reason.length < 10}
+          disabled={
+            loading || 
+            !reason.trim() || 
+            reason.length < 10 ||
+            (type === 'reschedule' && classInfo && !selectedAlternative)
+          }
           sx={{
             backgroundColor: type === 'cancel' ? '#ef4444' : '#3b82f6',
             color: '#ffffff',

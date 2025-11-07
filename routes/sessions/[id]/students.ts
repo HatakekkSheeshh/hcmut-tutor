@@ -32,9 +32,9 @@ export async function getSessionStudentsHandler(req: AuthRequest, res: Response)
       return res.status(403).json(errorResponse('Bạn không có quyền xem danh sách học sinh'));
     }
 
-    // Get student details
-    const allUsers = await storage.read<User>('users.json');
-    const students = allUsers.filter(u => session.studentIds.includes(u.id));
+    // Get student details - batch load instead of reading all users
+    const studentsMap = await storage.findByIds<User>('users.json', session.studentIds);
+    const students = Array.from(studentsMap.values());
 
     // Remove sensitive data
     const studentsData = students.map(s => ({

@@ -23,14 +23,14 @@ export async function getClassHandler(req: any, res: Response) {
       return res.status(404).json(errorResponse('Không tìm thấy lớp học'));
     }
 
-    // Get enrollments for this class
-    const enrollments = await storage.find<Enrollment>(
-      'enrollments.json',
-      (e) => e.classId === id && e.status === 'active'
-    );
-
-    // Get tutor info
-    const tutor = await storage.findById<User>('users.json', classItem.tutorId);
+    // Get enrollments and tutor info in parallel
+    const [enrollments, tutor] = await Promise.all([
+      storage.find<Enrollment>(
+        'enrollments.json',
+        (e) => e.classId === id && e.status === 'active'
+      ),
+      storage.findById<User>('users.json', classItem.tutorId)
+    ]);
 
     return res.json(
       successResponse({

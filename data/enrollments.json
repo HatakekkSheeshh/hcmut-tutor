@@ -31,13 +31,21 @@
     "id": "enroll__ryqSJ_DJDbJ",
     "studentId": "stu_CL7iuJCaQnMJ",
     "classId": "class_FeSr3Dut3Zyd",
-    "status": "active",
-    "enrolledAt": "2025-10-20T07:51:29.227Z"
+    "status": "inactive",
+    "enrolledAt": "2025-10-20T07:51:29.227Z",
+    "updatedAt": "2025-11-06T14:53:58.743Z"
   },
   {
     "id": "enroll_ghIdYrAN3VU5",
     "studentId": "stu_3RhgygZCqKGA",
     "classId": "class_FeSr3Dut3Zyd",
+    "status": "active",
+    "enrolledAt": "2025-10-13T07:51:29.227Z"
+  },
+  {
+    "id": "enroll_ghIdYrAN3VU6",
+    "studentId": "stu_3RhgygZCqKGA",
+    "classId": "class_FeSr3Dut3Zye",
     "status": "active",
     "enrolledAt": "2025-10-13T07:51:29.227Z"
   },
@@ -327,5 +335,14 @@
     "classId": "class_VPSWIrpFvknF",
     "status": "active",
     "enrolledAt": "2025-10-15T07:51:29.228Z"
+  },
+  {
+    "id": "enroll_b3JG9SYuI-Gg",
+    "classId": "class_FeSr3Dut3Zye",
+    "studentId": "stu_CL7iuJCaQnMJ",
+    "status": "active",
+    "enrolledAt": "2025-11-06T14:53:58.752Z",
+    "createdAt": "2025-11-06T14:53:58.752Z",
+    "updatedAt": "2025-11-06T14:53:58.752Z"
   }
 ]

@@ -103,7 +103,7 @@ const RegisterMobile: React.FC = () => {
             >
               <ArrowBack className="w-6 h-6" />
             </button>
-            <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-8 h-8 mr-2" />
+            <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8 mr-2" />
             <span className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               HCMUT
             </span>

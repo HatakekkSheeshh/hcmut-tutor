@@ -113,13 +113,13 @@ export async function cancelSessionHandler(req: AuthRequest, res: Response) {
       updatedAt: now()
     });
 
-    // Notify all students and tutor (except current user)
+    // Notify all students and tutor (except current user) - batch create
     const notifyUserIds = [...session.studentIds, session.tutorId].filter(
       uid => uid !== currentUser.userId
     );
     
-    for (const notifyUserId of notifyUserIds) {
-      const notification: Notification = {
+    if (notifyUserIds.length > 0) {
+      const notifications: Notification[] = notifyUserIds.map(notifyUserId => ({
         id: require('../../lib/utils.js').generateId('notif'),
         userId: notifyUserId,
         type: NotificationType.SESSION_CANCELLED,
@@ -128,8 +128,8 @@ export async function cancelSessionHandler(req: AuthRequest, res: Response) {
         read: false,
         link: `/sessions/${id}`,
         createdAt: now()
-      };
-      await storage.create('notifications.json', notification);
+      }));
+      await storage.createMany('notifications.json', notifications);
     }
 
     return res.json(successResponse(null, 'Hủy buổi học thành công'));
@@ -177,13 +177,13 @@ export async function rescheduleSessionHandler(req: AuthRequest, res: Response) 
       updatedAt: now()
     });
 
-    // Notify all students and tutor (except current user)
+    // Notify all students and tutor (except current user) - batch create
     const notifyUserIds = [...session.studentIds, session.tutorId].filter(
       uid => uid !== currentUser.userId
     );
     
-    for (const notifyUserId of notifyUserIds) {
-      const notification: Notification = {
+    if (notifyUserIds.length > 0) {
+      const notifications: Notification[] = notifyUserIds.map(notifyUserId => ({
         id: require('../../lib/utils.js').generateId('notif'),
         userId: notifyUserId,
         type: NotificationType.SESSION_RESCHEDULED,
@@ -193,8 +193,8 @@ export async function rescheduleSessionHandler(req: AuthRequest, res: Response) 
         link: `/sessions/${id}`,
         metadata: { reason },
         createdAt: now()
-      };
-      await storage.create('notifications.json', notification);
+      }));
+      await storage.createMany('notifications.json', notifications);
     }
 
     return res.json(successResponse(updatedSession, 'Đổi lịch buổi học thành công'));

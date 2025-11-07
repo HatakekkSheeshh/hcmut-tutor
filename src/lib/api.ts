@@ -762,6 +762,7 @@ export const sessionRequestsAPI = {
     reason: string;
     preferredStartTime?: string;
     preferredEndTime?: string;
+    alternativeSessionId?: string;
   }) {
     return fetchAPI('/session-requests', {
       method: 'POST',
@@ -773,10 +774,19 @@ export const sessionRequestsAPI = {
     return fetchAPI(`/session-requests/${id}`);
   },
 
+  async getAlternatives(params: {
+    sessionId?: string;
+    classId?: string;
+  }) {
+    const query = params ? '?' + new URLSearchParams(params as any).toString() : '';
+    return fetchAPI(`/session-requests/alternatives${query}`);
+  },
+
   async approve(id: string, data: {
     responseMessage?: string;
     newStartTime?: string;
     newEndTime?: string;
+    alternativeSessionId?: string;
   }) {
     return fetchAPI(`/session-requests/${id}/approve`, {
       method: 'PUT',

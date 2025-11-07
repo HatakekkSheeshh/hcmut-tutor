@@ -100,9 +100,9 @@ const TutorDashboardMobile: React.FC = () => {
             limit: 100
           }),
           api.classes.list({
-            tutorId: userData.id,
-            limit: 100
-          })
+          tutorId: userData.id,
+          limit: 100
+        })
         ])
         
         // Process sessions
@@ -921,101 +921,101 @@ const TutorDashboardMobile: React.FC = () => {
           <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Upcoming Sessions
           </h3>
-          <div className="space-y-3">
+      <div className="space-y-3">
             {upcomingSessions.map((session) => {
-              // Support both old studentId (string) and new studentIds (array)
-              const studentIds = session.studentIds && Array.isArray(session.studentIds) 
-                ? session.studentIds 
-                : session.studentId 
-                  ? [session.studentId] 
-                  : []
-              const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
+            // Support both old studentId (string) and new studentIds (array)
+            const studentIds = session.studentIds && Array.isArray(session.studentIds) 
+              ? session.studentIds 
+              : session.studentId 
+                ? [session.studentId] 
+                : []
+            const firstStudent = studentIds.length > 0 ? students[studentIds[0]] : null
               const studentCount = studentIds.length
-              const sessionDate = new Date(session.startTime)
-              const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
-              const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-              
-              return (
-                <div 
-                  key={session.id}
+            const sessionDate = new Date(session.startTime)
+            const formattedDate = sessionDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })
+            const formattedTime = sessionDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+            
+            return (
+              <div 
+                key={session.id}
                   className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} cursor-pointer`}
                   onClick={() => navigate(`/tutor/session/${session.id}`)}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className={`font-semibold text-sm line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {studentCount > 1 
                         ? `${firstStudent?.name || 'Loading...'} + ${studentCount - 1} more`
                         : firstStudent?.name || 'Loading...'}
-                    </h3>
-                    <span className={`px-2 py-1 rounded-full text-xs capitalize ${
-                      session.status === 'confirmed' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {session.status}
-                    </span>
-                  </div>
-                  
-                  <div className="mb-2">
-                    <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {session.subject}
-                    </p>
-                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {formattedDate} at {formattedTime} • {session.duration} mins
-                    </p>
-                  </div>
+                  </h3>
+                  <span className={`px-2 py-1 rounded-full text-xs capitalize ${
+                    session.status === 'confirmed' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {session.status}
+                  </span>
+                </div>
+                
+                <div className="mb-2">
+                  <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {session.subject}
+                  </p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {formattedDate} at {formattedTime} • {session.duration} mins
+                  </p>
+                </div>
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                        Session #{session.id?.slice(-4)}
-                      </p>
-                    </div>
-                    <div className="flex space-x-1">
-                      <Button 
-                        size="small" 
-                        variant="outlined"
-                        startIcon={<VideoCallIcon />}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Session #{session.id?.slice(-4)}
+                    </p>
+                  </div>
+              <div className="flex space-x-1">
+                <Button 
+                  size="small" 
+                  variant="outlined"
+                  startIcon={<VideoCallIcon />}
                         onClick={(e) => {
                           e.stopPropagation()
                         }}
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#000000',
-                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                          textTransform: 'none',
-                          fontWeight: '500',
-                          fontSize: '0.75rem',
-                          padding: '4px 8px'
-                        }}
-                      >
-                        Join
-                      </Button>
-                      <Button 
-                        size="small" 
-                        variant="outlined"
-                        startIcon={<ChatIcon />}
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                    textTransform: 'none',
+                    fontWeight: '500',
+                    fontSize: '0.75rem',
+                    padding: '4px 8px'
+                  }}
+                >
+                  Join
+                </Button>
+                <Button 
+                  size="small" 
+                  variant="outlined"
+                  startIcon={<ChatIcon />}
                         onClick={(e) => {
                           e.stopPropagation()
                           navigate('/tutor/messages')
                         }}
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#000000',
-                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                          textTransform: 'none',
-                          fontWeight: '500',
-                          fontSize: '0.75rem',
-                          padding: '4px 8px'
-                        }}
-                      >
-                        Message
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#000000',
+                    borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                    textTransform: 'none',
+                    fontWeight: '500',
+                    fontSize: '0.75rem',
+                    padding: '4px 8px'
+                  }}
+                >
+                  Message
+                </Button>
+              </div>
+            </div>
+          </div>
+            )
             })}
           </div>
         </div>
@@ -1060,7 +1060,7 @@ const TutorDashboardMobile: React.FC = () => {
                     }`}>
                       {session.status}
                     </span>
-                  </div>
+      </div>
                   
                   <div className="mb-2">
                     <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -1383,7 +1383,7 @@ const TutorDashboardMobile: React.FC = () => {
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center">
             <div className="w-8 h-8 flex items-center justify-center mr-3">
-              <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-8 h-8" />
+              <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
             </div>
             <span className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               HCMUT
@@ -1445,7 +1445,7 @@ const TutorDashboardMobile: React.FC = () => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center">
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
-                    <img src="/HCMCUT.svg" alt="HCMUT Logo" className="w-8 h-8" />
+                    <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
                   </div>
                   <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     HCMUT

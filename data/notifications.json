@@ -508,5 +508,72 @@
     "read": true,
     "link": "/sessions/ses_BQpnRi0QaeBv",
     "createdAt": "2025-11-06T07:51:29.224Z"
+  },
+  {
+    "id": "notif_c5oafr07x5cM",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_reschedule_request",
+    "title": "Yêu cầu đổi lịch buổi học",
+    "message": "Trần Cường Hương đã gửi yêu cầu đổi lịch buổi học Đại số tuyến tính",
+    "read": false,
+    "link": "/tutor/cancel-reschedule",
+    "metadata": {
+      "requestId": "req_orDriJURnXgx",
+      "sessionId": "class_class_FeSr3Dut3Zyd_next_session",
+      "type": "reschedule",
+      "classId": "class_FeSr3Dut3Zyd"
+    },
+    "createdAt": "2025-11-06T14:30:34.042Z"
+  },
+  {
+    "id": "notif_UFYnFfXWp0LZ",
+    "userId": "stu_CL7iuJCaQnMJ",
+    "type": "session_rescheduled",
+    "title": "Yêu cầu đổi lịch buổi học đã được chấp nhận",
+    "message": "Phạm Linh Hữu đã chấp nhận yêu cầu đổi lịch buổi học Đại số tuyến tính",
+    "read": false,
+    "link": "/student/class/class_FeSr3Dut3Zyd",
+    "metadata": {
+      "requestId": "req_orDriJURnXgx",
+      "sessionId": "class_class_FeSr3Dut3Zyd_next_session",
+      "classId": "class_FeSr3Dut3Zyd",
+      "responseMessage": "ok"
+    },
+    "createdAt": "2025-11-06T14:53:58.757Z"
+  },
+  {
+    "id": "notif_5j4HfOh9UFpN",
+    "userId": "tut_ZevJpYidjiUm",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Mạng máy tính",
+    "read": false,
+    "link": "/sessions/ses_BDAibwqCmgMj",
+    "createdAt": "2025-11-06T15:11:25.965Z"
+  },
+  {
+    "id": "notif_DkQrFFLT-5Lj",
+    "userId": "tut_ZevJpYidjiUm",
+    "type": "session_reschedule_request",
+    "title": "Yêu cầu đổi lịch buổi học",
+    "message": "Phan An Hoàng đã gửi yêu cầu đổi lịch buổi học Mạng máy tính",
+    "read": false,
+    "link": "/tutor/cancel-reschedule",
+    "metadata": {
+      "requestId": "req_IJTiWL6m9yTQ",
+      "sessionId": "ses_BDAibwqCmgMj",
+      "type": "reschedule"
+    },
+    "createdAt": "2025-11-06T15:36:40.537Z"
+  },
+  {
+    "id": "notif_0oZ5CMphA7Xl",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
+    "read": false,
+    "link": "/sessions/ses_6ZhRrxVh_XVJ",
+    "createdAt": "2025-11-07T05:12:08.159Z"
   }
 ]

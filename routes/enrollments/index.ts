@@ -86,31 +86,44 @@ export async function listEnrollmentsHandler(req: AuthRequest, res: Response) {
       filter
     );
 
-    // Enrich with class and student info
-    const enrichedData = await Promise.all(
-      result.data.map(async (enrollment) => {
-        const classItem = await storage.findById<Class>('classes.json', enrollment.classId);
-        const student = await storage.findById<User>('users.json', enrollment.studentId);
-        
-        return {
-          ...enrollment,
-          class: classItem ? {
-            id: classItem.id,
-            code: classItem.code,
-            subject: classItem.subject,
-            day: classItem.day,
-            startTime: classItem.startTime,
-            endTime: classItem.endTime
-          } : null,
-          student: student ? {
-            id: student.id,
-            name: student.name,
-            email: student.email,
-            avatar: student.avatar
-          } : null
-        };
-      })
-    );
+    // Enrich with class and student info - batch load instead of loop
+    const classIds = new Set<string>();
+    const studentIds = new Set<string>();
+    
+    result.data.forEach(enrollment => {
+      if (enrollment.classId) classIds.add(enrollment.classId);
+      if (enrollment.studentId) studentIds.add(enrollment.studentId);
+    });
+
+    // Load all data in parallel (only 2 read operations instead of N*2)
+    const [classesMap, usersMap] = await Promise.all([
+      storage.findByIds<Class>('classes.json', Array.from(classIds)),
+      storage.findByIds<User>('users.json', Array.from(studentIds))
+    ]);
+
+    // Enrich data (no more async calls)
+    const enrichedData = result.data.map(enrollment => {
+      const classItem = classesMap.get(enrollment.classId);
+      const student = usersMap.get(enrollment.studentId);
+      
+      return {
+        ...enrollment,
+        class: classItem ? {
+          id: classItem.id,
+          code: classItem.code,
+          subject: classItem.subject,
+          day: classItem.day,
+          startTime: classItem.startTime,
+          endTime: classItem.endTime
+        } : null,
+        student: student ? {
+          id: student.id,
+          name: student.name,
+          email: student.email,
+          avatar: student.avatar
+        } : null
+      };
+    });
 
     return res.json({
       success: true,
@@ -172,26 +185,33 @@ export async function createEnrollmentHandler(req: AuthRequest, res: Response) {
       );
     }
 
-    // Check for time conflicts with other enrolled classes
+    // Check for time conflicts with other enrolled classes - batch load
     const studentEnrollments = await storage.find<Enrollment>(
       'enrollments.json',
       (e) => e.studentId === currentUser.userId && e.status === EnrollmentStatus.ACTIVE
     );
 
-    for (const enrollment of studentEnrollments) {
-      const enrolledClass = await storage.findById<Class>('classes.json', enrollment.classId);
-      if (enrolledClass) {
-        if (hasTimeConflict(
-          classItem.day,
-          classItem.startTime,
-          classItem.endTime,
-          enrolledClass.day,
-          enrolledClass.startTime,
-          enrolledClass.endTime
-        )) {
-          return res.status(400).json(
-            errorResponse(`Lớp học bị trùng giờ với lớp ${enrolledClass.code} (${enrolledClass.day} ${enrolledClass.startTime}-${enrolledClass.endTime})`)
-          );
+    if (studentEnrollments.length > 0) {
+      // Batch load all enrolled classes at once
+      const enrolledClassIds = studentEnrollments.map(e => e.classId).filter(Boolean);
+      const enrolledClassesMap = await storage.findByIds<Class>('classes.json', enrolledClassIds);
+
+      // Check conflicts
+      for (const enrollment of studentEnrollments) {
+        const enrolledClass = enrolledClassesMap.get(enrollment.classId);
+        if (enrolledClass) {
+          if (hasTimeConflict(
+            classItem.day,
+            classItem.startTime,
+            classItem.endTime,
+            enrolledClass.day,
+            enrolledClass.startTime,
+            enrolledClass.endTime
+          )) {
+            return res.status(400).json(
+              errorResponse(`Lớp học bị trùng giờ với lớp ${enrolledClass.code} (${enrolledClass.day} ${enrolledClass.startTime}-${enrolledClass.endTime})`)
+            );
+          }
         }
       }
     }

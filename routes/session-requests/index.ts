@@ -71,58 +71,76 @@ export async function listSessionRequestsHandler(req: AuthRequest, res: Response
       filter
     );
 
-    // Enrich with session, student, tutor, and class info
-    const enrichedData = await Promise.all(
-      result.data.map(async (request) => {
-        const session = await storage.findById<Session>('sessions.json', request.sessionId);
-        const student = await storage.findById<User>('users.json', request.studentId);
-        const tutor = await storage.findById<User>('users.json', request.tutorId);
-        let classInfo = null;
-        
-        if (request.classId) {
-          const classItem = await storage.findById<Class>('classes.json', request.classId);
-          if (classItem) {
-            classInfo = {
-              id: classItem.id,
-              code: classItem.code,
-              subject: classItem.subject,
-              day: classItem.day,
-              startTime: classItem.startTime,
-              endTime: classItem.endTime
-            };
-          }
-        }
+    // Batch load all related data to avoid multiple findById calls
+    // Collect all unique IDs
+    const sessionIds = new Set<string>();
+    const userIds = new Set<string>();
+    const classIds = new Set<string>();
+    
+    result.data.forEach(request => {
+      if (request.sessionId) sessionIds.add(request.sessionId);
+      if (request.studentId) userIds.add(request.studentId);
+      if (request.tutorId) userIds.add(request.tutorId);
+      if (request.classId) classIds.add(request.classId);
+    });
 
-        return {
-          ...request,
-          session: session ? {
-            id: session.id,
-            subject: session.subject,
-            topic: session.topic,
-            startTime: session.startTime,
-            endTime: session.endTime,
-            status: session.status,
-            isOnline: session.isOnline,
-            location: session.location,
-            meetingLink: session.meetingLink
-          } : null,
-          student: student ? {
-            id: student.id,
-            name: student.name,
-            email: student.email,
-            avatar: student.avatar,
-            hcmutId: student.hcmutId
-          } : null,
-          tutor: tutor ? {
-            id: tutor.id,
-            name: tutor.name,
-            email: tutor.email,
-            avatar: tutor.avatar
-          } : null,
-          class: classInfo
-        };
-      })
-    );
+    // Load all data in parallel (only 3 read operations instead of N*3)
+    const [sessionsMap, usersMap, classesMap] = await Promise.all([
+      storage.findByIds<Session>('sessions.json', Array.from(sessionIds)),
+      storage.findByIds<User>('users.json', Array.from(userIds)),
+      storage.findByIds<Class>('classes.json', Array.from(classIds))
+    ]);
+
+    // Enrich with session, student, tutor, and class info (no more async calls)
+    const enrichedData = result.data.map((request) => {
+      const session = sessionsMap.get(request.sessionId);
+      const student = usersMap.get(request.studentId);
+      const tutor = usersMap.get(request.tutorId);
+      let classInfo = null;
+      
+      if (request.classId) {
+        const classItem = classesMap.get(request.classId);
+        if (classItem) {
+          classInfo = {
+            id: classItem.id,
+            code: classItem.code,
+            subject: classItem.subject,
+            day: classItem.day,
+            startTime: classItem.startTime,
+            endTime: classItem.endTime
+          };
+        }
+      }
+
+      return {
+        ...request,
+        session: session ? {
+          id: session.id,
+          subject: session.subject,
+          topic: session.topic,
+          startTime: session.startTime,
+          endTime: session.endTime,
+          status: session.status,
+          isOnline: session.isOnline,
+          location: session.location,
+          meetingLink: session.meetingLink
+        } : null,
+        student: student ? {
+          id: student.id,
+          name: student.name,
+          email: student.email,
+          avatar: student.avatar,
+          hcmutId: student.hcmutId
+        } : null,
+        tutor: tutor ? {
+          id: tutor.id,
+          name: tutor.name,
+          email: tutor.email,
+          avatar: tutor.avatar
+        } : null,
+        class: classInfo
+      };
+    });
 
     return res.json({
       success: true,
@@ -255,7 +273,7 @@ async function validateRescheduleTime(
 export async function createSessionRequestHandler(req: AuthRequest, res: Response) {
   try {
     const currentUser = req.user!;
-    const { sessionId, type, reason, preferredStartTime, preferredEndTime } = req.body;
+    const { sessionId, type, reason, preferredStartTime, preferredEndTime, alternativeSessionId } = req.body;
 
     // Only students can create requests
     if (currentUser.role !== UserRole.STUDENT) {
@@ -264,14 +282,68 @@ export async function createSessionRequestHandler(req: AuthRequest, res: Respons
       );
     }
 
-    // Get session details
-    const session = await storage.findById<Session>('sessions.json', sessionId);
+    // Get session details - handle virtual session for class
+    let session: Session | null = await storage.findById<Session>('sessions.json', sessionId);
+    let classData: Class | null = null;
+    
+    // If session not found, check if it's a virtual session for class
+    if (!session && sessionId.startsWith('class_')) {
+      const classId = sessionId.replace('class_', '').replace('_next_session', '');
+      classData = await storage.findById<Class>('classes.json', classId);
+      
+      if (!classData) {
+        return res.status(404).json(errorResponse('Không tìm thấy lớp học'));
+      }
+
+      // Check if student is enrolled in class
+      const enrollments = await storage.find('enrollments.json',
+        (e: any) => e.classId === classId && e.studentId === currentUser.userId && e.status === 'active'
+      );
+
+      if (enrollments.length === 0) {
+        return res.status(403).json(
+          errorResponse('Bạn không có quyền tạo yêu cầu cho lớp học này')
+        );
+      }
+
+      // Find the next upcoming session for this class
+      const classSessions = await storage.find<Session>('sessions.json',
+        (s: Session) => 
+          s.classId === classId && 
+          s.status === SessionStatus.CONFIRMED &&
+          new Date(s.startTime) >= new Date()
+      );
+
+      if (classSessions.length > 0) {
+        // Use the earliest upcoming session
+        session = classSessions.sort((a, b) => 
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        )[0];
+      } else {
+        // No upcoming session found, create a placeholder session object
+        session = {
+          id: sessionId,
+          studentIds: [],
+          tutorId: classData.tutorId,
+          subject: classData.subject,
+          status: SessionStatus.CONFIRMED,
+          startTime: new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          duration: classData.duration,
+          isOnline: classData.isOnline || false,
+          classId: classData.id,
+          createdAt: now(),
+          updatedAt: now()
+        } as Session;
+      }
+    }
+
     if (!session) {
       return res.status(404).json(errorResponse('Không tìm thấy buổi học'));
     }
 
-    // Check if session belongs to student
-    if (!session.studentIds?.includes(currentUser.userId)) {
+    // Check if session belongs to student (for real sessions)
+    if (session.id !== sessionId && !session.studentIds?.includes(currentUser.userId)) {
       return res.status(403).json(
         errorResponse('Bạn không có quyền tạo yêu cầu cho buổi học này')
       );
@@ -299,8 +371,8 @@ export async function createSessionRequestHandler(req: AuthRequest, res: Respons
       );
     }
 
-    // Validate preferred time for reschedule requests
-    if (type === RequestType.RESCHEDULE && preferredStartTime && preferredEndTime) {
+    // Validate preferred time for reschedule requests (only for individual sessions, not class with alternative)
+    if (type === RequestType.RESCHEDULE && preferredStartTime && preferredEndTime && !alternativeSessionId) {
       const validationError = await validateRescheduleTime(
         session.tutorId,
         preferredStartTime,
@@ -310,6 +382,61 @@ export async function createSessionRequestHandler(req: AuthRequest, res: Respons
 
       if (validationError) {
         return res.status(400).json(errorResponse(validationError));
+      }
+    }
+
+    // Validate alternative session/class for class reschedule
+    if (type === RequestType.RESCHEDULE && alternativeSessionId) {
+      // Check if alternative is a class (starts with 'class_') or a session
+      const isAlternativeClass = alternativeSessionId.startsWith('class_');
+      
+      if (isAlternativeClass) {
+        // Validate alternative class
+        const altClass = await storage.findById<Class>('classes.json', alternativeSessionId);
+        if (!altClass) {
+          return res.status(404).json(errorResponse('Không tìm thấy lớp học thay thế'));
+        }
+
+        // Verify alternative class belongs to same tutor and subject
+        if (altClass.tutorId !== session.tutorId || altClass.subject !== session.subject) {
+          return res.status(400).json(errorResponse('Lớp học thay thế phải cùng gia sư và môn học'));
+        }
+
+        // Check if alternative class has available slots
+        if (altClass.currentEnrollment >= altClass.maxStudents) {
+          return res.status(400).json(errorResponse('Lớp học thay thế đã đầy'));
+        }
+
+        // Check if student is not already enrolled in alternative class
+        const existingEnrollments = await storage.find('enrollments.json',
+          (e: any) => e.classId === alternativeSessionId && e.studentId === currentUser.userId && e.status === 'active'
+        );
+        if (existingEnrollments.length > 0) {
+          return res.status(400).json(errorResponse('Bạn đã tham gia lớp học thay thế này rồi'));
+        }
+      } else {
+        // Validate alternative session
+        const altSession = await storage.findById<Session>('sessions.json', alternativeSessionId);
+        if (!altSession) {
+          return res.status(404).json(errorResponse('Không tìm thấy buổi học thay thế'));
+        }
+
+        // Verify alternative session belongs to same tutor and subject
+        if (altSession.tutorId !== session.tutorId || altSession.subject !== session.subject) {
+          return res.status(400).json(errorResponse('Buổi học thay thế phải cùng gia sư và môn học'));
+        }
+
+        // Check if alternative session has available slots
+        const maxStudents = altSession.classId ? 10 : 5;
+        const currentStudents = altSession.studentIds?.length || 0;
+        if (currentStudents >= maxStudents) {
+          return res.status(400).json(errorResponse('Buổi học thay thế đã đầy'));
+        }
+
+        // Check if student is not already in alternative session
+        if (altSession.studentIds?.includes(currentUser.userId)) {
+          return res.status(400).json(errorResponse('Bạn đã tham gia buổi học thay thế này rồi'));
+        }
       }
     }
 
@@ -325,6 +452,7 @@ export async function createSessionRequestHandler(req: AuthRequest, res: Respons
       reason: reason,
       preferredStartTime: preferredStartTime,
       preferredEndTime: preferredEndTime,
+      alternativeSessionId: alternativeSessionId, // For class reschedule - selected alternative session
       createdAt: now(),
       updatedAt: now()
     };

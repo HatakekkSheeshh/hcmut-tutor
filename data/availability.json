@@ -27,10 +27,21 @@
         "day": "sunday",
         "startTime": "09:00",
         "endTime": "16:00"
+      },
+      {
+        "day": "friday",
+        "startTime": "09:00",
+        "endTime": "15:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "09:00",
+        "endTime": "17:00"
       }
     ],
     "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.224Z"
+    "updatedAt": "2025-11-06T15:32:42.295Z",
+    "exceptions": []
   },
   {
     "id": "avail_Ve3odcyQneSF",

@@ -22,25 +22,35 @@ export async function getNotificationsHandler(req: AuthRequest, res: Response) {
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
 
-    const filter = (notif: Notification) => {
-      if (notif.userId !== currentUser.userId) return false;
-      if (unreadOnly === 'true' && notif.read) return false;
-      return true;
-    };
-
-    const result = await storage.paginate<Notification>(
-      'notifications.json',
-      pageNum,
-      limitNum,
-      filter
-    );
-
-    // Count unread
+    // Read notifications once and use for both pagination and unread count
     const allNotifications = await storage.find<Notification>(
       'notifications.json',
       (n) => n.userId === currentUser.userId
     );
-    
+
+    // Filter for unread if needed
+    const filteredNotifications = unreadOnly === 'true' 
+      ? allNotifications.filter(n => !n.read)
+      : allNotifications;
+
+    // Manual pagination
+    const total = filteredNotifications.length;
+    const totalPages = Math.ceil(total / limitNum);
+    const start = (pageNum - 1) * limitNum;
+    const end = start + limitNum;
+    const paginatedData = filteredNotifications.slice(start, end);
+
+    const result = {
+      data: paginatedData,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages
+      }
+    };
+
+    // Count unread from all notifications (not just filtered)
     const unreadCount = allNotifications.filter(n => !n.read).length;
 
     return res.json(

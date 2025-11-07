@@ -107,14 +107,14 @@ export async function generateSessionsHandler(req: AuthRequest, res: Response) {
       currentDate.setDate(currentDate.getDate() + 7);
     }
 
-    // Save all sessions
-    for (const session of sessions) {
-      await storage.create('sessions.json', session);
+    // Save all sessions - batch create instead of loop
+    if (sessions.length > 0) {
+      await storage.createMany('sessions.json', sessions);
     }
 
-    // Create notification for enrolled students
-    for (const studentId of studentIds) {
-      const notification: Notification = {
+    // Create notification for enrolled students - batch create
+    if (studentIds.length > 0) {
+      const notifications: Notification[] = studentIds.map(studentId => ({
         id: generateId('notif'),
         userId: studentId,
         type: NotificationType.SESSION_BOOKING,
@@ -123,8 +123,8 @@ export async function generateSessionsHandler(req: AuthRequest, res: Response) {
         read: false,
         link: `/classes/${classItem.id}`,
         createdAt: now()
-      };
-      await storage.create('notifications.json', notification);
+      }));
+      await storage.createMany('notifications.json', notifications);
     }
 
     return res.status(201).json(

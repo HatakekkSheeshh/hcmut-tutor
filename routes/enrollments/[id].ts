@@ -34,9 +34,11 @@ export async function getEnrollmentHandler(req: AuthRequest, res: Response) {
       );
     }
 
-    // Get class and student info
-    const classItem = await storage.findById<Class>('classes.json', enrollment.classId);
-    const student = await storage.findById<User>('users.json', enrollment.studentId);
+    // Get class and student info - load in parallel
+    const [classItem, student] = await Promise.all([
+      storage.findById<Class>('classes.json', enrollment.classId),
+      storage.findById<User>('users.json', enrollment.studentId)
+    ]);
 
     return res.json(
       successResponse({
