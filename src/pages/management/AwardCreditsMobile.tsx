@@ -177,7 +177,10 @@ const AwardCreditsMobile: React.FC = () => {
       {/* Mobile Header */}
       <div className={`sticky top-0 z-40 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
         <div className="flex items-center justify-between p-4">
-          <div className="flex items-center">
+          <div 
+            className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/management')}
+          >
             <div className="w-8 h-8 flex items-center justify-center mr-3">
               <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
             </div>
@@ -535,7 +538,10 @@ const AwardCreditsMobile: React.FC = () => {
             <div className="p-6 h-full flex flex-col overflow-hidden">
               {/* Mobile Header */}
               <div className="flex items-center justify-between mb-8 flex-shrink-0">
-                <div className="flex items-center">
+                <div 
+                  className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate('/management')}
+                >
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
                     <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
                   </div>

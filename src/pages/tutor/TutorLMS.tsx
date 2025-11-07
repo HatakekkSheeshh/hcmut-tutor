@@ -236,7 +236,10 @@ const TutorLMS: React.FC = () => {
         <div className={`w-full lg:w-64 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="p-6">
             {/* Logo */}
-            <div className="flex items-center mb-8">
+            <div 
+              className="flex items-center mb-8 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate('/tutor')}
+            >
               <div className="w-10 h-10 flex items-center justify-center mr-3">
                 <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-10 h-10" />
               </div>

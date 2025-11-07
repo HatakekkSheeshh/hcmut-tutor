@@ -973,7 +973,10 @@ const StudentDashboardMobile: React.FC = () => {
       {/* Mobile Header */}
       <div className={`sticky top-0 z-40 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
         <div className="flex items-center justify-between p-4">
-          <div className="flex items-center">
+          <div 
+            className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/student')}
+          >
             <div className="w-8 h-8 flex items-center justify-center mr-3">
               <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
             </div>
@@ -1034,7 +1037,10 @@ const StudentDashboardMobile: React.FC = () => {
           <div className={`fixed left-0 top-0 h-full w-80 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl flex flex-col`}>
             {/* Mobile Header - Fixed */}
             <div className={`flex items-center justify-between p-6 flex-shrink-0 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-                <div className="flex items-center">
+                <div 
+                  className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate('/student')}
+                >
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
                     <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
                   </div>

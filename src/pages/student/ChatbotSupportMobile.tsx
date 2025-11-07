@@ -397,7 +397,10 @@ const ChatbotSupportMobile: React.FC = () => {
             <div className="p-6 h-full flex flex-col overflow-hidden">
               {/* Mobile Header */}
               <div className="flex items-center justify-between mb-8 flex-shrink-0">
-                <div className="flex items-center">
+                <div 
+                  className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate('/student')}
+                >
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
                     <img src="/HCMCUT.png" alt="HCMUT Logo" className="w-8 h-8" />
                   </div>
