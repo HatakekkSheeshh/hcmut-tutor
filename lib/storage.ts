@@ -1,4 +1,4 @@
-import { put, del, list, get } from '@vercel/blob';
+import { put, del, list } from '@vercel/blob';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -277,51 +277,65 @@ export class JSONStorage {
       // Try data/${filename} first (preferred location)
       const blobPath = `data/${filename}`;
       
-      try {
-        const blob = await get(blobPath);
-        const content = await blob.text();
+      // List blobs with exact path match
+      const { blobs } = await list({ prefix: blobPath });
+      
+      // Find exact match (not just prefix match)
+      const targetBlob = blobs.find(blob => blob.pathname === blobPath);
+      
+      if (targetBlob) {
+        // Fetch the blob content
+        const response = await fetch(targetBlob.url);
+        
+        // Check if response is OK and content-type is JSON
+        if (!response.ok) {
+          throw new Error(`Failed to fetch blob: ${response.status} ${response.statusText}`);
+        }
+        
+        const contentType = response.headers.get('content-type') || '';
+        const content = await response.text();
         
         // Validate that content is valid JSON (not HTML or error page)
         const trimmedContent = content.trim();
         if (!trimmedContent.startsWith('[') && !trimmedContent.startsWith('{')) {
           console.error(`Invalid JSON format for ${blobPath}: content starts with "${trimmedContent.substring(0, 50)}"`);
+          console.error(`Content-Type: ${contentType}, URL: ${targetBlob.url}`);
           // Try root level as fallback
           throw new Error('Invalid JSON format, trying root level');
         }
         
         return JSON.parse(content);
-      } catch (error: any) {
-        // Check if it's a "not found" error or invalid JSON format
-        const isNotFound = 
-          error.message?.includes('not found') || 
-          error.status === 404 ||
-          error.message?.includes('Invalid JSON format');
+      }
+      
+      // If not found at data/, try root level (backward compatibility)
+      const { blobs: rootBlobs } = await list({ prefix: filename });
+      const rootBlob = rootBlobs.find(blob => blob.pathname === filename);
+      
+      if (rootBlob) {
+        const response = await fetch(rootBlob.url);
         
-        if (isNotFound) {
-          // Try root level (backward compatibility)
-          try {
-            const rootBlob = await get(filename);
-            const content = await rootBlob.text();
-            
-            // Validate that content is valid JSON
-            const trimmedContent = content.trim();
-            if (!trimmedContent.startsWith('[') && !trimmedContent.startsWith('{')) {
-              console.error(`Invalid JSON format for ${filename} at root: content starts with "${trimmedContent.substring(0, 50)}"`);
-              console.error(`This might indicate the blob contains HTML or incorrect content. Please verify the file was uploaded correctly.`);
-              return [];
-            }
-            
-            return JSON.parse(content);
-          } catch (rootError: any) {
-            // File doesn't exist at either location
-            console.warn(`No blob found for ${filename} at ${blobPath} or root level`);
-            return [];
-          }
+        if (!response.ok) {
+          throw new Error(`Failed to fetch blob: ${response.status} ${response.statusText}`);
         }
         
-        // Re-throw if it's a different error (like network error)
-        throw error;
+        const contentType = response.headers.get('content-type') || '';
+        const content = await response.text();
+        
+        // Validate that content is valid JSON
+        const trimmedContent = content.trim();
+        if (!trimmedContent.startsWith('[') && !trimmedContent.startsWith('{')) {
+          console.error(`Invalid JSON format for ${filename} at root: content starts with "${trimmedContent.substring(0, 50)}"`);
+          console.error(`Content-Type: ${contentType}, URL: ${rootBlob.url}`);
+          console.error(`This might indicate the blob contains HTML or incorrect content. Please verify the file was uploaded correctly.`);
+          return [];
+        }
+        
+        return JSON.parse(content);
       }
+      
+      // File doesn't exist at either location
+      console.warn(`No blob found for ${filename} at ${blobPath} or root level`);
+      return [];
     } catch (error: any) {
       console.error(`Blob read error for ${filename}:`, error);
       // If it's a JSON parse error, log more details
