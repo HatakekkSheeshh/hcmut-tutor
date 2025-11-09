@@ -575,5 +575,25 @@
     "read": false,
     "link": "/sessions/ses_6ZhRrxVh_XVJ",
     "createdAt": "2025-11-07T05:12:08.159Z"
+  },
+  {
+    "id": "notif_a4c28d5c-c2d8-4efe-ab4f-65526eab95ba",
+    "userId": "stu_p8zzUZM5nqnx",
+    "type": "system",
+    "title": "Kiểm tra thông báo hệ thống",
+    "message": "Đây là một thông báo test được tạo tự động.",
+    "read": false,
+    "link": "/test/script",
+    "createdAt": "2025-11-09T14:53:53.887Z"
+  },
+  {
+    "id": "notif_C2hvxOyQZzlc",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
+    "read": false,
+    "link": "/sessions/ses_wYH1W0KReekG",
+    "createdAt": "2025-11-09T15:01:27.228Z"
   }
 ]

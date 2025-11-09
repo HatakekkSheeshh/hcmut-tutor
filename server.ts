@@ -62,6 +62,8 @@ import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, 
 import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './routes/forum/posts.js';
 import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './routes/forum/comments.js';
 
+import { listLibraryResourcesHandler, getLibraryResourceHandler, searchLibraryHandler } from './routes/library/index.ts';
+
 // Import handlers - Session Requests
 import { listSessionRequestsHandler, createSessionRequestHandler } from './routes/session-requests/index.js';
 import { getSessionRequestHandler, approveSessionRequestHandler, rejectSessionRequestHandler, withdrawSessionRequestHandler } from './routes/session-requests/[id].js';
@@ -217,6 +219,11 @@ app.post('/api/forum/posts/:id/like', authenticate, likePostHandler);
 app.get('/api/forum/posts/:id/comments', getCommentsHandler);
 app.post('/api/forum/posts/:id/comments', authenticate, createCommentHandler);
 app.delete('/api/forum/comments/:id', authenticate, deleteCommentHandler);
+
+// ===== DIGITAL LIBRARY ROUTES =====
+app.get('/api/library/resources', authenticate, listLibraryResourcesHandler);
+app.get('/api/library/resources/:id', authenticate, getLibraryResourceHandler);
+app.get('/api/library/search', authenticate, searchLibraryHandler);
 
 // ===== SESSION REQUESTS ROUTES =====
 
