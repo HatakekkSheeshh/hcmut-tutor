@@ -51,6 +51,7 @@ import { getEnrollmentHandler, updateEnrollmentHandler, deleteEnrollmentHandler 
 
 // Import handlers - Notifications
 import { getNotificationsHandler, markAsReadHandler, deleteNotificationHandler } from './routes/notifications/index.js';
+import { setupNotificationCron } from './lib/cron/notificationCron.js';
 
 // Import handlers - Progress
 import { listProgressHandler, createProgressHandler, getProgressHandler } from './routes/progress/index.js';
@@ -235,6 +236,8 @@ app.put('/api/session-requests/:id/approve', authenticate, validateBody(approveS
 app.put('/api/session-requests/:id/reject', authenticate, validateBody(rejectSessionRequestSchema), rejectSessionRequestHandler);
 app.delete('/api/session-requests/:id', authenticate, withdrawSessionRequestHandler);
 
+
+setupNotificationCron(1);
 // ===== ERROR HANDLING =====
 
 // 404 handler

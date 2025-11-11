@@ -592,8 +592,158 @@
     "type": "session_booking",
     "title": "Yêu cầu buổi học mới",
     "message": "2365732@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
-    "read": false,
+    "read": true,
     "link": "/sessions/ses_wYH1W0KReekG",
     "createdAt": "2025-11-09T15:01:27.228Z"
+  },
+  {
+    "id": "notif_efZTmw-8tEhE",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2277897@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
+    "read": true,
+    "link": "/sessions/ses_k6Ym9LCIjLUr",
+    "createdAt": "2025-11-11T15:24:03.150Z"
+  },
+  {
+    "id": "notif_N1WoqKUDNr9e",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2265780@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
+    "read": false,
+    "link": "/sessions/ses_-b9TUOABa7UL",
+    "createdAt": "2025-11-11T15:26:56.087Z"
+  },
+  {
+    "id": "notif_2x5lw1oIQdnJ",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2265780@hcmut.edu.vn đã đặt buổi học Toán cao cấp",
+    "read": false,
+    "link": "/sessions/ses_rTzQ6H1cLc7Z",
+    "createdAt": "2025-11-11T17:34:03.960Z"
+  },
+  {
+    "id": "notif_o_l17vAaDkA7",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2265780@hcmut.edu.vn đã đặt buổi học Điện tử",
+    "read": false,
+    "link": "/sessions/ses_InUdeWv174-1",
+    "createdAt": "2025-11-11T17:46:32.173Z"
+  },
+  {
+    "id": "notif_fX0njpasdns7",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2265780@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
+    "read": false,
+    "link": "/sessions/ses_2gMZPTm6wrcU",
+    "createdAt": "2025-11-11T18:12:02.408Z"
+  },
+  {
+    "id": "notif_Y6KRzVgGl-DF",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2265780@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
+    "read": false,
+    "link": "/sessions/ses_3LNb_3mGVow7",
+    "createdAt": "2025-11-11T18:16:43.744Z"
+  },
+  {
+    "id": "notif_A3VniZ1tdc7Z",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2265780@hcmut.edu.vn đã đặt buổi học Điện tử",
+    "read": false,
+    "link": "/sessions/ses_MxFK5G4YqjMj",
+    "createdAt": "2025-11-11T18:17:11.455Z"
+  },
+  {
+    "id": "notif_twPGnqxLBBWn",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2265780@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
+    "read": false,
+    "link": "/sessions/ses_i8s0VQFWA_Go",
+    "createdAt": "2025-11-11T18:18:46.170Z"
+  },
+  {
+    "id": "notif_dDG7VDG60iJO",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Toán cao cấp",
+    "read": false,
+    "link": "/sessions/ses_Jg1aY_VvCQNo",
+    "createdAt": "2025-11-11T18:30:32.583Z"
+  },
+  {
+    "id": "notif_9S03fnJHTmDL",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
+    "read": false,
+    "link": "/sessions/ses_swfx7lLsAAUN",
+    "createdAt": "2025-11-11T18:34:05.048Z"
+  },
+  {
+    "id": "notif__arAZCaAIuQS",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
+    "read": false,
+    "link": "/sessions/ses_iOZxkKeJ25TT",
+    "createdAt": "2025-11-11T18:55:27.494Z"
+  },
+  {
+    "id": "notif_cb963d56-60e3-4062-80ec-44d57e5509f1",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_cancel_request",
+    "title": "Yêu cầu hủy buổi học",
+    "message": "Phan An Hoàng đã gửi yêu cầu hủy buổi học Toán cao cấp",
+    "read": true,
+    "link": "/tutor/cancel-reschedule",
+    "createdAt": "2025-11-11T19:00:33.752Z"
+  },
+  {
+    "id": "notif_ff9a0083-6040-4dbb-be27-e3033629e403",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_cancel_request",
+    "title": "Yêu cầu hủy buổi học",
+    "message": "Phan An Hoàng đã gửi yêu cầu hủy buổi học Tiếng Anh",
+    "read": false,
+    "link": "/tutor/cancel-reschedule",
+    "createdAt": "2025-11-11T19:23:02.438Z"
+  },
+  {
+    "id": "notif_69f442a4-6f9a-4e05-9c40-535f831b6a12",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_cancel_request",
+    "title": "Yêu cầu hủy buổi học",
+    "message": "Phan An Hoàng đã gửi yêu cầu hủy buổi học Tiếng Anh",
+    "read": false,
+    "link": "/tutor/cancel-reschedule",
+    "createdAt": "2025-11-11T19:23:02.441Z"
+  },
+  {
+    "id": "notif_8a9b3c25-4e57-468d-ba7f-0ad745bfe44c",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "Phan An Hoàng đã đặt buổi học Toán cao cấp",
+    "read": false,
+    "link": "/sessions/ses_wrx1Hr3bFHhM",
+    "createdAt": "2025-11-11T19:26:02.459Z"
   }
 ]

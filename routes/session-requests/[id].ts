@@ -18,7 +18,9 @@ import {
   UserRole,
   SessionStatus,
   RequestType,
-  RequestStatus
+  RequestStatus,
+  Enrollment,
+  EnrollmentStatus
 } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
@@ -206,14 +208,14 @@ export async function approveSessionRequestHandler(req: AuthRequest, res: Respon
         if (isAlternativeClass) {
           // Handle class-to-class reschedule
           // 1. Unenroll student from original class
-          const originalEnrollments = await storage.find('enrollments.json',
-            (e: any) => e.classId === request.classId && e.studentId === request.studentId && e.status === 'active'
+          const originalEnrollments = await storage.find<Enrollment>('enrollments.json',
+            (e) => e.classId === request.classId && e.studentId === request.studentId && e.status === EnrollmentStatus.ACTIVE
           );
           
           for (const enrollment of originalEnrollments) {
-            await storage.update('enrollments.json', enrollment.id, {
-              status: 'inactive',
-              updatedAt: now()
+            await storage.update<Enrollment>('enrollments.json', enrollment.id, {
+              status: EnrollmentStatus.DROPPED,
+              droppedAt: now()
             });
           }
 

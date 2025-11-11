@@ -6,10 +6,10 @@
 
 import { Response } from 'express';
 import { storage } from '../../lib/storage.js';
-import { Session, SessionStatus, UserRole, Notification, NotificationType, Class, ClassStatus, Enrollment } from '../../lib/types.js';
+import { Session, SessionStatus, UserRole, Notification, NotificationType, Class, ClassStatus, Enrollment, User } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
-
+import { queueNotification } from '../../lib/services/notificationQueue.js';
 /**
  * GET /api/sessions
  */
@@ -164,7 +164,7 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       // Get all enrolled students
       const enrollments = await storage.find<Enrollment>(
         'enrollments.json',
-        (e) => e.classId === sessionData.classId && e.status === 'active'
+        (e: any) => e.classId === sessionData.classId && e.status === 'active'
       );
 
       studentIds = enrollments.map(e => e.studentId);
@@ -180,7 +180,7 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       }
 
       // Verify tutor exists
-      const tutor = await storage.findById('users.json', sessionData.tutorId);
+      const tutor = await storage.findById<User>('users.json', sessionData.tutorId);
       if (!tutor || tutor.role !== UserRole.TUTOR) {
         return res.status(404).json(
           errorResponse('Không tìm thấy gia sư')
@@ -286,17 +286,36 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       }
     } else {
       // Notify tutor (single notification, no need for batch)
-      const notification: Notification = {
-        id: generateId('notif'),
-        userId: tutorId,
-        type: NotificationType.SESSION_BOOKING,
-        title: 'Yêu cầu buổi học mới',
-        message: `${currentUser.email} đã đặt buổi học ${subject}`,
-        read: false,
-        link: `/sessions/${newSession.id}`,
-        createdAt: now()
-      };
-      await storage.create('notifications.json', notification);
+      // const notification: Notification = {
+      //   id: generateId('notif'),
+      //   userId: tutorId,
+      //   type: NotificationType.SESSION_BOOKING,
+      //   title: 'Yêu cầu buổi học mới',
+      //   message: `${currentUser.email} đã đặt buổi học ${subject}`,
+      //   read: false,
+      //   link: `/sessions/${newSession.id}`,
+      //   createdAt: now()
+      // };
+      // await storage.create('notifications.json', notification);
+
+      const requester = await storage.findById<User>('users.json', currentUser.userId); 
+      const fallbackName = requester?.hcmutId || currentUser.email;
+      const displayName = requester?.name || fallbackName;
+      const type = NotificationType.SESSION_BOOKING;
+      const title = 'Yêu cầu buổi học mới';
+      const message = `${displayName} đã đặt buổi học ${subject}`;
+      const link = `/sessions/${newSession.id}`;
+      await queueNotification(
+      tutorId, // 1. Target: Gửi cho ai (biến 'tutorId' phải được định nghĩa ở trên)
+      {
+      // 2. Payload: Nội dung
+        type: type,
+        title: title,
+        message: message,
+        link: link
+      },
+      5 // 3. Delay: 5 phút
+);
     }
 
     return res.status(201).json(

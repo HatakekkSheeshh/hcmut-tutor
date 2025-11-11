@@ -22,7 +22,7 @@ import {
 } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
-
+import { queueNotification } from '../../lib/services/notificationQueue.js';
 /**
  * GET /api/session-requests
  */
@@ -460,28 +460,52 @@ export async function createSessionRequestHandler(req: AuthRequest, res: Respons
     await storage.create('session-requests.json', newRequest);
 
     // Create notification for tutor
-    const notificationType = type === RequestType.CANCEL
-      ? NotificationType.SESSION_CANCEL_REQUEST
-      : NotificationType.SESSION_RESCHEDULE_REQUEST;
+    // const notificationType = type === RequestType.CANCEL
+    //   ? NotificationType.SESSION_CANCEL_REQUEST
+    //   : NotificationType.SESSION_RESCHEDULE_REQUEST;
 
-    const student = await storage.findById<User>('users.json', currentUser.userId);
-    const notification: Notification = {
-      id: generateId('notif'),
-      userId: session.tutorId,
-      type: notificationType,
-      title: type === RequestType.CANCEL ? 'Yêu cầu hủy buổi học' : 'Yêu cầu đổi lịch buổi học',
-      message: `${student?.name || currentUser.email} đã gửi yêu cầu ${type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${session.subject}`,
-      read: false,
-      link: `/tutor/cancel-reschedule`,
-      metadata: {
-        requestId: newRequest.id,
-        sessionId: sessionId,
-        type: type,
-        classId: session.classId
-      },
-      createdAt: now()
-    };
-    await storage.create('notifications.json', notification);
+    // const student = await storage.findById<User>('users.json', currentUser.userId);
+    // const notification: Notification = {
+    //   id: generateId('notif'),
+    //   userId: session.tutorId,
+    //   type: notificationType,
+    //   title: type === RequestType.CANCEL ? 'Yêu cầu hủy buổi học' : 'Yêu cầu đổi lịch buổi học',
+    //   message: `${student?.name || currentUser.email} đã gửi yêu cầu ${type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${session.subject}`,
+    //   read: false,
+    //   link: `/tutor/cancel-reschedule`,
+    //   metadata: {
+    //     requestId: newRequest.id,
+    //     sessionId: sessionId,
+    //     type: type,
+    //     classId: session.classId
+    //   },
+    //   createdAt: now()
+    // };
+    // await storage.create('notifications.json', notification);
+
+    // Create notification for tutor (via 5-minute queue)
+    const notificationType = type === RequestType.CANCEL
+      ? NotificationType.SESSION_CANCEL_REQUEST
+      : NotificationType.SESSION_RESCHEDULE_REQUEST;
+
+    const student = await storage.findById<User>('users.json', currentUser.userId);
+    const title = type === RequestType.CANCEL ? 'Yêu cầu hủy buổi học' : 'Yêu cầu đổi lịch buổi học';
+
+    const message = `${student?.name || currentUser.email} đã gửi yêu cầu ${type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${session.subject}`;
+    const link = `/tutor/cancel-reschedule`;
+
+    
+    await queueNotification(
+      session.tutorId,
+      {
+        
+        type: notificationType,
+        title: title,
+        message: message,
+        link: link
+      },
+      5
+    );
 
     // Get enriched request data
     const tutor = await storage.findById<User>('users.json', session.tutorId);
