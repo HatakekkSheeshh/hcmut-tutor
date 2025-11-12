@@ -7,7 +7,7 @@ import { useLongPolling } from '../../hooks/useLongPolling'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { conversationsAPI, usersAPI, authAPI, studentsAPI, uploadAPI } from '../../lib/api'
 import { formatDistanceToNow } from 'date-fns'
-import { EmojiPicker } from '../../components/EmojiPicker'
+import EmojiPicker from '../../components/EmojiPicker.tsx'
 import {
   Dashboard as DashboardIcon,
   Search as SearchIcon,
@@ -456,11 +456,11 @@ const Messages: React.FC = () => {
     }
     
     // Check if onlineUsers actually changed (chỉ update khi có thay đổi thực sự)
-    const currentOnlineUsersSet = new Set(onlineUsers || [])
+    const currentOnlineUsersSet = new Set<string>(onlineUsers || [])
     const onlineUsersChanged = 
       currentOnlineUsersSet.size !== lastOnlineUsersRef.current.size ||
-      Array.from(currentOnlineUsersSet).some(id => !lastOnlineUsersRef.current.has(id)) ||
-      Array.from(lastOnlineUsersRef.current).some(id => !currentOnlineUsersSet.has(id))
+      Array.from(currentOnlineUsersSet).some((id: string) => !lastOnlineUsersRef.current.has(id)) ||
+      Array.from(lastOnlineUsersRef.current).some((id: string) => !currentOnlineUsersSet.has(id))
     
     // Update last known online users ngay lập tức (không cần đợi API)
     if (onlineUsersChanged) {

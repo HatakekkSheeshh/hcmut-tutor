@@ -7,7 +7,7 @@ import { useLongPolling } from '../../hooks/useLongPolling'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { conversationsAPI, usersAPI, authAPI, tutorsAPI, uploadAPI } from '../../lib/api'
 import { formatDistanceToNow } from 'date-fns'
-import { EmojiPicker } from '../../components/EmojiPicker'
+import EmojiPicker from '../../components/EmojiPicker.tsx'
 import {
   Dashboard as DashboardIcon,
   Search as SearchIcon,
