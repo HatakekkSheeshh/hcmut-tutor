@@ -25,6 +25,28 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { navigateToDashboard } from '../../utils/navigation'
 
+interface LibraryResource {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+  format: string;
+  pages?: number;
+  duration?: string;
+  rating?: number;
+  downloads?: number;
+  views?: number;
+  description: string;
+  tags: string[];
+  isBookMarked: boolean;
+  isDownloaded: boolean;
+  subject?: string;
+  type?: string;
+  url?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 const DigitalLibraryAccessMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
@@ -36,6 +58,9 @@ const DigitalLibraryAccessMobile: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false)
   const [showFormatDropdown, setShowFormatDropdown] = useState(false)
 
+  const [libraryResources, setLibraryResources] = useState<LibraryResource[]>([])
+  const [isLoadingResources, setIsLoadingResources] = useState(false)
+  const [bookmarkPending, setBookmarkPending] = useState<string | null>(null)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -57,107 +82,257 @@ const DigitalLibraryAccessMobile: React.FC = () => {
     }
   }, [showFormatDropdown])
 
-  const getSelectedFormat = () => {
-    return formats.find(format => format.value === selectedFormat) || formats[0]
-  }
+  // const getSelectedFormat = () => {
+  //   return formats.find(format => format.value === selectedFormat) || formats[0]
+  // }
 
   const handleThemeToggle = () => {
     toggleTheme()
   }
 
 
-  const libraryResources = [
-    {
-      id: 1,
-      title: 'Advanced Mathematics for Engineers',
-      author: 'Dr. Sarah Wilson',
-      category: 'Mathematics',
-      format: 'PDF',
-      pages: 450,
-      rating: 4.8,
-      downloads: 1250,
-      description: 'Comprehensive guide to advanced mathematical concepts for engineering students.',
-      tags: ['Engineering', 'Calculus', 'Linear Algebra', 'Differential Equations'],
-      isBookmarked: false,
-      isDownloaded: false
-    },
-    {
-      id: 2,
-      title: 'Introduction to Machine Learning',
-      author: 'Prof. Mike Chen',
-      category: 'Computer Science',
-      format: 'Video',
-      duration: '12 hours',
-      rating: 4.9,
-      downloads: 2100,
-      description: 'Complete course on machine learning fundamentals and applications.',
-      tags: ['AI', 'Python', 'Data Science', 'Neural Networks'],
-      isBookmarked: true,
-      isDownloaded: true
-    },
-    {
-      id: 3,
-      title: 'Organic Chemistry Laboratory Manual',
-      author: 'Dr. Alice Brown',
-      category: 'Chemistry',
-      format: 'PDF',
-      pages: 320,
-      rating: 4.7,
-      downloads: 890,
-      description: 'Step-by-step laboratory procedures and safety guidelines.',
-      tags: ['Laboratory', 'Safety', 'Procedures', 'Organic Chemistry'],
-      isBookmarked: false,
-      isDownloaded: false
-    },
-    {
-      id: 4,
-      title: 'Physics Problem Solving Techniques',
-      author: 'Prof. David Lee',
-      category: 'Physics',
-      format: 'Interactive',
-      duration: '8 hours',
-      rating: 4.6,
-      downloads: 1560,
-      description: 'Interactive problem-solving methods for physics students.',
-      tags: ['Problem Solving', 'Mechanics', 'Thermodynamics', 'Electromagnetism'],
-      isBookmarked: true,
-      isDownloaded: false
-    }
-  ]
+  // const [libraryResources, setLibraryResources] = useState([
+  //   {
+  //     id: 1,
+  //     title: 'Advanced Mathematics for Engineers',
+  //     author: 'Dr. Sarah Wilson',
+  //     category: 'Mathematics',
+  //     format: 'PDF',
+  //     pages: 450,
+  //     rating: 4.8,
+  //     downloads: 1250,
+  //     description: 'Comprehensive guide to advanced mathematical concepts for engineering students.',
+  //     tags: ['Engineering', 'Calculus', 'Linear Algebra', 'Differential Equations'],
+  //     isBookmarked: false,
+  //     isDownloaded: false
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Introduction to Machine Learning',
+  //     author: 'Prof. Mike Chen',
+  //     category: 'Computer Science',
+  //     format: 'Video',
+  //     duration: '12 hours',
+  //     rating: 4.9,
+  //     downloads: 2100,
+  //     description: 'Complete course on machine learning fundamentals and applications.',
+  //     tags: ['AI', 'Python', 'Data Science', 'Neural Networks'],
+  //     isBookmarked: true,
+  //     isDownloaded: true
+  //   },
+  //   {
+  //     id: 3,
+  //     title: 'Organic Chemistry Laboratory Manual',
+  //     author: 'Dr. Alice Brown',
+  //     category: 'Chemistry',
+  //     format: 'PDF',
+  //     pages: 320,
+  //     rating: 4.7,
+  //     downloads: 890,
+  //     description: 'Step-by-step laboratory procedures and safety guidelines.',
+  //     tags: ['Laboratory', 'Safety', 'Procedures', 'Organic Chemistry'],
+  //     isBookmarked: false,
+  //     isDownloaded: false
+  //   },
+  //   {
+  //     id: 4,
+  //     title: 'Physics Problem Solving Techniques',
+  //     author: 'Prof. David Lee',
+  //     category: 'Physics',
+  //     format: 'Interactive',
+  //     duration: '8 hours',
+  //     rating: 4.6,
+  //     downloads: 1560,
+  //     description: 'Interactive problem-solving methods for physics students.',
+  //     tags: ['Problem Solving', 'Mechanics', 'Thermodynamics', 'Electromagnetism'],
+  //     isBookmarked: true,
+  //     isDownloaded: false
+  //   }
+  // ])
 
-  const categories = [
-    { name: 'All', value: 'all', count: libraryResources.length },
-    { name: 'Mathematics', value: 'Mathematics', count: 1 },
-    { name: 'Computer Science', value: 'Computer Science', count: 1 },
-    { name: 'Chemistry', value: 'Chemistry', count: 1 },
-    { name: 'Physics', value: 'Physics', count: 1 }
-  ]
+  // const categories = [
+  //   { name: 'All', value: 'all', count: libraryResources.length },
+  //   { name: 'Mathematics', value: 'Mathematics', count: 1 },
+  //   { name: 'Computer Science', value: 'Computer Science', count: 1 },
+  //   { name: 'Chemistry', value: 'Chemistry', count: 1 },
+  //   { name: 'Physics', value: 'Physics', count: 1 }
+  // ]
+
+  // const formats = [
+  //   { name: 'All Formats', value: 'all' },
+  //   { name: 'Document', value: 'Document' },
+  //   { name: 'Video', value: 'Video' },
+  //   { name: 'Book', value: 'Book' },
+  //   {name: 'Article', value: 'Article'}
+  // ]
 
   const formats = [
-    { name: 'All Formats', value: 'all' },
-    { name: 'PDF', value: 'PDF' },
-    { name: 'Video', value: 'Video' },
-    { name: 'Interactive', value: 'Interactive' }
-  ]
+    { name: 'All Formats', value: 'all' },
+    { name: 'Document', value: 'document' },
+    { name: 'Video', value: 'video' },
+    { name: 'Book', value: 'book' },
+    { name: 'Article', value: 'article' }
+  ]
+
+  const getSelectedFormat = () => {
+    return formats.find(format => format.value === selectedFormat) || formats[0]
+  }
+
+  const categories = [
+    { name: 'All', value: 'all', count: libraryResources.length },
+    { name: 'Mathematics', value: 'Mathematics', count: libraryResources.filter(r => (r.subject || r.category) === 'Mathematics').length },
+    { name: 'Computer Science', value: 'Computer Science', count: libraryResources.filter(r => (r.subject || r.category) === 'Computer Science').length },
+    { name: 'Chemistry', value: 'Chemistry', count: libraryResources.filter(r => (r.subject || r.category) === 'Chemistry').length },
+    { name: 'Physics', value: 'Physics', count: libraryResources.filter(r => (r.subject || r.category) === 'Physics').length }
+  ]
+
+  useEffect(() => {
+    let mounted = true
+    const fetchResources = async () => {
+      try {
+        setIsLoadingResources(true)
+
+        // 1. Check Local Storage for remain status
+        const saved = localStorage.getItem('libraryData')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (mounted && Array.isArray(parsed) && parsed.length > 0) {  
+            setLibraryResources(parsed as LibraryResource[])
+            setIsLoadingResources(false)
+            // Không return ở đây để luôn cố gắng fetch mới nếu không có searchTerm
+            // Nếu có searchTerm, ta vẫn cần fetch mới, nên logic này của desktop không thay đổi
+            if (!searchTerm.trim()) return; // Chỉ giữ lại local data nếu không search
+        }
+      }
+        
+        // Setup params cho API
+        const params = new URLSearchParams()
+        if (searchTerm.trim()) params.set('q', searchTerm.trim())
+        params.set('limit', '1000')
+
+        // 2. Primary: try backend search endpoint
+      try {
+          const res = await fetch(`/api/library/search?${params.toString()}`)
+          if (res.ok) {
+            const json = await res.json()
+            const data = json?.data || []
+          if (mounted && Array.isArray(data) && data.length > 0) {
+            const enriched = data.map((item: any) => ({
+              ...item,
+              id: item.id.toString(), // Đảm bảo ID là string để đồng bộ
+              isBookMarked: item.isBookMarked ?? false,
+              isDownloaded: item.isDownloaded ?? false,
+            }))
+            setLibraryResources(enriched)
+            // 💾 Lưu lại vào localStorage chỉ khi fetch thành công
+            localStorage.setItem('libraryData', JSON.stringify(enriched))
+            return
+          }
+        } else {
+          console.warn('API /api/library/search returned status', res.status)
+        }
+      } catch (apiErr) {
+        console.warn('Primary library API fetch failed:', apiErr)
+      }
+
+
+        // 3. Fallback: try loading static data file (Chỉ chạy khi không search và API thất bại)
+      if (!searchTerm.trim()) {
+        try {
+          const fallbackRes = await fetch('/data/library-materials.json')
+          if (fallbackRes.ok) {
+            const arr = await fallbackRes.json()
+            if (mounted && Array.isArray(arr)) {
+              const enriched = arr.map((item: any) => ({
+                ...item,
+                id: item.id.toString(), // Đảm bảo ID là string
+                isBookMarked: item.isBookMarked ?? false,
+                isDownloaded: item.isDownloaded ?? false,
+              }))
+              setLibraryResources(enriched)
+              // 💾 Lưu lại vào localStorage
+              localStorage.setItem('libraryData', JSON.stringify(enriched))
+              return
+            }
+          } else {
+            console.warn('Fallback /data/library-materials.json returned', fallbackRes.status)
+        }
+      } catch (fbErr) {
+        console.warn('Fallback fetch failed:', fbErr)
+      }
+      }
+
+        // 4. If all methods failed, clear resources (maintain previous behavior)
+        if (mounted) setLibraryResources([])
+      } catch (e) {
+        console.error('Failed to fetch library resources', e)
+      } finally {
+        if (mounted) setIsLoadingResources(false)
+      }
+    }
+
+    // Debounce quick typing: small delay
+    const t = setTimeout(fetchResources, 250)
+    return () => {
+      mounted = false
+      clearTimeout(t)
+    }
+  }, [searchTerm])
 
   const filteredResources = libraryResources.filter(resource => {
-    const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        resource.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        resource.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || resource.category === selectedCategory
-    const matchesFormat = selectedFormat === 'all' || resource.format === selectedFormat
-    return matchesSearch && matchesCategory && matchesFormat
-  })
+    const q = searchTerm.trim().toLowerCase()
+    const matchesSearch = !q || (
+      (resource.title || '').toLowerCase().includes(q) ||
+      (resource.author || '').toLowerCase().includes(q) ||
+      (resource.description || '').toLowerCase().includes(q) ||
+      ((resource.tags || []) as string[]).join(' ').toLowerCase().includes(q) ||
+      (resource.id || '').toLowerCase().includes(q)
+    )
+    // Kiểm tra category hoặc subject
+    const matchesCategory = selectedCategory === 'all' || (resource.subject || resource.category) === selectedCategory
+    // Kiểm tra format hoặc type
+    const matchesFormat = selectedFormat === 'all' || (resource.type || resource.format).toLowerCase() === selectedFormat.toLowerCase()
+    
+    // Thêm filter cho Bookmarked nếu người dùng nhấn vào nút "My Bookmarks"
+    const matchesBookmark = selectedCategory !== 'bookmarked' || resource.isBookMarked
 
-  const handleBookmark = (resourceId: number) => {
-    console.log('Bookmark resource:', resourceId)
-  }
+    return matchesSearch && matchesCategory && matchesFormat && matchesBookmark
+  })
 
-  const handleDownload = (resourceId: number) => {
-    console.log('Download resource:', resourceId)
-  }
+  const handleBookmark = (resourceId: string) => {
+    // Tạm thời bỏ qua setBookmarkPending vì đây là mobile và chưa có call API thực sự
+    setLibraryResources(prevResources => {
+      const updatedResources = prevResources.map(r =>
+        r.id === resourceId
+          ? { ...r, isBookMarked: !r.isBookMarked }  // đảo giá trị
+          : r
+      )
+      // 💾 Lưu trạng thái vào localStorage để reload vẫn nhớ
+      localStorage.setItem('libraryData', JSON.stringify(updatedResources))
+      return updatedResources
+    })
+  }
 
-  const handleShare = (resourceId: number) => {
+  const handleDownload = (resourceId: string) => {
+    setLibraryResources(prevResources => {
+      const updatedResources = prevResources.map(r => {
+        if (r.id === resourceId) {
+          const isCurrentlyDownloaded = r.isDownloaded || false
+          return { 
+            ...r, 
+            isDownloaded: !isCurrentlyDownloaded, // Đảo trạng thái Download
+            downloads: !isCurrentlyDownloaded ? (r.downloads || 0) + 1 : (r.downloads || 0) // Giả lập tăng download count
+          } 
+        }
+        return r
+      })
+      // 💾 Lưu trạng thái vào localStorage
+      localStorage.setItem('libraryData', JSON.stringify(updatedResources))
+      return updatedResources
+    })
+  }
+
+  const handleShare = (resourceId: string) => {
     console.log('Share resource:', resourceId)
   }
 
@@ -217,7 +392,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
             </div>
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
-                <div className="text-xl font-bold text-yellow-600 mb-1">{libraryResources.filter(r => r.isBookmarked).length}</div>
+                <div className="text-xl font-bold text-yellow-600 mb-1">{libraryResources.filter(r => r.isBookMarked).length}</div>
                 <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked</div>
               </div>
             </div>
@@ -368,7 +543,12 @@ const DigitalLibraryAccessMobile: React.FC = () => {
 
         {/* Quick Actions - Mobile */}
         <div className="grid grid-cols-2 gap-3">
-          <button className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
+          <button 
+            onClick={() => {
+              setSelectedCategory('bookmarked') // Đặt category thành 'bookmarked'
+              setShowFilters(false) // Đóng advanced filters nếu đang mở
+            }}
+            className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
             theme === 'dark'
               ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -419,7 +599,13 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h3 className={`font-semibold text-base mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {resource.title}
+                      <button
+                        onClick={() => navigate(`/common/library/${resource.id}`)}
+                        className="text-left w-full text-inherit hover:underline focus:outline-none"
+                        aria-label={`Open details for ${resource.title}`}
+                      >
+                        {resource.title}
+                      </button>
                     </h3>
                     <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                       by {resource.author}
@@ -437,7 +623,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                     <button
                       onClick={() => handleBookmark(resource.id)}
                       className={`p-2 rounded-lg ${
-                        resource.isBookmarked 
+                        resource.isBookMarked 
                           ? 'bg-yellow-100 text-yellow-600' 
                           : `${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
                       }`}
@@ -656,7 +842,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {libraryResources.filter(r => r.isBookmarked).length}
+                        {libraryResources.filter(r => r.isBookMarked).length}
                       </span>
                     </div>
                   </div>

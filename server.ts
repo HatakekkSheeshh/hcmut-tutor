@@ -66,7 +66,7 @@ import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, 
 import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './routes/forum/posts.js';
 import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './routes/forum/comments.js';
 
-import { listLibraryResourcesHandler, getLibraryResourceHandler, searchLibraryHandler } from './routes/library/index.ts';
+// import { listLibraryResourcesHandler, getLibraryResourceHandler, searchLibraryHandler } from './routes/library/index.ts';
 
 // Import handlers - Conversations
 import { listConversationsHandler, createConversationHandler, getConversationHandler, deleteConversationHandler } from './routes/conversations/index.js';
@@ -270,9 +270,9 @@ app.post('/api/forum/posts/:id/comments', authenticate, createCommentHandler);
 app.delete('/api/forum/comments/:id', authenticate, deleteCommentHandler);
 
 // ===== DIGITAL LIBRARY ROUTES =====
-app.get('/api/library/resources', authenticate, listLibraryResourcesHandler);
-app.get('/api/library/resources/:id', authenticate, getLibraryResourceHandler);
-app.get('/api/library/search', authenticate, searchLibraryHandler);
+// app.get('/api/library/resources', authenticate, listLibraryResourcesHandler);
+// app.get('/api/library/resources/:id', authenticate, getLibraryResourceHandler);
+// app.get('/api/library/search', authenticate, searchLibraryHandler);
 
 // ===== SESSION REQUESTS ROUTES =====
 
