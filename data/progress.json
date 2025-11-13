@@ -161,10 +161,10 @@
     "createdAt": "2025-11-11T14:12:04.362Z"
   },
   {
-    "id": "prog_v3z1TftV-mRy",
-    "studentId": "stu_QYojhnP7sLsJ",
-    "tutorId": "tut_61QAuOdQbyZS",
-    "sessionId": "ses_DROacTInGWff",
+    "id": "prog_BDZzCrjrqFH_",
+    "studentId": "stu_jJF_BDn9CPkw",
+    "tutorId": "tut_QAuiJWjIUx57",
+    "sessionId": "ses_BQpnRi0QaeBv",
     "subject": "Mạng máy tính",
     "topic": "Ôn tập Mạng máy tính",
     "notes": "Học sinh đã nắm được kiến thức cơ bản về Mạng máy tính",
@@ -197,13 +197,206 @@
       "Làm bài tập nhanh hơn"
     ],
     "challenges": [
-      "Cần thêm thời gian luyện tập",
+      "ChatGPT qúa nhiều",
       "Một số khái niệm còn khó"
     ],
     "nextSteps": [
       "Tiếp tục luyện bài tập",
       "Học thêm về phần nâng cao"
     ],
-    "createdAt": "2025-11-11T14:12:04.362Z"
+    "createdAt": "2025-11-06T07:51:29.186Z"
+  },
+  {
+    "id": "prog_sample_01",
+    "studentId": "stu_-47UcQuEG1Aq", 
+    "tutorId": "tut_QAuiJWjIUx57", 
+    "sessionId": "ses_sample_01",
+    "subject": "Lập trình Python",
+    "topic": "Vòng lặp và Hàm",
+    "notes": "Học sinh tiếp thu nhanh, cần làm thêm bài tập về nhà.",
+    "score": 8.5,
+    "improvements": [
+      "Tư duy logic tốt",
+      "Code sạch sẽ"
+    ],
+    "challenges": [
+      "Chưa quen với List Comprehension",
+      "Cần tối ưu thuật toán"
+    ],
+    "nextSteps": [
+      "Làm bài tập trang 45",
+      "Xem trước bài Hướng đối tượng"
+    ],
+    "createdAt": "2025-11-12T08:00:00.000Z"
+  },
+  {
+    "id": "prog_sample_02",
+    "studentId": "stu_abUgMaX8_8pV",
+    "tutorId": "tut_QAuiJWjIUx57",
+    "sessionId": "ses_sample_02",
+    "subject": "Lập trình Python",
+    "topic": "Hướng đối tượng (OOP)",
+    "notes": "Khó khăn trong việc hiểu tính kế thừa.",
+    "score": 7.0,
+    "improvements": [
+      "Đặt câu hỏi tích cực"
+    ],
+    "challenges": [
+      "Nhầm lẫn giữa Class và Object",
+      "ChatGPT qúa nhiều"
+    ],
+    "nextSteps": [
+      "Thực hành tạo Class đơn giản",
+      "Xem lại video bài giảng"
+    ],
+    "createdAt": "2025-11-14T08:00:00.000Z"
+  },
+  {
+    "id": "prog_gen_tut_ilaeZEbNdND-_iW9i",
+    "studentId": "stu_49hOz0co3idT",
+    "tutorId": "tut_ilaeZEbNdND-",
+    "sessionId": "ses_CyRtxsUkiW9i",
+    "subject": "Cơ sở dữ liệu",
+    "topic": "Ôn tập Cơ sở dữ liệu",
+    "notes": "Học viên nắm vững lý thuyết về các dạng chuẩn (Normalization). Tuy nhiên, cần cẩn thận hơn khi viết các câu truy vấn lồng nhau.",
+    "score": 8.5,
+    "improvements": [
+      "Tư duy thiết kế ERD tốt",
+      "Hiểu rõ ràng về khóa chính, khóa ngoại"
+    ],
+    "challenges": [
+      "Viết SQL Join nhiều bảng còn chậm"
+    ],
+    "nextSteps": [
+      "Luyện tập thêm bài tập về Transaction và Concurrency Control"
+    ],
+    "createdAt": "2025-11-13T05:32:00.000Z"
+  },
+  {
+    "id": "prog_gen_tut_88EyEpAvElqJ_r7Ms",
+    "studentId": "stu_lRx6lob9sDDG",
+    "tutorId": "tut_88EyEpAvElqJ",
+    "sessionId": "ses_CQMvb6nMr7Ms",
+    "subject": "Đại số tuyến tính",
+    "topic": "Ôn tập Đại số tuyến tính",
+    "notes": "Em có tư duy toán học tốt, giải nhanh các bài về ma trận nghịch đảo. Cần ôn lại phần không gian vector con.",
+    "score": 9.0,
+    "improvements": [
+      "Tính toán chính xác",
+      "Tiếp thu kiến thức mới nhanh"
+    ],
+    "challenges": [
+      "Khái niệm về cơ sở và số chiều còn hơi mơ hồ"
+    ],
+    "nextSteps": [
+      "Làm bài tập về chéo hóa ma trận"
+    ],
+    "createdAt": "2025-11-13T05:32:00.000Z"
+  },
+  {
+    "id": "prog_gen_tut_TNes434P5AEZ_VpKH",
+    "studentId": "stu_-47UcQuEG1Aq",
+    "tutorId": "tut_TNes434P5AEZ",
+    "sessionId": "ses_aqFWy-e9VpKH",
+    "subject": "Toán cao cấp",
+    "topic": "Ôn tập Toán cao cấp",
+    "notes": "Học viên làm tốt các bài tập đạo hàm và tích phân cơ bản. Phần phương trình vi phân cần luyện tập thêm để nhận dạng nhanh hơn.",
+    "score": 8.0,
+    "improvements": [
+      "Chăm chỉ làm bài tập về nhà",
+      "Thái độ học tập nghiêm túc"
+    ],
+    "challenges": [
+      "Kỹ năng biến đổi lượng giác chưa linh hoạt"
+    ],
+    "nextSteps": [
+      "Ôn tập kỹ các dạng phương trình vi phân cấp 2"
+    ],
+    "createdAt": "2025-11-13T05:32:00.000Z"
+  },
+  {
+    "id": "prog_gen_tut_ZevJpYidjiUm_kitt",
+    "studentId": "stu_1broUDQqc8WB",
+    "tutorId": "tut_ZevJpYidjiUm",
+    "sessionId": "ses_lMqmTUDQkitt",
+    "subject": "Mạng máy tính",
+    "topic": "Ôn tập Mạng máy tính",
+    "notes": "Đã hiểu rõ cơ chế hoạt động của TCP/IP. Em cần đọc thêm tài liệu tiếng Anh chuyên ngành để nắm bắt thuật ngữ tốt hơn.",
+    "score": 8.5,
+    "improvements": [
+      "Hỏi bài rất tích cực",
+      "Hiểu bài ngay tại lớp"
+    ],
+    "challenges": [
+      "Vốn từ vựng tiếng Anh chuyên ngành còn hạn chế"
+    ],
+    "nextSteps": [
+      "Thực hành bắt gói tin bằng Wireshark"
+    ],
+    "createdAt": "2025-11-13T05:32:00.000Z"
+  },
+  {
+    "id": "prog_gen_tut_x0-B_jiDzDIF_iDkD",
+    "studentId": "stu_-47UcQuEG1Aq",
+    "tutorId": "tut_x0-B_jiDzDIF",
+    "sessionId": "ses_NO-Ln1YqiDkD",
+    "subject": "Cơ sở dữ liệu",
+    "topic": "Ôn tập Cơ sở dữ liệu",
+    "notes": "Kỹ năng viết truy vấn SQL của bạn khá tốt. Tuy nhiên, cần chú ý tối ưu hóa câu lệnh khi làm việc với dữ liệu lớn.",
+    "score": 9.0,
+    "improvements": [
+      "Viết code SQL sạch sẽ, dễ đọc",
+      "Tư duy logic tốt"
+    ],
+    "challenges": [
+      "Chưa quen sử dụng Index để tăng tốc độ truy vấn"
+    ],
+    "nextSteps": [
+      "Tìm hiểu về Store Procedure và Trigger"
+    ],
+    "createdAt": "2025-11-13T05:32:00.000Z"
+  },
+  {
+    "id": "prog_gen_tut_oBHJXQvmjPPG_8u5-",
+    "studentId": "stu_Dkzw5MfS0lmg",
+    "tutorId": "tut_oBHJXQvmjPPG",
+    "sessionId": "ses_ModHwtVU8u5-",
+    "subject": "Hóa học",
+    "topic": "Ôn tập Hóa học",
+    "notes": "Em đã nắm vững bảng tuần hoàn và các liên kết hóa học. Cần cải thiện tốc độ tính toán trong các bài toán nồng độ dung dịch.",
+    "score": 7.5,
+    "improvements": [
+      "Nhớ lý thuyết tốt",
+      "Làm bài tập trắc nghiệm nhanh"
+    ],
+    "challenges": [
+      "Hay nhầm lẫn đơn vị đo lường",
+      "Tính toán số mol còn chậm"
+    ],
+    "nextSteps": [
+      "Làm thêm 20 bài tập về cân bằng ion"
+    ],
+    "createdAt": "2025-11-13T05:32:00.000Z"
+  },
+  {
+    "id": "prog_gen_tut_ui0LfAc9h475_xVq6",
+    "studentId": "stu_lRx6lob9sDDG",
+    "tutorId": "tut_ui0LfAc9h475",
+    "sessionId": "ses_VnUbg6yBxVq6",
+    "subject": "Vật lý đại cương",
+    "topic": "Ôn tập Vật lý đại cương",
+    "notes": "Học sinh giải tốt các bài toán động lực học chất điểm. Phần cơ học vật rắn cần chú ý hơn đến mô-men quán tính.",
+    "score": 8.0,
+    "improvements": [
+      "Vẽ hình phân tích lực chính xác",
+      "Trình bày bài giải khoa học"
+    ],
+    "challenges": [
+      "Áp dụng công thức bảo toàn năng lượng chưa linh hoạt"
+    ],
+    "nextSteps": [
+      "Ôn tập kỹ chương Dao động cơ"
+    ],
+    "createdAt": "2025-11-13T05:32:00.000Z"
   }
 ]

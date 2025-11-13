@@ -19,7 +19,12 @@ import {
   PersonSearch,
   Class,
   SmartToy as SmartToyIcon,
-  Chat as ChatIcon
+  Chat as ChatIcon,
+  //  Thêm icons mới
+  EmojiEvents as EmojiEventsIcon,
+  Flag as FlagIcon,
+  Notifications as NotificationsIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material'
 import { 
   Box,
@@ -27,7 +32,19 @@ import {
   Typography,
   LinearProgress,
   Chip,
-  Divider
+  Divider,
+  //  Thêm components UI mới
+  IconButton,
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  TextField,
+  MenuItem
 } from '@mui/material'
 import { progressAPI, usersAPI } from '../../lib/api'
 
@@ -39,11 +56,21 @@ interface SubjectProgress {
   improvements: string[]
   challenges: string[]
   progressRecords: any[]
+  targetScore: number //  Thêm trường targetScore
 }
+
+//  Data giả lập cho Achievements
+const achievements = [
+  { id: 1, title: 'Top 10%', icon: <EmojiEventsIcon />, color: '#ca8a04', bg: '#fefce8' },
+  { id: 2, title: '7 Day Streak', icon: <TrendingUp />, color: '#059669', bg: '#ecfdf5' },
+  { id: 3, title: 'Math Wizard', icon: <School />, color: '#2563eb', bg: '#eff6ff' },
+]
 
 const ViewProgressMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  
+  // --- State ---
   const [loading, setLoading] = useState(true)
   const [progressRecords, setProgressRecords] = useState<any[]>([])
   const [tutorsMap, setTutorsMap] = useState<Record<string, any>>({})
@@ -52,6 +79,11 @@ const ViewProgressMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showTimeRangeDropdown, setShowTimeRangeDropdown] = useState(false)
   const [activeMenu, setActiveMenu] = useState('view-progress')
+
+  //  State cho Dialog Set Goals
+  const [openGoalDialog, setOpenGoalDialog] = useState(false)
+  const [selectedSubject, setSelectedSubject] = useState('')
+  const [targetInput, setTargetInput] = useState<number | string>(90)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -69,21 +101,113 @@ const ViewProgressMobile: React.FC = () => {
     toggleTheme()
   }
 
-  // Menu items for navigation
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
-    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
-    { id: 'book-session', label: 'Book Session', icon: <School />, path: '/student/book' },
-    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
-  ]
+  //  Hàm loadData tách riêng để dùng cho Refresh (giữ nguyên logic cũ, thêm khởi tạo targetScore)
+  const loadData = async () => {
+    try {
+      setLoading(true)
+
+      // Get user from localStorage
+      const userStr = localStorage.getItem('user')
+      if (!userStr) {
+        navigate('/login')
+        return
+      }
+      const userData = JSON.parse(userStr)
+
+      // Load progress records for this student
+      const progressResponse = await progressAPI.list({ studentId: userData.id, limit: 1000 })
+      
+      if (progressResponse.data && Array.isArray(progressResponse.data)) {
+        const records = progressResponse.data
+        setProgressRecords(records)
+
+        // Get unique tutor IDs
+        const tutorIds = [...new Set(records.map((p: any) => p.tutorId))] as string[]
+        
+        // Load tutor data
+        const tutorsData: Record<string, any> = {}
+        await Promise.all(
+          tutorIds.map(async (tutorId) => {
+            try {
+              const response = await usersAPI.get(tutorId)
+              const tutorData = response.success ? response.data : response
+              if (tutorData) {
+                tutorsData[tutorId] = tutorData
+              }
+            } catch (err) {
+              console.error(`Error loading tutor ${tutorId}:`, err)
+            }
+          })
+        )
+
+        setTutorsMap(tutorsData)
+
+        // Process data by subject
+        const subjectMap = new Map<string, SubjectProgress>()
+
+        records.forEach((progress: any) => {
+          if (!subjectMap.has(progress.subject)) {
+            subjectMap.set(progress.subject, {
+              subject: progress.subject,
+              averageScore: 0,
+              totalRecords: 0,
+              topics: [],
+              improvements: [],
+              challenges: [],
+              progressRecords: [],
+              targetScore: 90 //  Khởi tạo targetScore mặc định
+            })
+          }
+
+          const subjectProgress = subjectMap.get(progress.subject)!
+          subjectProgress.progressRecords.push(progress)
+          
+          // Add unique topics
+          if (progress.topic && !subjectProgress.topics.includes(progress.topic)) {
+            subjectProgress.topics.push(progress.topic)
+          }
+
+          // Collect improvements and challenges
+          if (progress.improvements) {
+            progress.improvements.forEach((imp: string) => {
+              if (!subjectProgress.improvements.includes(imp)) {
+                subjectProgress.improvements.push(imp)
+              }
+            })
+          }
+          if (progress.challenges) {
+            progress.challenges.forEach((chal: string) => {
+              if (!subjectProgress.challenges.includes(chal)) {
+                subjectProgress.challenges.push(chal)
+              }
+            })
+          }
+        })
+
+        // Calculate averages
+        subjectMap.forEach((subjectProgress) => {
+          const scores = subjectProgress.progressRecords.map((p: any) => p.score || 0)
+          const averageScore = scores.length > 0 
+            ? scores.reduce((a, b) => a + b, 0) / scores.length
+            : 0
+          subjectProgress.averageScore = Math.round(averageScore * 10) // Convert 0-10 to 0-100%
+          subjectProgress.totalRecords = subjectProgress.progressRecords.length
+        })
+
+        setSubjectsProgress(Array.from(subjectMap.values()))
+      }
+    } catch (err: any) {
+      console.error('Error loading progress:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [])
+    loadData() // Gọi hàm loadData đã tách
+  }, [navigate])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -101,7 +225,45 @@ const ViewProgressMobile: React.FC = () => {
     }
   }, [showTimeRangeDropdown])
 
-  // Time range options
+  //  Handlers cho Goal Dialog
+  const handleOpenGoalDialog = () => {
+    if (subjectsProgress.length > 0) {
+      setSelectedSubject(subjectsProgress[0].subject)
+      setTargetInput(subjectsProgress[0].targetScore)
+    }
+    setOpenGoalDialog(true)
+  }
+
+  const handleCloseGoalDialog = () => setOpenGoalDialog(false)
+
+  const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const subjName = event.target.value
+    setSelectedSubject(subjName)
+    const subj = subjectsProgress.find(s => s.subject === subjName)
+    if (subj) setTargetInput(subj.targetScore)
+  }
+
+  const handleSaveGoal = () => {
+    const newTarget = Number(targetInput)
+    if (newTarget > 0 && newTarget <= 100) {
+      setSubjectsProgress(prev => prev.map(subj => 
+        subj.subject === selectedSubject ? { ...subj, targetScore: newTarget } : subj
+      ))
+      setOpenGoalDialog(false)
+    }
+  }
+
+  // Helper vars
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
+    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
+    { id: 'book-session', label: 'Book Session', icon: <School />, path: '/student/book' },
+    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
+    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
+    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
+    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
+  ]
+
   const timeRangeOptions = [
     { value: '1month', label: 'Last Month' },
     { value: '3months', label: 'Last 3 Months' },
@@ -112,110 +274,6 @@ const ViewProgressMobile: React.FC = () => {
   const getSelectedTimeRange = () => {
     return timeRangeOptions.find(option => option.value === timeRange) || timeRangeOptions[1]
   }
-
-  // Load progress data on mount
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true)
-
-        // Get user from localStorage
-        const userStr = localStorage.getItem('user')
-        if (!userStr) {
-          navigate('/login')
-          return
-        }
-        const userData = JSON.parse(userStr)
-
-        // Load progress records for this student
-        const progressResponse = await progressAPI.list({ studentId: userData.id, limit: 1000 })
-        
-        if (progressResponse.data && Array.isArray(progressResponse.data)) {
-          const records = progressResponse.data
-          setProgressRecords(records)
-
-          // Get unique tutor IDs
-          const tutorIds = [...new Set(records.map((p: any) => p.tutorId))] as string[]
-          
-          // Load tutor data
-          const tutorsData: Record<string, any> = {}
-          await Promise.all(
-            tutorIds.map(async (tutorId) => {
-              try {
-                const response = await usersAPI.get(tutorId)
-                const tutorData = response.success ? response.data : response
-                if (tutorData) {
-                  tutorsData[tutorId] = tutorData
-                }
-              } catch (err) {
-                console.error(`Error loading tutor ${tutorId}:`, err)
-              }
-            })
-          )
-
-          setTutorsMap(tutorsData)
-
-          // Process data by subject
-          const subjectMap = new Map<string, SubjectProgress>()
-
-          records.forEach((progress: any) => {
-            if (!subjectMap.has(progress.subject)) {
-              subjectMap.set(progress.subject, {
-                subject: progress.subject,
-                averageScore: 0,
-                totalRecords: 0,
-                topics: [],
-                improvements: [],
-                challenges: [],
-                progressRecords: []
-              })
-            }
-
-            const subjectProgress = subjectMap.get(progress.subject)!
-            subjectProgress.progressRecords.push(progress)
-            
-            // Add unique topics
-            if (progress.topic && !subjectProgress.topics.includes(progress.topic)) {
-              subjectProgress.topics.push(progress.topic)
-            }
-
-            // Collect improvements and challenges
-            if (progress.improvements) {
-              progress.improvements.forEach((imp: string) => {
-                if (!subjectProgress.improvements.includes(imp)) {
-                  subjectProgress.improvements.push(imp)
-                }
-              })
-            }
-            if (progress.challenges) {
-              progress.challenges.forEach((chal: string) => {
-                if (!subjectProgress.challenges.includes(chal)) {
-                  subjectProgress.challenges.push(chal)
-                }
-              })
-            }
-          })
-
-          // Calculate averages
-          subjectMap.forEach((subjectProgress) => {
-            const scores = subjectProgress.progressRecords.map((p: any) => p.score || 0)
-            const averageScore = scores.length > 0 
-              ? scores.reduce((a, b) => a + b, 0) / scores.length
-              : 0
-            subjectProgress.averageScore = Math.round(averageScore * 10) // Convert 0-10 to 0-100%
-            subjectProgress.totalRecords = subjectProgress.progressRecords.length
-          })
-
-          setSubjectsProgress(Array.from(subjectMap.values()))
-        }
-      } catch (err: any) {
-        console.error('Error loading progress:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadData()
-  }, [navigate])
 
   // Calculate overall stats
   const overallProgress = subjectsProgress.length > 0
@@ -251,17 +309,24 @@ const ViewProgressMobile: React.FC = () => {
           <div className="flex items-center">
             <button
               onClick={() => navigate('/student')}
-              className={`p-2 rounded-lg mr-3 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+              className={`p-2 rounded-lg mr-2 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               <ArrowBackIcon className="w-5 h-5" />
             </button>
             <div>
               <h1 className={`text-base font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Progress Report
+                Progress
               </h1>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-1">
+            {/*  Thêm nút Refresh, Notification, Avatar */}
+            <IconButton size="small" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
+              <Badge badgeContent={3} color="error" variant="dot">
+                <NotificationsIcon className="w-5 h-5" />
+              </Badge>
+            </IconButton>
+            {/* Các nút cũ */}
             <button
               onClick={handleThemeToggle}
               className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
@@ -280,7 +345,7 @@ const ViewProgressMobile: React.FC = () => {
       </div>
 
       {/* Mobile Content */}
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 pb-20">
         {/* Header Section */}
         <Paper 
           elevation={0}
@@ -412,6 +477,84 @@ const ViewProgressMobile: React.FC = () => {
           <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', mt: 1, display: 'block' }}>
             Average across all subjects
           </Typography>
+        </Paper>
+
+        {/*  Goals Section */}
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff', 
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`, 
+            borderRadius: '12px' 
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <FlagIcon sx={{ color: '#ef4444' }} />
+            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>My Goals</Typography>
+          </Box>
+          {subjectsProgress.slice(0, 2).map((subj, i) => (
+            <Box key={i} mb={2}>
+              <div className="flex justify-between text-xs mb-1">
+                <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{subj.subject}</span>
+                <span className="text-gray-500">{subj.averageScore}/{subj.targetScore}</span>
+              </div>
+              <LinearProgress 
+                variant="determinate" 
+                value={(subj.averageScore / (subj.targetScore || 100)) * 100} 
+                sx={{ 
+                  height: 6, 
+                  borderRadius: 3, 
+                  bgcolor: theme === 'dark' ? '#374151' : '#f1f5f9', 
+                  '& .MuiLinearProgress-bar': { bgcolor: '#ef4444' } 
+                }} 
+              />
+            </Box>
+          ))}
+          <Button 
+            variant="outlined" 
+            size="small" 
+            fullWidth 
+            onClick={handleOpenGoalDialog}
+            sx={{ 
+              mt: 1, 
+              textTransform: 'none',
+              borderColor: theme === 'dark' ? '#4b5563' : '#e5e7eb',
+              color: theme === 'dark' ? '#e5e7eb' : '#374151'
+            }}
+          >
+            Set New Goals
+          </Button>
+        </Paper>
+
+        {/*  Achievements Section */}
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 3, 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff', 
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`, 
+            borderRadius: '12px' 
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <EmojiEventsIcon sx={{ color: '#f59e0b' }} />
+            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>Achievements</Typography>
+          </Box>
+          <div className="grid grid-cols-3 gap-2">
+            {achievements.map((badge) => (
+              <div 
+                key={badge.id} 
+                className="flex flex-col items-center p-2 rounded-lg text-center" 
+                style={{ backgroundColor: theme === 'dark' ? '#374151' : badge.bg }}
+              >
+                <div style={{ color: badge.color }} className="mb-1">{badge.icon}</div>
+                <span className={`text-[10px] font-bold leading-tight ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  {badge.title}
+                </span>
+              </div>
+            ))}
+          </div>
         </Paper>
 
         {/* Subject Performance */}
@@ -776,6 +919,42 @@ const ViewProgressMobile: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/*  Dialog Set Goal */}
+      <Dialog open={openGoalDialog} onClose={handleCloseGoalDialog} fullWidth maxWidth="xs">
+        <DialogTitle>Set Goal</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2, fontSize: '0.9rem' }}>
+            Set your target score for a subject.
+          </DialogContentText>
+          <TextField
+            select
+            label="Subject"
+            fullWidth
+            value={selectedSubject}
+            onChange={handleSubjectChange}
+            sx={{ mb: 2 }}
+            size="small"
+          >
+            {subjectsProgress.map((subj) => (
+              <MenuItem key={subj.subject} value={subj.subject}>{subj.subject}</MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="Target Score (%)"
+            type="number"
+            fullWidth
+            value={targetInput}
+            onChange={(e) => setTargetInput(e.target.value)}
+            InputProps={{ inputProps: { min: 0, max: 100 } }}
+            size="small"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseGoalDialog}>Cancel</Button>
+          <Button onClick={handleSaveGoal} variant="contained">Save</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
