@@ -1,0 +1,13 @@
+[
+  {
+    "id": "job_803a51f8-45d4-4ff1-a42b-922f6bdcdae1",
+    "processAt": "2025-11-11T19:34:48.302Z",
+    "data": {
+      "type": "session_cancel_request",
+      "title": "Yêu cầu hủy buổi học",
+      "message": "Phan An Hoàng đã gửi yêu cầu hủy buổi học Toán cao cấp",
+      "link": "/tutor/cancel-reschedule",
+      "userId": "tut_QAuiJWjIUx57"
+    }
+  }
+]

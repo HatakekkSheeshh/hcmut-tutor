@@ -9,8 +9,8 @@ import {
   Session, 
   Class,
   SessionStatus,
-  AuthRequest
 } from '../../lib/types.js';
+import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse } from '../../lib/utils.js';
 
 export async function getAlternativeSessionsHandler(req: AuthRequest, res: Response) {

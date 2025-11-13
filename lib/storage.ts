@@ -257,6 +257,10 @@ export class JSONStorage {
     const filepath = join(this.dataDir, filename);
     try {
       const content = await readFile(filepath, 'utf-8');
+      if (!content || content.trim() === '') {
+      // Nếu file trống, trả về mảng rỗng
+      return [];
+      }
       return JSON.parse(content);
     } catch (error: any) {
       if (error.code === 'ENOENT') {

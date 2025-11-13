@@ -54,6 +54,7 @@ import { getEnrollmentHandler, updateEnrollmentHandler, deleteEnrollmentHandler 
 
 // Import handlers - Notifications
 import { getNotificationsHandler, markAsReadHandler, deleteNotificationHandler } from './routes/notifications/index.js';
+import { setupNotificationCron } from './lib/cron/notificationCron.js';
 
 // Import handlers - Progress
 import { listProgressHandler, createProgressHandler, getProgressHandler } from './routes/progress/index.js';
@@ -64,6 +65,8 @@ import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, 
 // Import handlers - Forum
 import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './routes/forum/posts.js';
 import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './routes/forum/comments.js';
+
+import { listLibraryResourcesHandler, getLibraryResourceHandler, searchLibraryHandler } from './routes/library/index.ts';
 
 // Import handlers - Session Requests
 import { listSessionRequestsHandler, createSessionRequestHandler } from './routes/session-requests/index.js';
@@ -253,6 +256,11 @@ app.get('/api/forum/posts/:id/comments', getCommentsHandler);
 app.post('/api/forum/posts/:id/comments', authenticate, createCommentHandler);
 app.delete('/api/forum/comments/:id', authenticate, deleteCommentHandler);
 
+// ===== DIGITAL LIBRARY ROUTES =====
+app.get('/api/library/resources', authenticate, listLibraryResourcesHandler);
+app.get('/api/library/resources/:id', authenticate, getLibraryResourceHandler);
+app.get('/api/library/search', authenticate, searchLibraryHandler);
+
 // ===== SESSION REQUESTS ROUTES =====
 
 app.get('/api/session-requests', authenticate, listSessionRequestsHandler);
@@ -263,6 +271,8 @@ app.put('/api/session-requests/:id/approve', authenticate, validateBody(approveS
 app.put('/api/session-requests/:id/reject', authenticate, validateBody(rejectSessionRequestSchema), rejectSessionRequestHandler);
 app.delete('/api/session-requests/:id', authenticate, withdrawSessionRequestHandler);
 
+
+setupNotificationCron(1);
 // ===== MANAGEMENT APPROVAL REQUESTS ROUTES =====
 
 app.get('/api/management/approvals', authenticate, authorize(UserRole.MANAGEMENT), listApprovalRequestsHandler);
