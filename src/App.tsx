@@ -62,6 +62,8 @@ function App() {
         <Route path="/management/approval" element={<ManagementDeviceDetector />} />
         <Route path="/management/reports" element={<ManagementDeviceDetector />} />
         <Route path="/management/awards" element={<ManagementDeviceDetector />} />
+        <Route path="/management/resources" element={<ManagementDeviceDetector />} />
+        <Route path="/management/users" element={<ManagementDeviceDetector />} />
         
         {/* Common Screens Routes */}
         <Route path="/common" element={<CommonDeviceDetector />} />

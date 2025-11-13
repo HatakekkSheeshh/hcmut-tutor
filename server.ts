@@ -7,7 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import { config } from './lib/config.js';
 import { authenticate, authorize, validateBody, errorHandler } from './lib/middleware.js';
-import { loginSchema, registerSchema, updateProfileSchema, createClassSchema, updateClassSchema, createEnrollmentSchema, updateEnrollmentSchema, createSessionRequestSchema, approveSessionRequestSchema, rejectSessionRequestSchema } from './lib/schemas.js';
+import { loginSchema, registerSchema, updateProfileSchema, createClassSchema, updateClassSchema, createEnrollmentSchema, updateEnrollmentSchema, createSessionRequestSchema, approveSessionRequestSchema, rejectSessionRequestSchema, createApprovalRequestSchema, approveApprovalRequestSchema, rejectApprovalRequestSchema, requestClarificationSchema, escalateApprovalRequestSchema, updateUserPermissionsSchema, revokeUserPermissionsSchema, grantTemporaryPermissionsSchema, optimizeResourceAllocationSchema, applyOptimizationSchema, manualOverrideSchema, createProgressReportSchema, updateProgressReportSchema, generatePerformanceAnalysisSchema, comparePerformanceSchema, awardCreditsSchema, revokeCreditsSchema, getEligibleStudentsSchema, uploadDocumentSchema, updateDocumentSchema, shareDocumentSchema, updateDocumentAccessSchema, createCommunityForumSchema, updateCommunityForumSchema, shareCommunityResourceSchema, restrictCommunityResourceSchema, createCommunityEventSchema } from './lib/schemas.js';
 import { UserRole } from './lib/types.js';
 
 // Import handlers - Auth
@@ -42,6 +42,9 @@ import { getSessionStudentsHandler, addStudentToSessionHandler, removeStudentFro
 import { getCalendarHandler } from './routes/calendar/[userId].js';
 import { getAvailabilityHandler, setAvailabilityHandler, updateAvailabilityHandler } from './routes/availability/index.js';
 
+// Import handlers - Rooms
+import { listRoomsHandler, checkRoomAvailabilityHandler } from './routes/rooms/index.js';
+
 // Import handlers - Classes & Enrollments
 import { listClassesHandler, createClassHandler } from './routes/classes/index.js';
 import { getClassHandler, updateClassHandler, deleteClassHandler } from './routes/classes/[id].js';
@@ -66,6 +69,33 @@ import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from '
 import { listSessionRequestsHandler, createSessionRequestHandler } from './routes/session-requests/index.js';
 import { getSessionRequestHandler, approveSessionRequestHandler, rejectSessionRequestHandler, withdrawSessionRequestHandler } from './routes/session-requests/[id].js';
 import { getAlternativeSessionsHandler } from './routes/session-requests/alternatives.js';
+
+// Import handlers - Management Approvals
+import { listApprovalRequestsHandler, createApprovalRequestHandler } from './routes/management/approvals/index.js';
+import { getApprovalRequestHandler, approveApprovalRequestHandler, rejectApprovalRequestHandler, requestClarificationHandler, escalateApprovalRequestHandler } from './routes/management/approvals/[id].js';
+
+// Import handlers - Management Permissions
+import { listUsersWithPermissionsHandler } from './routes/management/permissions/index.js';
+import { getUserPermissionsHandler, updateUserPermissionsHandler, revokeUserPermissionsHandler, grantTemporaryPermissionsHandler } from './routes/management/permissions/[userId].js';
+
+// Import handlers - Management Resources
+import { getResourceOverviewHandler, getInefficienciesHandler, optimizeResourceAllocationHandler, applyOptimizationHandler, manualOverrideHandler } from './routes/management/resources/index.js';
+
+// Import handlers - Management Reports
+import { listProgressReportsHandler, createProgressReportHandler, getProgressReportHandler, exportProgressReportHandler, updateProgressReportHandler } from './routes/management/reports/progress.js';
+
+// Import handlers - Management Analytics
+import { getPerformanceAnalysisHandler, generatePerformanceAnalysisHandler, comparePerformanceHandler, getPerformanceKPIsHandler } from './routes/management/analytics/performance.js';
+
+// Import handlers - Management Credits
+import { getEligibleStudentsHandler, awardCreditsHandler, getCreditHistoryHandler, revokeCreditsHandler } from './routes/management/credits/index.js';
+
+// Import handlers - Management Documents
+import { listDocumentsHandler, uploadDocumentHandler, getDocumentHandler, updateDocumentHandler, deleteDocumentHandler, shareDocumentHandler, getDocumentAccessHandler, updateDocumentAccessHandler } from './routes/management/documents/index.js';
+
+// Import handlers - Management Community
+import { listForumsHandler, createForumHandler, updateForumHandler, deleteForumHandler, pinForumHandler, lockForumHandler } from './routes/management/community/forums.js';
+import { listCommunityResourcesHandler, shareCommunityResourceHandler, restrictCommunityResourceHandler, createCommunityEventHandler, getCommunityActivitiesHandler } from './routes/management/community/index.js';
 
 // Create Express app
 const app = express();
@@ -169,6 +199,11 @@ app.get('/api/availability/:tutorId', getAvailabilityHandler);
 app.post('/api/availability', authenticate, setAvailabilityHandler);
 app.put('/api/availability/:id', authenticate, updateAvailabilityHandler);
 
+// ===== ROOMS ROUTES =====
+
+app.get('/api/rooms', authenticate, listRoomsHandler);
+app.get('/api/rooms/availability', authenticate, checkRoomAvailabilityHandler);
+
 // ===== CLASSES ROUTES =====
 
 app.get('/api/classes', listClassesHandler);
@@ -227,6 +262,81 @@ app.get('/api/session-requests/:id', authenticate, getSessionRequestHandler);
 app.put('/api/session-requests/:id/approve', authenticate, validateBody(approveSessionRequestSchema), approveSessionRequestHandler);
 app.put('/api/session-requests/:id/reject', authenticate, validateBody(rejectSessionRequestSchema), rejectSessionRequestHandler);
 app.delete('/api/session-requests/:id', authenticate, withdrawSessionRequestHandler);
+
+// ===== MANAGEMENT APPROVAL REQUESTS ROUTES =====
+
+app.get('/api/management/approvals', authenticate, authorize(UserRole.MANAGEMENT), listApprovalRequestsHandler);
+app.post('/api/management/approvals', authenticate, validateBody(createApprovalRequestSchema), createApprovalRequestHandler);
+app.get('/api/management/approvals/:id', authenticate, authorize(UserRole.MANAGEMENT), getApprovalRequestHandler);
+app.put('/api/management/approvals/:id/approve', authenticate, authorize(UserRole.MANAGEMENT), validateBody(approveApprovalRequestSchema), approveApprovalRequestHandler);
+app.put('/api/management/approvals/:id/reject', authenticate, authorize(UserRole.MANAGEMENT), validateBody(rejectApprovalRequestSchema), rejectApprovalRequestHandler);
+app.put('/api/management/approvals/:id/clarify', authenticate, authorize(UserRole.MANAGEMENT), validateBody(requestClarificationSchema), requestClarificationHandler);
+app.post('/api/management/approvals/:id/escalate', authenticate, authorize(UserRole.MANAGEMENT), validateBody(escalateApprovalRequestSchema), escalateApprovalRequestHandler);
+
+// ===== MANAGEMENT PERMISSIONS ROUTES =====
+
+app.get('/api/management/permissions/users', authenticate, authorize(UserRole.MANAGEMENT), listUsersWithPermissionsHandler);
+app.get('/api/management/permissions/users/:id', authenticate, authorize(UserRole.MANAGEMENT), getUserPermissionsHandler);
+app.put('/api/management/permissions/users/:id', authenticate, authorize(UserRole.MANAGEMENT), validateBody(updateUserPermissionsSchema), updateUserPermissionsHandler);
+app.post('/api/management/permissions/users/:id/revoke', authenticate, authorize(UserRole.MANAGEMENT), validateBody(revokeUserPermissionsSchema), revokeUserPermissionsHandler);
+app.post('/api/management/permissions/users/:id/temporary', authenticate, authorize(UserRole.MANAGEMENT), validateBody(grantTemporaryPermissionsSchema), grantTemporaryPermissionsHandler);
+
+// ===== MANAGEMENT RESOURCE ALLOCATION ROUTES =====
+
+app.get('/api/management/resources/overview', authenticate, authorize(UserRole.MANAGEMENT), getResourceOverviewHandler);
+app.get('/api/management/resources/inefficiencies', authenticate, authorize(UserRole.MANAGEMENT), getInefficienciesHandler);
+app.post('/api/management/resources/optimize', authenticate, authorize(UserRole.MANAGEMENT), validateBody(optimizeResourceAllocationSchema), optimizeResourceAllocationHandler);
+app.post('/api/management/resources/apply', authenticate, authorize(UserRole.MANAGEMENT), validateBody(applyOptimizationSchema), applyOptimizationHandler);
+app.post('/api/management/resources/manual-override', authenticate, authorize(UserRole.MANAGEMENT), validateBody(manualOverrideSchema), manualOverrideHandler);
+
+// ===== MANAGEMENT PROGRESS REPORTS ROUTES =====
+
+app.get('/api/management/reports/progress', authenticate, authorize(UserRole.MANAGEMENT), listProgressReportsHandler);
+app.post('/api/management/reports/progress', authenticate, authorize(UserRole.MANAGEMENT), validateBody(createProgressReportSchema), createProgressReportHandler);
+app.get('/api/management/reports/progress/:id', authenticate, authorize(UserRole.MANAGEMENT), getProgressReportHandler);
+app.get('/api/management/reports/progress/:id/export', authenticate, authorize(UserRole.MANAGEMENT), exportProgressReportHandler);
+app.put('/api/management/reports/progress/:id', authenticate, authorize(UserRole.MANAGEMENT), validateBody(updateProgressReportSchema), updateProgressReportHandler);
+
+// ===== MANAGEMENT ANALYTICS ROUTES =====
+
+app.get('/api/management/analytics/performance', authenticate, authorize(UserRole.MANAGEMENT), getPerformanceAnalysisHandler);
+app.post('/api/management/analytics/performance', authenticate, authorize(UserRole.MANAGEMENT), validateBody(generatePerformanceAnalysisSchema), generatePerformanceAnalysisHandler);
+app.get('/api/management/analytics/performance/compare', authenticate, authorize(UserRole.MANAGEMENT), comparePerformanceHandler);
+app.get('/api/management/analytics/performance/kpis', authenticate, authorize(UserRole.MANAGEMENT), getPerformanceKPIsHandler);
+
+// ===== MANAGEMENT TRAINING CREDITS ROUTES =====
+
+app.get('/api/management/credits/eligible', authenticate, authorize(UserRole.MANAGEMENT), getEligibleStudentsHandler);
+app.post('/api/management/credits/award', authenticate, authorize(UserRole.MANAGEMENT), validateBody(awardCreditsSchema), awardCreditsHandler);
+app.get('/api/management/credits/history', authenticate, authorize(UserRole.MANAGEMENT), getCreditHistoryHandler);
+app.put('/api/management/credits/:id/revoke', authenticate, authorize(UserRole.MANAGEMENT), validateBody(revokeCreditsSchema), revokeCreditsHandler);
+
+// ===== MANAGEMENT DOCUMENTS ROUTES =====
+
+app.get('/api/management/documents', authenticate, listDocumentsHandler);
+app.post('/api/management/documents', authenticate, validateBody(uploadDocumentSchema), uploadDocumentHandler);
+app.get('/api/management/documents/:id', authenticate, getDocumentHandler);
+app.put('/api/management/documents/:id', authenticate, validateBody(updateDocumentSchema), updateDocumentHandler);
+app.delete('/api/management/documents/:id', authenticate, deleteDocumentHandler);
+app.post('/api/management/documents/:id/share', authenticate, validateBody(shareDocumentSchema), shareDocumentHandler);
+app.get('/api/management/documents/:id/access', authenticate, getDocumentAccessHandler);
+app.put('/api/management/documents/:id/access', authenticate, validateBody(updateDocumentAccessSchema), updateDocumentAccessHandler);
+
+// ===== MANAGEMENT COMMUNITY ROUTES =====
+
+app.get('/api/management/community/forums', authenticate, authorize(UserRole.MANAGEMENT), listForumsHandler);
+app.post('/api/management/community/forums', authenticate, authorize(UserRole.MANAGEMENT), validateBody(createCommunityForumSchema), createForumHandler);
+app.put('/api/management/community/forums/:id', authenticate, authorize(UserRole.MANAGEMENT), validateBody(updateCommunityForumSchema), updateForumHandler);
+app.delete('/api/management/community/forums/:id', authenticate, authorize(UserRole.MANAGEMENT), deleteForumHandler);
+app.post('/api/management/community/forums/:id/pin', authenticate, authorize(UserRole.MANAGEMENT), pinForumHandler);
+app.post('/api/management/community/forums/:id/lock', authenticate, authorize(UserRole.MANAGEMENT), lockForumHandler);
+
+app.get('/api/management/community/resources', authenticate, listCommunityResourcesHandler);
+app.post('/api/management/community/resources', authenticate, validateBody(shareCommunityResourceSchema), shareCommunityResourceHandler);
+app.put('/api/management/community/resources/:id/restrict', authenticate, authorize(UserRole.MANAGEMENT), validateBody(restrictCommunityResourceSchema), restrictCommunityResourceHandler);
+
+app.post('/api/management/community/events', authenticate, authorize(UserRole.MANAGEMENT), validateBody(createCommunityEventSchema), createCommunityEventHandler);
+app.get('/api/management/community/activities', authenticate, authorize(UserRole.MANAGEMENT), getCommunityActivitiesHandler);
 
 // ===== ERROR HANDLING =====
 

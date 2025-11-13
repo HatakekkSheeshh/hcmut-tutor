@@ -1,0 +1,474 @@
+[
+  {
+    "id": "report_Uo_QHumNtIt7",
+    "title": "123",
+    "type": "student",
+    "scope": {
+      "timeRange": {
+        "startDate": "2025-10-13T00:00:00.000Z",
+        "endDate": "2025-11-12T23:59:59.999Z"
+      }
+    },
+    "data": {
+      "students": [
+        {
+          "studentId": "stu_sP3IPBS2iler",
+          "studentName": "Hoàng Dũng Minh",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 3,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Điện tử",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Toán cao cấp",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Xác suất thống kê",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_3xXLt1IWBsCS",
+          "studentName": "Đặng Nam Lan",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 1,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Mạng máy tính",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_a7LVENf1yYZ5",
+          "studentName": "Nguyễn Khánh Hương",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 1,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Cấu trúc dữ liệu",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_h8gj9_8-bjIL",
+          "studentName": "Bùi Dũng Phương",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 1,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Giải tích",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_aBXlnK4-0JBf",
+          "studentName": "Trần Bảo Văn",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 4,
+          "attendanceRate": 25,
+          "averageScore": 7,
+          "subjects": [
+            {
+              "subject": "Xác suất thống kê",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Cấu trúc dữ liệu",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Hệ điều hành",
+              "sessions": 2,
+              "averageScore": 7,
+              "attendanceRate": 50
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_dOHu6givateo",
+          "studentName": "Lê Khánh Tuấn",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 2,
+          "attendanceRate": 50,
+          "averageScore": 6,
+          "subjects": [
+            {
+              "subject": "Toán cao cấp",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Tiếng Anh",
+              "sessions": 1,
+              "averageScore": 6,
+              "attendanceRate": 100
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_JPwzdql5rJG0",
+          "studentName": "Phạm Mai Minh",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 1,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Vật lý đại cương",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_YiVGuLoCpVPF",
+          "studentName": "Bùi Cường Tuấn",
+          "sessionsCompleted": 2,
+          "sessionsTotal": 2,
+          "attendanceRate": 100,
+          "averageScore": 9.5,
+          "subjects": [
+            {
+              "subject": "Cấu trúc dữ liệu",
+              "sessions": 1,
+              "averageScore": 10,
+              "attendanceRate": 100
+            },
+            {
+              "subject": "Hệ điều hành",
+              "sessions": 1,
+              "averageScore": 9,
+              "attendanceRate": 100
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_1FhaUWxySQ4V",
+          "studentName": "Đỗ Hà Thị",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 3,
+          "attendanceRate": 33.33,
+          "averageScore": 7,
+          "subjects": [
+            {
+              "subject": "Cấu trúc dữ liệu",
+              "sessions": 2,
+              "averageScore": 7,
+              "attendanceRate": 50
+            },
+            {
+              "subject": "Hệ điều hành",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_KRDeTYJlBj41",
+          "studentName": "Lê An Tuấn",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 2,
+          "attendanceRate": 50,
+          "averageScore": 10,
+          "subjects": [
+            {
+              "subject": "Vật lý đại cương",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Hệ điều hành",
+              "sessions": 1,
+              "averageScore": 10,
+              "attendanceRate": 100
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_afp9r8MLsjE8",
+          "studentName": "Đặng Nam Văn",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 1,
+          "attendanceRate": 100,
+          "averageScore": 9,
+          "subjects": [
+            {
+              "subject": "Lập trình C/C++",
+              "sessions": 1,
+              "averageScore": 9,
+              "attendanceRate": 100
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_QYojhnP7sLsJ",
+          "studentName": "Nguyễn Bảo Phương",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 3,
+          "attendanceRate": 33.33,
+          "averageScore": 9,
+          "subjects": [
+            {
+              "subject": "Hệ điều hành",
+              "sessions": 2,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Mạng máy tính",
+              "sessions": 1,
+              "averageScore": 9,
+              "attendanceRate": 100
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_FaawsvPS_Mp3",
+          "studentName": "Nguyễn Mai Thị",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 1,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Vật lý đại cương",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_ZU0fknsTqL_A",
+          "studentName": "Lê Dũng Hữu",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 3,
+          "attendanceRate": 33.33,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Hệ điều hành",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 100
+            },
+            {
+              "subject": "Giải tích",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Toán cao cấp",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_ZfEvyF4Gu7bc",
+          "studentName": "Phạm Mai Phương",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 1,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Lập trình Python",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_5m0qgd6BvqGz",
+          "studentName": "Phan Nam Tuấn",
+          "sessionsCompleted": 1,
+          "sessionsTotal": 1,
+          "attendanceRate": 100,
+          "averageScore": 6,
+          "subjects": [
+            {
+              "subject": "Xác suất thống kê",
+              "sessions": 1,
+              "averageScore": 6,
+              "attendanceRate": 100
+            }
+          ],
+          "improvements": [
+            "Hiểu bài tốt hơn",
+            "Làm bài tập nhanh hơn"
+          ],
+          "challenges": [
+            "Cần thêm thời gian luyện tập",
+            "Một số khái niệm còn khó"
+          ]
+        },
+        {
+          "studentId": "stu_SgsgvGIuTR0F",
+          "studentName": "Đỗ Mai Thị",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 2,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Cấu trúc dữ liệu",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            },
+            {
+              "subject": "Vật lý đại cương",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        },
+        {
+          "studentId": "stu_KkyoEg58egl5",
+          "studentName": "Nguyễn Linh Tuấn",
+          "sessionsCompleted": 0,
+          "sessionsTotal": 1,
+          "attendanceRate": 0,
+          "averageScore": 0,
+          "subjects": [
+            {
+              "subject": "Hệ điều hành",
+              "sessions": 1,
+              "averageScore": 0,
+              "attendanceRate": 0
+            }
+          ],
+          "improvements": [],
+          "challenges": []
+        }
+      ],
+      "summary": {
+        "totalStudents": 18,
+        "totalTutors": 0,
+        "totalSessions": 33,
+        "completedSessions": 10,
+        "averageAttendanceRate": 29.16611111111111,
+        "averageScore": 3.5277777777777777,
+        "averageRating": 0
+      }
+    },
+    "filters": {},
+    "createdBy": "mgmt_1T4fph947Qu6",
+    "createdAt": "2025-11-12T16:13:53.935Z",
+    "updatedAt": "2025-11-12T16:13:53.935Z"
+  }
+]

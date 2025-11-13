@@ -235,7 +235,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
             </Typography>
           </Box>
           
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
             <LocationOn sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280', mr: 0.5 }} />
             <Typography
               variant="caption"
@@ -245,7 +245,9 @@ const SessionCard: React.FC<SessionCardProps> = ({
                 fontWeight: 500
               }}
             >
-              {session.location.type === 'online' ? 'Online' : 'In-Person'}
+              {session.location.type === 'online' 
+                ? 'Online' 
+                : (session.location.address || 'In-Person')}
             </Typography>
           </Box>
         </Box>

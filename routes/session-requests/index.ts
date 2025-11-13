@@ -225,20 +225,28 @@ async function validateRescheduleTime(
            !s.classId // Only check individual sessions
   );
 
+  // Buffer time between sessions (30 minutes)
+  const SESSION_BUFFER_MINUTES = 30;
+
   for (const existingSession of existingSessions) {
     const existingStart = new Date(existingSession.startTime);
     const existingEnd = new Date(existingSession.endTime);
 
-    // Check if sessions overlap (same date and overlapping times)
+    // Check if same date
+    if (existingStart.toDateString() !== preferredStart.toDateString()) {
+      continue;
+    }
+
+    // Apply buffer time: preferred time must start at least 30 minutes after existing session ends
+    // and must end at least 30 minutes before existing session starts
+    const existingEndWithBuffer = new Date(existingEnd.getTime() + SESSION_BUFFER_MINUTES * 60 * 1000);
+    const existingStartWithBuffer = new Date(existingStart.getTime() - SESSION_BUFFER_MINUTES * 60 * 1000);
+
+    // Check if preferred time overlaps with existing session (including buffer)
     if (
-      existingStart.toDateString() === preferredStart.toDateString() &&
-      (
-        (preferredStart >= existingStart && preferredStart < existingEnd) ||
-        (preferredEnd > existingStart && preferredEnd <= existingEnd) ||
-        (preferredStart <= existingStart && preferredEnd >= existingEnd)
-      )
+      (preferredStart < existingEndWithBuffer && preferredEnd > existingStartWithBuffer)
     ) {
-      return `Thời gian mong muốn trùng với buổi học khác (${existingSession.subject}, ${existingStart.toLocaleString('vi-VN')}). Vui lòng chọn thời gian khác.`;
+      return `Thời gian mong muốn trùng với buổi học khác (${existingSession.subject}, ${existingStart.toLocaleString('vi-VN')}) hoặc không đủ thời gian nghỉ (cần ít nhất ${SESSION_BUFFER_MINUTES} phút giữa các buổi học). Vui lòng chọn thời gian khác.`;
     }
   }
 

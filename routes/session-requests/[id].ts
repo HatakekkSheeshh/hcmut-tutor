@@ -189,13 +189,109 @@ export async function approveSessionRequestHandler(req: AuthRequest, res: Respon
 
     // Update session based on request type
     if (request.type === RequestType.CANCEL) {
-      // Cancel the session
-      await storage.update<Session>('sessions.json', request.sessionId, {
-        status: SessionStatus.CANCELLED,
-        cancelledBy: request.studentId,
-        cancelReason: request.reason,
+      // For cancel requests, always require management approval
+      // (to allow reassignment of resources, especially for offline sessions)
+      if (!session) {
+        return res.status(404).json(errorResponse('Không tìm thấy buổi học'));
+      }
+
+      const { ApprovalRequest, ApprovalRequestType, ApprovalRequestStatus } = await import('../../lib/types.js');
+      const { addDays } = await import('../../lib/utils.js');
+      
+      const deadlineDate = addDays(new Date(), 2);
+      
+      const approvalRequest: ApprovalRequest = {
+        id: generateId('approval'),
+        type: ApprovalRequestType.SESSION_CHANGE,
+        requesterId: request.studentId,
+        targetId: request.sessionId,
+        title: `Yêu cầu hủy session - ${session.subject}`,
+        description: `Yêu cầu hủy session "${session.subject}" từ student. Lý do: ${request.reason || 'Không có lý do'}. ${session.isOnline ? 'Session online' : 'Session offline - cần release phòng học'}.`,
+        status: ApprovalRequestStatus.PENDING,
+        priority: 'medium',
+        deadline: deadlineDate.toISOString(),
+        changeType: 'change_duration', // Use change_duration type but with cancel action
+        changeData: {
+          // Mark as cancel request
+          cancelRequest: true,
+          cancelReason: request.reason
+        },
+        originalSessionData: session,
+        proposedSessionData: {
+          ...session,
+          status: SessionStatus.CANCELLED,
+          cancelledBy: request.studentId,
+          cancelReason: request.reason
+        },
+        createdAt: now(),
+        updatedAt: now()
+      };
+
+      await storage.create<ApprovalRequest>('approvals.json', approvalRequest);
+
+      // Create notification for management users
+      const managementUsers = await storage.find<User>('users.json', 
+        (u) => u.role === UserRole.MANAGEMENT
+      );
+
+      const notifications = managementUsers.map(manager => ({
+        id: generateId('notif'),
+        userId: manager.id,
+        type: NotificationType.APPROVAL_REQUEST,
+        title: 'Yêu cầu hủy session cần phê duyệt',
+        message: `Yêu cầu hủy session "${session.subject}" từ student đã được tutor chấp nhận, cần management phê duyệt`,
+        read: false,
+        link: `/management/approvals/${approvalRequest.id}`,
+        metadata: {
+          approvalRequestId: approvalRequest.id,
+          sessionRequestId: request.id,
+          type: 'cancel_session',
+          priority: 'medium'
+        },
+        createdAt: now()
+      }));
+
+      await Promise.all(
+        notifications.map(notif => storage.create<Notification>('notifications.json', notif))
+      );
+
+      // Update session request - tutor has approved, but waiting for management approval
+      await storage.update<SessionRequest>('session-requests.json', id, {
+        status: RequestStatus.APPROVED, // Tutor has approved
+        responseMessage: responseMessage || 'Yêu cầu hủy đã được tutor chấp nhận, đang chờ management phê duyệt',
         updatedAt: now()
       });
+
+      // Create notification for student
+      const studentNotification: Notification = {
+        id: generateId('notif'),
+        userId: request.studentId,
+        type: NotificationType.SESSION_CANCELLED,
+        title: 'Yêu cầu hủy đã được tutor chấp nhận',
+        message: `Yêu cầu hủy session "${session.subject}" đã được tutor chấp nhận. Đang chờ management phê duyệt.`,
+        read: false,
+        link: `/student/session/${request.sessionId}`,
+        metadata: {
+          requestId: request.id,
+          sessionId: request.sessionId,
+          approvalRequestId: approvalRequest.id,
+          status: 'pending_management_approval'
+        },
+        createdAt: now()
+      };
+      await storage.create('notifications.json', studentNotification);
+
+      // Update the updatedRequest variable for response
+      const updatedRequestWithApproval = await storage.findById<SessionRequest>('session-requests.json', id);
+
+      return res.json(
+        successResponse({
+          ...updatedRequestWithApproval!,
+          requiresManagementApproval: true,
+          approvalRequestId: approvalRequest.id,
+          message: 'Yêu cầu hủy đã được tutor chấp nhận, đang chờ management phê duyệt'
+        }, 'Yêu cầu hủy đã được chấp nhận, đang chờ management phê duyệt')
+      );
     } else if (request.type === RequestType.RESCHEDULE) {
       // For class reschedule with alternative class or session
       const finalAlternativeSessionId = alternativeSessionId || request.alternativeSessionId;
@@ -305,62 +401,185 @@ export async function approveSessionRequestHandler(req: AuthRequest, res: Respon
             return res.status(400).json(errorResponse('Thời gian mới là bắt buộc cho yêu cầu đổi lịch'));
           }
 
-          const duration = Math.round(
-            (new Date(finalEndTime).getTime() - new Date(finalStartTime).getTime()) / (1000 * 60)
-          );
+          // Check if session is offline - if so, need management approval for room allocation
+          if (session && !session.isOnline) {
+            // For offline sessions, create approval request for management
+            // instead of directly updating the session (need to allocate room)
+            const { ApprovalRequest, ApprovalRequestType, ApprovalRequestStatus } = await import('../../lib/types.js');
+            const { addDays } = await import('../../lib/utils.js');
+            
+            const deadlineDate = addDays(new Date(), 2);
+            const newDuration = Math.round(
+              (new Date(finalEndTime).getTime() - new Date(finalStartTime).getTime()) / (1000 * 60)
+            );
+            
+            const approvalRequest: ApprovalRequest = {
+              id: generateId('approval'),
+              type: ApprovalRequestType.SESSION_CHANGE,
+              requesterId: request.studentId,
+              targetId: request.sessionId,
+              title: `Yêu cầu đổi lịch session offline - ${session.subject}`,
+              description: `Yêu cầu đổi lịch session offline từ ${new Date(session.startTime).toLocaleString('vi-VN')} sang ${new Date(finalStartTime).toLocaleString('vi-VN')}. Cần allocate lại phòng học.`,
+              status: ApprovalRequestStatus.PENDING,
+              priority: 'medium',
+              deadline: deadlineDate.toISOString(),
+              changeType: 'change_duration',
+              changeData: {
+                newStartTime: finalStartTime,
+                newEndTime: finalEndTime,
+                newDuration: newDuration
+              },
+              originalSessionData: session,
+              proposedSessionData: {
+                ...session,
+                startTime: finalStartTime,
+                endTime: finalEndTime,
+                duration: newDuration,
+                status: SessionStatus.RESCHEDULED,
+                rescheduledFrom: session.startTime
+              },
+              createdAt: now(),
+              updatedAt: now()
+            };
 
-          await storage.update<Session>('sessions.json', request.sessionId, {
-            startTime: finalStartTime,
-            endTime: finalEndTime,
-            duration: duration,
-            status: SessionStatus.RESCHEDULED,
-            rescheduledFrom: session?.startTime || request.preferredStartTime || finalStartTime,
-            updatedAt: now()
-          });
+            await storage.create<ApprovalRequest>('approvals.json', approvalRequest);
+
+            // Create notification for management users
+            const managementUsers = await storage.find<User>('users.json', 
+              (u) => u.role === UserRole.MANAGEMENT
+            );
+
+            const notifications = managementUsers.map(manager => ({
+              id: generateId('notif'),
+              userId: manager.id,
+              type: NotificationType.APPROVAL_REQUEST,
+              title: 'Yêu cầu đổi lịch session offline cần phê duyệt',
+              message: `Yêu cầu đổi lịch session offline "${session.subject}" cần phê duyệt để allocate lại phòng học`,
+              read: false,
+              link: `/management/approvals/${approvalRequest.id}`,
+              metadata: {
+                approvalRequestId: approvalRequest.id,
+                sessionRequestId: request.id,
+                type: 'reschedule_offline_session',
+                priority: 'medium'
+              },
+              createdAt: now()
+            }));
+
+            await Promise.all(
+              notifications.map(notif => storage.create<Notification>('notifications.json', notif))
+            );
+
+            // Update session request - tutor has approved, but waiting for management approval
+            await storage.update<SessionRequest>('session-requests.json', id, {
+              status: RequestStatus.APPROVED, // Tutor has approved
+              responseMessage: responseMessage || 'Yêu cầu đã được tutor chấp nhận, đang chờ management phê duyệt để allocate phòng học',
+              updatedAt: now()
+            });
+
+            // Update the updatedRequest variable for response
+            const updatedRequestWithApproval = await storage.findById<SessionRequest>('session-requests.json', id);
+
+            // Create notification for student
+            const studentNotification: Notification = {
+              id: generateId('notif'),
+              userId: request.studentId,
+              type: NotificationType.SESSION_RESCHEDULED,
+              title: 'Yêu cầu đổi lịch đã được tutor chấp nhận',
+              message: `Yêu cầu đổi lịch session "${session.subject}" đã được tutor chấp nhận. Đang chờ management phê duyệt để allocate phòng học.`,
+              read: false,
+              link: `/student/session/${request.sessionId}`,
+              metadata: {
+                requestId: request.id,
+                sessionId: request.sessionId,
+                approvalRequestId: approvalRequest.id,
+                status: 'pending_management_approval'
+              },
+              createdAt: now()
+            };
+            await storage.create('notifications.json', studentNotification);
+
+            return res.json(
+              successResponse({
+                ...updatedRequestWithApproval!,
+                requiresManagementApproval: true,
+                approvalRequestId: approvalRequest.id,
+                message: 'Yêu cầu đã được tutor chấp nhận, đang chờ management phê duyệt để allocate phòng học'
+              }, 'Yêu cầu đã được chấp nhận, đang chờ management phê duyệt')
+            );
+          } else {
+            // For online sessions, directly update the session time
+            // Keep status as CONFIRMED since tutor has approved and no management approval needed
+            const duration = Math.round(
+              (new Date(finalEndTime).getTime() - new Date(finalStartTime).getTime()) / (1000 * 60)
+            );
+
+            await storage.update<Session>('sessions.json', request.sessionId, {
+              startTime: finalStartTime,
+              endTime: finalEndTime,
+              duration: duration,
+              status: SessionStatus.CONFIRMED, // Keep as confirmed since tutor approved and no management approval needed
+              rescheduledFrom: session?.startTime || request.preferredStartTime || finalStartTime,
+              updatedAt: now()
+            });
+          }
         }
       }
     }
 
-    // Create notification for student
-    const notificationType = request.type === RequestType.CANCEL
-      ? NotificationType.SESSION_CANCELLED
-      : NotificationType.SESSION_RESCHEDULED;
+    // Create notification for student (only if not already created above for cancel/reschedule offline)
+    // Check if we already returned early (cancel or reschedule offline with management approval)
+    const updatedRequestFinal = await storage.findById<SessionRequest>('session-requests.json', id);
+    if (updatedRequestFinal && updatedRequestFinal.status === RequestStatus.APPROVED) {
+      // Check if this is a case that requires management approval (already handled above)
+      const requiresManagementApproval = 
+        (request.type === RequestType.CANCEL) ||
+        (request.type === RequestType.RESCHEDULE && session && !session.isOnline && !request.classId);
+      
+      if (!requiresManagementApproval) {
+        // Only create notification for cases that don't require management approval
+        // (online reschedule, class reschedule with alternative)
+        const notificationType = request.type === RequestType.CANCEL
+          ? NotificationType.SESSION_CANCELLED
+          : NotificationType.SESSION_RESCHEDULED;
 
-    const tutor = await storage.findById<User>('users.json', request.tutorId);
-    
-    // Get subject for notification message
-    let subjectName = 'buổi học';
-    if (session?.subject) {
-      subjectName = session.subject;
-    } else if (request.classId) {
-      const classData = await storage.findById<Class>('classes.json', request.classId);
-      if (classData) {
-        subjectName = classData.subject;
+        const tutor = await storage.findById<User>('users.json', request.tutorId);
+        
+        // Get subject for notification message
+        let subjectName = 'buổi học';
+        if (session?.subject) {
+          subjectName = session.subject;
+        } else if (request.classId) {
+          const classData = await storage.findById<Class>('classes.json', request.classId);
+          if (classData) {
+            subjectName = classData.subject;
+          }
+        }
+        
+        const notification: Notification = {
+          id: generateId('notif'),
+          userId: request.studentId,
+          type: notificationType,
+          title: request.type === RequestType.CANCEL 
+            ? 'Yêu cầu hủy buổi học đã được chấp nhận'
+            : 'Yêu cầu đổi lịch buổi học đã được chấp nhận',
+          message: `${tutor?.name || 'Gia sư'} đã chấp nhận yêu cầu ${request.type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${subjectName}`,
+          read: false,
+          link: request.classId ? `/student/class/${request.classId}` : `/student/session/${request.sessionId}`,
+          metadata: {
+            requestId: request.id,
+            sessionId: request.sessionId,
+            classId: request.classId,
+            responseMessage: responseMessage
+          },
+          createdAt: now()
+        };
+        await storage.create('notifications.json', notification);
       }
     }
-    
-    const notification: Notification = {
-      id: generateId('notif'),
-      userId: request.studentId,
-      type: notificationType,
-      title: request.type === RequestType.CANCEL 
-        ? 'Yêu cầu hủy buổi học đã được chấp nhận'
-        : 'Yêu cầu đổi lịch buổi học đã được chấp nhận',
-      message: `${tutor?.name || 'Gia sư'} đã chấp nhận yêu cầu ${request.type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${subjectName}`,
-      read: false,
-      link: request.classId ? `/student/class/${request.classId}` : `/student/session/${request.sessionId}`,
-      metadata: {
-        requestId: request.id,
-        sessionId: request.sessionId,
-        classId: request.classId,
-        responseMessage: responseMessage
-      },
-      createdAt: now()
-    };
-    await storage.create('notifications.json', notification);
 
     return res.json(
-      successResponse(updatedRequest, 'Phê duyệt yêu cầu thành công')
+      successResponse(updatedRequestFinal || updatedRequest, 'Phê duyệt yêu cầu thành công')
     );
   } catch (error: any) {
     console.error('Approve session request error:', error);

@@ -1,0 +1,148 @@
+[
+  {
+    "id": "event_T2eUAOEnpo_H",
+    "title": "Hội thảo chuyên đề",
+    "description": "Sự kiện webinar được tổ chức bởi Bùi Dũng Tuấn",
+    "type": "webinar",
+    "organizerId": "mgmt_18QNI2lAxnAD",
+    "startTime": "2025-11-23T05:00:00.000Z",
+    "endTime": "2025-11-23T08:00:00.000Z",
+    "meetingLink": "https://meet.google.com/PT-k9I7IG3Dj",
+    "isOnline": true,
+    "maxParticipants": 43,
+    "participants": [],
+    "status": "cancelled",
+    "category": "Khác",
+    "tags": [
+      "workshop"
+    ],
+    "resources": [],
+    "registrationRequired": true,
+    "metadata": {
+      "agenda": "Chương trình chi tiết sẽ được cập nhật",
+      "speakers": [
+        "Bùi Dũng Tuấn"
+      ]
+    },
+    "createdAt": "2025-11-07T11:45:24.932Z",
+    "updatedAt": "2025-10-31T06:16:40.015Z"
+  },
+  {
+    "id": "event_MbD_EoBoxgvr",
+    "title": "Workshop về phương pháp học tập hiệu quả",
+    "description": "Sự kiện workshop được tổ chức bởi Đỗ Hà Hoàng",
+    "type": "workshop",
+    "organizerId": "mgmt_qLukzSvoJWcO",
+    "startTime": "2025-11-14T06:00:00.000Z",
+    "endTime": "2025-11-14T08:00:00.000Z",
+    "meetingLink": "https://meet.google.com/s2WOmY6HbZCf",
+    "isOnline": false,
+    "maxParticipants": 87,
+    "participants": [],
+    "status": "cancelled",
+    "category": "Khác",
+    "tags": [
+      "cộng đồng",
+      "webinar"
+    ],
+    "resources": [],
+    "registrationRequired": false,
+    "metadata": {
+      "agenda": "Chương trình chi tiết sẽ được cập nhật",
+      "speakers": [
+        "Đỗ Hà Hoàng"
+      ]
+    },
+    "createdAt": "2025-11-04T18:42:56.845Z",
+    "updatedAt": "2025-10-29T01:17:51.949Z"
+  },
+  {
+    "id": "event_th1p_vF8s44N",
+    "title": "Workshop về phương pháp học tập hiệu quả",
+    "description": "Sự kiện meeting được tổ chức bởi Bùi Dũng Tuấn",
+    "type": "meeting",
+    "organizerId": "mgmt_18QNI2lAxnAD",
+    "startTime": "2025-11-06T10:00:00.000Z",
+    "endTime": "2025-11-06T13:00:00.000Z",
+    "location": "Phòng A101",
+    "meetingLink": "https://meet.google.com/_EDGsWAz12C4",
+    "isOnline": true,
+    "maxParticipants": 57,
+    "participants": [],
+    "status": "cancelled",
+    "category": "Chuyên đề",
+    "tags": [
+      "workshop",
+      "webinar"
+    ],
+    "resources": [],
+    "registrationRequired": true,
+    "metadata": {
+      "agenda": "Chương trình chi tiết sẽ được cập nhật",
+      "speakers": [
+        "Bùi Dũng Tuấn"
+      ]
+    },
+    "createdAt": "2025-10-28T17:51:24.360Z",
+    "updatedAt": "2025-11-06T03:38:40.289Z"
+  },
+  {
+    "id": "event_3PaHo1ADMuF-",
+    "title": "Hội thảo chuyên đề",
+    "description": "Sự kiện seminar được tổ chức bởi Phan Bảo Hương",
+    "type": "seminar",
+    "organizerId": "mgmt_lkN2DSFEv5dI",
+    "startTime": "2025-11-18T07:00:00.000Z",
+    "endTime": "2025-11-18T08:00:00.000Z",
+    "meetingLink": "https://meet.google.com/HDVPNB0nXCQ0",
+    "isOnline": true,
+    "maxParticipants": 41,
+    "participants": [],
+    "status": "cancelled",
+    "category": "Giao lưu",
+    "tags": [
+      "workshop",
+      "webinar"
+    ],
+    "resources": [],
+    "registrationRequired": false,
+    "metadata": {
+      "agenda": "Chương trình chi tiết sẽ được cập nhật",
+      "speakers": [
+        "Phan Bảo Hương"
+      ]
+    },
+    "createdAt": "2025-10-30T11:44:39.427Z",
+    "updatedAt": "2025-11-04T17:19:25.715Z"
+  },
+  {
+    "id": "event_6T9HBr58c7Ro",
+    "title": "Hội thảo chuyên đề",
+    "description": "Sự kiện webinar được tổ chức bởi Đỗ Hà Hoàng",
+    "type": "webinar",
+    "organizerId": "mgmt_qLukzSvoJWcO",
+    "startTime": "2025-11-19T07:00:00.000Z",
+    "endTime": "2025-11-19T08:00:00.000Z",
+    "location": "Phòng A101",
+    "meetingLink": "https://meet.google.com/i32K4C0WLu5g",
+    "isOnline": false,
+    "maxParticipants": 62,
+    "participants": [],
+    "status": "ongoing",
+    "category": "Giao lưu",
+    "tags": [
+      "cộng đồng"
+    ],
+    "resources": [],
+    "registrationRequired": true,
+    "registrationDeadline": "2025-11-18T07:00:00.000Z",
+    "metadata": {
+      "agenda": "Chương trình chi tiết sẽ được cập nhật",
+      "speakers": [
+        "Đỗ Hà Hoàng"
+      ]
+    },
+    "createdAt": "2025-10-27T21:07:03.084Z",
+    "updatedAt": "2025-10-29T12:13:55.011Z"
+  }
+]

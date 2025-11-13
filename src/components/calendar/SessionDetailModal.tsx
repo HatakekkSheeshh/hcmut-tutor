@@ -308,8 +308,8 @@ const SessionDetailModal: React.FC<SessionDetailModalProps> = ({
                     }}
                   >
                     {session.location.type === 'online' 
-                      ? session.location.meetingLink 
-                      : session.location.address
+                      ? (session.location.meetingLink || 'Virtual Meeting')
+                      : (session.location.address || 'Physical Location - Chưa được phân bổ')
                     }
                   </Typography>
                 </Box>

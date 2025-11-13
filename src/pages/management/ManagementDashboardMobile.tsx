@@ -304,6 +304,7 @@ const ManagementDashboardMobile: React.FC = () => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/management' },
     { id: 'approval-requests', label: 'Approval Requests', icon: <AssignmentIcon />, path: '/management/approval' },
+    { id: 'resource-allocation', label: 'Resource Allocation', icon: <TrendingUpIcon />, path: '/management/resources' },
     { id: 'reports-analytics', label: 'Reports & Analytics', icon: <BarChartIcon />, path: '/management/reports' },
     { id: 'award-credits', label: 'Award Credits', icon: <StarIcon />, path: '/management/awards' },
     { id: 'user-management', label: 'User Management', icon: <PeopleIcon />, path: '/management/users' },
