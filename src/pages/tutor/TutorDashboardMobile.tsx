@@ -394,12 +394,12 @@ const TutorDashboardMobile: React.FC = () => {
   const userName = user?.name || 'Tutor'
   const avatarUrl = user?.avatar
 
-  // Get upcoming sessions (confirmed or pending) from real data
+  // Get upcoming sessions (confirmed, pending, or rescheduled) from real data
   const upcomingSessions = sessions
     .filter(session => {
       const sessionDate = new Date(session.startTime)
       const now = new Date()
-      return (session.status === 'confirmed' || session.status === 'pending') && sessionDate >= now
+      return (session.status === 'confirmed' || session.status === 'pending' || session.status === 'rescheduled') && sessionDate >= now
     })
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
     .slice(0, 6) // Limit to 6 upcoming sessions

@@ -1,0 +1,424 @@
+[
+  {
+    "id": "doc_KnV4V7u4kshH",
+    "title": "Hướng dẫn sử dụng hệ thống",
+    "description": "Tài liệu reference được upload bởi Đặng An Lan",
+    "fileName": "document-1.txt",
+    "fileUrl": "https://storage.example.com/documents/Hbcd54WJdFbC",
+    "fileSize": 1260345,
+    "fileType": "text/plain",
+    "category": "reference",
+    "tags": [
+      "chính sách",
+      "tham khảo"
+    ],
+    "uploadedBy": "tut_6copkRNEBLGs",
+    "uploadedAt": "2025-10-25T17:00:49.014Z",
+    "updatedAt": "2025-10-25T00:42:51.524Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 47,
+    "viewCount": 16,
+    "metadata": {
+      "author": "Đặng An Lan",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 2
+    }
+  },
+  {
+    "id": "doc_3B_s7lCAFWX8",
+    "title": "Tài liệu học tập môn học",
+    "description": "Tài liệu reference được upload bởi Phạm Mai Phương",
+    "fileName": "document-2.txt",
+    "fileUrl": "https://storage.example.com/documents/qGv0sOFeygEd",
+    "fileSize": 1326290,
+    "fileType": "text/plain",
+    "category": "reference",
+    "tags": [
+      "tham khảo",
+      "tài liệu"
+    ],
+    "uploadedBy": "stu_ZfEvyF4Gu7bc",
+    "uploadedAt": "2025-11-07T00:59:56.967Z",
+    "updatedAt": "2025-11-04T18:21:00.614Z",
+    "isPublic": true,
+    "isEncrypted": true,
+    "accessLevel": "public",
+    "downloadCount": 43,
+    "viewCount": 21,
+    "metadata": {
+      "author": "Phạm Mai Phương",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 32
+    }
+  },
+  {
+    "id": "doc_OqvL6t1C8Wx-",
+    "title": "Tài liệu học tập môn học",
+    "description": "Tài liệu academic được upload bởi Đỗ Mai Thị",
+    "fileName": "document-3.docx",
+    "fileUrl": "https://storage.example.com/documents/7X3IlNDuY6M8",
+    "fileSize": 1742592,
+    "fileType": "application/msword",
+    "category": "academic",
+    "subject": "Toán cao cấp",
+    "tags": [
+      "tham khảo",
+      "hướng dẫn",
+      "chính sách"
+    ],
+    "uploadedBy": "stu_SgsgvGIuTR0F",
+    "uploadedAt": "2025-10-30T08:11:15.828Z",
+    "updatedAt": "2025-11-02T23:16:45.064Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 10,
+    "viewCount": 38,
+    "metadata": {
+      "author": "Đỗ Mai Thị",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 2
+    }
+  },
+  {
+    "id": "doc_HwXgpnE48OXo",
+    "title": "Tài liệu tham khảo",
+    "description": "Tài liệu other được upload bởi Đặng An Lan",
+    "fileName": "document-4.pdf",
+    "fileUrl": "https://storage.example.com/documents/m0LbmILEBhsH",
+    "fileSize": 2021176,
+    "fileType": "application/pdf",
+    "category": "other",
+    "tags": [
+      "hướng dẫn",
+      "tài liệu"
+    ],
+    "uploadedBy": "tut_6copkRNEBLGs",
+    "uploadedAt": "2025-10-15T05:10:23.887Z",
+    "updatedAt": "2025-10-24T03:47:17.191Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 15,
+    "viewCount": 71,
+    "metadata": {
+      "author": "Đặng An Lan",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 27
+    }
+  },
+  {
+    "id": "doc_fo_N_t4UvlUR",
+    "title": "Tài liệu tham khảo",
+    "description": "Tài liệu other được upload bởi Đỗ Hà Hoàng",
+    "fileName": "document-5.pdf",
+    "fileUrl": "https://storage.example.com/documents/VUqq9qZsGZNG",
+    "fileSize": 3285264,
+    "fileType": "application/pdf",
+    "category": "other",
+    "tags": [
+      "chính sách",
+      "hướng dẫn",
+      "tài liệu"
+    ],
+    "uploadedBy": "mgmt_qLukzSvoJWcO",
+    "uploadedAt": "2025-10-27T23:19:44.333Z",
+    "updatedAt": "2025-11-09T08:00:01.749Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "restricted",
+    "downloadCount": 40,
+    "viewCount": 3,
+    "metadata": {
+      "author": "Đỗ Hà Hoàng",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 38
+    }
+  },
+  {
+    "id": "doc_6yc6qpDLgKZ8",
+    "title": "Tài liệu học tập môn học",
+    "description": "Tài liệu other được upload bởi Đặng Nam Văn",
+    "fileName": "document-6.docx",
+    "fileUrl": "https://storage.example.com/documents/hN5o4CYl_UlH",
+    "fileSize": 764830,
+    "fileType": "application/msword",
+    "category": "other",
+    "tags": [
+      "chính sách",
+      "tài liệu"
+    ],
+    "uploadedBy": "stu_afp9r8MLsjE8",
+    "uploadedAt": "2025-11-05T08:45:12.701Z",
+    "updatedAt": "2025-10-15T03:45:09.606Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 27,
+    "viewCount": 95,
+    "metadata": {
+      "author": "Đặng Nam Văn",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 15
+    }
+  },
+  {
+    "id": "doc_oxmAX5whdKPi",
+    "title": "Quy định và chính sách",
+    "description": "Tài liệu administrative được upload bởi Hoàng Khánh Hương",
+    "fileName": "document-7.txt",
+    "fileUrl": "https://storage.example.com/documents/_W6g09OzBcwf",
+    "fileSize": 659130,
+    "fileType": "text/plain",
+    "category": "administrative",
+    "tags": [
+      "hướng dẫn"
+    ],
+    "uploadedBy": "stu_Z2bUHkAmmkQH",
+    "uploadedAt": "2025-10-18T18:34:57.911Z",
+    "updatedAt": "2025-10-16T22:31:50.355Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 0,
+    "viewCount": 17,
+    "metadata": {
+      "author": "Hoàng Khánh Hương",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 30
+    }
+  },
+  {
+    "id": "doc_kIxWAJfon7I2",
+    "title": "Tài liệu tham khảo",
+    "description": "Tài liệu administrative được upload bởi Bùi Dũng Phương",
+    "fileName": "document-8.docx",
+    "fileUrl": "https://storage.example.com/documents/deWXVgR8nfpq",
+    "fileSize": 1335156,
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "category": "administrative",
+    "tags": [
+      "chính sách",
+      "hướng dẫn"
+    ],
+    "uploadedBy": "stu_h8gj9_8-bjIL",
+    "uploadedAt": "2025-11-04T15:19:54.712Z",
+    "updatedAt": "2025-11-09T19:12:43.824Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 17,
+    "viewCount": 27,
+    "metadata": {
+      "author": "Bùi Dũng Phương",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 25
+    }
+  },
+  {
+    "id": "doc_HGYAYp5_2aDi",
+    "title": "Báo cáo thống kê",
+    "description": "Tài liệu reference được upload bởi Lê Dũng Hữu",
+    "fileName": "document-9.docx",
+    "fileUrl": "https://storage.example.com/documents/LDW2dTtuUR2o",
+    "fileSize": 4006271,
+    "fileType": "application/msword",
+    "category": "reference",
+    "tags": [
+      "hướng dẫn",
+      "tài liệu"
+    ],
+    "uploadedBy": "stu_ZU0fknsTqL_A",
+    "uploadedAt": "2025-11-05T07:44:33.071Z",
+    "updatedAt": "2025-11-05T06:50:50.902Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 28,
+    "viewCount": 5,
+    "metadata": {
+      "author": "Lê Dũng Hữu",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 35
+    }
+  },
+  {
+    "id": "doc_qLA9iP55eJMB",
+    "title": "Tài liệu học tập môn học",
+    "description": "Tài liệu reference được upload bởi Bùi Khánh Anh",
+    "fileName": "document-10.pdf",
+    "fileUrl": "https://storage.example.com/documents/l1WDna00OvkS",
+    "fileSize": 3592035,
+    "fileType": "application/pdf",
+    "category": "reference",
+    "tags": [
+      "hướng dẫn",
+      "tài liệu",
+      "tham khảo"
+    ],
+    "uploadedBy": "tut_61QAuOdQbyZS",
+    "uploadedAt": "2025-10-30T12:11:51.623Z",
+    "updatedAt": "2025-11-07T06:50:59.073Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 43,
+    "viewCount": 77,
+    "metadata": {
+      "author": "Bùi Khánh Anh",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 23
+    }
+  },
+  {
+    "id": "doc_1Y45Ovw78YWF",
+    "title": "Quy định và chính sách",
+    "description": "Tài liệu academic được upload bởi Phạm Mai Phương",
+    "fileName": "document-11.docx",
+    "fileUrl": "https://storage.example.com/documents/UHUBkc6FDHuj",
+    "fileSize": 1054312,
+    "fileType": "application/msword",
+    "category": "academic",
+    "subject": "Tiếng Anh",
+    "tags": [
+      "hướng dẫn",
+      "chính sách"
+    ],
+    "uploadedBy": "stu_ZfEvyF4Gu7bc",
+    "uploadedAt": "2025-10-13T07:16:13.576Z",
+    "updatedAt": "2025-10-29T10:14:25.117Z",
+    "isPublic": true,
+    "isEncrypted": true,
+    "accessLevel": "private",
+    "downloadCount": 22,
+    "viewCount": 92,
+    "metadata": {
+      "author": "Phạm Mai Phương",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 27
+    }
+  },
+  {
+    "id": "doc_qO00JpQagY02",
+    "title": "Hướng dẫn sử dụng hệ thống",
+    "description": "Tài liệu academic được upload bởi Trần Mai Thị",
+    "fileName": "document-12.pdf",
+    "fileUrl": "https://storage.example.com/documents/tHjCuDWTbIec",
+    "fileSize": 2238208,
+    "fileType": "application/pdf",
+    "category": "academic",
+    "subject": "Toán cao cấp",
+    "tags": [
+      "tham khảo"
+    ],
+    "uploadedBy": "tut_g0qfsZQJDZEe",
+    "uploadedAt": "2025-11-01T16:05:25.253Z",
+    "updatedAt": "2025-11-01T22:29:30.255Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 16,
+    "viewCount": 93,
+    "metadata": {
+      "author": "Trần Mai Thị",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 1
+    }
+  },
+  {
+    "id": "doc_QxgnaRfjKOK7",
+    "title": "Báo cáo thống kê",
+    "description": "Tài liệu administrative được upload bởi Bùi Dũng Phương",
+    "fileName": "document-13.docx",
+    "fileUrl": "https://storage.example.com/documents/4TzZn71pNFxd",
+    "fileSize": 4758199,
+    "fileType": "application/msword",
+    "category": "administrative",
+    "tags": [
+      "tham khảo"
+    ],
+    "uploadedBy": "stu_h8gj9_8-bjIL",
+    "uploadedAt": "2025-11-06T04:09:39.051Z",
+    "updatedAt": "2025-10-13T13:29:54.719Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 6,
+    "viewCount": 64,
+    "metadata": {
+      "author": "Bùi Dũng Phương",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 21
+    }
+  },
+  {
+    "id": "doc_ZpPgqv8ebiDF",
+    "title": "Tài liệu tham khảo",
+    "description": "Tài liệu other được upload bởi Đặng Nam Lan",
+    "fileName": "document-14.txt",
+    "fileUrl": "https://storage.example.com/documents/eko2hz514cQZ",
+    "fileSize": 2808258,
+    "fileType": "text/plain",
+    "category": "other",
+    "tags": [
+      "tham khảo",
+      "tài liệu"
+    ],
+    "uploadedBy": "stu_3xXLt1IWBsCS",
+    "uploadedAt": "2025-10-23T13:41:30.915Z",
+    "updatedAt": "2025-11-11T00:00:44.541Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 23,
+    "viewCount": 10,
+    "metadata": {
+      "author": "Đặng Nam Lan",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 42
+    }
+  },
+  {
+    "id": "doc_Azhd4pSjNL3D",
+    "title": "Tài liệu tham khảo",
+    "description": "Tài liệu reference được upload bởi Phạm Giang Văn",
+    "fileName": "document-15.txt",
+    "fileUrl": "https://storage.example.com/documents/pco4igFcU79G",
+    "fileSize": 4557534,
+    "fileType": "text/plain",
+    "category": "reference",
+    "tags": [
+      "chính sách"
+    ],
+    "uploadedBy": "tut_am6slkTzwGyq",
+    "uploadedAt": "2025-11-07T07:33:01.105Z",
+    "updatedAt": "2025-10-22T06:52:02.201Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "restricted",
+    "downloadCount": 36,
+    "viewCount": 17,
+    "metadata": {
+      "author": "Phạm Giang Văn",
+      "version": "1.0",
+      "language": "vi",
+      "pages": 24
+    }
+  }
+]

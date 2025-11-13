@@ -173,6 +173,85 @@ async function seed() {
     );
     console.log(`✅ Created ${mockData.sessionRequests.length} session requests`);
 
+    // Write management module data
+    await writeFile(
+      join(dataDir, 'permissions-audit.json'),
+      JSON.stringify(mockData.permissionAudits || [], null, 2),
+      'utf-8'
+    );
+    console.log(`✅ Created ${(mockData.permissionAudits || []).length} permission audits`);
+
+    await writeFile(
+      join(dataDir, 'training-credits.json'),
+      JSON.stringify(mockData.trainingCredits || [], null, 2),
+      'utf-8'
+    );
+    console.log(`✅ Created ${(mockData.trainingCredits || []).length} training credits`);
+
+    await writeFile(
+      join(dataDir, 'documents.json'),
+      JSON.stringify(mockData.documents || [], null, 2),
+      'utf-8'
+    );
+    console.log(`✅ Created ${(mockData.documents || []).length} documents`);
+
+    await writeFile(
+      join(dataDir, 'community-resources.json'),
+      JSON.stringify(mockData.communityResources || [], null, 2),
+      'utf-8'
+    );
+    console.log(`✅ Created ${(mockData.communityResources || []).length} community resources`);
+
+    await writeFile(
+      join(dataDir, 'community-events.json'),
+      JSON.stringify(mockData.communityEvents || [], null, 2),
+      'utf-8'
+    );
+    console.log(`✅ Created ${(mockData.communityEvents || []).length} community events`);
+
+    // Create empty management data files
+    await writeFile(
+      join(dataDir, 'optimization-plans.json'),
+      JSON.stringify([], null, 2),
+      'utf-8'
+    );
+    console.log('✅ Created optimization-plans.json (empty)');
+
+    await writeFile(
+      join(dataDir, 'progress-reports.json'),
+      JSON.stringify([], null, 2),
+      'utf-8'
+    );
+    console.log('✅ Created progress-reports.json (empty)');
+
+    await writeFile(
+      join(dataDir, 'document-permissions.json'),
+      JSON.stringify([], null, 2),
+      'utf-8'
+    );
+    console.log('✅ Created document-permissions.json (empty)');
+
+    await writeFile(
+      join(dataDir, 'document-sharing.json'),
+      JSON.stringify([], null, 2),
+      'utf-8'
+    );
+    console.log('✅ Created document-sharing.json (empty)');
+
+    await writeFile(
+      join(dataDir, 'document-activities.json'),
+      JSON.stringify([], null, 2),
+      'utf-8'
+    );
+    console.log('✅ Created document-activities.json (empty)');
+
+    await writeFile(
+      join(dataDir, 'community-activities.json'),
+      JSON.stringify([], null, 2),
+      'utf-8'
+    );
+    console.log('✅ Created community-activities.json (empty)');
+
     // Create empty messages file
     await writeFile(
       join(dataDir, 'messages.json'),
@@ -227,6 +306,11 @@ async function seed() {
     console.log(`   - Notifications: ${mockData.notifications.length}`);
     console.log(`   - Availability: ${mockData.availability.length}`);
     console.log(`   - Approval Requests: ${mockData.approvals.length}`);
+    console.log(`   - Permission Audits: ${(mockData.permissionAudits || []).length}`);
+    console.log(`   - Training Credits: ${(mockData.trainingCredits || []).length}`);
+    console.log(`   - Documents: ${(mockData.documents || []).length}`);
+    console.log(`   - Community Resources: ${(mockData.communityResources || []).length}`);
+    console.log(`   - Community Events: ${(mockData.communityEvents || []).length}`);
     console.log('\n📝 Default password for all users: password123');
     console.log('📝 Default password for management: admin123\n');
 

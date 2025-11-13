@@ -373,7 +373,9 @@ const TutorSessionDetailMobile: React.FC = () => {
                       {session.isOnline ? 'Online Video Call' : 'In-Person Meeting'}
                     </p>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {session.isOnline ? 'Virtual' : session.location || 'Physical Location'}
+                      {session.isOnline 
+                        ? (session.meetingLink || 'Virtual') 
+                        : (session.location || 'Physical Location - Chưa được phân bổ')}
                     </p>
                   </div>
                 </div>
