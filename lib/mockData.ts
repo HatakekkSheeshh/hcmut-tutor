@@ -13,6 +13,8 @@ import {
   ForumComment,
   Availability,
   ApprovalRequest,
+  ApprovalRequestType,
+  ApprovalRequestStatus,
   Class,
   Enrollment,
   CourseContent,
@@ -26,12 +28,19 @@ import {
   UserRole,
   SessionStatus,
   NotificationType,
-  ApprovalStatus,
   ClassStatus,
   EnrollmentStatus,
   SessionRequest,
   RequestType,
-  RequestStatus
+  RequestStatus,
+  TrainingCredit,
+  Document,
+  CommunityResource,
+  CommunityEvent,
+  PermissionAudit,
+  OptimizationPlan,
+  ProgressReport,
+  PerformanceAnalysis
 } from './types.js';
 import {
   generateId,
@@ -186,7 +195,7 @@ export const generateManagement = async (count: number = 5): Promise<Management[
       hcmutId: generateHCMUTId(),
       role: UserRole.MANAGEMENT,
       department: randomItem(['Academic Affairs', 'Student Services', 'IT Department', 'Administration']),
-      permissions: ['view_analytics', 'manage_users', 'approve_requests', 'view_reports'],
+      permissions: ['view_analytics', 'manage_users', 'approve_requests', 'view_reports', 'award_credits', 'manage_community'],
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
       phone: `09${randomInt(10000000, 99999999)}`,
       createdAt: now(),
@@ -482,25 +491,208 @@ export const generateAvailability = (tutors: Tutor[]): Availability[] => {
 /**
  * Generate mock approval requests
  */
-export const generateApprovalRequests = (tutors: Tutor[]): ApprovalRequest[] => {
+export const generateApprovalRequests = (
+  tutors: Tutor[], 
+  management: Management[], 
+  sessions: Session[],
+  forumPosts?: ForumPost[],
+  forumComments?: ForumComment[]
+): ApprovalRequest[] => {
   const requests: ApprovalRequest[] = [];
+  const statuses = [
+    ApprovalRequestStatus.PENDING,
+    ApprovalRequestStatus.APPROVED,
+    ApprovalRequestStatus.REJECTED,
+    ApprovalRequestStatus.CLARIFICATION_REQUESTED
+  ];
+  const priorities: ('low' | 'medium' | 'high' | 'urgent')[] = ['low', 'medium', 'high', 'urgent'];
 
+  // Tutor verification requests
   tutors.forEach(tutor => {
     if (!tutor.verified && Math.random() > 0.5) {
+      const createdAt = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+      const deadline = new Date(createdAt.getTime() + 48 * 60 * 60 * 1000);
       const request: ApprovalRequest = {
         id: generateId('req'),
-        type: 'tutor_verification',
+        type: ApprovalRequestType.TUTOR_VERIFICATION,
         requesterId: tutor.id,
         targetId: tutor.id,
         title: 'Yêu cầu xác thực Tutor',
-        description: `Tutor ${tutor.name} yêu cầu xác thực tài khoản`,
-        status: randomItem([ApprovalStatus.PENDING, ApprovalStatus.APPROVED, ApprovalStatus.REJECTED]),
-        createdAt: now(),
+        description: `Tutor ${tutor.name} yêu cầu xác thực tài khoản với các credentials: ${tutor.credentials?.join(', ') || 'N/A'}`,
+        status: randomItem(statuses),
+        priority: randomItem(priorities),
+        deadline: deadline.toISOString(),
+        reviewerId: Math.random() > 0.5 ? randomItem(management).id : undefined,
+        reviewNotes: Math.random() > 0.5 ? 'Đã xem xét và phê duyệt' : undefined,
+        createdAt: createdAt.toISOString(),
         updatedAt: now()
       };
       requests.push(request);
     }
   });
+
+  // Session change requests
+  sessions.filter(s => s.status === SessionStatus.CONFIRMED).slice(0, 5).forEach(session => {
+    if (Math.random() > 0.7) {
+      const createdAt = new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000);
+      const deadline = new Date(createdAt.getTime() + 48 * 60 * 60 * 1000);
+      const request: ApprovalRequest = {
+        id: generateId('req'),
+        type: ApprovalRequestType.SESSION_CHANGE,
+        requesterId: session.studentIds?.[0] || '',
+        targetId: session.id,
+        title: `Yêu cầu thay đổi session ${session.subject}`,
+        description: `Yêu cầu thay đổi lịch học cho session ${session.subject} vào ${new Date(session.startTime).toLocaleDateString('vi-VN')}`,
+        status: randomItem(statuses),
+        priority: randomItem(priorities),
+        deadline: deadline.toISOString(),
+        reviewerId: Math.random() > 0.5 ? randomItem(management).id : undefined,
+        createdAt: createdAt.toISOString(),
+        updatedAt: now()
+      };
+      requests.push(request);
+    }
+  });
+
+  // Resource allocation requests
+  if (sessions.length > 0 && tutors.length > 0) {
+    const numResourceRequests = Math.floor(Math.random() * 3) + 1; // 1-3 requests
+    for (let i = 0; i < numResourceRequests; i++) {
+      const createdAt = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+      const deadline = new Date(createdAt.getTime() + 48 * 60 * 60 * 1000);
+      
+      // Get some sessions and tutors for resource allocation
+      const selectedSessions = sessions.filter(s => s.status === SessionStatus.CONFIRMED).slice(0, 3);
+      const selectedTutors = tutors.slice(0, 2);
+      
+      if (selectedSessions.length > 0 && selectedTutors.length > 0) {
+        const changes: Array<{
+          type: 'reassign_tutor' | 'adjust_group_size' | 'reallocate_room' | 'adjust_schedule';
+          resourceId: string;
+          fromValue?: any;
+          toValue?: any;
+          reason?: string;
+        }> = [];
+        
+        // Add reassign tutor change
+        if (selectedSessions.length > 0 && selectedTutors.length >= 2) {
+          changes.push({
+            type: 'reassign_tutor',
+            resourceId: selectedSessions[0].id,
+            fromValue: selectedSessions[0].tutorId,
+            toValue: selectedTutors[1].id,
+            reason: 'Cân bằng workload giữa các tutors'
+          });
+        }
+        
+        // Add adjust group size change
+        if (selectedSessions.length > 1) {
+          const session = selectedSessions[1];
+          if (session.studentIds && session.studentIds.length > 0) {
+            changes.push({
+              type: 'adjust_group_size',
+              resourceId: session.id,
+              fromValue: session.studentIds,
+              toValue: session.studentIds.slice(0, Math.max(1, session.studentIds.length - 1)),
+              reason: 'Giảm kích thước nhóm để tăng chất lượng học tập'
+            });
+          }
+        }
+        
+        if (changes.length > 0) {
+          const affectedTutorIds = Array.from(new Set(changes.map((c: any) => [c.fromValue, c.toValue]).flat().filter(Boolean)));
+          const affectedSessionIds = changes.map((c: any) => c.resourceId);
+          const affectedStudentIds = Array.from(new Set(
+            selectedSessions.flatMap(s => s.studentIds || [])
+          ));
+          
+          const request: ApprovalRequest = {
+            id: generateId('approval'),
+            type: ApprovalRequestType.RESOURCE_ALLOCATION,
+            requesterId: randomItem(management).id,
+            targetId: selectedSessions[0].id,
+            title: 'Yêu cầu phân bổ lại tài nguyên',
+            description: `Yêu cầu phân bổ lại tài nguyên để tối ưu hóa hiệu quả hoạt động. Bao gồm ${changes.length} thay đổi.`,
+            status: randomItem(statuses),
+            priority: randomItem(priorities),
+            deadline: deadline.toISOString(),
+            resourceAllocationData: {
+              changes: changes,
+              affectedTutorIds: affectedTutorIds,
+              affectedSessionIds: affectedSessionIds,
+              affectedStudentIds: affectedStudentIds
+            },
+            reviewerId: Math.random() > 0.5 ? randomItem(management).id : undefined,
+            createdAt: createdAt.toISOString(),
+            updatedAt: now()
+          };
+          requests.push(request);
+        }
+      }
+    }
+  }
+
+  // Content moderation requests
+  if (forumPosts && forumComments) {
+    const numContentRequests = Math.floor(Math.random() * 3) + 1; // 1-3 requests
+    for (let i = 0; i < numContentRequests; i++) {
+      const createdAt = new Date(Date.now() - Math.random() * 5 * 24 * 60 * 60 * 1000);
+      const deadline = new Date(createdAt.getTime() + 48 * 60 * 60 * 1000);
+      
+      const violationTypes: Array<'spam' | 'inappropriate' | 'harassment' | 'false_information' | 'other'> = 
+        ['spam', 'inappropriate', 'harassment', 'false_information', 'other'];
+      const severities: Array<'low' | 'medium' | 'high' | 'critical'> = 
+        ['low', 'medium', 'high', 'critical'];
+      const contentTypes: Array<'post' | 'comment'> = ['post', 'comment'];
+      
+      const violationType = randomItem(violationTypes);
+      const severity = randomItem(severities);
+      const contentType = randomItem(contentTypes);
+      
+      // Get actual content from forum posts or comments
+      let content: ForumPost | ForumComment | null = null;
+      let contentId = '';
+      
+      if (contentType === 'post' && forumPosts.length > 0) {
+        content = randomItem(forumPosts);
+        contentId = content.id;
+      } else if (contentType === 'comment' && forumComments.length > 0) {
+        content = randomItem(forumComments);
+        contentId = content.id;
+      }
+      
+      if (content && contentId) {
+        const contentPreview = contentType === 'post' 
+          ? (content as ForumPost).content.substring(0, 200) + ((content as ForumPost).content.length > 200 ? '...' : '')
+          : (content as ForumComment).content.substring(0, 200) + ((content as ForumComment).content.length > 200 ? '...' : '');
+        
+        const request: ApprovalRequest = {
+          id: generateId('approval'),
+          type: ApprovalRequestType.CONTENT_MODERATION,
+          requesterId: randomItem(tutors).id, // Tutor or student reports content
+          targetId: contentId,
+          title: `Yêu cầu kiểm duyệt ${contentType === 'post' ? 'bài viết' : 'bình luận'}`,
+          description: `Yêu cầu kiểm duyệt ${contentType === 'post' ? 'bài viết' : 'bình luận'} do vi phạm: ${violationType}. Mức độ: ${severity}.`,
+          status: randomItem(statuses),
+          priority: severity === 'critical' || severity === 'high' ? 'high' : randomItem(priorities),
+          deadline: deadline.toISOString(),
+          contentModerationData: {
+            contentType: contentType,
+            contentId: contentId,
+            contentPreview: contentPreview,
+            reportedBy: [randomItem(tutors).id], // Can have multiple reporters
+            reportReasons: [`Vi phạm: ${violationType}`, 'Nội dung không phù hợp với cộng đồng'],
+            violationType: violationType,
+            severity: severity
+          },
+          reviewerId: Math.random() > 0.5 ? randomItem(management).id : undefined,
+          createdAt: createdAt.toISOString(),
+          updatedAt: now()
+        };
+        requests.push(request);
+      }
+    }
+  }
 
   return requests;
 };
@@ -1138,6 +1330,245 @@ const generateAssignmentSubmissions = (assignments: Assignment[], sessions: Sess
   return submissions;
 };
 
+// ===== MANAGEMENT MODULE SEED DATA GENERATORS =====
+
+/**
+ * Generate permission audit logs
+ */
+export const generatePermissionAudits = (management: Management[], allUsers: User[]): PermissionAudit[] => {
+  const audits: PermissionAudit[] = [];
+  const actions: ('grant' | 'revoke' | 'update')[] = ['grant', 'revoke', 'update'];
+  const permissions = ['view_analytics', 'manage_users', 'approve_requests', 'view_reports', 'award_credits', 'manage_community'];
+
+  // Generate some permission changes
+  for (let i = 0; i < 10; i++) {
+    const actor = randomItem(management);
+    const targetUser = randomItem(allUsers);
+    const action = randomItem(actions);
+    const permCount = randomInt(1, 3);
+    const selectedPerms = randomItems(permissions, permCount);
+
+    const audit: PermissionAudit = {
+      id: generateId('audit'),
+      userId: targetUser.id,
+      action,
+      permissions: selectedPerms,
+      previousPermissions: action === 'update' ? randomItems(permissions, randomInt(1, 2)) : undefined,
+      actorId: actor.id,
+      reason: randomItem([
+        'Thay đổi vai trò người dùng',
+        'Cập nhật quyền truy cập',
+        'Thu hồi quyền do vi phạm',
+        'Cấp quyền tạm thời'
+      ]),
+      temporary: Math.random() > 0.7,
+      expiresAt: Math.random() > 0.7 ? addDays(new Date(), randomInt(7, 30)).toISOString() : undefined,
+      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
+    };
+    audits.push(audit);
+  }
+
+  return audits;
+};
+
+/**
+ * Generate training credits
+ */
+export const generateTrainingCredits = (students: Student[], sessions: Session[], classes: Class[], management: Management[]): TrainingCredit[] => {
+  const credits: TrainingCredit[] = [];
+  const semesters = ['2024-2025-1', '2024-2025-2', '2023-2024-2'];
+
+  // Award credits to some students
+  students.slice(0, 10).forEach(student => {
+    if (Math.random() > 0.5) {
+      const session = randomItem(sessions.filter(s => s.studentIds?.includes(student.id) && s.status === SessionStatus.COMPLETED));
+      const semester = randomItem(semesters);
+      const creditAmount = randomInt(1, 3);
+
+      const credit: TrainingCredit = {
+        id: generateId('credit'),
+        studentId: student.id,
+        sessionId: session?.id,
+        classId: session?.classId,
+        semester,
+        credits: creditAmount,
+        reason: randomItem([
+          'Hoàn thành session với attendance rate >= 80%',
+          'Tham gia đầy đủ các buổi học trong semester',
+          'Performance tốt trong các sessions',
+          'Đạt yêu cầu về số lượng sessions completed'
+        ]),
+        awardedBy: randomItem(management).id,
+        awardedAt: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'active',
+        metadata: {
+          attendanceRate: randomInt(80, 100),
+          performanceScore: randomInt(7, 10),
+          completionRate: randomInt(80, 100)
+        }
+      };
+      credits.push(credit);
+    }
+  });
+
+  return credits;
+};
+
+/**
+ * Generate documents
+ */
+export const generateDocuments = (allUsers: User[]): Document[] => {
+  const documents: Document[] = [];
+  const categories: ('academic' | 'administrative' | 'reference' | 'other')[] = ['academic', 'administrative', 'reference', 'other'];
+  const fileTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+  const subjects = ['Toán cao cấp', 'Vật lý đại cương', 'Lập trình C/C++', 'Tiếng Anh'];
+
+  for (let i = 0; i < 15; i++) {
+    const uploader = randomItem(allUsers);
+    const category = randomItem(categories);
+    const fileType = randomItem(fileTypes);
+    const fileSize = randomInt(100000, 5000000); // 100KB to 5MB
+
+    const document: Document = {
+      id: generateId('doc'),
+      title: randomItem([
+        'Hướng dẫn sử dụng hệ thống',
+        'Tài liệu học tập môn học',
+        'Quy định và chính sách',
+        'Báo cáo thống kê',
+        'Tài liệu tham khảo'
+      ]),
+      description: `Tài liệu ${category} được upload bởi ${uploader.name}`,
+      fileName: `document-${i + 1}.${fileType.includes('pdf') ? 'pdf' : fileType.includes('word') ? 'docx' : 'txt'}`,
+      fileUrl: `https://storage.example.com/documents/${generateId()}`,
+      fileSize,
+      fileType,
+      category,
+      subject: category === 'academic' ? randomItem(subjects) : undefined,
+      tags: randomItems(['hướng dẫn', 'tài liệu', 'tham khảo', 'chính sách'], randomInt(1, 3)),
+      uploadedBy: uploader.id,
+      uploadedAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      isPublic: Math.random() > 0.5,
+      isEncrypted: Math.random() > 0.8,
+      accessLevel: Math.random() > 0.5 ? 'public' : Math.random() > 0.5 ? 'private' : 'restricted',
+      downloadCount: randomInt(0, 50),
+      viewCount: randomInt(0, 100),
+      metadata: {
+        author: uploader.name,
+        version: '1.0',
+        language: 'vi',
+        pages: randomInt(1, 50)
+      }
+    };
+    documents.push(document);
+  }
+
+  return documents;
+};
+
+/**
+ * Generate community resources
+ */
+export const generateCommunityResources = (allUsers: User[]): CommunityResource[] => {
+  const resources: CommunityResource[] = [];
+  const types: ('document' | 'link' | 'video' | 'other')[] = ['document', 'link', 'video', 'other'];
+  const categories: ('academic' | 'administrative' | 'reference' | 'event' | 'other')[] = ['academic', 'administrative', 'reference', 'event', 'other'];
+
+  for (let i = 0; i < 10; i++) {
+    const sharer = randomItem(allUsers);
+    const type = randomItem(types);
+    const category = randomItem(categories);
+
+    const resource: CommunityResource = {
+      id: generateId('resource'),
+      title: randomItem([
+        'Tài liệu học tập chung',
+        'Video hướng dẫn',
+        'Link tham khảo',
+        'Tài nguyên cộng đồng'
+      ]),
+      description: `Tài nguyên ${type} được chia sẻ bởi ${sharer.name}`,
+      type,
+      url: type === 'link' ? `https://example.com/resource-${i + 1}` : undefined,
+      fileUrl: type === 'document' || type === 'video' ? `https://storage.example.com/resources/${generateId()}` : undefined,
+      thumbnail: type === 'video' ? `https://storage.example.com/thumbnails/${generateId()}.jpg` : undefined,
+      category,
+      subject: category === 'academic' ? randomItem(['Toán', 'Lý', 'Hóa', 'Anh']) : undefined,
+      tags: randomItems(['học tập', 'tham khảo', 'cộng đồng'], randomInt(1, 3)),
+      sharedBy: sharer.id,
+      sharedAt: new Date(Date.now() - Math.random() * 20 * 24 * 60 * 60 * 1000).toISOString(),
+      isPublic: Math.random() > 0.4,
+      isEncrypted: Math.random() > 0.8,
+      accessLevel: Math.random() > 0.5 ? 'public' : 'private',
+      restrictedTo: Math.random() > 0.7 ? [randomItem(allUsers).id] : undefined,
+      downloadCount: randomInt(0, 30),
+      viewCount: randomInt(0, 80),
+      likes: randomItems(allUsers.map(u => u.id), randomInt(0, 5)),
+      createdAt: new Date(Date.now() - Math.random() * 20 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - Math.random() * 20 * 24 * 60 * 60 * 1000).toISOString()
+    };
+    resources.push(resource);
+  }
+
+  return resources;
+};
+
+/**
+ * Generate community events
+ */
+export const generateCommunityEvents = (management: Management[]): CommunityEvent[] => {
+  const events: CommunityEvent[] = [];
+  const types: ('webinar' | 'workshop' | 'meeting' | 'seminar' | 'other')[] = ['webinar', 'workshop', 'meeting', 'seminar', 'other'];
+  const statuses: ('scheduled' | 'ongoing' | 'completed' | 'cancelled')[] = ['scheduled', 'ongoing', 'completed', 'cancelled'];
+
+  for (let i = 0; i < 5; i++) {
+    const organizer = randomItem(management);
+    const type = randomItem(types);
+    const status = randomItem(statuses);
+    const daysFromNow = randomInt(-10, 30);
+    const startTime = addDays(new Date(), daysFromNow);
+    startTime.setHours(randomInt(9, 17), 0, 0, 0);
+    const endTime = new Date(startTime.getTime() + randomInt(1, 3) * 60 * 60 * 1000);
+
+    const event: CommunityEvent = {
+      id: generateId('event'),
+      title: randomItem([
+        'Workshop về phương pháp học tập hiệu quả',
+        'Webinar chia sẻ kinh nghiệm',
+        'Hội thảo chuyên đề',
+        'Buổi gặp mặt cộng đồng'
+      ]),
+      description: `Sự kiện ${type} được tổ chức bởi ${organizer.name}`,
+      type,
+      organizerId: organizer.id,
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+      location: Math.random() > 0.5 ? 'Phòng A101' : undefined,
+      meetingLink: Math.random() > 0.5 ? `https://meet.google.com/${generateId()}` : undefined,
+      isOnline: Math.random() > 0.5,
+      maxParticipants: randomInt(20, 100),
+      participants: [],
+      status,
+      category: randomItem(['Học tập', 'Giao lưu', 'Chuyên đề', 'Khác']),
+      tags: randomItems(['workshop', 'webinar', 'cộng đồng'], randomInt(1, 2)),
+      resources: [],
+      registrationRequired: Math.random() > 0.5,
+      registrationDeadline: Math.random() > 0.5 ? addDays(startTime, -1).toISOString() : undefined,
+      metadata: {
+        agenda: 'Chương trình chi tiết sẽ được cập nhật',
+        speakers: [organizer.name],
+        recordingUrl: status === 'completed' && Math.random() > 0.5 ? `https://storage.example.com/recordings/${generateId()}` : undefined
+      },
+      createdAt: new Date(Date.now() - Math.random() * 15 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - Math.random() * 15 * 24 * 60 * 60 * 1000).toISOString()
+    };
+    events.push(event);
+  }
+
+  return events;
+};
+
 /**
  * Generate all mock data
  */
@@ -1157,7 +1588,7 @@ export const generateAllMockData = async () => {
   const forumComments = generateForumComments(forumPosts, allUsers, 50);
   const notifications = generateNotifications(allUsers, sessions);
   const availability = generateAvailability(tutors);
-  const approvalRequests = generateApprovalRequests(tutors);
+  const approvalRequests = generateApprovalRequests(tutors, management, sessions);
   
   // Generate classes and enrollments
   const classes = generateClasses(tutors, availability);
@@ -1177,6 +1608,13 @@ export const generateAllMockData = async () => {
   // For seed data, we'll use individual sessions and some sessions with classId
   const sessionRequests = generateSessionRequests(allSessions, 25);
 
+  // Generate management module data
+  const permissionAudits = generatePermissionAudits(management, allUsers);
+  const trainingCredits = generateTrainingCredits(students, sessions, classes, management);
+  const documents = generateDocuments(allUsers);
+  const communityResources = generateCommunityResources(allUsers);
+  const communityEvents = generateCommunityEvents(management);
+
   return {
     users: allUsers,
     sessions,
@@ -1195,7 +1633,13 @@ export const generateAllMockData = async () => {
     grades,
     quizSubmissions,
     assignmentSubmissions,
-    sessionRequests
+    sessionRequests,
+    // Management module data
+    permissionAudits,
+    trainingCredits,
+    documents,
+    communityResources,
+    communityEvents
   };
 };
 

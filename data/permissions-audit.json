@@ -1,0 +1,158 @@
+[
+  {
+    "id": "audit_6bHhXeNGfIl6",
+    "userId": "tut_XMxVhXbv9E_C",
+    "action": "update",
+    "permissions": [
+      "award_credits",
+      "view_analytics",
+      "view_reports"
+    ],
+    "previousPermissions": [
+      "view_analytics",
+      "manage_users"
+    ],
+    "actorId": "mgmt_lkN2DSFEv5dI",
+    "reason": "Cập nhật quyền truy cập",
+    "temporary": false,
+    "expiresAt": "2025-12-08T14:12:04.452Z",
+    "createdAt": "2025-11-09T19:29:41.896Z"
+  },
+  {
+    "id": "audit_94_zZMIKp3nv",
+    "userId": "stu_QYojhnP7sLsJ",
+    "action": "update",
+    "permissions": [
+      "view_analytics"
+    ],
+    "previousPermissions": [
+      "manage_users"
+    ],
+    "actorId": "mgmt_lkN2DSFEv5dI",
+    "reason": "Cấp quyền tạm thời",
+    "temporary": true,
+    "createdAt": "2025-11-10T08:44:27.601Z"
+  },
+  {
+    "id": "audit_Q7eEgNviKeAo",
+    "userId": "stu_3xXLt1IWBsCS",
+    "action": "revoke",
+    "permissions": [
+      "view_analytics"
+    ],
+    "actorId": "mgmt_1T4fph947Qu6",
+    "reason": "Thu hồi quyền do vi phạm",
+    "temporary": false,
+    "createdAt": "2025-10-20T12:42:03.943Z"
+  },
+  {
+    "id": "audit_XnCi3qAJNSot",
+    "userId": "stu_FaawsvPS_Mp3",
+    "action": "update",
+    "permissions": [
+      "approve_requests"
+    ],
+    "previousPermissions": [
+      "view_analytics"
+    ],
+    "actorId": "mgmt_lkN2DSFEv5dI",
+    "reason": "Cập nhật quyền truy cập",
+    "temporary": false,
+    "expiresAt": "2025-12-07T14:12:04.452Z",
+    "createdAt": "2025-10-28T19:21:50.018Z"
+  },
+  {
+    "id": "audit_Lf5MM0NjfmHL",
+    "userId": "tut_iYSgGgPQ-okt",
+    "action": "update",
+    "permissions": [
+      "view_analytics",
+      "manage_users",
+      "approve_requests"
+    ],
+    "previousPermissions": [
+      "award_credits",
+      "view_reports"
+    ],
+    "actorId": "mgmt_1T4fph947Qu6",
+    "reason": "Cấp quyền tạm thời",
+    "temporary": false,
+    "createdAt": "2025-10-30T07:11:17.600Z"
+  },
+  {
+    "id": "audit_0KgN8fvV7BBL",
+    "userId": "stu_ZU0fknsTqL_A",
+    "action": "update",
+    "permissions": [
+      "view_analytics"
+    ],
+    "previousPermissions": [
+      "view_reports",
+      "approve_requests"
+    ],
+    "actorId": "mgmt_1T4fph947Qu6",
+    "reason": "Cập nhật quyền truy cập",
+    "temporary": false,
+    "createdAt": "2025-10-17T13:28:27.573Z"
+  },
+  {
+    "id": "audit_u9PduXDYBq9e",
+    "userId": "stu_a7LVENf1yYZ5",
+    "action": "revoke",
+    "permissions": [
+      "view_reports"
+    ],
+    "actorId": "mgmt_qLukzSvoJWcO",
+    "reason": "Cấp quyền tạm thời",
+    "temporary": true,
+    "createdAt": "2025-10-24T01:09:36.000Z"
+  },
+  {
+    "id": "audit_kU8zH2UR5tqX",
+    "userId": "tut_KvE_N02ucbtQ",
+    "action": "update",
+    "permissions": [
+      "approve_requests",
+      "award_credits",
+      "view_reports"
+    ],
+    "previousPermissions": [
+      "view_reports",
+      "award_credits"
+    ],
+    "actorId": "mgmt_qLukzSvoJWcO",
+    "reason": "Thu hồi quyền do vi phạm",
+    "temporary": true,
+    "createdAt": "2025-11-02T17:51:45.318Z"
+  },
+  {
+    "id": "audit_IK6WhtpLozat",
+    "userId": "stu_KRDeTYJlBj41",
+    "action": "update",
+    "permissions": [
+      "manage_community",
+      "award_credits",
+      "view_analytics"
+    ],
+    "previousPermissions": [
+      "approve_requests"
+    ],
+    "actorId": "mgmt_18QNI2lAxnAD",
+    "reason": "Cấp quyền tạm thời",
+    "temporary": true,
+    "createdAt": "2025-10-31T23:53:16.173Z"
+  },
+  {
+    "id": "audit_KTZ4xsLu6J67",
+    "userId": "mgmt_18QNI2lAxnAD",
+    "action": "grant",
+    "permissions": [
+      "view_analytics"
+    ],
+    "actorId": "mgmt_qLukzSvoJWcO",
+    "reason": "Cấp quyền tạm thời",
+    "temporary": false,
+    "expiresAt": "2025-11-28T14:12:04.452Z",
+    "createdAt": "2025-10-16T13:07:04.209Z"
+  }
+]

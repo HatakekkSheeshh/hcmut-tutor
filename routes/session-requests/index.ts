@@ -22,7 +22,7 @@ import {
 } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
-
+import { queueNotification } from '../../lib/services/notificationQueue.js';
 /**
  * GET /api/session-requests
  */
@@ -225,20 +225,28 @@ async function validateRescheduleTime(
            !s.classId // Only check individual sessions
   );
 
+  // Buffer time between sessions (30 minutes)
+  const SESSION_BUFFER_MINUTES = 30;
+
   for (const existingSession of existingSessions) {
     const existingStart = new Date(existingSession.startTime);
     const existingEnd = new Date(existingSession.endTime);
 
-    // Check if sessions overlap (same date and overlapping times)
+    // Check if same date
+    if (existingStart.toDateString() !== preferredStart.toDateString()) {
+      continue;
+    }
+
+    // Apply buffer time: preferred time must start at least 30 minutes after existing session ends
+    // and must end at least 30 minutes before existing session starts
+    const existingEndWithBuffer = new Date(existingEnd.getTime() + SESSION_BUFFER_MINUTES * 60 * 1000);
+    const existingStartWithBuffer = new Date(existingStart.getTime() - SESSION_BUFFER_MINUTES * 60 * 1000);
+
+    // Check if preferred time overlaps with existing session (including buffer)
     if (
-      existingStart.toDateString() === preferredStart.toDateString() &&
-      (
-        (preferredStart >= existingStart && preferredStart < existingEnd) ||
-        (preferredEnd > existingStart && preferredEnd <= existingEnd) ||
-        (preferredStart <= existingStart && preferredEnd >= existingEnd)
-      )
+      (preferredStart < existingEndWithBuffer && preferredEnd > existingStartWithBuffer)
     ) {
-      return `Thời gian mong muốn trùng với buổi học khác (${existingSession.subject}, ${existingStart.toLocaleString('vi-VN')}). Vui lòng chọn thời gian khác.`;
+      return `Thời gian mong muốn trùng với buổi học khác (${existingSession.subject}, ${existingStart.toLocaleString('vi-VN')}) hoặc không đủ thời gian nghỉ (cần ít nhất ${SESSION_BUFFER_MINUTES} phút giữa các buổi học). Vui lòng chọn thời gian khác.`;
     }
   }
 
@@ -460,28 +468,52 @@ export async function createSessionRequestHandler(req: AuthRequest, res: Respons
     await storage.create('session-requests.json', newRequest);
 
     // Create notification for tutor
-    const notificationType = type === RequestType.CANCEL
-      ? NotificationType.SESSION_CANCEL_REQUEST
-      : NotificationType.SESSION_RESCHEDULE_REQUEST;
+    // const notificationType = type === RequestType.CANCEL
+    //   ? NotificationType.SESSION_CANCEL_REQUEST
+    //   : NotificationType.SESSION_RESCHEDULE_REQUEST;
 
-    const student = await storage.findById<User>('users.json', currentUser.userId);
-    const notification: Notification = {
-      id: generateId('notif'),
-      userId: session.tutorId,
-      type: notificationType,
-      title: type === RequestType.CANCEL ? 'Yêu cầu hủy buổi học' : 'Yêu cầu đổi lịch buổi học',
-      message: `${student?.name || currentUser.email} đã gửi yêu cầu ${type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${session.subject}`,
-      read: false,
-      link: `/tutor/cancel-reschedule`,
-      metadata: {
-        requestId: newRequest.id,
-        sessionId: sessionId,
-        type: type,
-        classId: session.classId
-      },
-      createdAt: now()
-    };
-    await storage.create('notifications.json', notification);
+    // const student = await storage.findById<User>('users.json', currentUser.userId);
+    // const notification: Notification = {
+    //   id: generateId('notif'),
+    //   userId: session.tutorId,
+    //   type: notificationType,
+    //   title: type === RequestType.CANCEL ? 'Yêu cầu hủy buổi học' : 'Yêu cầu đổi lịch buổi học',
+    //   message: `${student?.name || currentUser.email} đã gửi yêu cầu ${type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${session.subject}`,
+    //   read: false,
+    //   link: `/tutor/cancel-reschedule`,
+    //   metadata: {
+    //     requestId: newRequest.id,
+    //     sessionId: sessionId,
+    //     type: type,
+    //     classId: session.classId
+    //   },
+    //   createdAt: now()
+    // };
+    // await storage.create('notifications.json', notification);
+
+    // Create notification for tutor (via 5-minute queue)
+    const notificationType = type === RequestType.CANCEL
+      ? NotificationType.SESSION_CANCEL_REQUEST
+      : NotificationType.SESSION_RESCHEDULE_REQUEST;
+
+    const student = await storage.findById<User>('users.json', currentUser.userId);
+    const title = type === RequestType.CANCEL ? 'Yêu cầu hủy buổi học' : 'Yêu cầu đổi lịch buổi học';
+
+    const message = `${student?.name || currentUser.email} đã gửi yêu cầu ${type === RequestType.CANCEL ? 'hủy' : 'đổi lịch'} buổi học ${session.subject}`;
+    const link = `/tutor/cancel-reschedule`;
+
+    
+    await queueNotification(
+      session.tutorId,
+      {
+        
+        type: notificationType,
+        title: title,
+        message: message,
+        link: link
+      },
+      5
+    );
 
     // Get enriched request data
     const tutor = await storage.findById<User>('users.json', session.tutorId);

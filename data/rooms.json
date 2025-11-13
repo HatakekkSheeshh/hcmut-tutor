@@ -1,0 +1,239 @@
+[
+  {
+    "id": "building_A",
+    "name": "Tòa nhà A",
+    "code": "A",
+    "description": "Tòa nhà A - Khu vực giảng dạy chính",
+    "floors": [
+      {
+        "floorNumber": 1,
+        "rooms": [
+          {
+            "id": "room_A101",
+            "name": "Phòng A101",
+            "code": "A101",
+            "capacity": 30,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính"],
+            "floor": 1,
+            "buildingId": "building_A"
+          },
+          {
+            "id": "room_A102",
+            "name": "Phòng A102",
+            "code": "A102",
+            "capacity": 25,
+            "equipment": ["Bảng trắng", "Máy chiếu"],
+            "floor": 1,
+            "buildingId": "building_A"
+          },
+          {
+            "id": "room_A103",
+            "name": "Phòng A103",
+            "code": "A103",
+            "capacity": 40,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính", "Hệ thống âm thanh"],
+            "floor": 1,
+            "buildingId": "building_A"
+          },
+          {
+            "id": "room_A104",
+            "name": "Phòng A104",
+            "code": "A104",
+            "capacity": 20,
+            "equipment": ["Bảng trắng"],
+            "floor": 1,
+            "buildingId": "building_A"
+          }
+        ]
+      },
+      {
+        "floorNumber": 2,
+        "rooms": [
+          {
+            "id": "room_A201",
+            "name": "Phòng A201",
+            "code": "A201",
+            "capacity": 35,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính"],
+            "floor": 2,
+            "buildingId": "building_A"
+          },
+          {
+            "id": "room_A202",
+            "name": "Phòng A202",
+            "code": "A202",
+            "capacity": 50,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính", "Hệ thống âm thanh"],
+            "floor": 2,
+            "buildingId": "building_A"
+          },
+          {
+            "id": "room_A203",
+            "name": "Phòng A203",
+            "code": "A203",
+            "capacity": 30,
+            "equipment": ["Bảng trắng", "Máy chiếu"],
+            "floor": 2,
+            "buildingId": "building_A"
+          }
+        ]
+      },
+      {
+        "floorNumber": 3,
+        "rooms": [
+          {
+            "id": "room_A301",
+            "name": "Phòng A301",
+            "code": "A301",
+            "capacity": 45,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính", "Hệ thống âm thanh"],
+            "floor": 3,
+            "buildingId": "building_A"
+          },
+          {
+            "id": "room_A302",
+            "name": "Phòng A302",
+            "code": "A302",
+            "capacity": 25,
+            "equipment": ["Bảng trắng", "Máy chiếu"],
+            "floor": 3,
+            "buildingId": "building_A"
+          }
+        ]
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.000Z",
+    "updatedAt": "2025-11-11T14:12:04.000Z"
+  },
+  {
+    "id": "building_B",
+    "name": "Tòa nhà B",
+    "code": "B",
+    "description": "Tòa nhà B - Khu vực thực hành",
+    "floors": [
+      {
+        "floorNumber": 1,
+        "rooms": [
+          {
+            "id": "room_B101",
+            "name": "Phòng B101",
+            "code": "B101",
+            "capacity": 20,
+            "equipment": ["Bảng trắng", "Máy tính"],
+            "floor": 1,
+            "buildingId": "building_B"
+          },
+          {
+            "id": "room_B102",
+            "name": "Phòng B102",
+            "code": "B102",
+            "capacity": 30,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính"],
+            "floor": 1,
+            "buildingId": "building_B"
+          },
+          {
+            "id": "room_B103",
+            "name": "Phòng B103",
+            "code": "B103",
+            "capacity": 15,
+            "equipment": ["Bảng trắng"],
+            "floor": 1,
+            "buildingId": "building_B"
+          }
+        ]
+      },
+      {
+        "floorNumber": 2,
+        "rooms": [
+          {
+            "id": "room_B201",
+            "name": "Phòng B201",
+            "code": "B201",
+            "capacity": 40,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính", "Hệ thống âm thanh"],
+            "floor": 2,
+            "buildingId": "building_B"
+          },
+          {
+            "id": "room_B202",
+            "name": "Phòng B202",
+            "code": "B202",
+            "capacity": 25,
+            "equipment": ["Bảng trắng", "Máy chiếu"],
+            "floor": 2,
+            "buildingId": "building_B"
+          }
+        ]
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.000Z",
+    "updatedAt": "2025-11-11T14:12:04.000Z"
+  },
+  {
+    "id": "building_C",
+    "name": "Tòa nhà C",
+    "code": "C",
+    "description": "Tòa nhà C - Khu vực hội thảo",
+    "floors": [
+      {
+        "floorNumber": 1,
+        "rooms": [
+          {
+            "id": "room_C101",
+            "name": "Phòng C101",
+            "code": "C101",
+            "capacity": 60,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính", "Hệ thống âm thanh", "Micro"],
+            "floor": 1,
+            "buildingId": "building_C"
+          },
+          {
+            "id": "room_C102",
+            "name": "Phòng C102",
+            "code": "C102",
+            "capacity": 80,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính", "Hệ thống âm thanh", "Micro", "Camera"],
+            "floor": 1,
+            "buildingId": "building_C"
+          },
+          {
+            "id": "room_C103",
+            "name": "Phòng C103",
+            "code": "C103",
+            "capacity": 35,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính"],
+            "floor": 1,
+            "buildingId": "building_C"
+          }
+        ]
+      },
+      {
+        "floorNumber": 2,
+        "rooms": [
+          {
+            "id": "room_C201",
+            "name": "Phòng C201",
+            "code": "C201",
+            "capacity": 50,
+            "equipment": ["Bảng trắng", "Máy chiếu", "Máy tính", "Hệ thống âm thanh"],
+            "floor": 2,
+            "buildingId": "building_C"
+          },
+          {
+            "id": "room_C202",
+            "name": "Phòng C202",
+            "code": "C202",
+            "capacity": 30,
+            "equipment": ["Bảng trắng", "Máy chiếu"],
+            "floor": 2,
+            "buildingId": "building_C"
+          }
+        ]
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.000Z",
+    "updatedAt": "2025-11-11T14:12:04.000Z"
+  }
+]
+

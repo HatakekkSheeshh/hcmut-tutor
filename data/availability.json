@@ -1,54 +1,20 @@
 [
   {
-    "id": "avail_bkqKtiPCyA0S",
-    "tutorId": "tut_QAuiJWjIUx57",
+    "id": "avail_OG-NDUOc6XIt",
+    "tutorId": "tut_61QAuOdQbyZS",
     "timeSlots": [
       {
         "day": "thursday",
-        "startTime": "12:00",
+        "startTime": "09:00",
         "endTime": "16:00"
       },
       {
-        "day": "saturday",
+        "day": "tuesday",
         "startTime": "08:00",
         "endTime": "16:00"
       },
       {
         "day": "wednesday",
-        "startTime": "11:00",
-        "endTime": "16:00"
-      },
-      {
-        "day": "tuesday",
-        "startTime": "09:00",
-        "endTime": "19:00"
-      },
-      {
-        "day": "sunday",
-        "startTime": "09:00",
-        "endTime": "16:00"
-      },
-      {
-        "day": "friday",
-        "startTime": "09:00",
-        "endTime": "15:00"
-      },
-      {
-        "day": "monday",
-        "startTime": "09:00",
-        "endTime": "17:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T15:32:42.295Z",
-    "exceptions": []
-  },
-  {
-    "id": "avail_Ve3odcyQneSF",
-    "tutorId": "tut_NrIX8Wa7MS0G",
-    "timeSlots": [
-      {
-        "day": "tuesday",
         "startTime": "11:00",
         "endTime": "20:00"
       },
@@ -56,408 +22,476 @@
         "day": "saturday",
         "startTime": "12:00",
         "endTime": "18:00"
-      },
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_7FWUeFv1FcRw",
+    "tutorId": "tut_6copkRNEBLGs",
+    "timeSlots": [
       {
-        "day": "friday",
-        "startTime": "12:00",
+        "day": "wednesday",
+        "startTime": "11:00",
         "endTime": "19:00"
       },
       {
         "day": "monday",
-        "startTime": "09:00",
-        "endTime": "18:00"
-      },
-      {
-        "day": "wednesday",
-        "startTime": "09:00",
-        "endTime": "20:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.224Z"
-  },
-  {
-    "id": "avail_pamdr7ymqSfB",
-    "tutorId": "tut_ZevJpYidjiUm",
-    "timeSlots": [
-      {
-        "day": "monday",
-        "startTime": "12:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "tuesday",
-        "startTime": "11:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "wednesday",
-        "startTime": "12:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "thursday",
-        "startTime": "09:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "friday",
         "startTime": "08:00",
-        "endTime": "20:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.224Z"
-  },
-  {
-    "id": "avail_8V99LNL7GJHG",
-    "tutorId": "tut_ui0LfAc9h475",
-    "timeSlots": [
-      {
-        "day": "tuesday",
-        "startTime": "12:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "wednesday",
-        "startTime": "11:00",
-        "endTime": "19:00"
+        "endTime": "17:00"
       },
       {
         "day": "saturday",
-        "startTime": "11:00",
-        "endTime": "19:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.224Z"
-  },
-  {
-    "id": "avail_9bvIUJvHkYkC",
-    "tutorId": "tut_mQjJx63STWcF",
-    "timeSlots": [
+        "startTime": "12:00",
+        "endTime": "20:00"
+      },
       {
-        "day": "thursday",
+        "day": "tuesday",
+        "startTime": "12:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "friday",
         "startTime": "10:00",
         "endTime": "20:00"
       },
       {
+        "day": "thursday",
+        "startTime": "12:00",
+        "endTime": "18:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_FqFbTFUkiDC4",
+    "tutorId": "tut_6_XCPhWi8xEP",
+    "timeSlots": [
+      {
+        "day": "thursday",
+        "startTime": "11:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "tuesday",
+        "startTime": "10:00",
+        "endTime": "19:00"
+      },
+      {
+        "day": "friday",
+        "startTime": "10:00",
+        "endTime": "18:00"
+      },
+      {
+        "day": "wednesday",
+        "startTime": "08:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "12:00",
+        "endTime": "18:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "11:00",
+        "endTime": "20:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_JurkbbQrywSu",
+    "tutorId": "tut_DtMRGUwYKFgQ",
+    "timeSlots": [
+      {
+        "day": "wednesday",
+        "startTime": "10:00",
+        "endTime": "18:00"
+      },
+      {
+        "day": "sunday",
+        "startTime": "10:00",
+        "endTime": "19:00"
+      },
+      {
+        "day": "tuesday",
+        "startTime": "10:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "08:00",
+        "endTime": "16:00"
+      },
+      {
+        "day": "friday",
+        "startTime": "11:00",
+        "endTime": "16:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "12:00",
+        "endTime": "19:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_PH0xw6ps2tBd",
+    "tutorId": "tut_g0qfsZQJDZEe",
+    "timeSlots": [
+      {
+        "day": "tuesday",
+        "startTime": "12:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "08:00",
+        "endTime": "16:00"
+      },
+      {
+        "day": "thursday",
+        "startTime": "08:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "wednesday",
+        "startTime": "12:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "friday",
+        "startTime": "11:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "12:00",
+        "endTime": "16:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_PQvzIfy-3_Tr",
+    "tutorId": "tut_fz5MO1FZqXhq",
+    "timeSlots": [
+      {
+        "day": "thursday",
+        "startTime": "11:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "sunday",
+        "startTime": "12:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "wednesday",
+        "startTime": "09:00",
+        "endTime": "19:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_6CHrSfjrpjm6",
+    "tutorId": "tut_41_KiR92vL7t",
+    "timeSlots": [
+      {
+        "day": "friday",
+        "startTime": "11:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "wednesday",
+        "startTime": "10:00",
+        "endTime": "19:00"
+      },
+      {
+        "day": "thursday",
+        "startTime": "08:00",
+        "endTime": "18:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "10:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "sunday",
+        "startTime": "12:00",
+        "endTime": "16:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "09:00",
+        "endTime": "16:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_7fQSPrjMNVbQ",
+    "tutorId": "tut_KvE_N02ucbtQ",
+    "timeSlots": [
+      {
+        "day": "monday",
+        "startTime": "08:00",
+        "endTime": "16:00"
+      },
+      {
+        "day": "thursday",
+        "startTime": "12:00",
+        "endTime": "19:00"
+      },
+      {
+        "day": "sunday",
+        "startTime": "10:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "08:00",
+        "endTime": "18:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_NWwitXqRE5q7",
+    "tutorId": "tut_eskLsiQzgRBY",
+    "timeSlots": [
+      {
+        "day": "friday",
+        "startTime": "09:00",
+        "endTime": "19:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "09:00",
+        "endTime": "18:00"
+      },
+      {
         "day": "tuesday",
         "startTime": "12:00",
         "endTime": "18:00"
       },
       {
         "day": "saturday",
-        "startTime": "10:00",
-        "endTime": "16:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.224Z"
-  },
-  {
-    "id": "avail_ADEsAvgoxQ5s",
-    "tutorId": "tut_OI2WdgyNqJEJ",
-    "timeSlots": [
-      {
-        "day": "monday",
         "startTime": "11:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "tuesday",
-        "startTime": "09:00",
         "endTime": "16:00"
       },
       {
         "day": "thursday",
-        "startTime": "12:00",
-        "endTime": "16:00"
-      },
-      {
-        "day": "wednesday",
-        "startTime": "12:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "sunday",
         "startTime": "08:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "saturday",
-        "startTime": "12:00",
         "endTime": "19:00"
       }
     ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.224Z"
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
   },
   {
-    "id": "avail_jliphIo0dVjJ",
-    "tutorId": "tut_TNes434P5AEZ",
+    "id": "avail_viPI6kwxT92X",
+    "tutorId": "tut_iYSgGgPQ-okt",
     "timeSlots": [
-      {
-        "day": "wednesday",
-        "startTime": "08:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "sunday",
-        "startTime": "10:00",
-        "endTime": "16:00"
-      },
-      {
-        "day": "friday",
-        "startTime": "08:00",
-        "endTime": "19:00"
-      },
-      {
-        "day": "saturday",
-        "startTime": "10:00",
-        "endTime": "19:00"
-      },
       {
         "day": "thursday",
-        "startTime": "09:00",
-        "endTime": "20:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.224Z"
-  },
-  {
-    "id": "avail_vA1DeDXUiEh4",
-    "tutorId": "tut_SAZDCdEtp4d5",
-    "timeSlots": [
-      {
-        "day": "wednesday",
-        "startTime": "12:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "tuesday",
-        "startTime": "12:00",
-        "endTime": "16:00"
-      },
-      {
-        "day": "saturday",
-        "startTime": "09:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "sunday",
-        "startTime": "08:00",
-        "endTime": "16:00"
-      },
-      {
-        "day": "friday",
-        "startTime": "08:00",
-        "endTime": "16:00"
-      },
-      {
-        "day": "monday",
-        "startTime": "08:00",
-        "endTime": "20:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.224Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
-  },
-  {
-    "id": "avail_4rcczqm28Akk",
-    "tutorId": "tut_x0-B_jiDzDIF",
-    "timeSlots": [
-      {
-        "day": "tuesday",
-        "startTime": "09:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "monday",
-        "startTime": "12:00",
+        "startTime": "11:00",
         "endTime": "19:00"
       },
       {
         "day": "wednesday",
-        "startTime": "12:00",
-        "endTime": "17:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
-  },
-  {
-    "id": "avail_do1BaFVReSGD",
-    "tutorId": "tut_ilaeZEbNdND-",
-    "timeSlots": [
+        "startTime": "08:00",
+        "endTime": "19:00"
+      },
       {
         "day": "sunday",
         "startTime": "12:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "saturday",
-        "startTime": "12:00",
-        "endTime": "17:00"
-      },
-      {
-        "day": "wednesday",
-        "startTime": "09:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "tuesday",
-        "startTime": "11:00",
         "endTime": "18:00"
       },
       {
-        "day": "friday",
-        "startTime": "08:00",
-        "endTime": "19:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
-  },
-  {
-    "id": "avail_o9bN-e9n86Za",
-    "tutorId": "tut_rFEAVqof-NxA",
-    "timeSlots": [
-      {
-        "day": "sunday",
-        "startTime": "08:00",
-        "endTime": "18:00"
-      },
-      {
-        "day": "wednesday",
-        "startTime": "10:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "friday",
-        "startTime": "08:00",
-        "endTime": "20:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
-  },
-  {
-    "id": "avail_Yi1CPm-4Fj4f",
-    "tutorId": "tut_FwDE7NJzIH_j",
-    "timeSlots": [
-      {
-        "day": "tuesday",
-        "startTime": "08:00",
-        "endTime": "18:00"
-      },
-      {
-        "day": "friday",
-        "startTime": "09:00",
-        "endTime": "16:00"
-      },
-      {
         "day": "saturday",
-        "startTime": "09:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "monday",
         "startTime": "12:00",
-        "endTime": "20:00"
-      },
-      {
-        "day": "thursday",
-        "startTime": "11:00",
         "endTime": "16:00"
       }
     ],
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
   },
   {
-    "id": "avail_BBksdO_vaJ5K",
-    "tutorId": "tut_88EyEpAvElqJ",
+    "id": "avail_Vf4tmrdnwqSP",
+    "tutorId": "tut_o6Rbm-CATfPE",
     "timeSlots": [
       {
-        "day": "thursday",
-        "startTime": "09:00",
-        "endTime": "20:00"
-      },
-      {
         "day": "friday",
-        "startTime": "12:00",
-        "endTime": "19:00"
-      },
-      {
-        "day": "wednesday",
-        "startTime": "11:00",
+        "startTime": "10:00",
         "endTime": "17:00"
       },
       {
-        "day": "tuesday",
-        "startTime": "09:00",
+        "day": "wednesday",
+        "startTime": "12:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "sunday",
+        "startTime": "11:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "11:00",
+        "endTime": "17:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_XZp1Brrc67Hp",
+    "tutorId": "tut_XMxVhXbv9E_C",
+    "timeSlots": [
+      {
+        "day": "thursday",
+        "startTime": "11:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "sunday",
+        "startTime": "11:00",
         "endTime": "19:00"
       },
       {
         "day": "monday",
         "startTime": "10:00",
+        "endTime": "18:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "09:00",
+        "endTime": "19:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_DhxtIBn0Lj35",
+    "tutorId": "tut_am6slkTzwGyq",
+    "timeSlots": [
+      {
+        "day": "friday",
+        "startTime": "11:00",
         "endTime": "20:00"
       },
       {
+        "day": "wednesday",
+        "startTime": "12:00",
+        "endTime": "19:00"
+      },
+      {
+        "day": "thursday",
+        "startTime": "08:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "tuesday",
+        "startTime": "09:00",
+        "endTime": "19:00"
+      },
+      {
         "day": "sunday",
+        "startTime": "09:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "08:00",
+        "endTime": "18:00"
+      }
+    ],
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
+  },
+  {
+    "id": "avail_UNWLcvcItL-_",
+    "tutorId": "tut_zpZeIVwqQuXK",
+    "timeSlots": [
+      {
+        "day": "sunday",
+        "startTime": "09:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "tuesday",
+        "startTime": "09:00",
+        "endTime": "16:00"
+      },
+      {
+        "day": "friday",
+        "startTime": "09:00",
+        "endTime": "18:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "11:00",
+        "endTime": "18:00"
+      },
+      {
+        "day": "saturday",
         "startTime": "12:00",
         "endTime": "16:00"
       }
     ],
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
   },
   {
-    "id": "avail_vK4QmmsDL0kQ",
-    "tutorId": "tut_oBHJXQvmjPPG",
-    "timeSlots": [
-      {
-        "day": "monday",
-        "startTime": "12:00",
-        "endTime": "18:00"
-      },
-      {
-        "day": "sunday",
-        "startTime": "11:00",
-        "endTime": "19:00"
-      },
-      {
-        "day": "friday",
-        "startTime": "08:00",
-        "endTime": "18:00"
-      }
-    ],
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
-  },
-  {
-    "id": "avail_Q8ksO_ClrikL",
-    "tutorId": "tut_0ri_8fMUaMuu",
+    "id": "avail_c9lTm6HrpkKD",
+    "tutorId": "tut_L9x4RXK42EtB",
     "timeSlots": [
       {
         "day": "wednesday",
         "startTime": "08:00",
-        "endTime": "19:00"
-      },
-      {
-        "day": "tuesday",
-        "startTime": "08:00",
-        "endTime": "19:00"
+        "endTime": "18:00"
       },
       {
         "day": "sunday",
+        "startTime": "09:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "tuesday",
+        "startTime": "09:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "thursday",
         "startTime": "11:00",
+        "endTime": "17:00"
+      },
+      {
+        "day": "saturday",
+        "startTime": "10:00",
+        "endTime": "20:00"
+      },
+      {
+        "day": "monday",
+        "startTime": "10:00",
         "endTime": "18:00"
       }
     ],
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
+    "createdAt": "2025-11-11T14:12:04.440Z",
+    "updatedAt": "2025-11-11T14:12:04.440Z"
   }
 ]

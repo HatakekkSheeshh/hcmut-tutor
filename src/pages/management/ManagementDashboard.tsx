@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card'
@@ -54,6 +54,21 @@ const ManagementDashboard: React.FC = () => {
   const [users, setUsers] = useState<any[]>([])
   const [sessions, setSessions] = useState<any[]>([])
   
+  // Management data states
+  const [recentRequests, setRecentRequests] = useState<any[]>([])
+  const [systemAlerts, setSystemAlerts] = useState<any[]>([])
+  const [resourceOverview, setResourceOverview] = useState<any>(null)
+  const [performanceKPIs, setPerformanceKPIs] = useState<any>(null)
+  const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0)
+  const [managementLoading, setManagementLoading] = useState(false)
+  
+  // Refs to prevent unnecessary API calls
+  const hasLoadedUserData = useRef(false)
+  const hasLoadedManagementData = useRef(false)
+  const managementIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const isManagementDataLoading = useRef(false)
+  const isInitialMount = useRef(true) // Track initial mount to allow reload on refresh
+  
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
   const [weather, setWeather] = useState<any>(null)
@@ -76,9 +91,16 @@ const ManagementDashboard: React.FC = () => {
   }
 
   // Load user data and system stats from backend
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
+    // Prevent concurrent calls only
+    // Note: We allow reload on refresh because refs are reset on mount
+    if (hasLoadedUserData.current) {
+      return
+    }
+    
     try {
       setLoading(true)
+      hasLoadedUserData.current = true
       
       // Get current user
       const userResult = await api.auth.getMe()
@@ -88,14 +110,44 @@ const ManagementDashboard: React.FC = () => {
         
         // Get all users (for stats)
         const usersResult = await api.users.list({ limit: 1000 })
-        if (usersResult.success) {
-          setUsers(usersResult.data || [])
+        
+        // Parse users data - backend returns { data: Array(40), pagination: {...} }
+        // fetchAPI returns data directly, so usersResult = { data: Array(40), pagination: {...} }
+        let usersList: any[] = []
+        
+        if (usersResult) {
+          if (Array.isArray(usersResult.data)) {
+            usersList = usersResult.data
+          } else if (usersResult.data?.data && Array.isArray(usersResult.data.data)) {
+            usersList = usersResult.data.data
+          } else if (Array.isArray(usersResult)) {
+            usersList = usersResult
+          }
+        }
+        
+        if (usersList.length > 0) {
+          setUsers(usersList)
         }
         
         // Get all sessions (for stats)
         const sessionsResult = await api.sessions.list({ limit: 1000 })
-        if (sessionsResult.success) {
-          setSessions(sessionsResult.data || [])
+        
+        // Parse sessions data - backend returns { data: Array(50), pagination: {...} }
+        // fetchAPI returns data directly, so sessionsResult = { data: Array(50), pagination: {...} }
+        let sessionsList: any[] = []
+        
+        if (sessionsResult) {
+          if (Array.isArray(sessionsResult.data)) {
+            sessionsList = sessionsResult.data
+          } else if (sessionsResult.data?.data && Array.isArray(sessionsResult.data.data)) {
+            sessionsList = sessionsResult.data.data
+          } else if (Array.isArray(sessionsResult)) {
+            sessionsList = sessionsResult
+          }
+        }
+        
+        if (sessionsList.length > 0) {
+          setSessions(sessionsList)
         }
       } else {
         // If auth fails, redirect to login
@@ -107,8 +159,226 @@ const ManagementDashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading user data:', error)
+      hasLoadedUserData.current = false // Reset on error to allow retry
     } finally {
       setLoading(false)
+    }
+  }, [navigate])
+
+  // Load management data from backend
+  const loadManagementData = useCallback(async (skipLoadingState = false) => {
+    // Prevent concurrent calls only
+    // Note: We allow reload on refresh because refs are reset on mount
+    if (isManagementDataLoading.current && !skipLoadingState) {
+      return
+    }
+    
+    // Only log on initial load, not on periodic refresh
+    if (!skipLoadingState) {
+      console.log('🔄 Loading management data...')
+    }
+    isManagementDataLoading.current = true
+    
+    try {
+      if (!skipLoadingState) {
+        setManagementLoading(true)
+      }
+      
+      // Load approval requests (pending only, limit 5)
+      try {
+        const approvalsResult = await api.management.approvals.list({ 
+          status: 'pending', 
+          limit: 5,
+          page: 1
+        })
+        
+        // Debug: Log full response structure only on initial load
+        if (!skipLoadingState) {
+          console.log('🔍 Approvals API Response:', {
+            hasSuccess: 'success' in approvalsResult,
+            success: approvalsResult.success,
+            hasData: !!approvalsResult.data,
+            dataKeys: approvalsResult.data ? Object.keys(approvalsResult.data) : [],
+            dataDataType: typeof approvalsResult.data?.data,
+            dataDataIsArray: Array.isArray(approvalsResult.data?.data),
+            dataIsArray: Array.isArray(approvalsResult.data)
+          })
+        }
+        
+        // Backend returns: successResponse({ data: [...], pagination: {...} })
+        // Which becomes: { success: true, data: { data: [...], pagination: {...} } }
+        let approvals: any[] = []
+        
+        if (approvalsResult && (approvalsResult.success || approvalsResult.data)) {
+          // Check nested structure: { success: true, data: { data: [...], pagination: {...} } }
+          if (approvalsResult.data?.data && Array.isArray(approvalsResult.data.data)) {
+            approvals = approvalsResult.data.data
+            // Get total from pagination
+            if (approvalsResult.data.pagination?.total !== undefined) {
+              setPendingApprovalsCount(approvalsResult.data.pagination.total)
+            }
+          } 
+          // Check if data is directly an array: { success: true, data: [...] }
+          else if (Array.isArray(approvalsResult.data)) {
+            approvals = approvalsResult.data
+          }
+          // Check if response itself is the data structure: { data: [...], pagination: {...} }
+          else if (approvalsResult.data && !approvalsResult.success && Array.isArray(approvalsResult.data)) {
+            approvals = approvalsResult.data
+          }
+        }
+          
+        // Only log on initial load
+        if (!skipLoadingState && approvals.length > 0) {
+          console.log('✅ Loaded', approvals.length, 'pending approvals')
+        }
+        setRecentRequests(approvals.slice(0, 5))
+        
+        // If we don't have pagination total, fetch count separately
+        if (approvals.length > 0 && !approvalsResult.data?.pagination?.total) {
+          const allPendingResult = await api.management.approvals.list({ status: 'pending', limit: 1000 })
+          if (allPendingResult && (allPendingResult.success || allPendingResult.data)) {
+            let allPending: any[] = []
+            if (allPendingResult.data?.data && Array.isArray(allPendingResult.data.data)) {
+              allPending = allPendingResult.data.data
+            } else if (Array.isArray(allPendingResult.data)) {
+              allPending = allPendingResult.data
+            }
+            if (allPending.length > 0) {
+              setPendingApprovalsCount(allPending.length)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error loading approvals:', error)
+      }
+      
+      // Load resource overview
+      try {
+        const resourceResult = await api.management.resources.getOverview()
+        if (resourceResult.success) {
+          setResourceOverview(resourceResult.data)
+        }
+        
+        // Also load inefficiencies count for stats
+        try {
+          const inefficienciesResult = await api.management.resources.getInefficiencies()
+          if (inefficienciesResult.success) {
+            const inefficienciesData = inefficienciesResult.data
+            const inefficienciesCount = inefficienciesData?.total || 
+                                       (inefficienciesData?.inefficiencies?.length || 0)
+            // Update resource overview with inefficiencies count
+            setResourceOverview((prev: any) => ({
+              ...prev,
+              inefficienciesCount
+            }))
+          }
+        } catch (error) {
+          console.error('❌ Error loading inefficiencies:', error)
+        }
+      } catch (error) {
+        console.error('❌ Error loading resource overview:', error)
+      }
+      
+      // Load performance KPIs
+      try {
+        const kpisResult = await api.management.analytics.getKPIs()
+        if (kpisResult.success) {
+          setPerformanceKPIs(kpisResult.data)
+        }
+      } catch (error) {
+        console.error('❌ Error loading KPIs:', error)
+      }
+      
+      // Load notifications (for system alerts)
+      try {
+        const notificationsResult = await api.notifications.list({ limit: 5 })
+        
+        // Debug: Log full response structure only on initial load
+        if (!skipLoadingState) {
+          console.log('🔍 Notifications API Response:', {
+            hasSuccess: 'success' in notificationsResult,
+            success: notificationsResult.success,
+            hasData: !!notificationsResult.data,
+            dataKeys: notificationsResult.data ? Object.keys(notificationsResult.data) : [],
+            dataDataType: typeof notificationsResult.data?.data,
+            dataDataIsArray: Array.isArray(notificationsResult.data?.data),
+            dataIsArray: Array.isArray(notificationsResult.data)
+          })
+        }
+        
+        // Backend returns: successResponse({ data: [...], pagination: {...}, unreadCount: ... })
+        // Which becomes: { success: true, data: { data: [...], pagination: {...}, unreadCount: ... } }
+        let notifications: any[] = []
+        
+        if (notificationsResult && (notificationsResult.success || notificationsResult.data)) {
+          // Check nested structure: { success: true, data: { data: [...], pagination: {...}, unreadCount: ... } }
+          if (notificationsResult.data?.data && Array.isArray(notificationsResult.data.data)) {
+            notifications = notificationsResult.data.data
+          }
+          // Check if data is directly an array: { success: true, data: [...] }
+          else if (Array.isArray(notificationsResult.data)) {
+            notifications = notificationsResult.data
+          }
+          // Check if response itself is the data structure: { data: [...], pagination: {...} }
+          else if (notificationsResult.data && !notificationsResult.success && Array.isArray(notificationsResult.data)) {
+            notifications = notificationsResult.data
+          }
+        }
+        
+        // Only log on initial load
+        if (!skipLoadingState && notifications.length > 0) {
+          console.log('✅ Loaded', notifications.length, 'notifications')
+        }
+        
+        // Transform notifications to alerts format
+        const alerts = notifications.map((notif: any) => ({
+          message: notif.title || notif.message || 'System notification',
+          time: notif.createdAt ? formatTimeAgo(new Date(notif.createdAt)) : 'Recently',
+          type: notif.type === 'warning' ? 'warning' : notif.type === 'error' ? 'error' : notif.type === 'success' ? 'success' : 'info'
+        }))
+        
+        setSystemAlerts(alerts)
+      } catch (error) {
+        console.error('❌ Error loading notifications:', error)
+        // Fallback to empty alerts
+        setSystemAlerts([])
+      }
+      
+    } catch (error) {
+      console.error('Error loading management data:', error)
+      // Reset flags on error to allow retry
+      isManagementDataLoading.current = false
+      hasLoadedManagementData.current = false
+    } finally {
+      isManagementDataLoading.current = false
+      if (!skipLoadingState) {
+        setManagementLoading(false)
+      }
+    }
+  }, [])
+
+  // Helper function to format time ago
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`
+    return `${Math.floor(diffInSeconds / 86400)} days ago`
+  }
+
+  // Helper function to format approval request date
+  const formatRequestDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      return {
+        date: date.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+        time: date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      }
+    } catch (error) {
+      return { date: dateString, time: '' }
     }
   }
 
@@ -135,28 +405,39 @@ const ManagementDashboard: React.FC = () => {
   }
 
   // Weather API function
-  const fetchWeather = async () => {
+  const fetchWeather = useCallback(async () => {
     try {
       setWeatherLoading(true)
       // Using OpenWeatherMap API (free tier)
       const API_KEY = 'd055198c2320f9b77049b5b9a1db7205' // Bạn cần đăng ký tại openweathermap.org
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=Ho%20Chi%20Minh%20City&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?q=Ho%20Chi%20Minh%20City&appid=${API_KEY}&units=metric`,
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        }
       )
+      
+      if (!response.ok) {
+        throw new Error(`Weather API error: ${response.status}`)
+      }
+      
       const data = await response.json()
       setWeather(data)
     } catch (error) {
       console.error('Error fetching weather:', error)
       // Fallback data nếu API không hoạt động
       setWeather({
-        main: { temp: 28, humidity: 75 },
+        main: { temp: 28, humidity: 75, feels_like: 30 },
         weather: [{ main: 'Clear', description: 'clear sky', icon: '01d' }],
         name: 'Ho Chi Minh City'
       })
     } finally {
       setWeatherLoading(false)
     }
-  }
+  }, [])
 
   // Get weather icon with time consideration
   const getWeatherIcon = (weatherMain: string) => {
@@ -230,41 +511,116 @@ const ManagementDashboard: React.FC = () => {
     return 'Good Evening'
   }
 
-  // useEffect for data loading, time and weather
+  // useEffect for loading user data on mount
   useEffect(() => {
-    // Load user data and stats
+    // Reset flags on mount to allow data reload on refresh
+    // Note: refs are already false on initial mount, but we reset them explicitly
+    // to ensure clean state when component remounts (e.g., after navigation)
+    hasLoadedUserData.current = false
+    hasLoadedManagementData.current = false
+    isManagementDataLoading.current = false
+    
+    // Load user data immediately on mount
     loadUserData()
     
-    // Update time every second
+    // Cleanup: clear any intervals on unmount
+    return () => {
+      if (managementIntervalRef.current) {
+        clearInterval(managementIntervalRef.current)
+        managementIntervalRef.current = null
+      }
+    }
+  }, [loadUserData]) // Include loadUserData to ensure it's up to date
+
+  // useEffect for loading management data after user is loaded
+  useEffect(() => {
+    // Only load management data if user is loaded and we haven't loaded it yet
+    const userId = user?.userId || user?.id
+    if (userId && !hasLoadedManagementData.current) {
+      hasLoadedManagementData.current = true
+      // Small delay to ensure user state is fully set
+      const timer = setTimeout(() => {
+        loadManagementData()
+      }, 100)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [user?.userId, user?.id, loadManagementData]) // Include loadManagementData in deps
+
+  // useEffect for time updates (runs continuously)
+  useEffect(() => {
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
 
+    return () => {
+      clearInterval(timeInterval)
+    }
+  }, []) // Only run once on mount
+
+  // useEffect for weather (runs once on mount and then periodically)
+  useEffect(() => {
     // Fetch weather on component mount
     fetchWeather()
 
     // Refresh weather every 10 minutes
-    const weatherInterval = setInterval(fetchWeather, 10 * 60 * 1000)
+    const weatherInterval = setInterval(() => {
+      fetchWeather()
+    }, 10 * 60 * 1000)
 
     return () => {
-      clearInterval(timeInterval)
       clearInterval(weatherInterval)
     }
-  }, [])
+  }, [fetchWeather]) // Include fetchWeather in dependencies
 
-  // Calculate stats from real data
+  // useEffect for periodic management data refresh (only setup after user is loaded)
+  useEffect(() => {
+    // Only setup interval if user is loaded and data has been loaded at least once
+    const userId = user?.userId || user?.id
+    if (!userId || !hasLoadedManagementData.current) return
+
+    // Clear any existing interval
+    if (managementIntervalRef.current) {
+      clearInterval(managementIntervalRef.current)
+    }
+
+    // Setup new interval for periodic refresh
+    // Use skipLoadingState=true to avoid showing loading spinner on refresh
+    managementIntervalRef.current = setInterval(() => {
+      // Reset loading flag to allow refresh
+      isManagementDataLoading.current = false
+      loadManagementData(true) // Skip loading state for periodic refresh
+    }, 30 * 1000)
+
+    return () => {
+      if (managementIntervalRef.current) {
+        clearInterval(managementIntervalRef.current)
+        managementIntervalRef.current = null
+      }
+    }
+  }, [user?.userId, user?.id, hasLoadedManagementData.current]) // Re-run when user changes or after initial load
+
+  // Calculate stats from real data - use useMemo to prevent recalculation on every render
+  const stats = useMemo(() => {
   const totalUsers = users.length
   const studentCount = users.filter(u => u.role === 'student').length
   const tutorCount = users.filter(u => u.role === 'tutor').length
   const activeSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
   const completedSessions = sessions.filter(s => s.status === 'completed').length
   
-  const stats = [
+    // Get management-specific stats
+    // Get inefficiencies count from resource overview (loaded from API)
+    const inefficienciesCount = resourceOverview?.inefficienciesCount || 
+                                resourceOverview?.overview?.workloadDistribution?.overloaded || 
+                                0
+    
+    return [
     { title: 'Total Users', value: totalUsers.toString(), icon: <PeopleIcon /> },
-    { title: 'Students', value: studentCount.toString(), icon: <PersonIcon /> },
-    { title: 'Tutors', value: tutorCount.toString(), icon: <AssignmentIcon /> },
-    { title: 'Active Sessions', value: activeSessions.toString(), icon: <CheckCircleIcon /> }
+      { title: 'Pending Approvals', value: pendingApprovalsCount.toString(), icon: <AssignmentIcon /> },
+      { title: 'Active Sessions', value: activeSessions.toString(), icon: <CheckCircleIcon /> },
+      { title: 'Resource Issues', value: inefficienciesCount.toString(), icon: <TrendingUpIcon /> }
   ]
+  }, [users, sessions, pendingApprovalsCount, resourceOverview])
 
   // User name from backend
   const userName = user?.name || 'Management'
@@ -284,46 +640,10 @@ const ManagementDashboard: React.FC = () => {
     )
   }
 
-  const recentRequests = [
-    {
-      id: 1,
-      user: 'John Smith',
-      type: 'Session Booking',
-      status: 'pending',
-      date: '2024-01-15',
-      time: '10:30 AM',
-      priority: 'high'
-    },
-    {
-      id: 2,
-      user: 'Sarah Johnson',
-      type: 'Credit Request',
-      status: 'approved',
-      date: '2024-01-15',
-      time: '09:15 AM',
-      priority: 'medium'
-    },
-    {
-      id: 3,
-      user: 'Mike Chen',
-      type: 'Tutor Application',
-      status: 'pending',
-      date: '2024-01-14',
-      time: '2:45 PM',
-      priority: 'high'
-    }
-  ]
-
-  const systemAlerts = [
-    { message: 'High server load detected', time: '5 minutes ago', type: 'warning' },
-    { message: 'New user registration spike', time: '1 hour ago', type: 'info' },
-    { message: 'Payment system maintenance scheduled', time: '2 hours ago', type: 'info' },
-    { message: 'Database backup completed', time: '3 hours ago', type: 'success' }
-  ]
-
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/management' },
     { id: 'approval-requests', label: 'Approval Requests', icon: <AssignmentIcon />, path: '/management/approval' },
+    { id: 'resource-allocation', label: 'Resource Allocation', icon: <TrendingUpIcon />, path: '/management/resources' },
     { id: 'reports-analytics', label: 'Reports & Analytics', icon: <BarChartIcon />, path: '/management/reports' },
     { id: 'award-credits', label: 'Award Credits', icon: <StarIcon />, path: '/management/awards' },
     { id: 'user-management', label: 'User Management', icon: <PeopleIcon />, path: '/management/users' },
@@ -686,8 +1006,25 @@ const ManagementDashboard: React.FC = () => {
               </div>
             </div>
 
+            {managementLoading && recentRequests.length === 0 ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className={`ml-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Đang tải yêu cầu...</span>
+              </div>
+            ) : recentRequests.length === 0 ? (
+              <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Không có yêu cầu nào đang chờ xử lý
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recentRequests.map((request) => (
+                {recentRequests.map((request) => {
+                  const requestDate = formatRequestDate(request.createdAt || request.submittedAt || new Date().toISOString())
+                  const requesterName = request.requester?.name || request.requesterName || 'Unknown User'
+                  const requestType = request.type || 'Unknown Type'
+                  const requestStatus = request.status || 'pending'
+                  const requestPriority = request.priority || 'medium'
+                  
+                  return (
                 <Card 
                   key={request.id} 
                   className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
@@ -700,27 +1037,39 @@ const ManagementDashboard: React.FC = () => {
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {request.user}
+                            {requesterName}
                       </h3>
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        request.status === 'pending' 
+                            requestStatus === 'pending' 
                           ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-green-100 text-green-800'
+                              : requestStatus === 'approved'
+                              ? 'bg-green-100 text-green-800'
+                              : requestStatus === 'rejected'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
                       }`}>
-                        {request.status}
+                            {requestStatus}
                       </span>
                     </div>
                     <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {request.type}
+                          {requestType}
                     </p>
                     <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {request.date} at {request.time}
+                          {requestDate.date} {requestDate.time && `at ${requestDate.time}`}
                     </p>
+                        {request.title && (
+                          <p className={`text-xs mb-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                            {request.title}
+                          </p>
+                        )}
                     <div className="flex space-x-2">
+                          {requestStatus === 'pending' && (
+                            <>
                       <Button 
                         size="small" 
                         variant="outlined" 
                         startIcon={<CheckCircleIcon />}
+                                onClick={() => navigate(`/management/approval/${request.id}`)}
                         style={{
                           backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
                           color: theme === 'dark' ? '#ffffff' : '#000000',
@@ -741,6 +1090,7 @@ const ManagementDashboard: React.FC = () => {
                         size="small" 
                         variant="outlined" 
                         startIcon={<AssignmentIcon />}
+                                onClick={() => navigate(`/management/approval/${request.id}`)}
                         style={{
                           backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
                           color: theme === 'dark' ? '#ffffff' : '#000000',
@@ -757,11 +1107,38 @@ const ManagementDashboard: React.FC = () => {
                       >
                         Review
                       </Button>
+                            </>
+                          )}
+                          {requestStatus !== 'pending' && (
+                            <Button 
+                              size="small" 
+                              variant="outlined" 
+                              startIcon={<AssignmentIcon />}
+                              onClick={() => navigate(`/management/approval/${request.id}`)}
+                              style={{
+                                backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                                color: theme === 'dark' ? '#ffffff' : '#000000',
+                                borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                                textTransform: 'none',
+                                fontWeight: '500'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                              }}
+                            >
+                              View Details
+                            </Button>
+                          )}
                     </div>
                   </div>
                 </Card>
-              ))}
+                  )
+                })}
             </div>
+            )}
           </div>
 
           {/* System Alerts Section */}
@@ -793,11 +1170,29 @@ const ManagementDashboard: React.FC = () => {
               </div>
 
               {/* Table Rows */}
-              {systemAlerts.map((alert, index) => (
+              {managementLoading && systemAlerts.length === 0 ? (
+                <div className="px-6 py-8 text-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className={`mt-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Đang tải thông báo...</p>
+                </div>
+              ) : systemAlerts.length === 0 ? (
+                <div className={`px-6 py-8 text-center ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Không có thông báo hệ thống
+                </div>
+              ) : (
+                systemAlerts.map((alert, index) => (
                 <div key={index} className={`px-4 lg:px-6 py-4 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} last:border-b-0`}>
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
                     <div className="flex items-center">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3"></div>
+                        <div className={`w-2 h-2 rounded-full mt-2 mr-3 ${
+                          alert.type === 'warning' 
+                            ? 'bg-yellow-500' 
+                            : alert.type === 'error'
+                            ? 'bg-red-500'
+                            : alert.type === 'success'
+                            ? 'bg-green-500'
+                            : 'bg-blue-500'
+                        }`}></div>
                       <div>
                         <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {alert.message}
@@ -808,19 +1203,22 @@ const ManagementDashboard: React.FC = () => {
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         alert.type === 'warning' 
                           ? 'bg-yellow-100 text-yellow-800' 
-                          : alert.type === 'info'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-green-100 text-green-800'
+                            : alert.type === 'error'
+                            ? 'bg-red-100 text-red-800'
+                            : alert.type === 'success'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-blue-100 text-blue-800'
                       }`}>
                         {alert.type}
                       </span>
                     </div>
-                    <div className={`hidden lg:block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      <div className={`hidden lg:block ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                       {alert.time}
                     </div>
                   </div>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -903,9 +1301,26 @@ const ManagementDashboard: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                {systemAlerts.slice(0, 4).map((alert, index) => (
+                {managementLoading && systemAlerts.length === 0 ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mx-auto"></div>
+                  </div>
+                ) : systemAlerts.length === 0 ? (
+                  <div className={`text-center py-4 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Không có hoạt động gần đây
+                  </div>
+                ) : (
+                  systemAlerts.slice(0, 4).map((alert, index) => (
                   <div key={index} className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3"></div>
+                      <div className={`w-2 h-2 rounded-full mt-2 mr-3 ${
+                        alert.type === 'warning' 
+                          ? 'bg-yellow-500' 
+                          : alert.type === 'error'
+                          ? 'bg-red-500'
+                          : alert.type === 'success'
+                          ? 'bg-green-500'
+                          : 'bg-blue-500'
+                      }`}></div>
                     <div className="flex-1">
                       <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {alert.message}
@@ -915,7 +1330,8 @@ const ManagementDashboard: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
 
               <Button 

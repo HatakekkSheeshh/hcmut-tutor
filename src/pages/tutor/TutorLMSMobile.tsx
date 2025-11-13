@@ -408,9 +408,16 @@ const TutorLMSMobile: React.FC = () => {
                       ) : (
                         <LocationOn className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                       )}
-                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        {session.isOnline ? 'Online' : 'In-Person'} • {session.duration} mins
-                      </p>
+                      <div>
+                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {session.isOnline ? 'Online' : 'In-Person'} • {session.duration} mins
+                        </p>
+                        {!session.isOnline && session.location && (
+                          <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {session.location}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center">

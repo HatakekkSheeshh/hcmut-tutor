@@ -18,7 +18,8 @@ import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,
   Security as SecurityIcon,
-  Notifications as NotificationsIcon
+  Notifications as NotificationsIcon,
+  TrendingUp
 } from '@mui/icons-material'
 import { Avatar } from '@mui/material'
 import { LineChart } from '@mui/x-charts/LineChart'
@@ -57,6 +58,7 @@ const ReportsAnalyticsMobile: React.FC = () => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/management' },
     { id: 'approval-requests', label: 'Approval Requests', icon: <AssignmentIcon />, path: '/management/approval' },
+    { id: 'resource-allocation', label: 'Resource Allocation', icon: <TrendingUp />, path: '/management/resources' },
     { id: 'reports-analytics', label: 'Reports & Analytics', icon: <BarChartIcon />, path: '/management/reports' },
     { id: 'award-credits', label: 'Award Credits', icon: <Star />, path: '/management/awards' },
     { id: 'user-management', label: 'User Management', icon: <People />, path: '/management/users' },

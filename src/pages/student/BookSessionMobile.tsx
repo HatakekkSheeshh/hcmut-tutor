@@ -556,10 +556,24 @@ const BookSessionMobile: React.FC = () => {
         // Get availability excluding class schedules
         const result = await api.availability.get(selectedTutor, true)
         
+        // Get tutor's existing sessions to exclude them (with buffer time)
+        const sessionsResponse = await api.sessions.list({
+          tutorId: selectedTutor,
+          status: 'confirmed,pending',
+          page: 1,
+          limit: 200
+        })
+        
+        const existingSessions = sessionsResponse?.data?.data || sessionsResponse?.data || []
+        
+        // Buffer time between sessions (30 minutes)
+        const SESSION_BUFFER_MINUTES = 30
+        
         if (result && result.data && result.data.timeSlots) {
           // Generate time slots for the next 14 days based on availability
           const slots: any[] = []
           const today = new Date()
+          today.setHours(0, 0, 0, 0)
           
           for (let i = 0; i < 14; i++) {
             const date = new Date(today)
@@ -580,10 +594,88 @@ const BookSessionMobile: React.FC = () => {
                 const startMinutes = startHour * 60 + startMin
                 const endMinutes = endHour * 60 + endMin
                 
-                // Generate slots based on selected duration
-                for (let minutes = startMinutes; minutes + selectedDuration <= endMinutes; minutes += selectedDuration) {
+                // Find the latest session end time (with buffer) on this date to optimize slot generation
+                let latestSessionEndWithBuffer = startMinutes // Start from availability start
+                
+                existingSessions.forEach((existingSession: any) => {
+                  if (existingSession.classId) return // Skip class sessions
+                  
+                  const existingStart = new Date(existingSession.startTime)
+                  const existingEnd = new Date(existingSession.endTime)
+                  
+                  // Compare dates in local timezone
+                  const slotYear = date.getFullYear()
+                  const slotMonth = date.getMonth()
+                  const slotDay = date.getDate()
+                  const existingYear = existingStart.getFullYear()
+                  const existingMonth = existingStart.getMonth()
+                  const existingDay = existingStart.getDate()
+                  
+                  // Check if same date (in local timezone)
+                  if (slotYear === existingYear && slotMonth === existingMonth && slotDay === existingDay) {
+                    const existingEndWithBuffer = new Date(existingEnd.getTime() + SESSION_BUFFER_MINUTES * 60 * 1000)
+                    const existingEndWithBufferMinutes = existingEndWithBuffer.getHours() * 60 + existingEndWithBuffer.getMinutes()
+                    // Update latest session end if this session ends later
+                    if (existingEndWithBufferMinutes > latestSessionEndWithBuffer) {
+                      latestSessionEndWithBuffer = existingEndWithBufferMinutes
+                    }
+                  }
+                })
+                
+                // Start generating slots from the later of: availability start or latest session end (with buffer)
+                const effectiveStartMinutes = Math.max(startMinutes, latestSessionEndWithBuffer)
+                
+                // Generate slots based on selected duration (increment by 30 minutes for flexibility)
+                for (let minutes = effectiveStartMinutes; minutes + selectedDuration <= endMinutes; minutes += 30) {
                   const hour = Math.floor(minutes / 60)
                   const min = minutes % 60
+                  
+                  // Create slot start and end times
+                  const slotStart = new Date(date)
+                  slotStart.setHours(hour, min, 0, 0)
+                  
+                  const slotEnd = new Date(slotStart)
+                  slotEnd.setMinutes(slotEnd.getMinutes() + selectedDuration)
+                  
+                  // Double-check for conflicts (in case of edge cases)
+                  const hasConflict = existingSessions.some((existingSession: any) => {
+                    if (existingSession.classId) return false // Don't check class sessions
+                    
+                    // Parse existing session times (UTC strings) - JavaScript Date automatically converts to local time
+                    const existingStart = new Date(existingSession.startTime)
+                    const existingEnd = new Date(existingSession.endTime)
+                    
+                    // Compare dates in local timezone (compare year, month, day)
+                    const slotYear = slotStart.getFullYear()
+                    const slotMonth = slotStart.getMonth()
+                    const slotDay = slotStart.getDate()
+                    const existingYear = existingStart.getFullYear()
+                    const existingMonth = existingStart.getMonth()
+                    const existingDay = existingStart.getDate()
+                    
+                    // Check if same date (in local timezone)
+                    if (slotYear !== existingYear || slotMonth !== existingMonth || slotDay !== existingDay) {
+                      return false
+                    }
+                    
+                    // Apply buffer time: slot must start at least 30 minutes after existing session ends
+                    // and must end at least 30 minutes before existing session starts
+                    const existingEndWithBuffer = new Date(existingEnd.getTime() + SESSION_BUFFER_MINUTES * 60 * 1000)
+                    const existingStartWithBuffer = new Date(existingStart.getTime() - SESSION_BUFFER_MINUTES * 60 * 1000)
+                    
+                    // Check if slot overlaps with existing session (including buffer)
+                    // Slot overlaps if it starts before session ends (with buffer) AND ends after session starts (with buffer)
+                    // Note: if slot starts exactly when session ends (with buffer), it doesn't overlap (>= is allowed)
+                    const overlaps = slotStart.getTime() < existingEndWithBuffer.getTime() && slotEnd.getTime() > existingStartWithBuffer.getTime()
+                    
+                    return overlaps
+                  })
+                  
+                  // Skip if conflicts or slot is in the past
+                  const now = new Date()
+                  if (hasConflict || slotStart < now) {
+                    return
+                  }
                   
                   // Calculate end time
                   const endSlotMinutes = minutes + selectedDuration
