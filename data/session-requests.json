@@ -66,20 +66,6 @@
     "updatedAt": "2025-11-02T07:51:29.243Z"
   },
   {
-    "id": "req_orDriJURnXgx",
-    "sessionId": "class_class_FeSr3Dut3Zyd_next_session",
-    "studentId": "stu_CL7iuJCaQnMJ",
-    "tutorId": "tut_QAuiJWjIUx57",
-    "classId": "class_FeSr3Dut3Zyd",
-    "type": "reschedule",
-    "status": "approved",
-    "reason": "siuuuu0weee",
-    "alternativeSessionId": "class_FeSr3Dut3Zye",
-    "createdAt": "2025-11-06T14:30:34.039Z",
-    "updatedAt": "2025-11-06T14:53:58.741Z",
-    "responseMessage": "ok"
-  },
-  {
     "id": "req_IJTiWL6m9yTQ",
     "sessionId": "ses_BDAibwqCmgMj",
     "studentId": "stu_p8zzUZM5nqnx",

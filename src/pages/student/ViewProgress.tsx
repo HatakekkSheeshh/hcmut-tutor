@@ -11,7 +11,12 @@ import {
   CheckCircle as CheckCircleIcon,
   BarChart as BarChartIcon,
   Warning as WarningIcon,
-  CalendarToday as CalendarTodayIcon
+  CalendarToday as CalendarTodayIcon,
+  EmojiEvents as EmojiEventsIcon,
+  Flag as FlagIcon,
+  Notifications as NotificationsIcon,
+  Refresh as RefreshIcon,
+  Close as CloseIcon
 } from '@mui/icons-material'
 import { 
   Box,
@@ -19,7 +24,18 @@ import {
   Typography,
   LinearProgress,
   Chip,
-  Divider
+  Divider,
+  IconButton,
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  TextField,
+  MenuItem
 } from '@mui/material'
 import { progressAPI, usersAPI } from '../../lib/api'
 
@@ -31,11 +47,19 @@ interface SubjectProgress {
   improvements: string[]
   challenges: string[]
   progressRecords: any[]
+  targetScore: number
 }
+
+const achievements = [
+  { id: 1, title: 'Top 10%', icon: <EmojiEventsIcon />, color: '#ca8a04', bg: '#fefce8' },
+  { id: 2, title: '7 Day Streak', icon: <TrendingUp />, color: '#059669', bg: '#ecfdf5' },
+  { id: 3, title: 'Math Wizard', icon: <School />, color: '#2563eb', bg: '#eff6ff' },
+]
 
 const ViewProgress: React.FC = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
+  
   const [loading, setLoading] = useState(true)
   const [progressRecords, setProgressRecords] = useState<any[]>([])
   const [tutorsMap, setTutorsMap] = useState<Record<string, any>>({})
@@ -43,109 +67,106 @@ const ViewProgress: React.FC = () => {
   const [timeRange, setTimeRange] = useState('3months')
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  // Load progress data on mount
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true)
+  const [openGoalDialog, setOpenGoalDialog] = useState(false)
+  const [selectedSubject, setSelectedSubject] = useState('')
+  const [targetInput, setTargetInput] = useState<number | string>(90)
 
-        // Get user from localStorage
-        const userStr = localStorage.getItem('user')
-        if (!userStr) {
-          navigate('/login')
-          return
-        }
-        const userData = JSON.parse(userStr)
+  const loadData = async () => {
+    try {
+      setLoading(true)
 
-        // Load progress records for this student
-        const progressResponse = await progressAPI.list({ studentId: userData.id, limit: 1000 })
+      const userStr = localStorage.getItem('user')
+      if (!userStr) {
+        navigate('/login')
+        return
+      }
+      const userData = JSON.parse(userStr)
+
+      const progressResponse = await progressAPI.list({ studentId: userData.id, limit: 1000 })
+      
+      console.log('Progress response:', progressResponse) 
+
+      if (progressResponse.data && Array.isArray(progressResponse.data)) {
+        const records = progressResponse.data
+        setProgressRecords(records)
+
+        const tutorIds = [...new Set(records.map((p: any) => p.tutorId))] as string[]
         
-        console.log('Progress response:', progressResponse) // Debug
+        const tutorsData: Record<string, any> = {}
+        await Promise.all(
+          tutorIds.map(async (tutorId) => {
+            try {
+              const response = await usersAPI.get(tutorId)
+              const tutorData = response.success ? response.data : response
+              if (tutorData) {
+                tutorsData[tutorId] = tutorData
+              }
+            } catch (err) {
+              console.error(`Error loading tutor ${tutorId}:`, err)
+            }
+          })
+        )
 
-        if (progressResponse.data && Array.isArray(progressResponse.data)) {
-          const records = progressResponse.data
-          setProgressRecords(records)
+        setTutorsMap(tutorsData)
 
-          // Get unique tutor IDs
-          const tutorIds = [...new Set(records.map((p: any) => p.tutorId))] as string[]
+        const subjectMap = new Map<string, SubjectProgress>()
+
+        records.forEach((progress: any) => {
+          if (!subjectMap.has(progress.subject)) {
+            subjectMap.set(progress.subject, {
+              subject: progress.subject,
+              averageScore: 0,
+              totalRecords: 0,
+              topics: [],
+              improvements: [],
+              challenges: [],
+              progressRecords: [],
+              targetScore: 90
+            })
+          }
+
+          const subjectProgress = subjectMap.get(progress.subject)!
+          subjectProgress.progressRecords.push(progress)
           
-          // Load tutor data
-          const tutorsData: Record<string, any> = {}
-          await Promise.all(
-            tutorIds.map(async (tutorId) => {
-              try {
-                const response = await usersAPI.get(tutorId)
-                const tutorData = response.success ? response.data : response
-                if (tutorData) {
-                  tutorsData[tutorId] = tutorData
-                }
-              } catch (err) {
-                console.error(`Error loading tutor ${tutorId}:`, err)
+          if (progress.topic && !subjectProgress.topics.includes(progress.topic)) {
+            subjectProgress.topics.push(progress.topic)
+          }
+
+          if (progress.improvements) {
+            progress.improvements.forEach((imp: string) => {
+              if (!subjectProgress.improvements.includes(imp)) {
+                subjectProgress.improvements.push(imp)
               }
             })
-          )
+          }
+          if (progress.challenges) {
+            progress.challenges.forEach((chal: string) => {
+              if (!subjectProgress.challenges.includes(chal)) {
+                subjectProgress.challenges.push(chal)
+              }
+            })
+          }
+        })
 
-          setTutorsMap(tutorsData)
+        subjectMap.forEach((subjectProgress) => {
+          const scores = subjectProgress.progressRecords.map((p: any) => p.score || 0)
+          const averageScore = scores.length > 0 
+            ? scores.reduce((a, b) => a + b, 0) / scores.length
+            : 0
+          subjectProgress.averageScore = Math.round(averageScore * 10) 
+          subjectProgress.totalRecords = subjectProgress.progressRecords.length
+        })
 
-          // Process data by subject
-          const subjectMap = new Map<string, SubjectProgress>()
-
-          records.forEach((progress: any) => {
-            if (!subjectMap.has(progress.subject)) {
-              subjectMap.set(progress.subject, {
-                subject: progress.subject,
-                averageScore: 0,
-                totalRecords: 0,
-                topics: [],
-                improvements: [],
-                challenges: [],
-                progressRecords: []
-              })
-            }
-
-            const subjectProgress = subjectMap.get(progress.subject)!
-            subjectProgress.progressRecords.push(progress)
-            
-            // Add unique topics
-            if (progress.topic && !subjectProgress.topics.includes(progress.topic)) {
-              subjectProgress.topics.push(progress.topic)
-            }
-
-            // Collect improvements and challenges
-            if (progress.improvements) {
-              progress.improvements.forEach((imp: string) => {
-                if (!subjectProgress.improvements.includes(imp)) {
-                  subjectProgress.improvements.push(imp)
-                }
-              })
-            }
-            if (progress.challenges) {
-              progress.challenges.forEach((chal: string) => {
-                if (!subjectProgress.challenges.includes(chal)) {
-                  subjectProgress.challenges.push(chal)
-                }
-              })
-            }
-          })
-
-          // Calculate averages
-          subjectMap.forEach((subjectProgress) => {
-            const scores = subjectProgress.progressRecords.map((p: any) => p.score || 0)
-            const averageScore = scores.length > 0 
-              ? scores.reduce((a, b) => a + b, 0) / scores.length
-              : 0
-            subjectProgress.averageScore = Math.round(averageScore * 10) // Convert 0-10 to 0-100%
-            subjectProgress.totalRecords = subjectProgress.progressRecords.length
-          })
-
-          setSubjectsProgress(Array.from(subjectMap.values()))
-        }
-      } catch (err: any) {
-        console.error('Error loading progress:', err)
-      } finally {
-        setLoading(false)
+        setSubjectsProgress(Array.from(subjectMap.values()))
       }
+    } catch (err: any) {
+      console.error('Error loading progress:', err)
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
     loadData()
   }, [navigate])
 
@@ -153,7 +174,39 @@ const ViewProgress: React.FC = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  // Calculate overall stats
+  const handleOpenGoalDialog = () => {
+    if (subjectsProgress.length > 0) {
+      setSelectedSubject(subjectsProgress[0].subject)
+      setTargetInput(subjectsProgress[0].targetScore)
+    }
+    setOpenGoalDialog(true)
+  }
+
+  const handleCloseGoalDialog = () => {
+    setOpenGoalDialog(false)
+  }
+
+  const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const subjName = event.target.value
+    setSelectedSubject(subjName)
+    const subj = subjectsProgress.find(s => s.subject === subjName)
+    if (subj) {
+      setTargetInput(subj.targetScore)
+    }
+  }
+
+  const handleSaveGoal = () => {
+    const newTarget = Number(targetInput)
+    if (newTarget > 0 && newTarget <= 100) {
+      setSubjectsProgress(prev => prev.map(subj => 
+        subj.subject === selectedSubject 
+          ? { ...subj, targetScore: newTarget } 
+          : subj
+      ))
+      setOpenGoalDialog(false)
+    }
+  }
+
   const overallProgress = subjectsProgress.length > 0
     ? Math.round(subjectsProgress.reduce((sum, s) => sum + s.averageScore, 0) / subjectsProgress.length)
     : 0
@@ -167,7 +220,6 @@ const ViewProgress: React.FC = () => {
     { title: 'Progress Records', value: progressRecords.length.toString(), icon: <Assignment />, color: 'secondary' },
   ]
 
-  // Loading state
   if (loading) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
@@ -182,10 +234,8 @@ const ViewProgress: React.FC = () => {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar - Sticky */}
         <div className={`w-full lg:w-60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} lg:block`}>
           <div className="p-6">
-            {/* Logo */}
             <div 
               className="flex items-center mb-8 cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/student')}
@@ -198,7 +248,6 @@ const ViewProgress: React.FC = () => {
               </span>
             </div>
 
-            {/* Progress Overview */}
             <div className="mb-8">
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 PROGRESS OVERVIEW
@@ -221,7 +270,6 @@ const ViewProgress: React.FC = () => {
               </div>
             </div>
 
-            {/* Quick Actions */}
             <div>
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 QUICK ACTIONS
@@ -239,19 +287,28 @@ const ViewProgress: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content - Redesigned Report Layout */}
         <div className="flex-1 p-4 lg:p-8 max-w-[1600px] mx-auto">
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden mb-4">
-            <button
-              onClick={handleDrawerToggle}
-              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
-            >
-              <MenuIcon className="w-6 h-6" />
-            </button>
+          
+          <div className="flex justify-between items-center mb-6">
+            <div className="lg:hidden">
+              <button
+                onClick={handleDrawerToggle}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
+              >
+                <MenuIcon className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="hidden lg:block"></div>
+            
+            <div className="flex items-center gap-3">
+              <IconButton>
+                <Badge badgeContent={3} color="error">
+                  <NotificationsIcon sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
+                </Badge>
+              </IconButton>
+            </div>
           </div>
 
-          {/* Header Section */}
           <Paper 
             elevation={0}
             sx={{ 
@@ -271,9 +328,9 @@ const ViewProgress: React.FC = () => {
                   Comprehensive overview of your learning journey and achievements
                 </Typography>
               </Box>
-                <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
                 className={`px-4 py-2.5 border rounded-lg font-medium ${
                     theme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white'
@@ -284,10 +341,9 @@ const ViewProgress: React.FC = () => {
                   <option value="3months">Last 3 Months</option>
                   <option value="6months">Last 6 Months</option>
                   <option value="1year">Last Year</option>
-                </select>
+              </select>
             </Box>
 
-            {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               {stats.map((stat, index) => (
                 <Box 
@@ -313,9 +369,7 @@ const ViewProgress: React.FC = () => {
             </div>
           </Paper>
 
-          {/* Main Report Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Column - Progress Overview */}
             <div className="lg:col-span-8">
               <Paper 
                 elevation={0}
@@ -327,7 +381,6 @@ const ViewProgress: React.FC = () => {
                   height: '100%'
                 }}
               >
-        {/* Overall Progress */}
                 <Box mb={4}>
                   <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
                     <Typography variant="h6" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
@@ -364,7 +417,6 @@ const ViewProgress: React.FC = () => {
 
                 <Divider sx={{ my: 3, borderColor: theme === 'dark' ? '#374151' : '#e5e7eb' }} />
 
-                {/* Subject-wise Progress */}
                 <Box mb={4}>
                   <Typography variant="h6" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 3 }}>
                     Subject Performance
@@ -445,7 +497,6 @@ const ViewProgress: React.FC = () => {
 
                 <Divider sx={{ my: 3, borderColor: theme === 'dark' ? '#374151' : '#e5e7eb' }} />
 
-                {/* Recent Progress Records */}
                 <Box>
                   <Typography variant="h6" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 3 }}>
                     Recent Sessions
@@ -520,17 +571,86 @@ const ViewProgress: React.FC = () => {
                   )}
                 </Box>
               </Paper>
-              </div>
+            </div>
 
-            {/* Right Column - Insights */}
             <div className="lg:col-span-4">
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Improvements */}
+                
+                <Paper 
+                  elevation={0} 
+                  sx={{ 
+                    p: 3, 
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff', 
+                    border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+                    borderRadius: '12px' 
+                  }} 
+                >
+                  <Box display="flex" alignItems="center" gap={1} mb={3}>
+                    <FlagIcon sx={{ color: '#ef4444' }} />
+                    <Typography variant="h6" fontWeight="700" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>My Goals</Typography>
+                  </Box>
+                  {subjectsProgress.slice(0, 3).map((subj, i) => (
+                    <Box key={i} mb={3}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{subj.subject}</span>
+                        <span className="text-gray-500 font-medium">{subj.averageScore} / <span className="text-blue-600">{subj.targetScore}</span></span>
+                      </div>
+                      <LinearProgress 
+                        variant="determinate" 
+                        value={(subj.averageScore / (subj.targetScore || 100)) * 100} 
+                        sx={{ 
+                          height: 6, 
+                          borderRadius: 3, 
+                          bgcolor: theme === 'dark' ? '#374151' : '#f1f5f9', 
+                          '& .MuiLinearProgress-bar': { bgcolor: '#ef4444' } 
+                        }} 
+                      />
+                    </Box>
+                  ))}
+                  <Button 
+                    variant="text" 
+                    size="small" 
+                    fullWidth
+                    onClick={handleOpenGoalDialog}
+                  >
+                    Set New Goals
+                  </Button>
+                </Paper>
+
+                <Paper 
+                  elevation={0} 
+                  sx={{ 
+                    p: 3, 
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff', 
+                    border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+                    borderRadius: '12px' 
+                  }} 
+                >
+                  <Box display="flex" alignItems="center" gap={1} mb={3}>
+                    <EmojiEventsIcon sx={{ color: '#f59e0b' }} />
+                    <Typography variant="h6" fontWeight="700" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>Achievements</Typography>
+                  </Box>
+                  <div className="grid grid-cols-3 gap-2">
+                    {achievements.map((badge) => (
+                      <div 
+                        key={badge.id} 
+                        className="flex flex-col items-center p-2 rounded-lg text-center transition-transform hover:scale-105 cursor-pointer" 
+                        style={{ backgroundColor: theme === 'dark' ? '#374151' : badge.bg }}
+                      >
+                        <div style={{ color: badge.color }} className="mb-1">{badge.icon}</div>
+                        <span className={`text-[10px] font-bold leading-tight ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {badge.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </Paper>
+
                 <Paper 
                   elevation={0}
                   sx={{ 
                     p: 3, 
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
                     border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
                     borderRadius: '12px'
                   }}
@@ -574,12 +694,11 @@ const ViewProgress: React.FC = () => {
                   )}
                 </Paper>
 
-                {/* Challenges */}
                 <Paper 
                   elevation={0}
                   sx={{ 
                     p: 3, 
-              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
                     border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
                     borderRadius: '12px'
                   }}
@@ -628,13 +747,11 @@ const ViewProgress: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={handleDrawerToggle}></div>
           <div className={`fixed left-0 top-0 h-full w-80 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-xl`}>
             <div className="p-6">
-              {/* Mobile Header */}
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center">
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
@@ -648,11 +765,10 @@ const ViewProgress: React.FC = () => {
                   onClick={handleDrawerToggle}
                   className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
                 >
-                  <MenuIcon className="w-6 h-6" />
+                  <CloseIcon className="w-6 h-6" />
                 </button>
               </div>
 
-              {/* Mobile Progress Overview */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                   PROGRESS OVERVIEW
@@ -675,7 +791,6 @@ const ViewProgress: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mobile Quick Actions */}
               <div className="space-y-2">
                 <button 
                   onClick={() => {
@@ -712,6 +827,41 @@ const ViewProgress: React.FC = () => {
           </div>
         </div>
       )}
+
+      <Dialog open={openGoalDialog} onClose={handleCloseGoalDialog}>
+        <DialogTitle>Set Learning Goal</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Select a subject and set your target score (0-100%) to track your progress.
+          </DialogContentText>
+          <TextField
+            select
+            label="Subject"
+            fullWidth
+            value={selectedSubject}
+            onChange={handleSubjectChange}
+            sx={{ mb: 2 }}
+          >
+            {subjectsProgress.map((subj) => (
+              <MenuItem key={subj.subject} value={subj.subject}>
+                {subj.subject}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="Target Score (%)"
+            type="number"
+            fullWidth
+            value={targetInput}
+            onChange={(e) => setTargetInput(e.target.value)}
+            InputProps={{ inputProps: { min: 0, max: 100 } }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseGoalDialog}>Cancel</Button>
+          <Button onClick={handleSaveGoal} variant="contained">Save Goal</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

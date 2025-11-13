@@ -250,16 +250,6 @@
     "createdAt": "2025-11-06T07:51:29.224Z"
   },
   {
-    "id": "notif_DPswXGR6cHi7",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Đại số tuyến tính vào 18:00:00 10/10/2025",
-    "read": false,
-    "link": "/sessions/ses_Mth5Doi4DIB8",
-    "createdAt": "2025-11-06T07:51:29.224Z"
-  },
-  {
     "id": "notif_0GvbL9qW6QNU",
     "userId": "tut_NrIX8Wa7MS0G",
     "type": "session_cancelled",
@@ -575,5 +565,115 @@
     "read": false,
     "link": "/sessions/ses_6ZhRrxVh_XVJ",
     "createdAt": "2025-11-07T05:12:08.159Z"
+  },
+  {
+    "id": "notif_gsZH1Suw9Ne4",
+    "userId": "tut_mQjJx63STWcF",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Lập trình C/C++",
+    "read": false,
+    "link": "/sessions/ses_gJ6HPN-G4W6o",
+    "createdAt": "2025-11-11T06:22:35.036Z"
+  },
+  {
+    "id": "notif_WtWfmGaqLkgo",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Điện tử",
+    "read": false,
+    "link": "/sessions/ses_5NTDqs7V8c5v",
+    "createdAt": "2025-11-11T06:44:36.382Z"
+  },
+  {
+    "id": "notif_IDEdHfscL2S-",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
+    "read": false,
+    "link": "/sessions/ses_eBDVQ0valbiC",
+    "createdAt": "2025-11-11T06:48:34.745Z"
+  },
+  {
+    "id": "notif_Td3IZuXanS3k",
+    "userId": "tut_QAuiJWjIUx57",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "2365732@hcmut.edu.vn đã đặt buổi học Điện tử",
+    "read": false,
+    "link": "/sessions/ses_8eNowZi8Tw6_",
+    "createdAt": "2025-11-11T06:50:32.087Z"
+  },
+  {
+    "id": "notif_bW8bw1l1fFHA",
+    "userId": "stu_Dkzw5MfS0lmg",
+    "type": "session_booking",
+    "title": "Lịch học mới được tạo",
+    "message": "18 buổi học cho lớp C02 - Tiếng Anh đã được tạo",
+    "read": false,
+    "link": "/classes/class_gqiLbziHXa-G",
+    "createdAt": "2025-11-11T08:34:43.035Z"
+  },
+  {
+    "id": "notif_zIY5guQkS63t",
+    "userId": "stu_xyHCrONyfX5i",
+    "type": "session_booking",
+    "title": "Lịch học mới được tạo",
+    "message": "18 buổi học cho lớp C02 - Tiếng Anh đã được tạo",
+    "read": false,
+    "link": "/classes/class_gqiLbziHXa-G",
+    "createdAt": "2025-11-11T08:34:43.035Z"
+  },
+  {
+    "id": "notif_R2l11Rh3IFxN",
+    "userId": "stu_3RhgygZCqKGA",
+    "type": "session_booking",
+    "title": "Lịch học mới được tạo",
+    "message": "13 buổi học cho lớp C01 - Đại số tuyến tính đã được tạo",
+    "read": false,
+    "link": "/classes/class_FeSr3Dut3Zyd",
+    "createdAt": "2025-11-12T11:35:27.690Z"
+  },
+  {
+    "id": "notif_9L1D4oAbXKgF",
+    "userId": "stu_l7BbBkC4tz5Z",
+    "type": "session_booking",
+    "title": "Lịch học mới được tạo",
+    "message": "13 buổi học cho lớp C01 - Đại số tuyến tính đã được tạo",
+    "read": false,
+    "link": "/classes/class_FeSr3Dut3Zyd",
+    "createdAt": "2025-11-12T11:35:27.690Z"
+  },
+  {
+    "id": "notif_GLk6dG3Kgs1L",
+    "userId": "stu_xyHCrONyfX5i",
+    "type": "session_booking",
+    "title": "Lịch học mới được tạo",
+    "message": "13 buổi học cho lớp C01 - Đại số tuyến tính đã được tạo",
+    "read": false,
+    "link": "/classes/class_FeSr3Dut3Zyd",
+    "createdAt": "2025-11-12T11:35:27.690Z"
+  },
+  {
+    "id": "notif_doyNBsUqlFOZ",
+    "userId": "stu_X9P40VHl5eYS",
+    "type": "session_booking",
+    "title": "Lịch học mới được tạo",
+    "message": "13 buổi học cho lớp C01 - Đại số tuyến tính đã được tạo",
+    "read": false,
+    "link": "/classes/class_FeSr3Dut3Zyd",
+    "createdAt": "2025-11-12T11:35:27.690Z"
+  },
+  {
+    "id": "notif_ZYVcBxdvMexS",
+    "userId": "stu_abUgMaX8_8pV",
+    "type": "session_booking",
+    "title": "Lịch học mới được tạo",
+    "message": "13 buổi học cho lớp C01 - Đại số tuyến tính đã được tạo",
+    "read": false,
+    "link": "/classes/class_FeSr3Dut3Zyd",
+    "createdAt": "2025-11-12T11:35:27.690Z"
   }
 ]
