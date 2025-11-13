@@ -578,5 +578,28 @@
       "read": false,
       "createdAt": "2025-11-12T19:02:44.757Z"
     }
+  },
+  {
+    "id": "conv_e7DO2Fnw6BEu0CQKy-cRD",
+    "participants": [
+      "stu_afp9r8MLsjE8",
+      "stu_FyRaYWIiysPh"
+    ],
+    "unreadCount": {
+      "stu_afp9r8MLsjE8": 0,
+      "stu_FyRaYWIiysPh": 2
+    },
+    "createdAt": "2025-11-13T04:13:09.877Z",
+    "updatedAt": "2025-11-13T04:29:44.399Z",
+    "lastMessage": {
+      "id": "msg_VTRZCFicEZY3ikXC1B8jf",
+      "conversationId": "conv_e7DO2Fnw6BEu0CQKy-cRD",
+      "senderId": "stu_afp9r8MLsjE8",
+      "receiverId": "stu_FyRaYWIiysPh",
+      "content": "😉",
+      "type": "text",
+      "read": false,
+      "createdAt": "2025-11-13T04:29:44.399Z"
+    }
   }
 ]

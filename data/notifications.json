@@ -1,732 +1,46 @@
 [
   {
-    "id": "notif_L-2YX6mys8fT",
-    "userId": "stu_afp9r8MLsjE8",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Lập trình C/C++ vào 15:00:00 13/10/2025",
-    "read": true,
-    "link": "/sessions/ses_MT5AMsE4EBXj",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_4kaEYMMcOqag",
-    "userId": "stu_FyRaYWIiysPh",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Xác suất thống kê vào 14:00:00 12/10/2025",
-    "read": false,
-    "link": "/sessions/ses_asV8kg_8a4qg",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_ERnJhXC-HJnu",
-    "userId": "stu_5m0qgd6BvqGz",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Xác suất thống kê vào 09:00:00 30/10/2025",
-    "read": false,
-    "link": "/sessions/ses_FLkoE5PnAgQZ",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_QXVWgPDBPX01",
-    "userId": "stu_3xXLt1IWBsCS",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Mạng máy tính vào 14:00:00 15/10/2025",
-    "read": true,
-    "link": "/sessions/ses_ss1JNAe-_RuP",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_MMNEib9vz46t",
-    "userId": "stu_3xXLt1IWBsCS",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cơ sở dữ liệu vào 17:00:00 28/11/2025",
-    "read": false,
-    "link": "/sessions/ses_zhkXQP40EOaa",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_jYOh3SYU5FM9",
-    "userId": "stu_3xXLt1IWBsCS",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Mạng máy tính vào 08:00:00 15/11/2025",
-    "read": false,
-    "link": "/sessions/ses_XvUTW8woSBqZ",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_yb05ELcqtoAr",
-    "userId": "stu_sP3IPBS2iler",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Điện tử vào 11:00:00 15/10/2025",
-    "read": true,
-    "link": "/sessions/ses_wVN48xTdStNz",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_EnKYjiV-yuKN",
-    "userId": "stu_sP3IPBS2iler",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Toán cao cấp vào 08:00:00 10/11/2025",
-    "read": true,
-    "link": "/sessions/ses_J9gTt4Rp1-Y7",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_nMCUOd05IA3L",
-    "userId": "stu_ZU0fknsTqL_A",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Hệ điều hành vào 12:00:00 23/10/2025",
-    "read": false,
-    "link": "/sessions/ses_JFk9hS6ZV7fl",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_ZFZZpH55pTBx",
-    "userId": "stu_ZU0fknsTqL_A",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Giải tích vào 17:00:00 21/10/2025",
-    "read": true,
-    "link": "/sessions/ses_dLHufMH2Zcqz",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_PdZtOvy3yQyQ",
-    "userId": "stu_SgsgvGIuTR0F",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Lập trình C/C++ vào 10:00:00 1/12/2025",
-    "read": true,
-    "link": "/sessions/ses_dyagh9zAbZPU",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_tDN2OkmyrwXz",
-    "userId": "stu_SgsgvGIuTR0F",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cấu trúc dữ liệu vào 12:00:00 15/10/2025",
-    "read": true,
-    "link": "/sessions/ses_OHGudCbClF-Z",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_Stm2SQUDTzn2",
-    "userId": "stu_KkyoEg58egl5",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Hệ điều hành vào 18:00:00 7/11/2025",
-    "read": true,
-    "link": "/sessions/ses_v2W3ZeGSHCAR",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_ipaTXbsoWd4o",
-    "userId": "stu_YiVGuLoCpVPF",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cấu trúc dữ liệu vào 16:00:00 15/10/2025",
-    "read": false,
-    "link": "/sessions/ses_zoRy1hrhlT6V",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_vOkcES1-2HNQ",
-    "userId": "stu_YiVGuLoCpVPF",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Hệ điều hành vào 12:00:00 16/10/2025",
-    "read": true,
-    "link": "/sessions/ses_T1tkCFSEa66j",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_MGJLEsuYFhfH",
-    "userId": "stu_YiVGuLoCpVPF",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Hệ điều hành vào 09:00:00 14/11/2025",
-    "read": true,
-    "link": "/sessions/ses_fdj2TECGrSh8",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_HhjMKfDuXVP3",
-    "userId": "stu_KRDeTYJlBj41",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Vật lý đại cương vào 11:00:00 14/10/2025",
-    "read": true,
-    "link": "/sessions/ses_zXnPSR8foQ8H",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_kZkNTHd-X1Yg",
-    "userId": "stu_KRDeTYJlBj41",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Hệ điều hành vào 15:00:00 25/10/2025",
-    "read": false,
-    "link": "/sessions/ses_SEnjD2HbwwIw",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_UR-qAoH36yec",
-    "userId": "stu_QYojhnP7sLsJ",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Mạng máy tính vào 14:00:00 6/11/2025",
-    "read": true,
-    "link": "/sessions/ses_DROacTInGWff",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_yxqNY16-Srnz",
-    "userId": "stu_ZfEvyF4Gu7bc",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Tiếng Anh vào 10:00:00 15/11/2025",
-    "read": true,
-    "link": "/sessions/ses_8wAqyS3hGPXa",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_FzIXQc7KAOmh",
-    "userId": "stu_ZfEvyF4Gu7bc",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Lập trình Python vào 08:00:00 24/10/2025",
-    "read": false,
-    "link": "/sessions/ses_wj1e0MxvuRXH",
-    "createdAt": "2025-11-11T14:12:04.439Z"
-  },
-  {
-    "id": "notif_EdBRx6gScm9W",
-    "userId": "stu_h8gj9_8-bjIL",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Giải tích vào 17:00:00 19/10/2025",
-    "read": false,
-    "link": "/sessions/ses_pfu8KrHZFBiM",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_qlpHfH_3em34",
-    "userId": "stu_h8gj9_8-bjIL",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Vật lý đại cương vào 14:00:00 22/11/2025",
-    "read": true,
-    "link": "/sessions/ses_4SXdcHPkJ8j7",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_HMDz4nqUJX6O",
-    "userId": "stu_a7LVENf1yYZ5",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cấu trúc dữ liệu vào 12:00:00 10/11/2025",
-    "read": false,
-    "link": "/sessions/ses_hqNfR87G2ECE",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_5Sg1KMYivbbu",
-    "userId": "stu_a7LVENf1yYZ5",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Đại số tuyến tính vào 09:00:00 24/11/2025",
-    "read": false,
-    "link": "/sessions/ses_gVEw_63uNtI5",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_KYVCyloZlW3E",
-    "userId": "stu_JPwzdql5rJG0",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Toán cao cấp vào 17:00:00 5/12/2025",
-    "read": false,
-    "link": "/sessions/ses_xmAxDqbzkRUi",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_f9e1vvT8jjN3",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Giải tích vào 17:00:00 19/10/2025",
-    "read": false,
-    "link": "/sessions/ses_pfu8KrHZFBiM",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_paJ0rH2jf6t6",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Mạng máy tính vào 14:00:00 6/11/2025",
-    "read": true,
-    "link": "/sessions/ses_DROacTInGWff",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_tZeNVYiAf1GX",
-    "userId": "tut_6copkRNEBLGs",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cơ học kỹ thuật vào 17:00:00 30/11/2025",
-    "read": false,
-    "link": "/sessions/ses_NrNz5G7UilbP",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_KQn1H--z4UWW",
-    "userId": "tut_6copkRNEBLGs",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Giải tích vào 17:00:00 21/10/2025",
-    "read": false,
-    "link": "/sessions/ses_dLHufMH2Zcqz",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_9mxfyv8bIeFW",
-    "userId": "tut_DtMRGUwYKFgQ",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cấu trúc dữ liệu vào 16:00:00 15/10/2025",
-    "read": false,
-    "link": "/sessions/ses_e6xfzEimodP2",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_g4AxXTx0apNC",
-    "userId": "tut_g0qfsZQJDZEe",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cấu trúc dữ liệu vào 12:00:00 22/10/2025",
-    "read": true,
-    "link": "/sessions/ses_AVUuXw9oEdxX",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_Vfn1OaER5z72",
-    "userId": "tut_fz5MO1FZqXhq",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cơ sở dữ liệu vào 17:00:00 28/11/2025",
-    "read": true,
-    "link": "/sessions/ses_zhkXQP40EOaa",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_boxYnDKMocWR",
-    "userId": "tut_41_KiR92vL7t",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Lập trình C/C++ vào 10:00:00 1/12/2025",
-    "read": true,
-    "link": "/sessions/ses_dyagh9zAbZPU",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_54w7GB5bVMeJ",
-    "userId": "tut_o6Rbm-CATfPE",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Toán cao cấp vào 08:00:00 10/11/2025",
-    "read": true,
-    "link": "/sessions/ses_J9gTt4Rp1-Y7",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_BOaQB2Cp32Mq",
-    "userId": "tut_o6Rbm-CATfPE",
-    "type": "session_reminder",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Toán cao cấp vào 17:00:00 15/10/2025",
-    "read": false,
-    "link": "/sessions/ses_1aU8ymy4RAeD",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_bQAZemu-0PXI",
-    "userId": "tut_o6Rbm-CATfPE",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Hệ điều hành vào 10:00:00 28/10/2025",
-    "read": false,
-    "link": "/sessions/ses_E-gaKK98eeoh",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_falTKwi0MQYP",
-    "userId": "tut_o6Rbm-CATfPE",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Toán cao cấp vào 17:00:00 5/12/2025",
-    "read": true,
-    "link": "/sessions/ses_xmAxDqbzkRUi",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_rc9QkvU2DOwP",
-    "userId": "tut_zpZeIVwqQuXK",
-    "type": "session_cancelled",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cấu trúc dữ liệu vào 12:00:00 15/10/2025",
-    "read": false,
-    "link": "/sessions/ses_OHGudCbClF-Z",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_wCx3CQMHZ6YW",
-    "userId": "tut_L9x4RXK42EtB",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Cấu trúc dữ liệu vào 16:00:00 15/10/2025",
-    "read": false,
-    "link": "/sessions/ses_zoRy1hrhlT6V",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_AgoCEIMnpOzS",
-    "userId": "tut_L9x4RXK42EtB",
-    "type": "session_booking",
-    "title": "Thông báo về buổi học",
-    "message": "Bạn có buổi học Vật lý đại cương vào 10:00:00 10/11/2025",
-    "read": false,
-    "link": "/sessions/ses_2UT4HUvF2xj6",
-    "createdAt": "2025-11-11T14:12:04.440Z"
-  },
-  {
-    "id": "notif_GizFw1tWLvBz",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2330009@hcmut.edu.vn đã đặt buổi học Mạng máy tính",
-    "read": false,
-    "link": "/sessions/ses_qIhX8dOJIorL",
-    "createdAt": "2025-11-12T03:32:14.010Z"
-  },
-  {
-    "id": "notif_4KLRulMntKhu",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "session_reschedule_request",
-    "title": "Yêu cầu đổi lịch buổi học",
-    "message": "Đặng Nam Văn đã gửi yêu cầu đổi lịch buổi học Mạng máy tính",
-    "read": false,
-    "link": "/tutor/cancel-reschedule",
-    "metadata": {
-      "requestId": "req_NMzyUPCpFUwH",
-      "sessionId": "ses_qIhX8dOJIorL",
-      "type": "reschedule"
-    },
-    "createdAt": "2025-11-12T04:20:45.784Z"
-  },
-  {
-    "id": "notif_VYeoXtGbpVnS",
-    "userId": "stu_afp9r8MLsjE8",
-    "type": "session_rescheduled",
-    "title": "Yêu cầu đổi lịch buổi học đã được chấp nhận",
-    "message": "Bùi Khánh Anh đã chấp nhận yêu cầu đổi lịch buổi học Mạng máy tính",
-    "read": false,
-    "link": "/student/session/ses_qIhX8dOJIorL",
-    "metadata": {
-      "requestId": "req_NMzyUPCpFUwH",
-      "sessionId": "ses_qIhX8dOJIorL",
-      "responseMessage": "Ok em"
-    },
-    "createdAt": "2025-11-12T04:21:42.487Z"
-  },
-  {
-    "id": "notif_Zd-U3ZZASh4e",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2330009@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
-    "read": false,
-    "link": "/sessions/ses_wm4ooR_l0vAu",
-    "createdAt": "2025-11-12T11:07:02.737Z"
-  },
-  {
-    "id": "notif_dyjby8Y96F7P",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2330009@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
-    "read": false,
-    "link": "/sessions/ses_nVkbLMLUThlo",
-    "createdAt": "2025-11-12T11:49:15.630Z"
-  },
-  {
-    "id": "notif_uqVygyX5J7-K",
-    "userId": "mgmt_18QNI2lAxnAD",
-    "type": "approval_request",
-    "title": "Yêu cầu phân bổ phòng học mới",
-    "message": "Buổi học offline Tiếng Anh cần được phân bổ phòng học",
-    "read": false,
-    "link": "/management/approvals/approval_tSTTUCSnTH_L",
-    "metadata": {
-      "approvalRequestId": "approval_tSTTUCSnTH_L",
-      "type": "resource_allocation",
-      "priority": "high",
-      "sessionId": "ses_nVkbLMLUThlo"
-    },
-    "createdAt": "2025-11-12T11:50:35.031Z"
-  },
-  {
-    "id": "notif_aMkIspio7Tet",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "approval_request",
-    "title": "Yêu cầu phân bổ phòng học đã được tạo",
-    "message": "Yêu cầu phân bổ phòng học cho buổi học Tiếng Anh đã được gửi tới management. Phòng học sẽ được phân bổ sau khi management phê duyệt.",
-    "read": false,
-    "link": "/sessions/ses_nVkbLMLUThlo",
-    "metadata": {
-      "approvalRequestId": "approval_tSTTUCSnTH_L",
-      "type": "resource_allocation"
-    },
-    "createdAt": "2025-11-12T11:50:35.037Z"
-  },
-  {
-    "id": "notif_bRPWOxximymo",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "approval_approved",
-    "title": "Yêu cầu đã được phê duyệt",
-    "message": "Yêu cầu \"Yêu cầu phân bổ phòng học cho buổi học Tiếng Anh\" đã được phê duyệt",
-    "read": false,
-    "link": "/management/approvals/approval_tSTTUCSnTH_L",
-    "metadata": {
-      "approvalRequestId": "approval_tSTTUCSnTH_L",
-      "reviewNotes": "Yêu cầu đã được phê duyệt"
-    },
-    "createdAt": "2025-11-12T12:54:22.680Z"
-  },
-  {
-    "id": "notif_gbhtUFbSc3Yw",
-    "userId": "tut_61QAuOdQbyZS",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2330009@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
-    "read": false,
-    "link": "/sessions/ses_USPUWKpDIk5j",
-    "createdAt": "2025-11-12T13:10:41.311Z"
-  },
-  {
-    "id": "notif_HAiRQZWHHJKd",
-    "userId": "mgmt_lkN2DSFEv5dI",
-    "type": "approval_request",
-    "title": "Yêu cầu phân bổ phòng học mới",
-    "message": "Buổi học offline Tiếng Anh cần được phân bổ phòng học",
-    "read": false,
-    "link": "/sessions/ses_6ZhRrxVh_XVJ",
-    "createdAt": "2025-11-07T05:12:08.159Z"
-  },
-  {
-    "id": "notif_a4c28d5c-c2d8-4efe-ab4f-65526eab95ba",
-    "userId": "stu_p8zzUZM5nqnx",
-    "type": "system",
-    "title": "Kiểm tra thông báo hệ thống",
-    "message": "Đây là một thông báo test được tạo tự động.",
-    "read": false,
-    "link": "/test/script",
-    "createdAt": "2025-11-09T14:53:53.887Z"
-  },
-  {
-    "id": "notif_C2hvxOyQZzlc",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2365732@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
-    "read": true,
-    "link": "/sessions/ses_wYH1W0KReekG",
-    "createdAt": "2025-11-09T15:01:27.228Z"
-  },
-  {
-    "id": "notif_efZTmw-8tEhE",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2277897@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
-    "read": true,
-    "link": "/sessions/ses_k6Ym9LCIjLUr",
-    "createdAt": "2025-11-11T15:24:03.150Z"
-  },
-  {
-    "id": "notif_N1WoqKUDNr9e",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2265780@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
-    "read": false,
-    "link": "/sessions/ses_-b9TUOABa7UL",
-    "createdAt": "2025-11-11T15:26:56.087Z"
-  },
-  {
-    "id": "notif_2x5lw1oIQdnJ",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2265780@hcmut.edu.vn đã đặt buổi học Toán cao cấp",
-    "read": false,
-    "link": "/sessions/ses_rTzQ6H1cLc7Z",
-    "createdAt": "2025-11-11T17:34:03.960Z"
-  },
-  {
-    "id": "notif_o_l17vAaDkA7",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2265780@hcmut.edu.vn đã đặt buổi học Điện tử",
-    "read": false,
-    "link": "/sessions/ses_InUdeWv174-1",
-    "createdAt": "2025-11-11T17:46:32.173Z"
-  },
-  {
-    "id": "notif_fX0njpasdns7",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2265780@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
-    "read": false,
-    "link": "/sessions/ses_2gMZPTm6wrcU",
-    "createdAt": "2025-11-11T18:12:02.408Z"
-  },
-  {
-    "id": "notif_Y6KRzVgGl-DF",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2265780@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
-    "read": false,
-    "link": "/sessions/ses_3LNb_3mGVow7",
-    "createdAt": "2025-11-11T18:16:43.744Z"
-  },
-  {
-    "id": "notif_A3VniZ1tdc7Z",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2265780@hcmut.edu.vn đã đặt buổi học Điện tử",
-    "read": false,
-    "link": "/sessions/ses_MxFK5G4YqjMj",
-    "createdAt": "2025-11-11T18:17:11.455Z"
-  },
-  {
-    "id": "notif_twPGnqxLBBWn",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2265780@hcmut.edu.vn đã đặt buổi học Đại số tuyến tính",
-    "read": false,
-    "link": "/sessions/ses_i8s0VQFWA_Go",
-    "createdAt": "2025-11-11T18:18:46.170Z"
-  },
-  {
-    "id": "notif_dDG7VDG60iJO",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2365732@hcmut.edu.vn đã đặt buổi học Toán cao cấp",
-    "read": false,
-    "link": "/sessions/ses_Jg1aY_VvCQNo",
-    "createdAt": "2025-11-11T18:30:32.583Z"
-  },
-  {
-    "id": "notif_9S03fnJHTmDL",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2365732@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
-    "read": false,
-    "link": "/sessions/ses_swfx7lLsAAUN",
-    "createdAt": "2025-11-11T18:34:05.048Z"
-  },
-  {
-    "id": "notif__arAZCaAIuQS",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "2365732@hcmut.edu.vn đã đặt buổi học Tiếng Anh",
-    "read": false,
-    "link": "/sessions/ses_iOZxkKeJ25TT",
-    "createdAt": "2025-11-11T18:55:27.494Z"
-  },
-  {
-    "id": "notif_cb963d56-60e3-4062-80ec-44d57e5509f1",
+    "id": "notif_hxlmFVuLqCAk0yrwx2gPO",
     "userId": "tut_QAuiJWjIUx57",
     "type": "session_cancel_request",
     "title": "Yêu cầu hủy buổi học",
     "message": "Phan An Hoàng đã gửi yêu cầu hủy buổi học Toán cao cấp",
-    "read": true,
-    "link": "/tutor/cancel-reschedule",
-    "createdAt": "2025-11-11T19:00:33.752Z"
-  },
-  {
-    "id": "notif_ff9a0083-6040-4dbb-be27-e3033629e403",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_cancel_request",
-    "title": "Yêu cầu hủy buổi học",
-    "message": "Phan An Hoàng đã gửi yêu cầu hủy buổi học Tiếng Anh",
     "read": false,
     "link": "/tutor/cancel-reschedule",
-    "createdAt": "2025-11-11T19:23:02.438Z"
+    "createdAt": "2025-11-13T03:21:48.261Z"
   },
   {
-    "id": "notif_69f442a4-6f9a-4e05-9c40-535f831b6a12",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_cancel_request",
-    "title": "Yêu cầu hủy buổi học",
-    "message": "Phan An Hoàng đã gửi yêu cầu hủy buổi học Tiếng Anh",
+    "id": "notif_ZPVyOit9OI_Y",
+    "userId": "mgmt_lkN2DSFEv5dI",
+    "type": "approval_request",
+    "title": "Yêu cầu phân bổ phòng học mới",
+    "message": "Buổi học offline Toán cao cấp cần được phân bổ phòng học",
     "read": false,
-    "link": "/tutor/cancel-reschedule",
-    "createdAt": "2025-11-11T19:23:02.441Z"
-  },
-  {
-    "id": "notif_8a9b3c25-4e57-468d-ba7f-0ad745bfe44c",
-    "userId": "tut_QAuiJWjIUx57",
-    "type": "session_booking",
-    "title": "Yêu cầu buổi học mới",
-    "message": "Phan An Hoàng đã đặt buổi học Toán cao cấp",
-    "read": false,
-    "link": "/sessions/ses_wrx1Hr3bFHhM",
-    "createdAt": "2025-11-11T19:26:02.459Z"
-    "link": "/management/approvals/approval_n1JKJCJXHv3j",
+    "link": "/management/approvals/approval_HsLQ0Yz2rDuu",
     "metadata": {
-      "approvalRequestId": "approval_n1JKJCJXHv3j",
+      "approvalRequestId": "approval_HsLQ0Yz2rDuu",
       "type": "resource_allocation",
       "priority": "high",
-      "sessionId": "ses_USPUWKpDIk5j"
+      "sessionId": "ses_1ROPv2Fajgu_"
     },
-    "createdAt": "2025-11-12T13:25:07.729Z"
+    "createdAt": "2025-11-13T04:52:40.177Z"
   },
   {
-    "id": "notif_ixb4uSlHvKEf",
+    "id": "notif_JB-RDkdqCWHU",
     "userId": "tut_61QAuOdQbyZS",
     "type": "approval_request",
     "title": "Yêu cầu phân bổ phòng học đã được tạo",
-    "message": "Yêu cầu phân bổ phòng học cho buổi học Tiếng Anh đã được gửi tới management. Phòng học sẽ được phân bổ sau khi management phê duyệt.",
+    "message": "Yêu cầu phân bổ phòng học cho buổi học Toán cao cấp đã được gửi tới management. Phòng học sẽ được phân bổ sau khi management phê duyệt.",
     "read": false,
-    "link": "/sessions/ses_USPUWKpDIk5j",
+    "link": "/sessions/ses_1ROPv2Fajgu_",
     "metadata": {
-      "approvalRequestId": "approval_n1JKJCJXHv3j",
+      "approvalRequestId": "approval_HsLQ0Yz2rDuu",
       "type": "resource_allocation"
     },
-    "createdAt": "2025-11-12T13:25:07.734Z"
+    "createdAt": "2025-11-13T04:52:40.180Z"
   },
   {
-    "id": "notif_Q59peEbkFHUZ",
+    "id": "notif_5nR8vD2o7rKn",
     "userId": "stu_afp9r8MLsjE8",
     "type": "system",
     "title": "Phân bổ tài nguyên đã được cập nhật",
@@ -734,23 +48,33 @@
     "read": false,
     "link": "/sessions",
     "metadata": {
-      "approvalRequestId": "approval_n1JKJCJXHv3j",
+      "approvalRequestId": "approval_HsLQ0Yz2rDuu",
       "type": "resource_allocation"
     },
-    "createdAt": "2025-11-12T14:15:16.835Z"
+    "createdAt": "2025-11-13T04:54:08.993Z"
   },
   {
-    "id": "notif_ZCb9obNr7bWS",
+    "id": "notif_ikJmIanx6Ndj",
     "userId": "tut_61QAuOdQbyZS",
     "type": "approval_approved",
     "title": "Yêu cầu đã được phê duyệt",
-    "message": "Yêu cầu \"Yêu cầu phân bổ phòng học cho buổi học Tiếng Anh\" đã được phê duyệt",
+    "message": "Yêu cầu \"Yêu cầu phân bổ phòng học cho buổi học Toán cao cấp\" đã được phê duyệt",
     "read": false,
-    "link": "/management/approvals/approval_n1JKJCJXHv3j",
+    "link": "/management/approvals/approval_HsLQ0Yz2rDuu",
     "metadata": {
-      "approvalRequestId": "approval_n1JKJCJXHv3j",
+      "approvalRequestId": "approval_HsLQ0Yz2rDuu",
       "reviewNotes": "Yêu cầu đã được phê duyệt"
     },
-    "createdAt": "2025-11-12T14:15:16.841Z"
+    "createdAt": "2025-11-13T04:54:08.996Z"
+  },
+  {
+    "id": "notif_pM16kPs0Edk4qMnT-vn9C",
+    "userId": "tut_61QAuOdQbyZS",
+    "type": "session_booking",
+    "title": "Yêu cầu buổi học mới",
+    "message": "Đặng Nam Văn đã đặt buổi học Toán cao cấp",
+    "read": false,
+    "link": "/sessions/ses_1ROPv2Fajgu_",
+    "createdAt": "2025-11-13T04:56:55.256Z"
   }
 ]

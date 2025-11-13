@@ -3,7 +3,7 @@
 import { storage } from './storage.js'; 
 import { Notification, NotificationType } from './types.js'; // Đảm bảo 'Notification' trong types.ts
                                          // khớp với cấu trúc bạn gửi
-import { v4 as uuidv4 } from 'uuid'; 
+import { nanoid } from 'nanoid'; 
 
 /**
  * Dữ liệu đầu vào MỚI để tạo thông báo
@@ -26,7 +26,7 @@ export async function createNotification(data: CreateNotificationData): Promise<
   try {
     // 1. Tạo đối tượng thông báo mới
     const newNotification: Notification = {
-      id: `notif_${uuidv4()}`, // Dùng prefix 'notif_' giống như dữ liệu mẫu của bạn
+      id: `notif_${nanoid()}`, // Dùng prefix 'notif_' giống như dữ liệu mẫu của bạn
       userId: data.userId,
       type: data.type,
       title: data.title,

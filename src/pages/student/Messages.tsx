@@ -7,7 +7,7 @@ import { useLongPolling } from '../../hooks/useLongPolling'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { conversationsAPI, usersAPI, authAPI, tutorsAPI, uploadAPI } from '../../lib/api'
 import { formatDistanceToNow } from 'date-fns'
-import EmojiPicker from '../../components/EmojiPicker.tsx'
+import { EmojiPickerComponent } from '../../components/EmojiPicker.tsx'
 import {
   Dashboard as DashboardIcon,
   Search as SearchIcon,
@@ -233,31 +233,79 @@ const Messages: React.FC = () => {
             }
           })
           
-          // Load all users FIRST using batch API (much faster than multiple individual calls)
-          // This prevents showing "User xxx" placeholder
+          // Load all users FIRST - similar to dashboard approach
+          // Load all users from API and filter by participant IDs
           let finalUsersMap: Record<string, any> = { ...usersRef.current }
           
           if (allUserIds.size > 0) {
             try {
-              // Use batch loading API - only 1 API call instead of N calls
-              const userIdsArray = Array.from(allUserIds)
-              const batchResponse = await usersAPI.getByIds(userIdsArray)
+              // Load all users from API (similar to dashboard)
+              const usersResponse = await usersAPI.list({ limit: 1000 })
               
-              if (batchResponse.success && batchResponse.data) {
-                // Convert array to map for easy lookup
-                batchResponse.data.forEach((user: any) => {
+              // Parse response - handle different formats like dashboard does
+              let usersList: any[] = []
+              
+              if (usersResponse && Array.isArray(usersResponse)) {
+                usersList = usersResponse
+              } else if (usersResponse.success && usersResponse.data) {
+                if (Array.isArray(usersResponse.data)) {
+                  usersList = usersResponse.data
+                } else if (usersResponse.data.data && Array.isArray(usersResponse.data.data)) {
+                  usersList = usersResponse.data.data
+                }
+              } else if (usersResponse.data && Array.isArray(usersResponse.data)) {
+                // Paginated response: { data: [...], pagination: {...} }
+                usersList = usersResponse.data
+              } else if (usersResponse.data && usersResponse.data.data && Array.isArray(usersResponse.data.data)) {
+                usersList = usersResponse.data.data
+              }
+              
+              // Filter to only participants and convert to map
+              const participantIds = Array.from(allUserIds)
+              usersList.forEach((user: any) => {
+                if (user && user.id && participantIds.includes(user.id)) {
                   finalUsersMap[user.id] = user
+                }
+                })
+              
+              // If some users are still missing, load them individually
+              const missingIds = participantIds.filter(id => !finalUsersMap[id])
+              if (missingIds.length > 0) {
+                const userPromises = missingIds.map(async (userId) => {
+                  try {
+                    const userResponse = await usersAPI.get(userId)
+                    if (userResponse.success && userResponse.data) {
+                      return [userId, userResponse.data]
+                    } else if (userResponse.data) {
+                      // Handle case where data is directly in response
+                      return [userId, userResponse.data]
+              }
+            } catch (error) {
+              if (process.env.NODE_ENV === 'development') {
+                      console.error(`[Messages] Failed to load user ${userId}:`, error)
+                    }
+                  }
+                  return null
+                })
+                
+                const userResults = await Promise.all(userPromises)
+                userResults.forEach(result => {
+                  if (result) {
+                    finalUsersMap[result[0]] = result[1]
+                  }
                 })
               }
             } catch (error) {
               if (process.env.NODE_ENV === 'development') {
-                console.error('[Messages] Failed to batch load users:', error)
+                console.error('[Messages] Failed to load users:', error)
               }
               // Fallback to individual loading if batch fails
               const userPromises = Array.from(allUserIds).map(async (userId) => {
                 try {
                   const userResponse = await usersAPI.get(userId)
                   if (userResponse.success && userResponse.data) {
+                    return [userId, userResponse.data]
+                  } else if (userResponse.data) {
                     return [userId, userResponse.data]
                   }
                 } catch (error) {
@@ -681,8 +729,9 @@ const Messages: React.FC = () => {
       const lastMessage = conversation.lastMessage
       const unreadCount = conversation.unreadCount?.[currentUserId] || 0
       
-      // Get other participant ID even if user info not loaded yet
-      const displayName = otherUser?.name || otherUser?.email || `User ${otherId?.slice(0, 8) || 'Unknown'}`
+      // Get display name from user data - prioritize name, then email, fallback to loading state
+      // Don't show "User xxx" - show loading or email instead
+      const displayName = otherUser?.name || otherUser?.email || (otherId ? 'Loading...' : 'Unknown')
       
       return {
         id: conversation.id,
@@ -965,7 +1014,8 @@ const Messages: React.FC = () => {
   }
 
   const handleEmojiSelect = (emoji: string) => {
-    setNewMessage(prev => prev + emoji)
+    // Emoji is already inserted at cursor position by EmojiPickerComponent
+    // Just close the picker
     setShowEmojiPicker(false)
     // Focus input after selecting emoji
     setTimeout(() => {
@@ -1607,9 +1657,12 @@ const Messages: React.FC = () => {
                           <EmojiEmotionsIcon className="w-5 h-5" />
                         </button>
                         {showEmojiPicker && (
-                          <EmojiPicker
+                          <EmojiPickerComponent
                             onEmojiSelect={handleEmojiSelect}
                             theme={theme === 'dark' ? 'dark' : 'light'}
+                            inputRef={messageInputRef}
+                            inputValue={newMessage}
+                            onInputChange={setNewMessage}
                           />
                         )}
                       </div>
@@ -1664,24 +1717,34 @@ const Messages: React.FC = () => {
             {/* User Profile */}
             <div className="text-center mb-8">
               <Avatar
+                src={currentUser?.avatar}
                 sx={{
                   width: 96,
                   height: 96,
-                  bgcolor: getAvatarColor('Student User'),
+                  bgcolor: getAvatarColor(currentUser?.name || currentUser?.email || 'User'),
                   fontSize: '2rem',
                   fontWeight: 'bold',
                   mx: 'auto',
                   mb: 2
                 }}
               >
-                {getInitials('Student User')}
+                {getInitials(currentUser?.name || currentUser?.email || 'User')}
               </Avatar>
               <h4 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Good Morning Student
+                {currentUser?.name || currentUser?.email || 'User'}
               </h4>
               <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Continue your learning journey and achieve your goals
+                {currentUser?.role === 'student' 
+                  ? 'Continue your learning journey and achieve your goals'
+                  : currentUser?.role === 'tutor'
+                  ? 'Share your knowledge and help students succeed'
+                  : 'Manage the system and support users'}
               </p>
+              {currentUser?.email && (
+                <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                  {currentUser.email}
+              </p>
+              )}
             </div>
 
             {/* Social Links */}

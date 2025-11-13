@@ -1,6 +1,7 @@
 import { put, del, list } from '@vercel/blob';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { existsSync } from 'fs';
 
 /**
  * JSONStorage - Quản lý việc đọc/ghi JSON files
@@ -25,8 +26,25 @@ export class JSONStorage {
       } else {
         return await this.readFromLocal(filename);
       }
-    } catch (error) {
-      console.error(`Error reading ${filename}:`, error);
+    } catch (error: any) {
+      console.error(`Error reading ${filename}:`, error.message || error);
+      // Nếu lỗi JSON parsing, thử backup file và tạo file mới
+      if (error instanceof SyntaxError || (error.message && error.message.includes('JSON'))) {
+        console.warn(`⚠️ File ${filename} có lỗi JSON. Đang backup và tạo file mới...`);
+        try {
+          const filepath = join(this.dataDir, filename);
+          if (existsSync(filepath)) {
+            const backupPath = `${filepath}.backup.${Date.now()}`;
+            const content = await readFile(filepath, 'utf-8');
+            await writeFile(backupPath, content, 'utf-8');
+            console.log(`📦 Đã backup file lỗi vào: ${backupPath}`);
+          }
+        } catch (backupError: any) {
+          console.error(`Không thể backup file:`, backupError.message);
+        }
+        // Trả về mảng rỗng để tạo file mới
+        return [];
+      }
       return [];
     }
   }

@@ -259,5 +259,44 @@
     "updatedAt": "2025-11-12T14:15:16.823Z",
     "reviewerId": "mgmt_1T4fph947Qu6",
     "reviewNotes": "Yêu cầu đã được phê duyệt"
+  },
+  {
+    "id": "approval_HsLQ0Yz2rDuu",
+    "type": "resource_allocation",
+    "requesterId": "tut_61QAuOdQbyZS",
+    "targetId": "ses_1ROPv2Fajgu_",
+    "title": "Yêu cầu phân bổ phòng học cho buổi học Toán cao cấp",
+    "description": "Buổi học offline đã được tutor xác nhận nhưng chưa có phòng học. Vui lòng phân bổ phòng học phù hợp.\n\nThời gian: 16:00:00 15/11/2025 - 17:30:00 15/11/2025\nMôn học: Toán cao cấp\nSố học sinh: 1\n\nYêu cầu thiết bị: whiteboard, projector",
+    "status": "approved",
+    "priority": "high",
+    "deadline": "2025-11-15T04:52:40.175Z",
+    "resourceAllocationData": {
+      "changes": [
+        {
+          "type": "reallocate_room",
+          "resourceId": "ses_1ROPv2Fajgu_",
+          "fromValue": null,
+          "toValue": "Phòng A103",
+          "reason": "Offline session requires room allocation with equipment: whiteboard, projector",
+          "equipmentRequirements": [
+            "whiteboard",
+            "projector"
+          ]
+        }
+      ],
+      "affectedSessionIds": [
+        "ses_1ROPv2Fajgu_"
+      ],
+      "affectedTutorIds": [
+        "tut_61QAuOdQbyZS"
+      ],
+      "affectedStudentIds": [
+        "stu_afp9r8MLsjE8"
+      ]
+    },
+    "createdAt": "2025-11-13T04:52:40.175Z",
+    "updatedAt": "2025-11-13T04:54:08.987Z",
+    "reviewerId": "mgmt_1T4fph947Qu6",
+    "reviewNotes": "Yêu cầu đã được phê duyệt"
   }
 ]

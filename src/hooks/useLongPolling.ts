@@ -1,11 +1,17 @@
 /**
- * Hook realtime cho chat sử dụng Socket.IO.
+ * Hook realtime cho chat sử dụng REST API + Polling (Vercel compatible).
+ * Socket.IO được disable trên production vì Vercel không hỗ trợ WebSocket.
  * Giữ tên useLongPolling để tương thích với code cũ.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { API_BASE_URL, WEBSOCKET_URL } from '../env';
+
+// Check if we're in production (Vercel)
+const isProduction = typeof window !== 'undefined' 
+  ? window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+  : false;
 
 interface Message {
   id: string;
@@ -205,8 +211,9 @@ export function useLongPolling({
     socket.on('connect', () => {
       console.log('[useLongPolling] ✅ Socket.io connected:', socket.id);
       setIsConnected(true);
+      // Join room ngay khi connect nếu đã có conversationId
       if (currentConversationRef.current) {
-        console.log('[useLongPolling] Joining room:', currentConversationRef.current);
+        console.log('[useLongPolling] 🚪 Joining room on connect:', currentConversationRef.current);
         socket.emit('join-room', currentConversationRef.current);
       }
     });
@@ -515,7 +522,8 @@ export function useLongPolling({
       return;
     }
 
-    // Nếu socket.io đã kết nối, không cần polling
+    // Chỉ polling khi Socket.IO không kết nối được (fallback)
+    // Nếu Socket.IO đã kết nối, không cần polling
     if (socketRef.current?.connected) {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -524,12 +532,15 @@ export function useLongPolling({
       return;
     }
 
-    // Bắt đầu polling mỗi 1 giây khi socket.io không kết nối được
-    // Giảm từ 2 giây xuống 1 giây để nhanh hơn khi Socket.io không hoạt động
+    // Bắt đầu polling:
+    // - Production (Vercel): Poll mỗi 2 giây (tiết kiệm request)
+    // - Development: Poll mỗi 1 giây khi Socket.IO không kết nối được
+    const pollInterval = isProduction ? 2000 : 1000;
+    
     if (!pollingIntervalRef.current) {
       pollingIntervalRef.current = setInterval(() => {
         void pollNewMessages();
-      }, 1000); // Poll mỗi 1 giây (nhanh hơn 2 giây) - sẽ tự động dừng khi Socket.io kết nối được
+      }, pollInterval);
     }
 
     return () => {
@@ -569,7 +580,11 @@ export function useLongPolling({
 
     void loadHistory();
 
-    if (socketRef.current?.connected) {
+    // Join room khi conversationId thay đổi
+    // Nếu socket chưa connect, sẽ tự động join khi socket connect (trong event handler 'connect')
+    if (socketRef.current) {
+      if (socketRef.current.connected) {
+        // Socket đã connect, join room ngay
       if (previousConversationRef.current && previousConversationRef.current !== conversationId) {
         console.log('[useLongPolling] 🚪 Leaving previous room:', previousConversationRef.current);
         socketRef.current.emit('leave-room', previousConversationRef.current);
@@ -577,7 +592,12 @@ export function useLongPolling({
       console.log('[useLongPolling] 🚪 Joining room:', conversationId);
       socketRef.current.emit('join-room', conversationId);
     } else {
-      console.warn('[useLongPolling] ⚠️ Socket.io not connected, cannot join room');
+        // Socket chưa connect, sẽ tự động join khi connect xong (trong event handler 'connect')
+        console.log('[useLongPolling] ⏳ Socket connecting, will join room when connected');
+      }
+    } else {
+      // Socket chưa được tạo, sẽ được tạo trong useEffect khác
+      console.log('[useLongPolling] ⏳ Socket not initialized yet');
     }
 
     previousConversationRef.current = conversationId;

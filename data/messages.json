@@ -908,5 +908,25 @@
     "type": "text",
     "read": false,
     "createdAt": "2025-11-12T19:02:44.757Z"
+  },
+  {
+    "id": "msg_l9uBXCWiXUhWDB_a-C1Jz",
+    "conversationId": "conv_e7DO2Fnw6BEu0CQKy-cRD",
+    "senderId": "stu_afp9r8MLsjE8",
+    "receiverId": "stu_FyRaYWIiysPh",
+    "content": "siaa",
+    "type": "text",
+    "read": false,
+    "createdAt": "2025-11-13T04:20:18.664Z"
+  },
+  {
+    "id": "msg_VTRZCFicEZY3ikXC1B8jf",
+    "conversationId": "conv_e7DO2Fnw6BEu0CQKy-cRD",
+    "senderId": "stu_afp9r8MLsjE8",
+    "receiverId": "stu_FyRaYWIiysPh",
+    "content": "😉",
+    "type": "text",
+    "read": false,
+    "createdAt": "2025-11-13T04:29:44.399Z"
   }
 ]

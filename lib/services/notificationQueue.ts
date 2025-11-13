@@ -1,7 +1,7 @@
 // File: lib/services/notificationQueue.ts
 
 import { storage } from '../storage.js';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import { NotificationType } from '../types.js';
 
 export type NotificationPayload = Omit<CreateNotificationData, 'userId'>;
@@ -41,7 +41,7 @@ export async function addToQueue(data: CreateNotificationData, delayMinutes: num
 
     // 2. Tạo đối tượng "job"
     const newJob: NotificationJob = {
-      id: `job_${uuidv4()}`,
+      id: `job_${nanoid()}`,
       processAt: processAt.toISOString(),
       data: data,
     };

@@ -894,7 +894,8 @@ export const uploadAPI = {
     });
 
     return data;
-// ===== MANAGEMENT =====
+  }
+};
 
 // ===== ROOMS =====
 
@@ -1470,7 +1471,7 @@ export const api = {
   enrollments: enrollmentsAPI,
   sessionRequests: sessionRequestsAPI,
   conversations: conversationsAPI,
-  upload: uploadAPI
+  upload: uploadAPI,
   management: managementAPI
 };
 

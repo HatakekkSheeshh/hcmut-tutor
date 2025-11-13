@@ -68,6 +68,10 @@ import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from '
 
 import { listLibraryResourcesHandler, getLibraryResourceHandler, searchLibraryHandler } from './routes/library/index.ts';
 
+// Import handlers - Conversations
+import { listConversationsHandler, createConversationHandler, getConversationHandler, deleteConversationHandler } from './routes/conversations/index.js';
+import { getMessagesHandler, sendMessageHandler } from './routes/conversations/[id]/messages.js';
+
 // Import handlers - Session Requests
 import { listSessionRequestsHandler, createSessionRequestHandler } from './routes/session-requests/index.js';
 import { getSessionRequestHandler, approveSessionRequestHandler, rejectSessionRequestHandler, withdrawSessionRequestHandler } from './routes/session-requests/[id].js';
@@ -229,6 +233,15 @@ app.delete('/api/enrollments/:id', authenticate, deleteEnrollmentHandler);
 app.get('/api/notifications', authenticate, getNotificationsHandler);
 app.put('/api/notifications/:id/read', authenticate, markAsReadHandler);
 app.delete('/api/notifications/:id', authenticate, deleteNotificationHandler);
+
+// ===== CONVERSATIONS ROUTES =====
+
+app.get('/api/conversations', authenticate, listConversationsHandler);
+app.post('/api/conversations', authenticate, createConversationHandler);
+app.get('/api/conversations/:id', authenticate, getConversationHandler);
+app.delete('/api/conversations/:id', authenticate, deleteConversationHandler);
+app.get('/api/conversations/:id/messages', authenticate, getMessagesHandler);
+app.post('/api/conversations/:id/messages', authenticate, sendMessageHandler);
 
 // ===== PROGRESS ROUTES =====
 
