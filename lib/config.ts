@@ -56,6 +56,41 @@ export const config = {
   upload: {
     maxFileSize: 10 * 1024 * 1024, // 10MB
     allowedTypes: ['image/jpeg', 'image/png', 'application/pdf', 'video/mp4']
+  },
+
+  // Training Credits Policy
+  trainingCredits: {
+    // Minimum requirements for eligibility
+    minAttendanceRate: 80, // percentage
+    minSessionsCompleted: 5,
+    minPerformanceScore: 7.0, // optional
+    // Maximum credits per session/semester
+    maxCreditsPerSession: 1,
+    maxCreditsPerSemester: 5,
+    // Duplicate award prevention (BR-1)
+    preventDuplicateAwards: true,
+    duplicateCheckWindow: 'semester' // 'session' | 'semester' | 'year'
+  },
+
+  // Document Sharing Configuration
+  documents: {
+    maxFileSize: 50 * 1024 * 1024, // 50MB
+    allowedTypes: [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'image/jpeg',
+      'image/png',
+      'video/mp4'
+    ],
+    requireEncryption: false, // For sensitive documents
+    scanForMalware: false, // Would integrate with antivirus service
+    defaultAccessLevel: 'private'
   }
 };
 

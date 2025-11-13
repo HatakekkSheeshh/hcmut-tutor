@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -24,112 +24,499 @@ import {
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import api from '../../lib/api'
+import RoomSelector from '../../components/rooms/RoomSelector'
+
+// Component to handle session loading and RoomSelector display
+const RoomSelectorWrapper: React.FC<{
+  selectedRequest: any
+  location: string
+  setLocation: (location: string) => void
+  setError: (error: string | null) => void
+  theme: string
+}> = ({ selectedRequest, location, setLocation, setError, theme }) => {
+  const [sessionData, setSessionData] = useState<any>(null)
+  const [loadingSession, setLoadingSession] = useState(true)
+  
+  useEffect(() => {
+    const loadSession = async () => {
+      // Try to get session info from targetEntity first
+      const sessionInfo = selectedRequest?.targetEntity || null
+      const sessionId = selectedRequest?.targetId || selectedRequest?.resourceAllocationData?.affectedSessionIds?.[0]
+      
+      if (sessionInfo && sessionInfo.startTime && sessionInfo.endTime) {
+        setSessionData(sessionInfo)
+        setLoadingSession(false)
+        return
+      }
+      
+      if (sessionId) {
+        try {
+          const response = await api.sessions.get(sessionId)
+          if (response.success) {
+            setSessionData(response.data)
+          }
+        } catch (err) {
+          console.error('Error loading session:', err)
+        } finally {
+          setLoadingSession(false)
+        }
+      } else {
+        setLoadingSession(false)
+      }
+    }
+    
+    loadSession()
+  }, [selectedRequest])
+  
+  if (loadingSession) {
+    return (
+      <div className="mb-4 text-center py-4">
+        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+          Đang tải thông tin session...
+        </p>
+      </div>
+    )
+  }
+  
+  if (sessionData && sessionData.startTime && sessionData.endTime) {
+    const sessionId = selectedRequest?.targetId || selectedRequest?.resourceAllocationData?.affectedSessionIds?.[0]
+    
+    // Get equipment requirements from approval request
+    const equipmentRequirements = selectedRequest?.resourceAllocationData?.changes?.find(
+      (change: any) => change.type === 'reallocate_room'
+    )?.equipmentRequirements || []
+    
+    return (
+      <div className="mb-4">
+        <RoomSelector
+          startTime={sessionData.startTime}
+          endTime={sessionData.endTime}
+          excludeSessionId={sessionId}
+          selectedRoom={location}
+          onSelectRoom={(roomName) => {
+            console.log('Room selected:', roomName)
+            setLocation(roomName)
+            setError(null)
+            // Verify location was set
+            setTimeout(() => {
+              console.log('Location state after setting:', roomName)
+            }, 0)
+          }}
+          required
+          equipmentRequirements={equipmentRequirements}
+        />
+      </div>
+    )
+  }
+  
+  // Fallback to manual input
+  return (
+    <div className={`mb-4 p-4 rounded-lg ${theme === 'dark' ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-800'}`}>
+      <p className="mb-2">Không thể tải thông tin session để kiểm tra phòng học. Vui lòng nhập phòng học thủ công.</p>
+      <TextField
+        fullWidth
+        label="Phòng học *"
+        placeholder="Ví dụ: Phòng A101, Phòng B203"
+        value={location}
+        onChange={(e) => {
+          setLocation(e.target.value)
+          setError(null)
+        }}
+        required
+        error={!location.trim() && location.length > 0}
+        helperText={!location.trim() && location.length > 0 ? 'Vui lòng nhập phòng học' : 'Nhập tên phòng học sẽ được phân bổ cho buổi học offline'}
+        sx={{
+          marginTop: 2,
+          '& .MuiOutlinedInput-root': {
+            color: theme === 'dark' ? '#ffffff' : '#111827',
+            backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+            '& fieldset': {
+              borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+            },
+            '&:hover fieldset': {
+              borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+            },
+          },
+          '& .MuiInputLabel-root': {
+            color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+          },
+          '& .MuiInputLabel-root.Mui-focused': {
+            color: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+          },
+        }}
+      />
+    </div>
+  )
+}
 
 const ApprovalRequests: React.FC = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
   const [filterType, setFilterType] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedRequest, setSelectedRequest] = useState<any>(null)
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false)
   const [actionType, setActionType] = useState('')
   const [reason, setReason] = useState('')
+  const [location, setLocation] = useState('') // Location for room allocation
   const [mobileOpen, setMobileOpen] = useState(false)
+  
+  // State for API data
+  const [requests, setRequests] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState({ pending: 0, approved: 0, total: 0 })
+  const [actionLoading, setActionLoading] = useState(false)
+  
+  // Detail view state
+  const [selectedRequestDetail, setSelectedRequestDetail] = useState<any>(null)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [clarificationText, setClarificationText] = useState('')
+  const [isClarificationDialogOpen, setIsClarificationDialogOpen] = useState(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  const requests = [
-    {
-      id: 1,
-      user: 'John Smith',
-      type: 'Tutor Application',
-      status: 'pending',
-      date: '2024-01-15',
-      time: '10:30 AM',
-      priority: 'high',
-      details: 'Applied for Mathematics tutoring position',
-      documents: ['CV', 'Certificates', 'References']
-    },
-    {
-      id: 2,
-      user: 'Sarah Johnson',
-      type: 'Credit Request',
-      status: 'pending',
-      date: '2024-01-15',
-      time: '09:15 AM',
-      priority: 'medium',
-      details: 'Requesting 50 training credits for completed course',
-      documents: ['Course Certificate', 'Completion Proof']
-    },
-    {
-      id: 3,
-      user: 'Mike Chen',
-      type: 'Session Booking',
-      status: 'pending',
-      date: '2024-01-14',
-      time: '2:45 PM',
-      priority: 'high',
-      details: 'Booking session with Dr. Wilson for Physics',
-      documents: ['Student ID', 'Payment Proof']
-    },
-    {
-      id: 4,
-      user: 'Alice Brown',
-      type: 'Account Verification',
-      status: 'approved',
-      date: '2024-01-13',
-      time: '11:20 AM',
-      priority: 'low',
-      details: 'Email verification and profile completion',
-      documents: ['Email Verification', 'Profile Photo']
+  // Load approvals from API
+  const loadApprovals = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // Build query params
+      const params: any = {
+        page: 1,
+        limit: 1000 // Load all for now, can add pagination later
+      }
+      
+      // Add filters
+      if (filterType !== 'all') {
+        // Map filterType to API type
+        const typeMap: Record<string, string> = {
+          'tutor': 'tutor_verification',
+          'credit': 'credit_request',
+          'session': 'session_change',
+          'verification': 'tutor_verification'
+        }
+        if (typeMap[filterType]) {
+          params.type = typeMap[filterType]
+        }
+      }
+      
+      // Add status filter
+      if (filterStatus !== 'all') {
+        params.status = filterStatus
+      }
+      
+      const result = await api.management.approvals.list(params)
+      
+      if (result.success && result.data) {
+        let approvalsList: any[] = []
+        
+        // Parse response structure
+        if (result.data.data && Array.isArray(result.data.data)) {
+          approvalsList = result.data.data
+        } else if (Array.isArray(result.data)) {
+          approvalsList = result.data
+        }
+        
+        // Apply client-side search filter
+        if (searchTerm) {
+          approvalsList = approvalsList.filter(request => {
+            const requesterName = request.requester?.name || ''
+            const requestType = request.type || ''
+            const title = request.title || ''
+            const description = request.description || ''
+            
+            const searchLower = searchTerm.toLowerCase()
+            return requesterName.toLowerCase().includes(searchLower) ||
+                   requestType.toLowerCase().includes(searchLower) ||
+                   title.toLowerCase().includes(searchLower) ||
+                   description.toLowerCase().includes(searchLower)
+          })
+        }
+        
+        setRequests(approvalsList)
+        
+        // Calculate stats
+        const pending = approvalsList.filter(r => r.status === 'pending').length
+        const approved = approvalsList.filter(r => r.status === 'approved').length
+        setStats({ pending, approved, total: approvalsList.length })
+      } else {
+        setError(result.error || 'Không thể tải danh sách yêu cầu')
+      }
+    } catch (err: any) {
+      console.error('Error loading approvals:', err)
+      setError('Có lỗi xảy ra khi tải danh sách yêu cầu')
+    } finally {
+      setLoading(false)
     }
-  ]
+  }, [filterType, filterStatus, searchTerm])
 
-  const filteredRequests = requests.filter(request => {
-    const matchesType = filterType === 'all' || request.type.toLowerCase().includes(filterType.toLowerCase())
-    const matchesSearch = request.user.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         request.type.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesType && matchesSearch
-  })
+  // Load data on mount and when filters change
+  useEffect(() => {
+    loadApprovals()
+  }, [loadApprovals])
 
   const handleAction = (request: any, type: string) => {
+    console.log('🔄 Opening action dialog:', { requestId: request.id, type, requestType: request.type })
     setSelectedRequest(request)
     setActionType(type)
     setIsActionDialogOpen(true)
+    setReason('')
+    const isRoomAllocation = type === 'approve' && 
+        request.type === 'resource_allocation' && 
+        request.resourceAllocationData?.changes?.some((change: any) => change.type === 'reallocate_room')
+    if (isRoomAllocation) {
+      console.log('📋 This is a room allocation request, resetting location')
+    }
+    setLocation('') // Reset location
   }
 
-  const handleSubmitAction = () => {
-    console.log('Action submitted:', {
-      request: selectedRequest,
-      action: actionType,
-      reason
+  // Load approval request detail
+  const loadRequestDetail = async (requestId: string) => {
+    try {
+      setDetailLoading(true)
+      setError(null)
+      const result = await api.management.approvals.get(requestId)
+      if (result.success && result.data) {
+        setSelectedRequestDetail(result.data)
+        setIsDetailDialogOpen(true)
+      } else {
+        setError(result.error || 'Không thể tải chi tiết yêu cầu')
+      }
+    } catch (err: any) {
+      console.error('Error loading request detail:', err)
+      setError('Có lỗi xảy ra khi tải chi tiết yêu cầu')
+    } finally {
+      setDetailLoading(false)
+    }
+  }
+
+  // Handle request clarification
+  const handleRequestClarification = async () => {
+    if (!selectedRequest || !clarificationText || clarificationText.length < 10) {
+      setError('Yêu cầu làm rõ phải có ít nhất 10 ký tự')
+      return
+    }
+
+    try {
+      setActionLoading(true)
+      setError(null)
+      const result = await api.management.approvals.requestClarification(selectedRequest.id, {
+        clarificationRequest: clarificationText
+      })
+      
+      if (result.success) {
+        await loadApprovals()
+        setIsClarificationDialogOpen(false)
+        setClarificationText('')
+        setSelectedRequest(null)
+      } else {
+        setError(result.error || 'Không thể gửi yêu cầu làm rõ')
+      }
+    } catch (err: any) {
+      console.error('Error requesting clarification:', err)
+      setError('Có lỗi xảy ra khi gửi yêu cầu làm rõ')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleSubmitAction = async () => {
+    if (!selectedRequest) return
+    
+    // Validate reject reason
+    if (actionType === 'reject' && (!reason || reason.length < 10)) {
+      setError('Lý do từ chối phải có ít nhất 10 ký tự')
+      return
+    }
+    
+    // Validate location for resource_allocation with reallocate_room
+    const isRoomAllocationRequest = actionType === 'approve' && 
+        selectedRequest.type === 'resource_allocation' && 
+        selectedRequest.resourceAllocationData?.changes?.some((change: any) => change.type === 'reallocate_room')
+    
+    console.log('🔍 Validating location before submit:', { 
+      isRoomAllocationRequest, 
+      location, 
+      locationType: typeof location,
+      locationLength: location?.length,
+      locationTrimmed: location?.trim(),
+      locationTrimmedLength: location?.trim()?.length,
+      selectedRequestId: selectedRequest.id,
+      selectedRequestType: selectedRequest.type
     })
-    setIsActionDialogOpen(false)
-    setReason('')
+    
+    if (isRoomAllocationRequest && (!location || !location.trim())) {
+      console.error('❌ Location validation failed - location is empty or invalid')
+      setError('Vui lòng chọn phòng học để phân bổ cho buổi học offline')
+      return
+    }
+    
+    try {
+      setActionLoading(true)
+      setError(null)
+      
+      let result
+      if (actionType === 'approve') {
+        const approveData: any = {
+          reviewNotes: reason || 'Yêu cầu đã được phê duyệt'
+        }
+        
+        // Add location if this is a room allocation request
+        if (isRoomAllocationRequest) {
+          const trimmedLocation = location?.trim()
+          if (trimmedLocation && trimmedLocation.length > 0) {
+            approveData.location = trimmedLocation
+            console.log('✅ Sending approve request with location:', approveData.location)
+          } else {
+            console.error('❌ Room allocation request but location is invalid after trim:', { 
+              location, 
+              trimmedLocation,
+              locationType: typeof location,
+              locationLength: location?.length,
+              isRoomAllocationRequest,
+              selectedRequestId: selectedRequest.id,
+              selectedRequestType: selectedRequest.type
+            })
+            setError('Vui lòng chọn phòng học để phân bổ cho buổi học offline')
+            setActionLoading(false)
+            return
+          }
+        }
+        
+        console.log('📤 Approve data being sent to API:', JSON.stringify(approveData, null, 2))
+        result = await api.management.approvals.approve(selectedRequest.id, approveData)
+      } else if (actionType === 'reject') {
+        result = await api.management.approvals.reject(selectedRequest.id, {
+          reviewNotes: reason,
+          reason: reason
+        })
+      } else {
+        return
+      }
+      
+      if (result.success) {
+        // Reload approvals
+        await loadApprovals()
+        setIsActionDialogOpen(false)
+        setReason('')
+        setLocation('')
+        setSelectedRequest(null)
+      } else {
+        setError(result.error || 'Không thể thực hiện thao tác')
+      }
+    } catch (err: any) {
+      console.error('Error submitting action:', err)
+      setError(err.message || 'Có lỗi xảy ra khi thực hiện thao tác')
+    } finally {
+      setActionLoading(false)
+    }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'low': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'urgent': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+      case 'high': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'approved': return 'bg-green-100 text-green-800'
-      case 'rejected': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+      case 'approved': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      case 'rejected': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+      case 'clarification_requested': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+      case 'escalated': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
     }
+  }
+
+  // Format date/time
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    return { date: dateStr, time: timeStr }
+  }
+
+  // Get type display name
+  const getTypeDisplayName = (type: string) => {
+    const typeMap: Record<string, string> = {
+      'tutor_verification': 'Xác thực Tutor',
+      'session_change': 'Thay đổi Buổi học',
+      'resource_allocation': 'Phân bổ Tài nguyên',
+      'content_moderation': 'Kiểm duyệt Nội dung'
+    }
+    return typeMap[type] || type
+  }
+
+  // Get change type display name
+  const getChangeTypeDisplayName = (changeType: string) => {
+    const typeMap: Record<string, string> = {
+      'change_type': 'Thay đổi Loại Session (Individual ↔ Group)',
+      'change_location': 'Thay đổi Địa điểm/Mode (Offline ↔ Online)',
+      'change_duration': 'Thay đổi Thời gian (Reschedule)'
+    }
+    return typeMap[changeType] || changeType
+  }
+
+  // Format session change details
+  const formatSessionChangeDetails = (request: any) => {
+    if (request.type !== 'session_change' || !request.changeType || !request.changeData) {
+      return null
+    }
+
+    const details: any = {
+      changeType: request.changeType,
+      changeTypeDisplay: getChangeTypeDisplayName(request.changeType)
+    }
+
+    // Format based on change type
+    if (request.changeType === 'change_type') {
+      if (request.changeData.mergeSessionIds) {
+        details.action = `Merge ${request.changeData.mergeSessionIds.length} sessions thành 1 group session`
+        details.mergeSessionIds = request.changeData.mergeSessionIds
+      } else if (request.changeData.splitInto) {
+        details.action = `Split session thành ${request.changeData.splitInto} individual sessions`
+      }
+    } else if (request.changeType === 'change_location') {
+      if (request.changeData.newIsOnline) {
+        details.action = `Chuyển từ offline sang online`
+        details.meetingLink = request.changeData.newMeetingLink
+      } else {
+        details.action = `Chuyển từ online sang offline`
+        details.location = request.changeData.newLocation
+      }
+    } else if (request.changeType === 'change_duration') {
+      if (request.originalSessionData && request.changeData.newStartTime) {
+        const oldTime = new Date(request.originalSessionData.startTime).toLocaleString('vi-VN')
+        const newTime = new Date(request.changeData.newStartTime).toLocaleString('vi-VN')
+        details.action = `Đổi lịch từ ${oldTime} sang ${newTime}`
+        details.oldTime = request.originalSessionData.startTime
+        details.newTime = request.changeData.newStartTime
+        details.location = request.originalSessionData.location
+        details.isOffline = !request.originalSessionData.isOnline
+      }
+    }
+
+    return details
   }
 
   // Helper function to get initials from name
   const getInitials = (name: string) => {
+    if (!name) return '??'
     return name
       .split(' ')
       .map(word => word.charAt(0))
@@ -140,6 +527,7 @@ const ApprovalRequests: React.FC = () => {
 
   // Helper function to generate avatar color based on name
   const getAvatarColor = (name: string) => {
+    if (!name) return '#607d8b'
     const colors = [
       '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
       '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
@@ -148,6 +536,59 @@ const ApprovalRequests: React.FC = () => {
     ]
     const index = name.charCodeAt(0) % colors.length
     return colors[index]
+  }
+
+  // Helper function to parse description into bullet points
+  const parseDescription = (description: string): string[] => {
+    if (!description) return []
+    
+    // First, split by newlines (preserve them)
+    let items: string[] = []
+    const lines = description.split('\n')
+    
+    lines.forEach(line => {
+      const trimmedLine = line.trim()
+      if (!trimmedLine) return
+      
+      // If line contains multiple sentences (ends with period followed by space and capital letter)
+      // Split by period followed by space and capital letter
+      const sentences = trimmedLine.split(/(?<=\.)\s+(?=[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ])/g)
+      
+      if (sentences.length > 1) {
+        // Multiple sentences found, add each as separate item
+        sentences.forEach(sentence => {
+          const trimmed = sentence.trim()
+          if (trimmed) {
+            items.push(trimmed)
+          }
+        })
+      } else {
+        // Single sentence or no clear sentence breaks
+        // Try splitting by periods followed by space
+        const periodSplit = trimmedLine.split(/\.\s+/)
+        if (periodSplit.length > 1) {
+          periodSplit.forEach((item, index) => {
+            const trimmed = item.trim()
+            if (trimmed) {
+              // Add period back except for last item if it doesn't already have one
+              if (index < periodSplit.length - 1 && !trimmed.endsWith('.')) {
+                items.push(trimmed + '.')
+              } else {
+                items.push(trimmed)
+              }
+            }
+          })
+        } else {
+          // No periods found, add as single item
+          items.push(trimmedLine)
+        }
+      }
+    })
+    
+    // Clean up: remove empty items and trim
+    items = items.map(item => item.trim()).filter(item => item.length > 0)
+    
+    return items
   }
 
 
@@ -180,7 +621,7 @@ const ApprovalRequests: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Pending:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {requests.filter(r => r.status === 'pending').length}
+                      {stats.pending}
                     </span>
                   </div>
                 </div>
@@ -188,7 +629,7 @@ const ApprovalRequests: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Approved:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {requests.filter(r => r.status === 'approved').length}
+                      {stats.approved}
                     </span>
                   </div>
                 </div>
@@ -196,7 +637,7 @@ const ApprovalRequests: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {requests.length}
+                      {stats.total}
                     </span>
                   </div>
                 </div>
@@ -245,12 +686,23 @@ const ApprovalRequests: React.FC = () => {
                 </p>
               </div>
               <div className="flex space-x-2">
-                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={loadApprovals}
+                  disabled={loading}
+                >
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  Bulk Approve
+                  Refresh
                 </Button>
               </div>
             </div>
+            
+            {/* Error Message */}
+            {error && (
+              <div className={`mb-4 p-4 rounded-lg bg-red-100 border border-red-400 text-red-700 dark:bg-red-900 dark:border-red-700 dark:text-red-200`}>
+                {error}
+              </div>
+            )}
           </div>
 
           {/* Filters */}
@@ -268,7 +720,7 @@ const ApprovalRequests: React.FC = () => {
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Search & Filters
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <div className="relative">
                       <input
@@ -300,8 +752,26 @@ const ApprovalRequests: React.FC = () => {
                       <option value="all">All Types</option>
                       <option value="tutor">Tutor Applications</option>
                       <option value="credit">Credit Requests</option>
-                      <option value="session">Session Bookings</option>
+                      <option value="session">Session Changes</option>
                       <option value="verification">Account Verification</option>
+                    </select>
+                  </div>
+                  <div>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className={`w-full px-3 py-3 border rounded-lg ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    >
+                      <option value="all">All Status</option>
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="clarification_requested">Clarification Requested</option>
+                      <option value="escalated">Escalated</option>
                     </select>
                   </div>
                 </div>
@@ -352,8 +822,27 @@ const ApprovalRequests: React.FC = () => {
           </div>
 
           {/* Requests List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredRequests.map((request) => (
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Đang tải danh sách yêu cầu...
+              </p>
+            </div>
+          ) : requests.length === 0 ? (
+            <div className="text-center py-12">
+              <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Không có yêu cầu nào
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {requests.map((request) => {
+              const requesterName = request.requester?.name || 'Unknown User'
+              const dateTime = formatDateTime(request.createdAt)
+              const typeDisplay = getTypeDisplayName(request.type)
+              
+              return (
               <Card 
                 key={request.id} 
                 className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
@@ -371,29 +860,42 @@ const ApprovalRequests: React.FC = () => {
                         sx={{
                           width: 40,
                           height: 40,
-                          bgcolor: getAvatarColor(request.user),
+                          bgcolor: getAvatarColor(requesterName),
                           fontSize: '1rem',
                           fontWeight: 'bold',
                           mr: 3
                         }}
+                        src={request.requester?.avatar}
                       >
-                        {getInitials(request.user)}
+                        {getInitials(requesterName)}
                       </Avatar>
                       <div>
                         <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {request.user}
+                          {requesterName}
                         </h3>
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {request.type}
+                          {typeDisplay}
                         </p>
-                        <div className="flex space-x-1 mt-1">
-                          <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(request.priority)}`}>
-                            {request.priority}
-                          </span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {request.priority && (
+                            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(request.priority)}`}>
+                              {request.priority}
+                            </span>
+                          )}
                           <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(request.status)}`}>
-                            {request.status}
+                            {request.status === 'pending' ? 'Chờ duyệt' :
+                             request.status === 'approved' ? 'Đã duyệt' :
+                             request.status === 'rejected' ? 'Từ chối' :
+                             request.status === 'clarification_requested' ? 'Cần làm rõ' :
+                             request.status === 'escalated' ? 'Đã chuyển lên' :
+                             request.status}
                           </span>
                         </div>
+                        {request.reviewer && (
+                          <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Reviewer: {request.reviewer.name}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -403,45 +905,178 @@ const ApprovalRequests: React.FC = () => {
                     <div className="flex items-center">
                       <Schedule className="w-4 h-4 text-gray-400 mr-2" />
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {request.date} at {request.time}
+                        {dateTime.date} lúc {dateTime.time}
                       </span>
                     </div>
-                    <div className="flex items-center">
-                      <Info className="w-4 h-4 text-gray-400 mr-2" />
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {request.details}
-                      </span>
+                    <div className="flex items-start">
+                      <Info className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                      <div className="flex-1">
+                        <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {request.title}
+                        </p>
+                        {request.description && (
+                          <div className="space-y-1">
+                            {parseDescription(request.description).map((item, index) => (
+                              <div key={index} className="flex items-start">
+                                <span className={`text-sm mr-2 mt-0.5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  •
+                                </span>
+                                <p className={`text-sm flex-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                  {item}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    {request.deadline && (
+                      <div className="flex items-center">
+                        <Schedule className="w-4 h-4 text-gray-400 mr-2" />
+                        <span className={`text-sm ${request.isDeadlinePassed ? 'text-red-600' : request.isDeadlineApproaching ? 'text-yellow-600' : theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Hạn: {formatDateTime(request.deadline).date} {formatDateTime(request.deadline).time}
+                          {request.isDeadlinePassed && ' (Đã quá hạn)'}
+                          {request.isDeadlineApproaching && !request.isDeadlinePassed && ' (Sắp đến hạn)'}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Documents */}
-                  <div className="mb-4">
-                    <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Documents:
-                    </h4>
-                    <div className="flex flex-wrap gap-1">
-                      {request.documents.map((doc, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                        >
-                          {doc}
-                        </span>
-                      ))}
+                  {/* Attachments */}
+                  {request.attachments && request.attachments.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className={`text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        Tài liệu đính kèm:
+                      </h4>
+                      <div className="flex flex-wrap gap-1">
+                        {request.attachments.map((doc: string, index: number) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs rounded-full"
+                          >
+                            {doc}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
+                  
+                  {/* Review Notes */}
+                  {request.reviewNotes && (
+                    <div className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-700">
+                      <h4 className={`text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        Ghi chú đánh giá:
+                      </h4>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {request.reviewNotes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Session Change Details Preview */}
+                  {request.type === 'session_change' && request.changeType && (
+                    <div className="mb-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center mb-2">
+                        <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" />
+                        <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
+                          {getChangeTypeDisplayName(request.changeType)}
+                        </span>
+                      </div>
+                      {request.changeType === 'change_duration' && request.changeData?.newStartTime && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-blue-200' : 'text-blue-700'}`}>
+                          Thay đổi thời gian: {formatDateTime(request.changeData.newStartTime).date} {formatDateTime(request.changeData.newStartTime).time}
+                        </p>
+                      )}
+                      {request.changeType === 'change_location' && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-blue-200' : 'text-blue-700'}`}>
+                          {request.changeData?.newIsOnline ? 'Chuyển sang online' : `Chuyển sang offline: ${request.changeData?.newLocation || ''}`}
+                        </p>
+                      )}
+                      {request.changeType === 'change_type' && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-blue-200' : 'text-blue-700'}`}>
+                          {request.changeData?.mergeSessionIds 
+                            ? `Merge ${request.changeData.mergeSessionIds.length} sessions` 
+                            : request.changeData?.splitInto 
+                            ? `Split thành ${request.changeData.splitInto} sessions`
+                            : 'Thay đổi loại session'}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Resource Allocation Details Preview */}
+                  {request.type === 'resource_allocation' && request.resourceAllocationData && (
+                    <div className="mb-4 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                      <div className="flex items-center mb-2">
+                        <Info className="w-4 h-4 text-purple-600 dark:text-purple-400 mr-2" />
+                        <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-purple-300' : 'text-purple-900'}`}>
+                          Phân bổ Tài nguyên
+                        </span>
+                      </div>
+                      {request.resourceAllocationData.changes && request.resourceAllocationData.changes.length > 0 && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-purple-200' : 'text-purple-700'}`}>
+                          {request.resourceAllocationData.changes.length} thay đổi: {request.resourceAllocationData.changes.map((c: any) => {
+                            const typeMap: Record<string, string> = {
+                              'reassign_tutor': 'Thay đổi tutor',
+                              'adjust_group_size': 'Điều chỉnh nhóm',
+                              'reallocate_room': 'Phân bổ lại phòng',
+                              'adjust_schedule': 'Điều chỉnh lịch'
+                            };
+                            return typeMap[c.type] || c.type;
+                          }).join(', ')}
+                        </p>
+                      )}
+                      {request.resourceAllocationData.affectedTutorIds && request.resourceAllocationData.affectedTutorIds.length > 0 && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-purple-200' : 'text-purple-700'}`}>
+                          Ảnh hưởng {request.resourceAllocationData.affectedTutorIds.length} tutor(s)
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Content Moderation Details Preview */}
+                  {request.type === 'content_moderation' && request.contentModerationData && (
+                    <div className="mb-4 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+                      <div className="flex items-center mb-2">
+                        <Info className="w-4 h-4 text-orange-600 dark:text-orange-400 mr-2" />
+                        <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-orange-300' : 'text-orange-900'}`}>
+                          Kiểm duyệt {request.contentModerationData.contentType === 'post' ? 'Bài viết' : 'Bình luận'}
+                        </span>
+                      </div>
+                      {request.contentModerationData.violationType && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-orange-200' : 'text-orange-700'}`}>
+                          Loại vi phạm: {request.contentModerationData.violationType === 'spam' ? 'Spam' :
+                            request.contentModerationData.violationType === 'inappropriate' ? 'Không phù hợp' :
+                            request.contentModerationData.violationType === 'harassment' ? 'Quấy rối' :
+                            request.contentModerationData.violationType === 'false_information' ? 'Thông tin sai' :
+                            'Khác'}
+                        </p>
+                      )}
+                      {request.contentModerationData.severity && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-orange-200' : 'text-orange-700'}`}>
+                          Mức độ: {request.contentModerationData.severity}
+                        </p>
+                      )}
+                      {request.contentModerationData.contentPreview && (
+                        <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-orange-200' : 'text-orange-700'}`}>
+                          Preview: {request.contentModerationData.contentPreview.substring(0, 100)}...
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   {/* Action Buttons */}
-                  <div className="flex space-x-2">
-                    {request.status === 'pending' ? (
+                  <div className="flex flex-wrap gap-2">
+                    {request.status === 'pending' || request.status === 'clarification_requested' ? (
                       <>
                         <Button 
                           size="small" 
                           className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => handleAction(request, 'approve')}
+                          disabled={actionLoading}
                         >
                           <CheckCircle className="w-4 h-4 mr-1" />
-                          Approve
+                          Duyệt
                         </Button>
                         <Button 
                           size="small" 
@@ -461,39 +1096,63 @@ const ApprovalRequests: React.FC = () => {
                             e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                           }}
                           onClick={() => handleAction(request, 'reject')}
+                          disabled={actionLoading}
                         >
                           <Cancel className="w-4 h-4 mr-1" />
-                          Reject
+                          Từ chối
+                        </Button>
+                        <Button 
+                          size="small" 
+                          variant="outlined"
+                          className="flex-1"
+                          style={{
+                            backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                            color: theme === 'dark' ? '#ffffff' : '#3b82f6',
+                            borderColor: theme === 'dark' ? '#000000' : '#3b82f6',
+                            textTransform: 'none',
+                            fontWeight: '500'
+                          }}
+                          onClick={() => {
+                            setSelectedRequest(request)
+                            setIsClarificationDialogOpen(true)
+                            setClarificationText('')
+                          }}
+                          disabled={actionLoading}
+                        >
+                          <Info className="w-4 h-4 mr-1" />
+                          Làm rõ
                         </Button>
                       </>
-                    ) : (
-                      <Button 
-                        size="small" 
-                        variant="outlined"
-                        className="flex-1"
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#000000',
-                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                          textTransform: 'none',
-                          fontWeight: '500'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
-                        }}
-                      >
-                        <Info className="w-4 h-4 mr-1" />
-                        View Details
-                      </Button>
-                    )}
+                    ) : null}
+                    <Button 
+                      size="small" 
+                      variant="outlined"
+                      className="flex-1"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                      }}
+                      onClick={() => loadRequestDetail(request.id)}
+                    >
+                      <Info className="w-4 h-4 mr-1" />
+                      Chi tiết
+                    </Button>
                   </div>
                 </div>
               </Card>
-            ))}
+              )
+            })}
           </div>
+          )}
         </div>
       </div>
 
@@ -531,7 +1190,7 @@ const ApprovalRequests: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Pending:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {requests.filter(r => r.status === 'pending').length}
+                        {stats.pending}
                       </span>
                     </div>
                   </div>
@@ -539,7 +1198,7 @@ const ApprovalRequests: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Approved:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {requests.filter(r => r.status === 'approved').length}
+                        {stats.approved}
                       </span>
                     </div>
                   </div>
@@ -603,7 +1262,7 @@ const ApprovalRequests: React.FC = () => {
             backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
           }}
         >
-          {actionType === 'approve' ? 'Approve Request' : 'Reject Request'}
+          {actionType === 'approve' ? 'Duyệt Yêu cầu' : 'Từ chối Yêu cầu'}
         </DialogTitle>
         <DialogContent 
           sx={{ 
@@ -620,7 +1279,7 @@ const ApprovalRequests: React.FC = () => {
                   fontWeight: '500'
                 }}
               >
-                User: {selectedRequest?.user}
+                Người yêu cầu: {selectedRequest?.requester?.name || 'Unknown'}
               </Typography>
               <Typography 
                 variant="body2" 
@@ -629,22 +1288,109 @@ const ApprovalRequests: React.FC = () => {
                   fontWeight: '400'
                 }}
               >
-                Type: {selectedRequest?.type}
+                Loại: {selectedRequest ? getTypeDisplayName(selectedRequest.type) : ''}
+              </Typography>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: theme === 'dark' ? '#d1d5db' : '#6b7280',
+                  fontWeight: '400',
+                  mt: 1
+                }}
+              >
+                Tiêu đề: {selectedRequest?.title}
               </Typography>
             </div>
 
+            {/* Equipment Requirements Display */}
+            {actionType === 'approve' && 
+             selectedRequest?.type === 'resource_allocation' && 
+             selectedRequest?.resourceAllocationData?.changes?.some((change: any) => change.type === 'reallocate_room') && (() => {
+              const roomAllocationChange = selectedRequest?.resourceAllocationData?.changes?.find(
+                (change: any) => change.type === 'reallocate_room'
+              )
+              const equipmentRequirements = roomAllocationChange?.equipmentRequirements || []
+              
+              if (equipmentRequirements.length > 0) {
+                const equipmentNameMap: { [key: string]: string } = {
+                  'whiteboard': 'Bảng trắng',
+                  'projector': 'Máy chiếu',
+                  'computer': 'Máy tính',
+                  'sound_system': 'Hệ thống âm thanh',
+                  'microphone': 'Micro',
+                  'camera': 'Camera'
+                }
+                
+                return (
+                  <div className={`mb-4 p-3 rounded-lg border ${theme === 'dark' ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200'}`}>
+                    <Typography 
+                      variant="subtitle2" 
+                      sx={{ 
+                        color: theme === 'dark' ? '#93c5fd' : '#1e40af',
+                        fontWeight: 600,
+                        mb: 1.5
+                      }}
+                    >
+                      Yêu cầu thiết bị từ tutor:
+                    </Typography>
+                    <div className="flex flex-wrap gap-2">
+                      {equipmentRequirements.map((eqId: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                            theme === 'dark' ? 'bg-blue-800 text-blue-200' : 'bg-blue-100 text-blue-800'
+                          }`}
+                        >
+                          {equipmentNameMap[eqId] || eqId}
+                        </span>
+                      ))}
+                    </div>
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        color: theme === 'dark' ? '#93c5fd' : '#1e40af',
+                        display: 'block',
+                        mt: 1.5
+                      }}
+                    >
+                      Chỉ hiển thị các phòng có đủ thiết bị yêu cầu. Nếu không có phòng phù hợp, sẽ hiển thị tất cả phòng.
+                    </Typography>
+                  </div>
+                )
+              }
+              return null
+            })()}
+
             <div>
+              {/* Room Selector for resource_allocation with reallocate_room */}
+              {actionType === 'approve' && 
+               selectedRequest?.type === 'resource_allocation' && 
+               selectedRequest?.resourceAllocationData?.changes?.some((change: any) => change.type === 'reallocate_room') && (
+                <RoomSelectorWrapper
+                  selectedRequest={selectedRequest}
+                  location={location}
+                  setLocation={setLocation}
+                  setError={setError}
+                  theme={theme}
+                />
+              )}
+              
               <TextField
                 fullWidth
-                label="Response Message"
+                label={actionType === 'approve' ? 'Ghi chú phê duyệt' : 'Lý do từ chối (tối thiểu 10 ký tự)'}
                 multiline
                 rows={3}
                 value={reason}
-                onChange={(e) => setReason(e.target.value)}
+                onChange={(e) => {
+                  setReason(e.target.value)
+                  setError(null)
+                }}
+                error={actionType === 'reject' && reason.length > 0 && reason.length < 10}
+                helperText={actionType === 'reject' && reason.length > 0 && reason.length < 10 ? 'Lý do từ chối phải có ít nhất 10 ký tự' : ''}
                 placeholder={
                   actionType === 'approve' 
-                    ? 'Message to send to user about approval...'
-                    : 'Reason for rejection...'
+                    ? 'Nhập ghi chú cho người yêu cầu về việc phê duyệt...'
+                    : 'Nhập lý do từ chối (bắt buộc, tối thiểu 10 ký tự)...'
                 }
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -678,7 +1424,13 @@ const ApprovalRequests: React.FC = () => {
           }}
         >
           <MuiButton 
-            onClick={() => setIsActionDialogOpen(false)}
+            onClick={() => {
+              setIsActionDialogOpen(false)
+              setReason('')
+              setLocation('')
+              setError(null)
+            }}
+            disabled={actionLoading}
             sx={{
               color: theme === 'dark' ? '#ffffff' : '#111827',
               '&:hover': {
@@ -686,21 +1438,850 @@ const ApprovalRequests: React.FC = () => {
               }
             }}
           >
-            Cancel
+            Hủy
           </MuiButton>
           <MuiButton 
             onClick={handleSubmitAction} 
             variant="contained"
             color={actionType === 'approve' ? 'success' : 'error'}
+            disabled={actionLoading || 
+                     (actionType === 'reject' && (!reason || reason.length < 10)) ||
+                     (actionType === 'approve' && 
+                      selectedRequest?.type === 'resource_allocation' && 
+                      selectedRequest?.resourceAllocationData?.changes?.some((change: any) => change.type === 'reallocate_room') &&
+                      !location.trim())}
             sx={{
               backgroundColor: actionType === 'approve' ? '#10b981' : '#ef4444',
               '&:hover': {
                 backgroundColor: actionType === 'approve' ? '#059669' : '#dc2626'
+              },
+              '&:disabled': {
+                backgroundColor: theme === 'dark' ? '#374151' : '#d1d5db'
               }
             }}
           >
-            {actionType === 'approve' ? 'Approve' : 'Reject'}
+            {actionLoading ? 'Đang xử lý...' : (actionType === 'approve' ? 'Duyệt' : 'Từ chối')}
           </MuiButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Clarification Dialog */}
+      <Dialog 
+        open={isClarificationDialogOpen} 
+        onClose={() => setIsClarificationDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb'
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            color: theme === 'dark' ? '#ffffff' : '#111827',
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
+          }}
+        >
+          Yêu cầu làm rõ
+        </DialogTitle>
+        <DialogContent 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
+          }}
+        >
+          <div className="space-y-4 mt-4">
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: theme === 'dark' ? '#d1d5db' : '#6b7280',
+                mb: 2
+              }}
+            >
+              Yêu cầu người dùng làm rõ thông tin về yêu cầu này.
+            </Typography>
+            <TextField
+              fullWidth
+              label="Yêu cầu làm rõ (tối thiểu 10 ký tự)"
+              multiline
+              rows={4}
+              value={clarificationText}
+              onChange={(e) => {
+                setClarificationText(e.target.value)
+                setError(null)
+              }}
+              error={clarificationText.length > 0 && clarificationText.length < 10}
+              helperText={clarificationText.length > 0 && clarificationText.length < 10 ? 'Yêu cầu làm rõ phải có ít nhất 10 ký tự' : ''}
+              placeholder="Nhập yêu cầu làm rõ chi tiết..."
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: theme === 'dark' ? '#ffffff' : '#111827',
+                  backgroundColor: theme === 'dark' ? '#374151' : '#ffffff',
+                  '& fieldset': {
+                    borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme === 'dark' ? '#6b7280' : '#9ca3af',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: theme === 'dark' ? '#3b82f6' : '#3b82f6',
+                },
+              }}
+            />
+          </div>
+        </DialogContent>
+        <DialogActions 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            padding: '16px 24px'
+          }}
+        >
+          <MuiButton 
+            onClick={() => {
+              setIsClarificationDialogOpen(false)
+              setClarificationText('')
+              setError(null)
+            }}
+            disabled={actionLoading}
+            sx={{
+              color: theme === 'dark' ? '#ffffff' : '#111827',
+              '&:hover': {
+                backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6'
+              }
+            }}
+          >
+            Hủy
+          </MuiButton>
+          <MuiButton 
+            onClick={handleRequestClarification} 
+            variant="contained"
+            color="primary"
+            disabled={actionLoading || !clarificationText || clarificationText.length < 10}
+            sx={{
+              backgroundColor: '#3b82f6',
+              '&:hover': {
+                backgroundColor: '#2563eb'
+              },
+              '&:disabled': {
+                backgroundColor: theme === 'dark' ? '#374151' : '#d1d5db'
+              }
+            }}
+          >
+            {actionLoading ? 'Đang gửi...' : 'Gửi yêu cầu'}
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Detail Dialog */}
+      <Dialog 
+        open={isDetailDialogOpen} 
+        onClose={() => setIsDetailDialogOpen(false)} 
+        maxWidth="md" 
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb'
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            color: theme === 'dark' ? '#ffffff' : '#111827',
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
+          }}
+        >
+          Chi tiết Yêu cầu Phê duyệt
+        </DialogTitle>
+        <DialogContent 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            maxHeight: '70vh',
+            overflowY: 'auto'
+          }}
+        >
+          {detailLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Đang tải chi tiết...
+              </p>
+            </div>
+          ) : selectedRequestDetail ? (
+            <div className="space-y-6 mt-4">
+              {/* Basic Information */}
+              <div>
+                <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Thông tin cơ bản
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Người yêu cầu:</span>
+                    <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {selectedRequestDetail.requester?.name || 'Unknown'}
+                    </span>
+                  </div>
+                  {selectedRequestDetail.reviewer && (
+                    <div className="flex justify-between">
+                      <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Người duyệt:</span>
+                      <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedRequestDetail.reviewer.name}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Loại:</span>
+                    <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {getTypeDisplayName(selectedRequestDetail.type)}
+                    </span>
+                  </div>
+                  {selectedRequestDetail.changeType && (
+                    <div className="flex justify-between">
+                      <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Loại thay đổi:</span>
+                      <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {getChangeTypeDisplayName(selectedRequestDetail.changeType)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Trạng thái:</span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(selectedRequestDetail.status)}`}>
+                      {selectedRequestDetail.status === 'pending' ? 'Chờ duyệt' :
+                       selectedRequestDetail.status === 'approved' ? 'Đã duyệt' :
+                       selectedRequestDetail.status === 'rejected' ? 'Từ chối' :
+                       selectedRequestDetail.status === 'clarification_requested' ? 'Cần làm rõ' :
+                       selectedRequestDetail.status === 'escalated' ? 'Đã chuyển lên' :
+                       selectedRequestDetail.status}
+                    </span>
+                  </div>
+                  {selectedRequestDetail.priority && (
+                    <div className="flex justify-between">
+                      <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Độ ưu tiên:</span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedRequestDetail.priority)}`}>
+                        {selectedRequestDetail.priority}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Ngày tạo:</span>
+                    <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {formatDateTime(selectedRequestDetail.createdAt).date} {formatDateTime(selectedRequestDetail.createdAt).time}
+                    </span>
+                  </div>
+                  {selectedRequestDetail.deadline && (
+                    <div className="flex justify-between">
+                      <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Hạn:</span>
+                      <span className={`font-medium ${selectedRequestDetail.isDeadlinePassed ? 'text-red-600' : selectedRequestDetail.isDeadlineApproaching ? 'text-yellow-600' : theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {formatDateTime(selectedRequestDetail.deadline).date} {formatDateTime(selectedRequestDetail.deadline).time}
+                        {selectedRequestDetail.isDeadlinePassed && ' (Đã quá hạn)'}
+                        {selectedRequestDetail.isDeadlineApproaching && !selectedRequestDetail.isDeadlinePassed && ' (Sắp đến hạn)'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Title and Description */}
+              <div>
+                <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Mô tả
+                </h3>
+                <div className="space-y-2">
+                  <div>
+                    <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {selectedRequestDetail.title}
+                    </span>
+                  </div>
+                  <div>
+                    <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {selectedRequestDetail.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Target Entity Information */}
+              {selectedRequestDetail.targetEntity && (
+                <div>
+                  <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {selectedRequestDetail.type === 'session_change' ? 'Thông tin Session' :
+                     selectedRequestDetail.type === 'content_moderation' ? 'Thông tin Nội dung' :
+                     selectedRequestDetail.type === 'resource_allocation' ? 'Thông tin Phân bổ' :
+                     'Thông tin Entity'}
+                  </h3>
+                  <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} space-y-2`}>
+                    {/* Session Information */}
+                    {selectedRequestDetail.type === 'session_change' && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Session ID:</span>
+                          <span className={`font-mono text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            {selectedRequestDetail.targetEntity.id}
+                          </span>
+                        </div>
+                        {selectedRequestDetail.targetEntity.subject && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Môn học:</span>
+                            <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {selectedRequestDetail.targetEntity.subject}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.startTime && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Thời gian:</span>
+                            <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {formatDateTime(selectedRequestDetail.targetEntity.startTime).date} {formatDateTime(selectedRequestDetail.targetEntity.startTime).time}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.status && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Trạng thái:</span>
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(selectedRequestDetail.targetEntity.status)}`}>
+                              {selectedRequestDetail.targetEntity.status}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.studentIds && selectedRequestDetail.targetEntity.studentIds.length > 0 && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Số học sinh:</span>
+                            <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {selectedRequestDetail.targetEntity.studentIds.length}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Content Information */}
+                    {selectedRequestDetail.type === 'content_moderation' && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Loại:</span>
+                          <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            {selectedRequestDetail.targetEntity.contentType === 'post' ? 'Bài viết' : 'Bình luận'}
+                          </span>
+                        </div>
+                        {selectedRequestDetail.targetEntity.title && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tiêu đề:</span>
+                            <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {selectedRequestDetail.targetEntity.title}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.content && (
+                          <div className="mt-2">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Nội dung:</span>
+                            <div className={`mt-1 p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+                              <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                {selectedRequestDetail.targetEntity.content}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.status && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Trạng thái:</span>
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(selectedRequestDetail.targetEntity.status)}`}>
+                              {selectedRequestDetail.targetEntity.status === 'pending' ? 'Chờ duyệt' :
+                               selectedRequestDetail.targetEntity.status === 'approved' ? 'Đã duyệt' :
+                               selectedRequestDetail.targetEntity.status === 'rejected' ? 'Từ chối' :
+                               selectedRequestDetail.targetEntity.status === 'hidden' ? 'Ẩn' :
+                               selectedRequestDetail.targetEntity.status}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Resource Allocation Information */}
+                    {selectedRequestDetail.type === 'resource_allocation' && (
+                      <>
+                        {selectedRequestDetail.targetEntity.optimizationPlanId && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Optimization Plan ID:</span>
+                            <span className={`font-mono text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {selectedRequestDetail.targetEntity.optimizationPlanId}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.affectedTutorIds && selectedRequestDetail.targetEntity.affectedTutorIds.length > 0 && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tutors bị ảnh hưởng:</span>
+                            <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {selectedRequestDetail.targetEntity.affectedTutorIds.length}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.affectedSessionIds && selectedRequestDetail.targetEntity.affectedSessionIds.length > 0 && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Sessions bị ảnh hưởng:</span>
+                            <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {selectedRequestDetail.targetEntity.affectedSessionIds.length}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequestDetail.targetEntity.affectedStudentIds && selectedRequestDetail.targetEntity.affectedStudentIds.length > 0 && (
+                          <div className="flex justify-between">
+                            <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Students bị ảnh hưởng:</span>
+                            <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              {selectedRequestDetail.targetEntity.affectedStudentIds.length}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Session Change Details */}
+              {selectedRequestDetail.type === 'session_change' && selectedRequestDetail.changeType && (
+                <div>
+                  <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Chi tiết Thay đổi Session
+                  </h3>
+                  <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} space-y-4`}>
+                    <div>
+                      <span className={`font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Loại thay đổi:
+                      </span>
+                      <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {getChangeTypeDisplayName(selectedRequestDetail.changeType)}
+                      </span>
+                    </div>
+
+                    {/* Change Type: change_duration */}
+                    {selectedRequestDetail.changeType === 'change_duration' && (
+                      <div className="space-y-3">
+                        {selectedRequestDetail.originalSessionData && (
+                          <div>
+                            <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Thông tin Session hiện tại:
+                            </h4>
+                            <div className={`pl-4 space-y-1 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-3 rounded`}>
+                              <div>
+                                <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Môn học:</span>
+                                <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                  {selectedRequestDetail.originalSessionData.subject}
+                                </span>
+                              </div>
+                              <div>
+                                <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Thời gian hiện tại:</span>
+                                <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                  {formatDateTime(selectedRequestDetail.originalSessionData.startTime).date} {formatDateTime(selectedRequestDetail.originalSessionData.startTime).time}
+                                </span>
+                              </div>
+                              {selectedRequestDetail.originalSessionData.location && (
+                                <div>
+                                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Địa điểm:</span>
+                                  <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {selectedRequestDetail.originalSessionData.location}
+                                  </span>
+                                </div>
+                              )}
+                              <div>
+                                <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Mode:</span>
+                                <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                  {selectedRequestDetail.originalSessionData.isOnline ? 'Online' : 'Offline'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {selectedRequestDetail.changeData?.newStartTime && (
+                          <div>
+                            <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Thời gian mới:
+                            </h4>
+                            <div className={`pl-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-3 rounded`}>
+                              <div>
+                                <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Thời gian mới:</span>
+                                <span className={`ml-2 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                  {formatDateTime(selectedRequestDetail.changeData.newStartTime).date} {formatDateTime(selectedRequestDetail.changeData.newStartTime).time}
+                                </span>
+                              </div>
+                              {selectedRequestDetail.changeData.newDuration && (
+                                <div>
+                                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Thời lượng:</span>
+                                  <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {selectedRequestDetail.changeData.newDuration} phút
+                                  </span>
+                                </div>
+                              )}
+                              {selectedRequestDetail.originalSessionData && !selectedRequestDetail.originalSessionData.isOnline && (
+                                <div className="mt-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-800">
+                                  <p className={`text-xs ${theme === 'dark' ? 'text-yellow-200' : 'text-yellow-800'}`}>
+                                    ⚠️ Session offline - Cần allocate lại phòng học
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Change Type: change_location */}
+                    {selectedRequestDetail.changeType === 'change_location' && (
+                      <div className="space-y-3">
+                        {selectedRequestDetail.originalSessionData && (
+                          <div>
+                            <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Thông tin hiện tại:
+                            </h4>
+                            <div className={`pl-4 space-y-1 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-3 rounded`}>
+                              <div>
+                                <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Mode:</span>
+                                <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                  {selectedRequestDetail.originalSessionData.isOnline ? 'Online' : 'Offline'}
+                                </span>
+                              </div>
+                              {selectedRequestDetail.originalSessionData.location && (
+                                <div>
+                                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Địa điểm:</span>
+                                  <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {selectedRequestDetail.originalSessionData.location}
+                                  </span>
+                                </div>
+                              )}
+                              {selectedRequestDetail.originalSessionData.meetingLink && (
+                                <div>
+                                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Meeting Link:</span>
+                                  <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {selectedRequestDetail.originalSessionData.meetingLink}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {selectedRequestDetail.changeData && (
+                          <div>
+                            <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Thay đổi:
+                            </h4>
+                            <div className={`pl-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-3 rounded`}>
+                              <div>
+                                <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Mode mới:</span>
+                                <span className={`ml-2 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                  {selectedRequestDetail.changeData.newIsOnline ? 'Online' : 'Offline'}
+                                </span>
+                              </div>
+                              {selectedRequestDetail.changeData.newMeetingLink && (
+                                <div>
+                                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Meeting Link mới:</span>
+                                  <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {selectedRequestDetail.changeData.newMeetingLink}
+                                  </span>
+                                </div>
+                              )}
+                              {selectedRequestDetail.changeData.newLocation && (
+                                <div>
+                                  <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Địa điểm mới:</span>
+                                  <span className={`ml-2 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {selectedRequestDetail.changeData.newLocation}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Change Type: change_type */}
+                    {selectedRequestDetail.changeType === 'change_type' && (
+                      <div className="space-y-3">
+                        {selectedRequestDetail.changeData?.mergeSessionIds && (
+                          <div>
+                            <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Merge Sessions:
+                            </h4>
+                            <div className={`pl-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-3 rounded`}>
+                              <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                Merge {selectedRequestDetail.changeData.mergeSessionIds.length} individual sessions thành 1 group session
+                              </p>
+                              <div className="mt-2">
+                                <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                  Session IDs: {selectedRequestDetail.changeData.mergeSessionIds.join(', ')}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {selectedRequestDetail.changeData?.splitInto && (
+                          <div>
+                            <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Split Session:
+                            </h4>
+                            <div className={`pl-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-3 rounded`}>
+                              <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                Split session thành {selectedRequestDetail.changeData.splitInto} individual sessions
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Resource Allocation Details */}
+              {selectedRequestDetail.type === 'resource_allocation' && selectedRequestDetail.resourceAllocationData && (
+                <div>
+                  <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Chi tiết Phân bổ Tài nguyên
+                  </h3>
+                  <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} space-y-4`}>
+                    {selectedRequestDetail.resourceAllocationData.optimizationPlanId && (
+                      <div>
+                        <span className={`font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Optimization Plan ID:
+                        </span>
+                        <span className={`ml-2 font-mono text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {selectedRequestDetail.resourceAllocationData.optimizationPlanId}
+                        </span>
+                      </div>
+                    )}
+                    {selectedRequestDetail.resourceAllocationData.changes && selectedRequestDetail.resourceAllocationData.changes.length > 0 && (
+                      <div>
+                        <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Các thay đổi:
+                        </h4>
+                        <div className="space-y-2">
+                          {selectedRequestDetail.resourceAllocationData.changes.map((change: any, index: number) => {
+                            const typeMap: Record<string, string> = {
+                              'reassign_tutor': 'Thay đổi Tutor',
+                              'adjust_group_size': 'Điều chỉnh Kích thước Nhóm',
+                              'reallocate_room': 'Phân bổ lại Phòng',
+                              'adjust_schedule': 'Điều chỉnh Lịch'
+                            };
+                            return (
+                              <div key={index} className={`p-3 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+                                <div className="flex justify-between items-start mb-1">
+                                  <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {typeMap[change.type] || change.type}
+                                  </span>
+                                </div>
+                                <div className="text-sm space-y-1">
+                                  <div>
+                                    <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Resource ID:</span>
+                                    <span className={`ml-2 font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                      {change.resourceId}
+                                    </span>
+                                  </div>
+                                  {change.fromValue && (
+                                    <div>
+                                      <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Từ:</span>
+                                      <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                        {typeof change.fromValue === 'object' ? JSON.stringify(change.fromValue) : change.fromValue}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {change.toValue && (
+                                    <div>
+                                      <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Sang:</span>
+                                      <span className={`ml-2 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                        {typeof change.toValue === 'object' ? JSON.stringify(change.toValue) : change.toValue}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {change.reason && (
+                                    <div>
+                                      <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Lý do:</span>
+                                      <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                        {change.reason}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Content Moderation Details */}
+              {selectedRequestDetail.type === 'content_moderation' && selectedRequestDetail.contentModerationData && (
+                <div>
+                  <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Chi tiết Kiểm duyệt Nội dung
+                  </h3>
+                  <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} space-y-4`}>
+                    <div>
+                      <span className={`font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Loại nội dung:
+                      </span>
+                      <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedRequestDetail.contentModerationData.contentType === 'post' ? 'Bài viết' : 'Bình luận'}
+                      </span>
+                    </div>
+                    {selectedRequestDetail.contentModerationData.violationType && (
+                      <div>
+                        <span className={`font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Loại vi phạm:
+                        </span>
+                        <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {selectedRequestDetail.contentModerationData.violationType === 'spam' ? 'Spam' :
+                           selectedRequestDetail.contentModerationData.violationType === 'inappropriate' ? 'Không phù hợp' :
+                           selectedRequestDetail.contentModerationData.violationType === 'harassment' ? 'Quấy rối' :
+                           selectedRequestDetail.contentModerationData.violationType === 'false_information' ? 'Thông tin sai' :
+                           'Khác'}
+                        </span>
+                      </div>
+                    )}
+                    {selectedRequestDetail.contentModerationData.severity && (
+                      <div>
+                        <span className={`font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Mức độ:
+                        </span>
+                        <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                          selectedRequestDetail.contentModerationData.severity === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                          selectedRequestDetail.contentModerationData.severity === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
+                          selectedRequestDetail.contentModerationData.severity === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                          'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                        }`}>
+                          {selectedRequestDetail.contentModerationData.severity}
+                        </span>
+                      </div>
+                    )}
+                    {selectedRequestDetail.contentModerationData.contentPreview && (
+                      <div>
+                        <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Preview nội dung:
+                        </h4>
+                        <div className={`p-3 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+                          <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {selectedRequestDetail.contentModerationData.contentPreview}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedRequestDetail.contentModerationData.reportedBy && selectedRequestDetail.contentModerationData.reportedBy.length > 0 && (
+                      <div>
+                        <span className={`font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Được báo cáo bởi:
+                        </span>
+                        <span className={`ml-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {selectedRequestDetail.contentModerationData.reportedBy.length} người dùng
+                        </span>
+                      </div>
+                    )}
+                    {selectedRequestDetail.contentModerationData.reportReasons && selectedRequestDetail.contentModerationData.reportReasons.length > 0 && (
+                      <div>
+                        <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Lý do báo cáo:
+                        </h4>
+                        <ul className={`list-disc list-inside space-y-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {selectedRequestDetail.contentModerationData.reportReasons.map((reason: string, index: number) => (
+                            <li key={index} className="text-sm">{reason}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Review Notes */}
+              {selectedRequestDetail.reviewNotes && (
+                <div>
+                  <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Ghi chú đánh giá
+                  </h3>
+                  <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {selectedRequestDetail.reviewNotes}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Clarification Request */}
+              {selectedRequestDetail.clarificationRequest && (
+                <div>
+                  <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Yêu cầu làm rõ
+                  </h3>
+                  <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'} border ${theme === 'dark' ? 'border-blue-800' : 'border-blue-200'}`}>
+                    <p className={`${theme === 'dark' ? 'text-blue-200' : 'text-blue-800'}`}>
+                      {selectedRequestDetail.clarificationRequest}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </DialogContent>
+        <DialogActions 
+          sx={{ 
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            padding: '16px 24px'
+          }}
+        >
+          <MuiButton 
+            onClick={() => setIsDetailDialogOpen(false)}
+            sx={{
+              color: theme === 'dark' ? '#ffffff' : '#111827',
+              '&:hover': {
+                backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6'
+              }
+            }}
+          >
+            Đóng
+          </MuiButton>
+          {selectedRequestDetail && (selectedRequestDetail.status === 'pending' || selectedRequestDetail.status === 'clarification_requested') && (
+            <>
+              <MuiButton 
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  handleAction(selectedRequestDetail, 'approve')
+                }}
+                variant="contained"
+                color="success"
+                sx={{
+                  backgroundColor: '#10b981',
+                  '&:hover': {
+                    backgroundColor: '#059669'
+                  }
+                }}
+              >
+                Duyệt
+              </MuiButton>
+              <MuiButton 
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  handleAction(selectedRequestDetail, 'reject')
+                }}
+                variant="contained"
+                color="error"
+                sx={{
+                  backgroundColor: '#ef4444',
+                  '&:hover': {
+                    backgroundColor: '#dc2626'
+                  }
+                }}
+              >
+                Từ chối
+              </MuiButton>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </div>

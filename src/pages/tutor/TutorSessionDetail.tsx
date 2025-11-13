@@ -306,7 +306,9 @@ const TutorSessionDetail: React.FC = () => {
                         {data.isOnline ? 'Online Video Call' : 'In-Person Meeting'}
                       </p>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {data.isOnline ? 'Virtual' : 'Physical Location'}
+                        {data.isOnline 
+                          ? (data.meetingLink || 'Virtual') 
+                          : (data.location || 'Physical Location - Chưa được phân bổ')}
                       </p>
                     </>
                   )}

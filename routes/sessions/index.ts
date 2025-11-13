@@ -6,10 +6,10 @@
 
 import { Response } from 'express';
 import { storage } from '../../lib/storage.js';
-import { Session, SessionStatus, UserRole, Notification, NotificationType, Class, ClassStatus, Enrollment } from '../../lib/types.js';
+import { Session, SessionStatus, UserRole, Notification, NotificationType, Class, ClassStatus, Enrollment, User } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
-
+import { queueNotification } from '../../lib/services/notificationQueue.js';
 /**
  * GET /api/sessions
  */
@@ -59,8 +59,11 @@ export async function listSessionsHandler(req: AuthRequest, res: Response) {
         }
       }
 
-      // Filter by status
-      if (status && session.status !== status) return false;
+      // Filter by status (support comma-separated values like "confirmed,pending")
+      if (status) {
+        const statusList = (status as string).split(',').map(s => s.trim());
+        if (!statusList.includes(session.status)) return false;
+      }
 
       // Filter by date range
       if (startDate) {
@@ -164,7 +167,7 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       // Get all enrolled students
       const enrollments = await storage.find<Enrollment>(
         'enrollments.json',
-        (e) => e.classId === sessionData.classId && e.status === 'active'
+        (e: any) => e.classId === sessionData.classId && e.status === 'active'
       );
 
       studentIds = enrollments.map(e => e.studentId);
@@ -180,7 +183,7 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       }
 
       // Verify tutor exists
-      const tutor = await storage.findById('users.json', sessionData.tutorId);
+      const tutor = await storage.findById<User>('users.json', sessionData.tutorId);
       if (!tutor || tutor.role !== UserRole.TUTOR) {
         return res.status(404).json(
           errorResponse('Không tìm thấy gia sư')
@@ -220,26 +223,40 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       }
 
       // Also check for conflicts with existing sessions at the exact same date and time
+      // Include buffer time (30 minutes) between sessions
       const existingSessions = await storage.find<Session>(
         'sessions.json',
-        (s) => s.tutorId === tutorId && !s.classId // Only check non-class-based sessions
+        (s) => s.tutorId === tutorId && 
+               !s.classId && // Only check non-class-based sessions
+               (s.status === SessionStatus.CONFIRMED || s.status === SessionStatus.PENDING) // Only check confirmed/pending sessions
       );
 
       const newSessionStart = new Date(sessionData.startTime);
       const newSessionEnd = new Date(newSessionStart.getTime() + (sessionData.duration || 60) * 60000);
 
+      // Buffer time between sessions (30 minutes)
+      const SESSION_BUFFER_MINUTES = 30;
+
       for (const existingSession of existingSessions) {
         const existingStart = new Date(existingSession.startTime);
         const existingEnd = new Date(existingStart.getTime() + (existingSession.duration || 60) * 60000);
 
-        // Check if sessions overlap (same exact date and overlapping times)
+        // Check if same date
+        if (existingStart.toDateString() !== newSessionStart.toDateString()) {
+          continue;
+        }
+
+        // Apply buffer time: new session must start at least 30 minutes after existing session ends
+        // and must end at least 30 minutes before existing session starts
+        const existingEndWithBuffer = new Date(existingEnd.getTime() + SESSION_BUFFER_MINUTES * 60 * 1000);
+        const existingStartWithBuffer = new Date(existingStart.getTime() - SESSION_BUFFER_MINUTES * 60 * 1000);
+
+        // Check if new session overlaps with existing session (including buffer)
         if (
-          (newSessionStart >= existingStart && newSessionStart < existingEnd) ||
-          (newSessionEnd > existingStart && newSessionEnd <= existingEnd) ||
-          (newSessionStart <= existingStart && newSessionEnd >= existingEnd)
+          (newSessionStart < existingEndWithBuffer && newSessionEnd > existingStartWithBuffer)
         ) {
           return res.status(400).json(
-            errorResponse('Thời gian buổi học đã được đặt bởi buổi học khác. Vui lòng chọn thời gian khác.')
+            errorResponse(`Thời gian buổi học trùng với buổi học khác hoặc không đủ thời gian nghỉ (cần ít nhất ${SESSION_BUFFER_MINUTES} phút giữa các buổi học). Vui lòng chọn thời gian khác.`)
           );
         }
       }
@@ -286,17 +303,36 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       }
     } else {
       // Notify tutor (single notification, no need for batch)
-      const notification: Notification = {
-        id: generateId('notif'),
-        userId: tutorId,
-        type: NotificationType.SESSION_BOOKING,
-        title: 'Yêu cầu buổi học mới',
-        message: `${currentUser.email} đã đặt buổi học ${subject}`,
-        read: false,
-        link: `/sessions/${newSession.id}`,
-        createdAt: now()
-      };
-      await storage.create('notifications.json', notification);
+      // const notification: Notification = {
+      //   id: generateId('notif'),
+      //   userId: tutorId,
+      //   type: NotificationType.SESSION_BOOKING,
+      //   title: 'Yêu cầu buổi học mới',
+      //   message: `${currentUser.email} đã đặt buổi học ${subject}`,
+      //   read: false,
+      //   link: `/sessions/${newSession.id}`,
+      //   createdAt: now()
+      // };
+      // await storage.create('notifications.json', notification);
+
+      const requester = await storage.findById<User>('users.json', currentUser.userId); 
+      const fallbackName = requester?.hcmutId || currentUser.email;
+      const displayName = requester?.name || fallbackName;
+      const type = NotificationType.SESSION_BOOKING;
+      const title = 'Yêu cầu buổi học mới';
+      const message = `${displayName} đã đặt buổi học ${subject}`;
+      const link = `/sessions/${newSession.id}`;
+      await queueNotification(
+      tutorId, // 1. Target: Gửi cho ai (biến 'tutorId' phải được định nghĩa ở trên)
+      {
+      // 2. Payload: Nội dung
+        type: type,
+        title: title,
+        message: message,
+        link: link
+      },
+      5 // 3. Delay: 5 phút
+);
     }
 
     return res.status(201).json(

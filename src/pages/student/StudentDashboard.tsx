@@ -326,7 +326,7 @@ const StudentDashboard: React.FC = () => {
   // Calculate stats from real data
   const totalSessions = sessions.length
   const completedSessions = sessions.filter(s => s.status === 'completed').length
-  const upcomingSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed').length
+  const upcomingSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed' || s.status === 'pending' || s.status === 'rescheduled').length
   const totalClasses = enrollments.length
   
   const stats = [
@@ -339,7 +339,7 @@ const StudentDashboard: React.FC = () => {
   // Filter out class sessions (sessions with classId) - those belong to My Classes section
   const sessionsCourses = sessions
     .filter(session => 
-      (session.status === 'confirmed' || session.status === 'pending') &&
+      (session.status === 'confirmed' || session.status === 'pending' || session.status === 'rescheduled') &&
       !session.classId // Only show individual sessions, not class sessions
     )
     .map(session => {

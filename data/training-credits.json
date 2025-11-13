@@ -1,0 +1,80 @@
+[
+  {
+    "id": "credit_tAuhk9fZZFHD",
+    "studentId": "stu_afp9r8MLsjE8",
+    "sessionId": "ses_MT5AMsE4EBXj",
+    "semester": "2023-2024-2",
+    "credits": 3,
+    "reason": "Tham gia đầy đủ các buổi học trong semester",
+    "awardedBy": "mgmt_1T4fph947Qu6",
+    "awardedAt": "2025-10-10T04:36:31.229Z",
+    "status": "active",
+    "metadata": {
+      "attendanceRate": 85,
+      "performanceScore": 7,
+      "completionRate": 87
+    }
+  },
+  {
+    "id": "credit__4T3sx993iF4",
+    "studentId": "stu_5m0qgd6BvqGz",
+    "sessionId": "ses_FLkoE5PnAgQZ",
+    "semester": "2024-2025-2",
+    "credits": 3,
+    "reason": "Performance tốt trong các sessions",
+    "awardedBy": "mgmt_1T4fph947Qu6",
+    "awardedAt": "2025-11-03T04:44:00.655Z",
+    "status": "active",
+    "metadata": {
+      "attendanceRate": 83,
+      "performanceScore": 7,
+      "completionRate": 93
+    }
+  },
+  {
+    "id": "credit_CUBTIsXopTAH",
+    "studentId": "stu_Z2bUHkAmmkQH",
+    "semester": "2023-2024-2",
+    "credits": 1,
+    "reason": "Đạt yêu cầu về số lượng sessions completed",
+    "awardedBy": "mgmt_lkN2DSFEv5dI",
+    "awardedAt": "2025-11-08T10:28:47.432Z",
+    "status": "active",
+    "metadata": {
+      "attendanceRate": 92,
+      "performanceScore": 7,
+      "completionRate": 92
+    }
+  },
+  {
+    "id": "credit_ymyEHKsXEq4s",
+    "studentId": "stu_dOHu6givateo",
+    "sessionId": "ses_5GXmgRsVV1Tk",
+    "semester": "2024-2025-1",
+    "credits": 1,
+    "reason": "Đạt yêu cầu về số lượng sessions completed",
+    "awardedBy": "mgmt_qLukzSvoJWcO",
+    "awardedAt": "2025-10-21T19:51:46.131Z",
+    "status": "active",
+    "metadata": {
+      "attendanceRate": 94,
+      "performanceScore": 8,
+      "completionRate": 96
+    }
+  },
+  {
+    "id": "credit_3wJkzOgpXuXm",
+    "studentId": "stu_sP3IPBS2iler",
+    "semester": "2024-2025-1",
+    "credits": 1,
+    "reason": "Đạt yêu cầu về số lượng sessions completed",
+    "awardedBy": "mgmt_lkN2DSFEv5dI",
+    "awardedAt": "2025-10-25T18:22:18.797Z",
+    "status": "active",
+    "metadata": {
+      "attendanceRate": 95,
+      "performanceScore": 8,
+      "completionRate": 91
+    }
+  }
+]

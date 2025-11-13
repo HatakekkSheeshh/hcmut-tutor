@@ -1,159 +1,306 @@
 # HCMUT Learning Management System
 
-Hệ thống quản lý học tập trực tuyến toàn diện với giao diện hiện đại, được xây dựng bằng React + Vite + TypeScript, tích hợp Material-UI và Tailwind CSS.
+A comprehensive online learning management system with modern interface, built with React + Vite + TypeScript, integrated with Material-UI and Tailwind CSS. The system has been developed to near completion with full features for Students, Tutors, and Management roles.
 
-## 🚀 Tính năng chính
+## Overview
 
-### 👨‍🎓 Cho Student (Học sinh):
-- **Dashboard**: Tổng quan về tiến độ học tập, lịch sử buổi học, thống kê cá nhân
-- **Search Tutors**: Tìm kiếm và lọc gia sư theo môn học, đánh giá, thời gian
-- **Book Session**: Đặt lịch học với gia sư qua wizard step-by-step
-- **Session Detail**: Chi tiết buổi học, tham gia video call, tài liệu
-- **Evaluate Session**: Đánh giá và phản hồi sau buổi học
-- **View Progress**: Theo dõi tiến độ học tập, mục tiêu, thành tích
-- **AI Chatbot**: Hỗ trợ học tập bằng AI chatbot thông minh
+The HCMUT Learning Management System is a full-stack web application designed to facilitate online tutoring and learning management. It provides separate interfaces for students, tutors, and administrative staff, with real-time communication capabilities, comprehensive session management, and advanced administrative features.
 
-### 👨‍🏫 Cho Tutor (Gia sư):
-- **Dashboard**: Tổng quan về học sinh, lịch dạy, thu nhập, thống kê
-- **Set Availability**: Quản lý lịch rảnh, thời gian dạy, lịch tái diễn
-- **Manage Sessions**: Quản lý buổi học, chỉnh sửa thông tin, xem chi tiết
-- **Handle Cancel/Reschedule**: Xử lý yêu cầu hủy/đổi lịch từ học sinh
-- **Track Student Progress**: Theo dõi tiến độ học sinh chi tiết, điểm mạnh/yếu
+## Core Features
 
-### 🏢 Cho Management (Quản lý):
-- **Management Dashboard**: Tổng quan hệ thống, thống kê toàn diện, cảnh báo
-- **Approval Requests**: Phê duyệt yêu cầu từ học sinh và gia sư
-- **Reports & Analytics**: Báo cáo và phân tích dữ liệu chi tiết
-- **Award Training Credits**: Quản lý và trao điểm rèn luyện
+### Student Features
 
-### 🌐 Common Screens (Màn hình chung):
-- **Login**: Xác thực SSO, đăng nhập bằng email hoặc nhà cung cấp bên thứ 3
-- **Profile Management**: Quản lý thông tin cá nhân, học vấn, sở thích
-- **Digital Library Access**: Truy cập thư viện số, tài liệu học tập
-- **Online Community Forum**: Diễn đàn cộng đồng, chia sẻ kiến thức
-- **Notifications Center**: Trung tâm thông báo, quản lý alerts
+- **Dashboard**: Overview of learning progress, session history, personal statistics, and weather widget
+- **Search Tutors**: Advanced search and filtering of tutors by subject, rating, availability, and time slots
+- **Book Session**: Schedule learning sessions with tutors through a step-by-step wizard (supports individual and group sessions)
+- **Session Detail**: Detailed session information including course materials, assignments, quizzes, and grades
+- **Evaluate Session**: Post-session evaluation and feedback with comprehensive rating system
+- **View Progress**: Track learning progress, goals, and achievements with detailed analytics
+- **AI Chatbot**: Intelligent AI chatbot for learning support
+- **Messages**: Real-time chat with tutors and other students using WebSocket technology
+- **Calendar**: Personal learning calendar with calendar view
+- **Sessions List**: Complete list of all sessions with advanced filtering and search capabilities
 
-## 🛠️ Công nghệ sử dụng
+### Tutor Features
 
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite (tốc độ build nhanh)
+- **Dashboard**: Overview of students, teaching schedule, earnings, and statistics
+- **Set Availability**: Manage free time slots, teaching hours, and recurring schedules
+- **Manage Sessions**: Comprehensive session management including editing information and viewing details
+- **Tutor Session Detail**: Detailed session view with course contents, quizzes, and assignments
+- **Handle Cancel/Reschedule**: Process cancellation and rescheduling requests from students
+- **Track Student Progress**: Detailed tracking of student progress, strengths, and weaknesses
+- **Messages**: Real-time chat with students using WebSocket technology
+- **Calendar**: Teaching schedule calendar view
+- **Tutor LMS**: Course content management, quiz creation, and assignment management
+- **Quiz Results View**: View and analyze student quiz results
+- **Assignment Submissions View**: Review and grade student assignment submissions
+
+### Management Features
+
+- **Management Dashboard**: System overview, comprehensive statistics, and alerts
+- **Approval Requests**: Approve requests from students and tutors (session changes, resource allocation, content moderation)
+- **Reports & Analytics**: Detailed data reports and analytics with performance analysis
+- **Award Training Credits**: Manage and award training credits to students
+- **User Management**: Comprehensive user management for students, tutors, and management staff
+- **Resource Allocation**: Optimize resource allocation (rooms, equipment) with automated optimization
+- **Permissions Management**: Manage user access permissions and roles
+- **Document Management**: Manage documents and sharing capabilities
+- **Community Management**: Manage forum, events, and community resources
+
+### Common Features
+
+- **Login/Register**: JWT-based authentication with email registration and login
+- **Profile Management**: Manage personal information, academic details, interests, and avatar
+- **Digital Library Access**: Access digital library, learning materials, and search resources
+- **Online Community Forum**: Community forum for knowledge sharing with posts and comments
+- **Notifications Center**: Notification center with queue-based system (5-minute delay) for managing alerts
+
+## Technology Stack
+
+### Frontend
+
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite 4.5.0 (fast build performance)
 - **UI Libraries**: 
   - Material-UI (MUI) v7.2.0 - Icons, Components, Form controls
-  - Tailwind CSS - Styling và responsive design
-- **Routing**: React Router DOM v6
-- **State Management**: React Context + Hooks
-- **Theme**: Custom ThemeContext với Dark/Light mode
+  - Tailwind CSS 3.3.5 - Styling and responsive design
+- **Routing**: React Router DOM v6.20.1
+- **State Management**: React Context API with Hooks
+- **Theme**: Custom ThemeContext with Dark/Light mode support
 - **Icons**: Material-UI Icons (@mui/icons-material)
+- **Date Handling**: date-fns v4.1.0
+- **Animations**: GSAP v3.13.0 with @gsap/react
+- **Charts**: @mui/x-charts v8.14.0
+- **Date Pickers**: @mui/x-date-pickers v8.14.1
+- **Emoji Picker**: emoji-picker-react v4.15.0
+- **Real-time Communication**: Socket.IO Client v4.7.5
 
-## 📁 Cấu trúc thư mục
+### Backend
+
+- **Runtime**: Node.js with TypeScript (tsx)
+- **Framework**: Express v5.1.0
+- **Authentication**: JWT (jsonwebtoken v9.0.2)
+- **Password Hashing**: bcryptjs v3.0.2
+- **Storage**: JSON file-based storage system
+- **Real-time Communication**: Socket.IO Server v4.7.5
+- **CORS**: cors v2.8.5
+- **Validation**: zod v4.1.12
+
+### Infrastructure
+
+- **Frontend Hosting**: Vercel (Serverless Functions)
+- **WebSocket Server**: Railway/Render (separate server deployment)
+- **File Storage**: Vercel Blob Storage (@vercel/blob v2.0.0)
+
+## Project Structure
 
 ```
-src/
-├── components/
-│   └── ui/                     # UI components tái sử dụng
-│       ├── Button.tsx          # Button component
-│       ├── Card.tsx            # Card component
-│       ├── Input.tsx           # Input component
-│       ├── Avatar.tsx          # Avatar component
-│       ├── Modal.tsx           # Modal component
-│       ├── Table.tsx           # Table component
-│       └── Sidebar.tsx         # Sidebar component
-├── contexts/
-│   └── ThemeContext.tsx        # Quản lý theme light/dark
-├── pages/
-│   ├── student/                # Trang cho học sinh (7 trang)
-│   │   ├── StudentDashboard.tsx
-│   │   ├── SearchTutors.tsx
-│   │   ├── BookSession.tsx
-│   │   ├── SessionDetail.tsx
-│   │   ├── EvaluateSession.tsx
-│   │   ├── ViewProgress.tsx
-│   │   └── ChatbotSupport.tsx
-│   ├── tutor/                  # Trang cho gia sư (5 trang)
-│   │   ├── TutorDashboard.tsx
-│   │   ├── SetAvailability.tsx
-│   │   ├── ManageSessions.tsx
-│   │   ├── HandleCancelReschedule.tsx
-│   │   └── TrackStudentProgress.tsx
-│   ├── management/              # Trang quản lý (4 trang)
-│   │   ├── ManagementDashboard.tsx
-│   │   ├── ApprovalRequests.tsx
-│   │   ├── ReportsAnalytics.tsx
-│   │   └── AwardCredits.tsx
-│   └── common/                 # Màn hình chung (5 trang)
-│       ├── Login.tsx
-│       ├── ProfileManagement.tsx
-│       ├── DigitalLibraryAccess.tsx
-│       ├── OnlineCommunityForum.tsx
-│       └── NotificationsCenter.tsx
-├── App.tsx                     # Main app component với routing
-├── main.tsx                    # Entry point
-└── index.css                   # Global styles với Tailwind
+├── src/                          # Frontend source code
+│   ├── components/
+│   │   ├── ui/                   # Reusable UI components
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── Input.tsx
+│   │   │   └── ...
+│   │   ├── EmojiPicker.tsx       # Emoji picker component
+│   │   └── DeviceDetector.tsx    # Device detection
+│   ├── contexts/
+│   │   └── ThemeContext.tsx      # Theme management
+│   ├── hooks/
+│   │   ├── useLongPolling.ts     # Real-time chat hook
+│   │   └── useOnlineStatus.ts    # Online status tracking
+│   ├── lib/
+│   │   └── api.ts                 # API client
+│   ├── pages/
+│   │   ├── student/              # Student pages (10+ pages)
+│   │   ├── tutor/                # Tutor pages (10+ pages)
+│   │   ├── management/           # Management pages (8+ pages)
+│   │   └── common/               # Common pages (6 pages)
+│   ├── App.tsx                   # Main app with routing
+│   ├── main.tsx                  # Entry point
+│   └── env.ts                    # Environment configuration
+├── routes/                       # Backend API routes
+│   ├── auth/                     # Authentication APIs
+│   ├── users/                    # User management APIs
+│   ├── sessions/                 # Session APIs
+│   ├── conversations/            # Chat/Messages APIs
+│   ├── notifications/            # Notification APIs
+│   ├── forum/                    # Forum APIs
+│   ├── library/                  # Library APIs
+│   ├── management/               # Management APIs
+│   └── ...
+├── lib/                          # Backend libraries
+│   ├── storage.ts                # JSON file storage
+│   ├── middleware.ts             # Authentication middleware
+│   ├── notification.ts           # Notification creation
+│   ├── services/
+│   │   ├── notificationQueue.ts  # Notification queue service
+│   │   └── resourceOptimizer.ts  # Resource optimization
+│   └── cron/
+│       └── notificationCron.ts  # Cron job processor
+├── ws-server/                    # WebSocket server
+│   └── index.ts                  # Socket.IO server implementation
+├── data/                         # JSON data files
+│   ├── users.json
+│   ├── sessions.json
+│   ├── conversations.json
+│   ├── messages.json
+│   ├── notifications.json
+│   └── notification_queue.json
+├── docs/                         # Documentation
+│   ├── NOTIFICATIONS_SYSTEM.md   # Notification system documentation
+│   ├── WEBSOCKET_SETUP.md        # WebSocket setup guide
+│   ├── API_DOCS.md               # API reference
+│   ├── BACKEND_README.md         # Backend architecture
+│   └── ...
+├── server.ts                     # Express API server
+└── package.json
 ```
 
-## 🎨 Design System
+## Design System
 
-### UI/UX Pattern
-- **3-Column Layout**: Sidebar + Main Content + Right Panel (desktop)
-- **Mobile-First**: Responsive design với mobile drawer
-- **Consistent Navigation**: Sidebar navigation với quick actions
-- **Dark/Light Theme**: Toggle theme với persistent preference
+### UI/UX Patterns
+
+- **Three-Column Layout**: Sidebar + Main Content + Right Panel (desktop view)
+- **Mobile-First Approach**: Responsive design with mobile drawer navigation
+- **Consistent Navigation**: Sidebar navigation with quick action buttons
+- **Dark/Light Theme**: Theme toggle with persistent user preference
+- **Real-time Updates**: WebSocket integration for chat and online status
 
 ### Component Architecture
-- **Reusable UI Components**: Button, Card, Input, Modal, Table
-- **Theme Integration**: Consistent styling với Tailwind CSS
-- **Responsive Design**: Mobile drawer, adaptive layouts
-- **Accessibility**: Keyboard navigation, screen reader support
 
-## 🚀 Cài đặt và chạy
+- **Reusable UI Components**: Button, Card, Input, Modal, Table components
+- **Theme Integration**: Consistent styling with Tailwind CSS
+- **Responsive Design**: Mobile drawer, adaptive layouts for all screen sizes
+- **Accessibility**: Keyboard navigation and screen reader support
+- **Emoji Picker**: Production-ready emoji picker component (Messenger/Discord style)
 
-1. **Cài đặt dependencies:**
+## Installation and Setup
+
+### Prerequisites
+
+- Node.js 18 or higher
+- npm or yarn package manager
+
+### Installation Steps
+
+1. **Clone repository and install dependencies:**
 ```bash
+git clone <repository-url>
+cd v1
 npm install
 ```
 
-2. **Chạy development server:**
+2. **Configure environment variables:**
+Create a `.env` file in the root directory:
+```env
+# JWT Secret
+JWT_SECRET=your-secret-key-here
+
+# Frontend URL (for CORS)
+FRONTEND_URL=http://localhost:5173
+
+# WebSocket Server URL (for production)
+VITE_WEBSOCKET_URL=wss://your-ws-server.railway.app
+```
+
+3. **Start development servers:**
+
+**Terminal 1 - Frontend (Vite):**
 ```bash
 npm run dev
 ```
+Frontend will be available at: `http://localhost:5173`
 
-3. **Build cho production:**
+**Terminal 2 - Backend API (Express):**
 ```bash
-npm run build
+npm run dev:api
+# or
+npm run api
+```
+API server will be available at: `http://localhost:3000`
+
+**Terminal 3 - WebSocket Server (Socket.IO):**
+```bash
+npm run dev:ws
+# or
+npm run ws
+```
+WebSocket server will be available at: `http://localhost:3001`
+
+### Development Scripts
+
+```bash
+# Frontend
+npm run dev              # Start Vite development server
+npm run build            # Build for production
+npm run preview          # Preview production build
+
+# Backend
+npm run api              # Start API server
+npm run dev:api          # Start API server with watch mode
+npm run ws               # Start WebSocket server
+npm run dev:ws           # Start WebSocket server with watch mode
+
+# Database
+npm run seed             # Seed initial data
+npm run seed:clean       # Clean and reseed data
+npm run validate         # Validate data integrity
+npm run stats            # Generate data statistics
+
+# Testing
+npm run test:api         # Test API endpoints
+npm run test:management # Test management APIs
 ```
 
-4. **Preview production build:**
-```bash
-npm run preview
-```
+## Key Features
 
-## 🎯 Tính năng nổi bật
+### Modern UI/UX
 
-### 🎨 Modern UI/UX
-- **Consistent Design**: Tất cả trang đều có cùng UI/UX pattern
-- **HCMUT Branding**: Logo HCMUT thống nhất trên tất cả trang
-- **Professional Look**: Giao diện chuyên nghiệp, hiện đại
-- **Intuitive Navigation**: Điều hướng trực quan, dễ sử dụng
+- **Consistent Design**: All pages follow the same UI/UX pattern
+- **HCMUT Branding**: Unified HCMUT logo across all pages
+- **Professional Appearance**: Professional and modern interface design
+- **Intuitive Navigation**: User-friendly navigation system
+- **Emoji Picker**: Production-ready emoji picker similar to Messenger/Discord
 
-### 📱 Responsive Design
-- **Mobile-First**: Thiết kế ưu tiên mobile
-- **Adaptive Layouts**: Tự động điều chỉnh cho mọi thiết bị
-- **Touch-Friendly**: Tối ưu cho cảm ứng
-- **Mobile Drawer**: Navigation drawer cho mobile
+### Responsive Design
 
-### 🌙 Dark Mode Support
-- **Theme Toggle**: Chuyển đổi light/dark theme
-- **Persistent Preference**: Lưu lựa chọn theme
-- **Smooth Transitions**: Chuyển đổi mượt mà
-- **Consistent Styling**: Styling nhất quán cho cả 2 theme
+- **Mobile-First**: Mobile-optimized design approach
+- **Adaptive Layouts**: Automatic adjustment for all device sizes
+- **Touch-Friendly**: Optimized for touch interactions
+- **Mobile Drawer**: Navigation drawer for mobile devices
+- **Mobile Versions**: All pages have dedicated mobile versions
 
-### ⚡ Performance
-- **Fast Build**: Vite build tool nhanh
-- **Optimized Bundle**: Kích thước bundle tối ưu
-- **Lazy Loading**: Tải component khi cần
-- **Code Splitting**: Chia nhỏ code theo route
+### Dark Mode Support
 
-## 🎨 Color Palette & Theming
+- **Theme Toggle**: Seamless light/dark theme switching
+- **Persistent Preference**: Theme preference saved in localStorage
+- **Smooth Transitions**: Smooth theme transition animations
+- **Consistent Styling**: Consistent styling across both themes
+
+### Performance Optimization
+
+- **Fast Build**: Vite build tool for rapid development
+- **Optimized Bundle**: Optimized bundle size
+- **Lazy Loading**: Component lazy loading when needed
+- **Code Splitting**: Route-based code splitting
+
+### Real-time Features
+
+- **WebSocket Chat**: Real-time messaging with Socket.IO
+- **Online Status**: Track online/offline status of users
+- **Message Synchronization**: Synchronized messages between frontend and backend
+- **Room-based Messaging**: Conversation-based room management
+
+### Notification System
+
+- **Queue-based**: Delay notifications with queue system (5-minute default delay)
+- **Cron Job**: Automatic notification processing every 1 minute
+- **Multiple Types**: 12+ different notification types
+- **Batch Notifications**: Support for sending to multiple users simultaneously
+- **Pagination**: Pagination and filtering support
+
+## Color Palette and Theming
 
 ### Light Theme
 - **Primary**: Blue (#3B82F6)
@@ -173,15 +320,17 @@ npm run preview
 - **Background**: Gray-900 (#111827)
 - **Text**: White (#FFFFFF)
 
-## 📊 System Overview
+## System Architecture
 
-### User Roles & Permissions
-- **Student**: 7 trang chức năng học tập
-- **Tutor**: 5 trang quản lý dạy học
-- **Management**: 4 trang quản lý hệ thống
-- **Common**: 5 trang dùng chung cho tất cả roles
+### User Roles and Permissions
+
+- **Student**: 10+ pages for learning functionality
+- **Tutor**: 10+ pages for teaching management
+- **Management**: 8+ pages for system administration
+- **Common**: 6 pages shared across all roles
 
 ### Navigation Structure
+
 ```
 /student/*          # Student pages
 /tutor/*            # Tutor pages  
@@ -189,132 +338,269 @@ npm run preview
 /common/*           # Common screens
 ```
 
-### Key Features by Role
+### Backend API Structure
 
-#### Student Features
-- Dashboard với thống kê cá nhân
-- Tìm kiếm gia sư nâng cao
-- Booking session với wizard
-- AI chatbot hỗ trợ học tập
-- Theo dõi tiến độ chi tiết
-
-#### Tutor Features
-- Dashboard quản lý học sinh
-- Quản lý lịch dạy linh hoạt
-- Theo dõi tiến độ học sinh
-- Xử lý yêu cầu hủy/đổi lịch
-
-#### Management Features
-- Dashboard tổng quan hệ thống
-- Phê duyệt yêu cầu
-- Báo cáo và phân tích
-- Quản lý điểm rèn luyện
-
-## 🔧 Customization
-
-### Theme Configuration
-```typescript
-// src/contexts/ThemeContext.tsx
-const theme = {
-  light: {
-    background: 'bg-gray-50',
-    text: 'text-gray-900',
-    // ... other light theme configs
-  },
-  dark: {
-    background: 'bg-gray-900', 
-    text: 'text-white',
-    // ... other dark theme configs
-  }
-}
+```
+/api/auth/*                    # Authentication endpoints
+/api/users/*                   # User management endpoints
+/api/sessions/*                # Session management endpoints
+/api/conversations/*           # Chat/Messages endpoints
+/api/notifications/*           # Notification endpoints
+/api/forum/*                   # Forum endpoints
+/api/library/*                 # Digital library endpoints
+/api/management/*              # Management API endpoints
+/api/classes/*                 # Class management endpoints
+/api/enrollments/*             # Enrollment management endpoints
+/api/session-requests/*        # Session request endpoints
+/api/progress/*                # Progress tracking endpoints
+/api/evaluations/*             # Evaluation endpoints
+/api/availability/*            # Availability management endpoints
+/api/rooms/*                   # Room management endpoints
 ```
 
-### Component Styling
-```typescript
-// Sử dụng Tailwind classes
-<div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
-  <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-    Title
-  </h1>
-</div>
-```
+## Backend Architecture
 
-## 📱 Mobile Support
+### API Server (Express)
 
-- **Responsive Breakpoints**: sm, md, lg, xl
-- **Touch Gestures**: Swipe, tap, pinch
-- **Mobile-Optimized**: Components tối ưu cho mobile
-- **Progressive Web App**: Sẵn sàng cho PWA
+- **Port**: 3000 (development environment)
+- **Authentication**: JWT-based authentication system
+- **Storage**: JSON file-based storage (can be migrated to database)
+- **CORS**: Enabled for frontend communication
+- **Middleware**: Authentication, Authorization, and Validation middleware
 
-## 🔮 Future Enhancements
+### WebSocket Server (Socket.IO)
 
-- [ ] Real-time notifications với WebSocket
+- **Port**: 3001 (development environment)
+- **Purpose**: Real-time chat and online status tracking
+- **Authentication**: JWT token in handshake
+- **Features**: 
+  - Room-based messaging system
+  - Online user tracking
+  - Message broadcasting
+  - Comprehensive error handling
+
+### Notification System
+
+- **Queue-based**: 5-minute delay (configurable)
+- **Cron Job**: Runs every 1 minute to process queue
+- **Storage**: 
+  - `notifications.json` - Created notifications
+  - `notification_queue.json` - Pending jobs awaiting processing
+- **Types**: 12+ different notification types
+
+## Documentation
+
+Detailed documentation is available in the `docs/` directory:
+
+- **NOTIFICATIONS_SYSTEM.md** - Complete notification system documentation
+- **WEBSOCKET_SETUP.md** - WebSocket server setup guide
+- **API_DOCS.md** - Complete API reference
+- **BACKEND_README.md** - Backend architecture and setup guide
+- **CLASS_ENROLLMENT_API_DOCS.md** - Class and Enrollment API documentation
+- **DEPLOYMENT.md** - Deployment guide for Vercel
+- **FLOW_DOCUMENTATION.md** - System flow and architecture documentation
+- **HUONG_DAN_SU_DUNG.md** - User guide
+- **QUICK_REFERENCE.md** - Quick reference guide
+- **SCHEMAS_REFERENCE.md** - Data schemas reference
+- **TYPES_REFERENCE.md** - TypeScript types reference
+- **APPROVAL_REQUESTS_SUMMARY.md** - Approval system documentation
+- **SESSION_CHANGE_APPROVAL.md** - Session change workflow documentation
+
+## Deployment
+
+### Frontend Deployment (Vercel)
+
+1. Connect GitHub repository to Vercel
+2. Build command: `npm run build`
+3. Output directory: `dist`
+4. Configure environment variables: `VITE_WEBSOCKET_URL`
+
+### Backend API Deployment (Vercel Serverless)
+
+- Deploy as Vercel Serverless Functions
+- API routes automatically exposed at `/api/*`
+
+### WebSocket Server Deployment (Railway/Render)
+
+- Deploy separately as Vercel does not support persistent WebSocket connections
+- See detailed instructions in `docs/WEBSOCKET_SETUP.md`
+
+## Completed Features
+
+### Core Features
+
+- [x] Authentication and Authorization (JWT)
+- [x] User Management (CRUD operations)
+- [x] Session Management (Individual and Group sessions)
+- [x] Class and Enrollment System
+- [x] Real-time Chat (WebSocket)
+- [x] Notification System (Queue-based)
+- [x] Forum System
+- [x] Digital Library
+- [x] Progress Tracking
+- [x] Evaluation System
+- [x] Approval Workflow
+- [x] Resource Allocation
+- [x] Analytics and Reports
+- [x] Training Credits Management
+
+### UI/UX Features
+
+- [x] Dark/Light Theme
+- [x] Responsive Design (Mobile and Desktop)
+- [x] Emoji Picker (Production-ready)
+- [x] Real-time Online Status
+- [x] File Upload (Vercel Blob)
+- [x] Calendar View
+- [x] Search and Filter
+- [x] Pagination
+- [x] Loading States
+- [x] Error Handling
+
+### Advanced Features
+
+- [x] Session Requests (Cancel/Reschedule)
+- [x] Approval Requests (Multi-level approval system)
+- [x] Resource Optimization
+- [x] Performance Analytics
+- [x] Document Management
+- [x] Community Management
+- [x] Permission Management
+- [x] Batch Operations
+
+## Future Enhancements
+
 - [ ] Video call integration (WebRTC)
 - [ ] Payment processing (Stripe/PayPal)
-- [ ] Advanced analytics với charts
-- [ ] Mobile app (React Native)
-- [ ] Multi-language support (i18n)
-- [ ] AI-powered recommendations
-- [ ] Advanced search với Elasticsearch
+- [ ] Push notifications (FCM, APNS)
+- [ ] Email notifications
+- [ ] Advanced search with Elasticsearch
 - [ ] Real-time collaboration tools
+- [ ] Mobile app (React Native)
+- [ ] Multi-language support (i18n) - i18next already integrated
+- [ ] AI-powered recommendations
 - [ ] Advanced reporting dashboard
+- [ ] Database migration (PostgreSQL/MongoDB)
+- [ ] Caching layer (Redis)
+- [ ] Rate limiting
+- [ ] API versioning
 
-## 🏗️ Architecture Decisions
+## Architecture Decisions
 
-### Why React + TypeScript?
-- **Type Safety**: Phát hiện lỗi compile-time
-- **Developer Experience**: IntelliSense, auto-completion
-- **Maintainability**: Code dễ bảo trì và mở rộng
-- **Performance**: Virtual DOM, optimized rendering
+### React and TypeScript
 
-### Why Vite?
-- **Fast Development**: Hot reload nhanh
-- **Modern Build**: ES modules, native ESM
-- **Optimized Production**: Tree shaking, code splitting
-- **Developer Experience**: Simple config, fast builds
+- **Type Safety**: Compile-time error detection
+- **Developer Experience**: IntelliSense and auto-completion
+- **Maintainability**: Easy to maintain and extend
+- **Performance**: Virtual DOM with optimized rendering
 
-### Why Tailwind CSS?
-- **Utility-First**: Styling nhanh và consistent
+### Vite Build Tool
+
+- **Fast Development**: Rapid hot module replacement
+- **Modern Build**: ES modules and native ESM support
+- **Optimized Production**: Tree shaking and code splitting
+- **Developer Experience**: Simple configuration and fast builds
+
+### Tailwind CSS
+
+- **Utility-First**: Fast and consistent styling approach
 - **Responsive**: Built-in responsive utilities
 - **Dark Mode**: Native dark mode support
-- **Performance**: Purged CSS, small bundle size
+- **Performance**: Purged CSS with small bundle size
 
-## 📚 Documentation
+### JSON File Storage
 
-Chi tiết các document được lưu trong thư mục `docs/` (không bao gồm trong repository):
-- `API_DOCS.md` - API Reference
-- `BACKEND_README.md` - Backend Architecture & Setup
-- `CLASS_ENROLLMENT_API_DOCS.md` - Class & Enrollment APIs
-- `DEPLOYMENT.md` - Deployment Guide (Vercel)
-- `FLOW_DOCUMENTATION.md` - System Flow & Architecture
-- `HUONG_DAN_SU_DUNG.md` - User Guide
-- `QUICK_REFERENCE.md` - Quick Reference
-- `SCHEMAS_REFERENCE.md` - Data Schemas
-- `TYPES_REFERENCE.md` - TypeScript Types
+- **Simplicity**: Easy setup and development
+- **No Database Required**: No database setup needed
+- **Portable**: Easy backup and migration
+- **Note**: Can be migrated to database when scaling
 
-## 📄 License
+### Separate WebSocket Server
 
-MIT License - Xem file LICENSE để biết thêm chi tiết.
+- **Vercel Limitation**: Vercel does not support persistent WebSocket connections
+- **Scalability**: WebSocket server can scale independently
+- **Flexibility**: Can be deployed on Railway/Render/Heroku
 
-## 🤝 Contributing
+## Quick Start Guide
 
-1. Fork repository
-2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
+### Development Setup
 
-## 📞 Support
+1. **Install dependencies:**
+```bash
+npm install
+```
 
-Nếu có vấn đề hoặc câu hỏi, vui lòng tạo issue trên GitHub repository.
+2. **Start all servers (3 terminals required):**
 
-## 🎉 Acknowledgments
+**Terminal 1 - Frontend:**
+```bash
+npm run dev
+```
 
-- Material-UI team cho component library tuyệt vời
-- Tailwind CSS team cho utility-first CSS framework
-- React team cho framework mạnh mẽ
-- Vite team cho build tool nhanh
+**Terminal 2 - Backend API:**
+```bash
+npm run dev:api
+```
+
+**Terminal 3 - WebSocket Server:**
+```bash
+npm run dev:ws
+```
+
+### Seed Data
+
+```bash
+# Seed initial data
+npm run seed
+
+# Clean and reseed
+npm run seed:clean
+```
+
+### Access Points
+
+- Frontend: http://localhost:5173
+- API Server: http://localhost:3000/api
+- WebSocket Server: ws://localhost:3001
+- Health Check: http://localhost:3001/health
+
+### Default Credentials
+
+Refer to `lib/seed.ts` or `data/users.json` for default user credentials.
+
+## Support
+
+For issues or questions:
+
+1. Check documentation in the `docs/` directory
+2. Create an issue on the GitHub repository
+3. Review logs in console (browser and server)
+
+## Acknowledgments
+
+- Material-UI team for the excellent component library
+- Tailwind CSS team for the utility-first CSS framework
+- React team for the powerful framework
+- Vite team for the fast build tool
+- Socket.IO team for real-time communication capabilities
+- Emoji Picker React team for the emoji picker component
+
+## License
+
+MIT License - See LICENSE file for details.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
-**HCMUT Learning Management System** - Hệ thống quản lý học tập trực tuyến hiện đại và toàn diện! 🚀
+**HCMUT Learning Management System** - A modern and comprehensive online learning management system.
+
+**Version**: 1.0  
+**Status**: Near Completion - Production Ready  
+**Last Updated**: January 2024

@@ -1,0 +1,10 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "npm run ws"
+restartPolicyType = "ON_FAILURE"
+
+[env]
+PORT = "3001"
+

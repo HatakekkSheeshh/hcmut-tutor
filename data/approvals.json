@@ -1,24 +1,302 @@
 [
   {
-    "id": "req_3BC-hnwQq-1G",
+    "id": "req_a1SeRoSo0lC1",
     "type": "tutor_verification",
-    "requesterId": "tut_NrIX8Wa7MS0G",
-    "targetId": "tut_NrIX8Wa7MS0G",
+    "requesterId": "tut_L9x4RXK42EtB",
+    "targetId": "tut_L9x4RXK42EtB",
     "title": "Yêu cầu xác thực Tutor",
-    "description": "Tutor Hoàng Nam Hoàng yêu cầu xác thực tài khoản",
-    "status": "rejected",
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
+    "description": "Tutor Đặng Nam Minh yêu cầu xác thực tài khoản với các credentials: Thạc sĩ Cơ sở dữ liệu",
+    "status": "approved",
+    "priority": "high",
+    "deadline": "2025-11-12T08:08:35.205Z",
+    "reviewerId": "mgmt_qLukzSvoJWcO",
+    "createdAt": "2025-11-10T08:08:35.205Z",
+    "updatedAt": "2025-11-11T14:12:04.441Z"
   },
   {
-    "id": "req_Pp4GjurX7K-P",
-    "type": "tutor_verification",
-    "requesterId": "tut_88EyEpAvElqJ",
-    "targetId": "tut_88EyEpAvElqJ",
-    "title": "Yêu cầu xác thực Tutor",
-    "description": "Tutor Hoàng Giang Hữu yêu cầu xác thực tài khoản",
+    "id": "req_uVNmTDALL7oL",
+    "type": "session_change",
+    "requesterId": "stu_FaawsvPS_Mp3",
+    "targetId": "ses_2UT4HUvF2xj6",
+    "title": "Yêu cầu thay đổi session Vật lý đại cương",
+    "description": "Yêu cầu thay đổi lịch học cho session Vật lý đại cương vào 10/11/2025",
+    "status": "pending",
+    "priority": "high",
+    "deadline": "2025-11-11T16:41:19.644Z",
+    "createdAt": "2025-11-09T16:41:19.644Z",
+    "updatedAt": "2025-11-11T14:12:04.441Z"
+  },
+  {
+    "id": "approval_8Ow18-iIFXE-",
+    "type": "resource_allocation",
+    "requesterId": "mgmt_1T4fph947Qu6",
+    "targetId": "ses_pfu8KrHZFBiM",
+    "title": "Yêu cầu phân bổ lại tài nguyên",
+    "description": "Yêu cầu phân bổ lại tài nguyên để tối ưu hóa hiệu quả hoạt động. Bao gồm 2 thay đổi.",
+    "status": "approved",
+    "priority": "medium",
+    "deadline": "2025-11-07T09:32:14.766Z",
+    "resourceAllocationData": {
+      "changes": [
+        {
+          "type": "reassign_tutor",
+          "resourceId": "ses_pfu8KrHZFBiM",
+          "fromValue": "tut_61QAuOdQbyZS",
+          "toValue": "tut_6copkRNEBLGs",
+          "reason": "Cân bằng workload giữa các tutors"
+        },
+        {
+          "type": "adjust_group_size",
+          "resourceId": "ses_J9gTt4Rp1-Y7",
+          "fromValue": [
+            "stu_sP3IPBS2iler"
+          ],
+          "toValue": [
+            "stu_sP3IPBS2iler"
+          ],
+          "reason": "Giảm kích thước nhóm để tăng chất lượng học tập"
+        }
+      ],
+      "affectedTutorIds": [
+        "tut_61QAuOdQbyZS",
+        "tut_6copkRNEBLGs",
+        [
+          "stu_sP3IPBS2iler"
+        ],
+        [
+          "stu_sP3IPBS2iler"
+        ]
+      ],
+      "affectedSessionIds": [
+        "ses_pfu8KrHZFBiM",
+        "ses_J9gTt4Rp1-Y7"
+      ],
+      "affectedStudentIds": [
+        "stu_h8gj9_8-bjIL",
+        "stu_sP3IPBS2iler"
+      ]
+    },
+    "reviewerId": "mgmt_18QNI2lAxnAD",
+    "createdAt": "2025-11-05T09:32:14.766Z",
+    "updatedAt": "2025-11-11T14:12:04.441Z"
+  },
+  {
+    "id": "approval_LmIWiDMz6sGc",
+    "type": "resource_allocation",
+    "requesterId": "mgmt_lkN2DSFEv5dI",
+    "targetId": "ses_pfu8KrHZFBiM",
+    "title": "Yêu cầu phân bổ lại tài nguyên",
+    "description": "Yêu cầu phân bổ lại tài nguyên để tối ưu hóa hiệu quả hoạt động. Bao gồm 2 thay đổi.",
     "status": "rejected",
-    "createdAt": "2025-11-06T07:51:29.225Z",
-    "updatedAt": "2025-11-06T07:51:29.225Z"
+    "priority": "low",
+    "deadline": "2025-11-11T14:24:41.895Z",
+    "resourceAllocationData": {
+      "changes": [
+        {
+          "type": "reassign_tutor",
+          "resourceId": "ses_pfu8KrHZFBiM",
+          "fromValue": "tut_61QAuOdQbyZS",
+          "toValue": "tut_6copkRNEBLGs",
+          "reason": "Cân bằng workload giữa các tutors"
+        },
+        {
+          "type": "adjust_group_size",
+          "resourceId": "ses_J9gTt4Rp1-Y7",
+          "fromValue": [
+            "stu_sP3IPBS2iler"
+          ],
+          "toValue": [
+            "stu_sP3IPBS2iler"
+          ],
+          "reason": "Giảm kích thước nhóm để tăng chất lượng học tập"
+        }
+      ],
+      "affectedTutorIds": [
+        "tut_61QAuOdQbyZS",
+        "tut_6copkRNEBLGs",
+        [
+          "stu_sP3IPBS2iler"
+        ],
+        [
+          "stu_sP3IPBS2iler"
+        ]
+      ],
+      "affectedSessionIds": [
+        "ses_pfu8KrHZFBiM",
+        "ses_J9gTt4Rp1-Y7"
+      ],
+      "affectedStudentIds": [
+        "stu_h8gj9_8-bjIL",
+        "stu_sP3IPBS2iler"
+      ]
+    },
+    "createdAt": "2025-11-09T14:24:41.895Z",
+    "updatedAt": "2025-11-11T14:12:04.441Z"
+  },
+  {
+    "id": "approval_wqqY842-xOYn",
+    "type": "resource_allocation",
+    "requesterId": "mgmt_qLukzSvoJWcO",
+    "targetId": "ses_pfu8KrHZFBiM",
+    "title": "Yêu cầu phân bổ lại tài nguyên",
+    "description": "Yêu cầu phân bổ lại tài nguyên để tối ưu hóa hiệu quả hoạt động. Bao gồm 2 thay đổi.",
+    "status": "pending",
+    "priority": "medium",
+    "deadline": "2025-11-12T17:52:44.939Z",
+    "resourceAllocationData": {
+      "changes": [
+        {
+          "type": "reassign_tutor",
+          "resourceId": "ses_pfu8KrHZFBiM",
+          "fromValue": "tut_61QAuOdQbyZS",
+          "toValue": "tut_6copkRNEBLGs",
+          "reason": "Cân bằng workload giữa các tutors"
+        },
+        {
+          "type": "adjust_group_size",
+          "resourceId": "ses_J9gTt4Rp1-Y7",
+          "fromValue": [
+            "stu_sP3IPBS2iler"
+          ],
+          "toValue": [
+            "stu_sP3IPBS2iler"
+          ],
+          "reason": "Giảm kích thước nhóm để tăng chất lượng học tập"
+        }
+      ],
+      "affectedTutorIds": [
+        "tut_61QAuOdQbyZS",
+        "tut_6copkRNEBLGs",
+        [
+          "stu_sP3IPBS2iler"
+        ],
+        [
+          "stu_sP3IPBS2iler"
+        ]
+      ],
+      "affectedSessionIds": [
+        "ses_pfu8KrHZFBiM",
+        "ses_J9gTt4Rp1-Y7"
+      ],
+      "affectedStudentIds": [
+        "stu_h8gj9_8-bjIL",
+        "stu_sP3IPBS2iler"
+      ]
+    },
+    "createdAt": "2025-11-10T17:52:44.939Z",
+    "updatedAt": "2025-11-11T14:12:04.441Z"
+  },
+  {
+    "id": "approval_tSTTUCSnTH_L",
+    "type": "resource_allocation",
+    "requesterId": "tut_61QAuOdQbyZS",
+    "targetId": "ses_nVkbLMLUThlo",
+    "title": "Yêu cầu phân bổ phòng học cho buổi học Tiếng Anh",
+    "description": "Buổi học offline đã được tutor xác nhận nhưng chưa có phòng học. Vui lòng phân bổ phòng học phù hợp.\n\nThời gian: 16:00:00 15/11/2025 - 17:30:00 15/11/2025\nMôn học: Tiếng Anh\nSố học sinh: 1",
+    "status": "approved",
+    "priority": "high",
+    "deadline": "2025-11-14T11:50:35.028Z",
+    "resourceAllocationData": {
+      "changes": [
+        {
+          "type": "reallocate_room",
+          "resourceId": "ses_nVkbLMLUThlo",
+          "fromValue": null,
+          "toValue": "Phòng A101",
+          "reason": "Offline session requires room allocation"
+        }
+      ],
+      "affectedSessionIds": [
+        "ses_nVkbLMLUThlo"
+      ],
+      "affectedTutorIds": [
+        "tut_61QAuOdQbyZS"
+      ],
+      "affectedStudentIds": [
+        "stu_afp9r8MLsjE8"
+      ]
+    },
+    "createdAt": "2025-11-12T11:50:35.028Z",
+    "updatedAt": "2025-11-12T12:54:22.676Z",
+    "reviewerId": "mgmt_1T4fph947Qu6",
+    "reviewNotes": "Yêu cầu đã được phê duyệt"
+  },
+  {
+    "id": "approval_n1JKJCJXHv3j",
+    "type": "resource_allocation",
+    "requesterId": "tut_61QAuOdQbyZS",
+    "targetId": "ses_USPUWKpDIk5j",
+    "title": "Yêu cầu phân bổ phòng học cho buổi học Tiếng Anh",
+    "description": "Buổi học offline đã được tutor xác nhận nhưng chưa có phòng học. Vui lòng phân bổ phòng học phù hợp.\n\nThời gian: 16:00:00 15/11/2025 - 17:30:00 15/11/2025\nMôn học: Tiếng Anh\nSố học sinh: 1\n\nYêu cầu thiết bị: whiteboard, projector",
+    "status": "approved",
+    "priority": "high",
+    "deadline": "2025-11-14T13:25:07.726Z",
+    "resourceAllocationData": {
+      "changes": [
+        {
+          "type": "reallocate_room",
+          "resourceId": "ses_USPUWKpDIk5j",
+          "fromValue": null,
+          "toValue": "Phòng A101",
+          "reason": "Offline session requires room allocation with equipment: whiteboard, projector",
+          "equipmentRequirements": [
+            "whiteboard",
+            "projector"
+          ]
+        }
+      ],
+      "affectedSessionIds": [
+        "ses_USPUWKpDIk5j"
+      ],
+      "affectedTutorIds": [
+        "tut_61QAuOdQbyZS"
+      ],
+      "affectedStudentIds": [
+        "stu_afp9r8MLsjE8"
+      ]
+    },
+    "createdAt": "2025-11-12T13:25:07.726Z",
+    "updatedAt": "2025-11-12T14:15:16.823Z",
+    "reviewerId": "mgmt_1T4fph947Qu6",
+    "reviewNotes": "Yêu cầu đã được phê duyệt"
+  },
+  {
+    "id": "approval_HsLQ0Yz2rDuu",
+    "type": "resource_allocation",
+    "requesterId": "tut_61QAuOdQbyZS",
+    "targetId": "ses_1ROPv2Fajgu_",
+    "title": "Yêu cầu phân bổ phòng học cho buổi học Toán cao cấp",
+    "description": "Buổi học offline đã được tutor xác nhận nhưng chưa có phòng học. Vui lòng phân bổ phòng học phù hợp.\n\nThời gian: 16:00:00 15/11/2025 - 17:30:00 15/11/2025\nMôn học: Toán cao cấp\nSố học sinh: 1\n\nYêu cầu thiết bị: whiteboard, projector",
+    "status": "approved",
+    "priority": "high",
+    "deadline": "2025-11-15T04:52:40.175Z",
+    "resourceAllocationData": {
+      "changes": [
+        {
+          "type": "reallocate_room",
+          "resourceId": "ses_1ROPv2Fajgu_",
+          "fromValue": null,
+          "toValue": "Phòng A103",
+          "reason": "Offline session requires room allocation with equipment: whiteboard, projector",
+          "equipmentRequirements": [
+            "whiteboard",
+            "projector"
+          ]
+        }
+      ],
+      "affectedSessionIds": [
+        "ses_1ROPv2Fajgu_"
+      ],
+      "affectedTutorIds": [
+        "tut_61QAuOdQbyZS"
+      ],
+      "affectedStudentIds": [
+        "stu_afp9r8MLsjE8"
+      ]
+    },
+    "createdAt": "2025-11-13T04:52:40.175Z",
+    "updatedAt": "2025-11-13T04:54:08.987Z",
+    "reviewerId": "mgmt_1T4fph947Qu6",
+    "reviewNotes": "Yêu cầu đã được phê duyệt"
   }
 ]

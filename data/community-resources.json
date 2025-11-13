@@ -1,0 +1,261 @@
+[
+  {
+    "id": "resource_siA0LdJIJIYe",
+    "title": "Tài liệu học tập chung",
+    "description": "Tài nguyên video được chia sẻ bởi Phan Bảo Hương",
+    "type": "video",
+    "fileUrl": "https://storage.example.com/resources/UIpnic4WYlbP",
+    "thumbnail": "https://storage.example.com/thumbnails/iCmKJ8Tc-Bf7.jpg",
+    "category": "academic",
+    "subject": "Hóa",
+    "tags": [
+      "cộng đồng",
+      "tham khảo"
+    ],
+    "sharedBy": "mgmt_lkN2DSFEv5dI",
+    "sharedAt": "2025-10-30T03:36:00.433Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "restrictedTo": [
+      "mgmt_qLukzSvoJWcO"
+    ],
+    "downloadCount": 15,
+    "viewCount": 63,
+    "likes": [],
+    "createdAt": "2025-10-22T14:35:15.223Z",
+    "updatedAt": "2025-10-31T14:31:21.195Z"
+  },
+  {
+    "id": "resource_F-27VW7O023W",
+    "title": "Tài nguyên cộng đồng",
+    "description": "Tài nguyên other được chia sẻ bởi Phan Nam Tuấn",
+    "type": "other",
+    "category": "administrative",
+    "tags": [
+      "học tập",
+      "tham khảo"
+    ],
+    "sharedBy": "stu_5m0qgd6BvqGz",
+    "sharedAt": "2025-10-29T14:42:30.441Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 4,
+    "viewCount": 12,
+    "likes": [
+      "mgmt_qLukzSvoJWcO",
+      "tut_DtMRGUwYKFgQ",
+      "tut_L9x4RXK42EtB",
+      "stu_ZfEvyF4Gu7bc"
+    ],
+    "createdAt": "2025-10-30T04:27:36.536Z",
+    "updatedAt": "2025-10-30T10:36:31.864Z"
+  },
+  {
+    "id": "resource_e5wZnsbbi2O0",
+    "title": "Tài nguyên cộng đồng",
+    "description": "Tài nguyên document được chia sẻ bởi Lê An Tuấn",
+    "type": "document",
+    "fileUrl": "https://storage.example.com/resources/YonrOsufC-W1",
+    "category": "reference",
+    "tags": [
+      "cộng đồng"
+    ],
+    "sharedBy": "stu_KRDeTYJlBj41",
+    "sharedAt": "2025-10-24T06:20:54.791Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 29,
+    "viewCount": 74,
+    "likes": [
+      "stu_YiVGuLoCpVPF",
+      "stu_a7LVENf1yYZ5",
+      "tut_41_KiR92vL7t"
+    ],
+    "createdAt": "2025-10-31T14:31:10.031Z",
+    "updatedAt": "2025-11-05T17:18:27.717Z"
+  },
+  {
+    "id": "resource_ZfSh7oFsEUFI",
+    "title": "Tài nguyên cộng đồng",
+    "description": "Tài nguyên link được chia sẻ bởi Hoàng Dũng Tuấn",
+    "type": "link",
+    "url": "https://example.com/resource-4",
+    "category": "reference",
+    "tags": [
+      "tham khảo",
+      "học tập",
+      "cộng đồng"
+    ],
+    "sharedBy": "tut_6_XCPhWi8xEP",
+    "sharedAt": "2025-10-29T02:55:06.734Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 16,
+    "viewCount": 60,
+    "likes": [
+      "stu_3xXLt1IWBsCS",
+      "tut_o6Rbm-CATfPE"
+    ],
+    "createdAt": "2025-11-02T16:11:27.715Z",
+    "updatedAt": "2025-10-24T03:36:46.834Z"
+  },
+  {
+    "id": "resource_KoZ10OXOzGdf",
+    "title": "Video hướng dẫn",
+    "description": "Tài nguyên video được chia sẻ bởi Bùi Khánh Anh",
+    "type": "video",
+    "fileUrl": "https://storage.example.com/resources/ybx1hST6r0qz",
+    "thumbnail": "https://storage.example.com/thumbnails/i-1s1JjPWXp4.jpg",
+    "category": "event",
+    "tags": [
+      "cộng đồng",
+      "tham khảo"
+    ],
+    "sharedBy": "tut_61QAuOdQbyZS",
+    "sharedAt": "2025-11-02T06:41:30.283Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "downloadCount": 2,
+    "viewCount": 62,
+    "likes": [
+      "tut_am6slkTzwGyq"
+    ],
+    "createdAt": "2025-11-01T06:07:15.465Z",
+    "updatedAt": "2025-11-03T16:00:42.801Z"
+  },
+  {
+    "id": "resource_jvArVmJQbPyy",
+    "title": "Tài nguyên cộng đồng",
+    "description": "Tài nguyên document được chia sẻ bởi Trần Bảo Văn",
+    "type": "document",
+    "fileUrl": "https://storage.example.com/resources/cXMEALEhKdo6",
+    "category": "event",
+    "tags": [
+      "học tập"
+    ],
+    "sharedBy": "stu_aBXlnK4-0JBf",
+    "sharedAt": "2025-11-02T07:53:26.292Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 14,
+    "viewCount": 45,
+    "likes": [
+      "stu_dOHu6givateo",
+      "tut_o6Rbm-CATfPE",
+      "stu_KkyoEg58egl5",
+      "tut_fz5MO1FZqXhq"
+    ],
+    "createdAt": "2025-11-05T06:58:09.957Z",
+    "updatedAt": "2025-11-07T08:58:59.367Z"
+  },
+  {
+    "id": "resource__iiruyYuUJnt",
+    "title": "Tài liệu học tập chung",
+    "description": "Tài nguyên other được chia sẻ bởi Đỗ Hà Thị",
+    "type": "other",
+    "category": "administrative",
+    "tags": [
+      "cộng đồng",
+      "tham khảo"
+    ],
+    "sharedBy": "stu_1FhaUWxySQ4V",
+    "sharedAt": "2025-11-07T19:57:27.716Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "restrictedTo": [
+      "tut_g0qfsZQJDZEe"
+    ],
+    "downloadCount": 22,
+    "viewCount": 5,
+    "likes": [
+      "stu_sP3IPBS2iler",
+      "tut_41_KiR92vL7t",
+      "tut_zpZeIVwqQuXK"
+    ],
+    "createdAt": "2025-10-24T19:58:23.695Z",
+    "updatedAt": "2025-10-27T20:35:46.239Z"
+  },
+  {
+    "id": "resource_OfcDLDlPdnPG",
+    "title": "Video hướng dẫn",
+    "description": "Tài nguyên video được chia sẻ bởi Đỗ Mai Thị",
+    "type": "video",
+    "fileUrl": "https://storage.example.com/resources/cYqmrLM4PS_E",
+    "thumbnail": "https://storage.example.com/thumbnails/5ilJ49pCwty1.jpg",
+    "category": "event",
+    "tags": [
+      "cộng đồng"
+    ],
+    "sharedBy": "stu_SgsgvGIuTR0F",
+    "sharedAt": "2025-10-27T00:15:51.224Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 18,
+    "viewCount": 63,
+    "likes": [
+      "tut_L9x4RXK42EtB",
+      "stu_QYojhnP7sLsJ",
+      "stu_KRDeTYJlBj41"
+    ],
+    "createdAt": "2025-11-07T11:23:39.031Z",
+    "updatedAt": "2025-11-04T18:24:30.437Z"
+  },
+  {
+    "id": "resource_TVKagp0eCmmC",
+    "title": "Tài liệu học tập chung",
+    "description": "Tài nguyên other được chia sẻ bởi Bùi Dũng Phương",
+    "type": "other",
+    "category": "academic",
+    "subject": "Toán",
+    "tags": [
+      "cộng đồng",
+      "tham khảo",
+      "học tập"
+    ],
+    "sharedBy": "stu_h8gj9_8-bjIL",
+    "sharedAt": "2025-11-05T05:29:18.656Z",
+    "isPublic": true,
+    "isEncrypted": false,
+    "accessLevel": "public",
+    "restrictedTo": [
+      "stu_dOHu6givateo"
+    ],
+    "downloadCount": 22,
+    "viewCount": 28,
+    "likes": [],
+    "createdAt": "2025-11-01T06:36:15.555Z",
+    "updatedAt": "2025-11-02T21:45:40.917Z"
+  },
+  {
+    "id": "resource_rAC9s4svsaYV",
+    "title": "Tài liệu học tập chung",
+    "description": "Tài nguyên video được chia sẻ bởi Hoàng Mai Hoàng",
+    "type": "video",
+    "fileUrl": "https://storage.example.com/resources/ltbYRVGj1EyN",
+    "thumbnail": "https://storage.example.com/thumbnails/UeheNMGKD7zl.jpg",
+    "category": "event",
+    "tags": [
+      "học tập"
+    ],
+    "sharedBy": "tut_41_KiR92vL7t",
+    "sharedAt": "2025-11-03T23:52:28.905Z",
+    "isPublic": false,
+    "isEncrypted": false,
+    "accessLevel": "private",
+    "downloadCount": 6,
+    "viewCount": 32,
+    "likes": [
+      "stu_sP3IPBS2iler"
+    ],
+    "createdAt": "2025-10-28T04:56:12.281Z",
+    "updatedAt": "2025-10-26T17:00:52.799Z"
+  }
+]

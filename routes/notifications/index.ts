@@ -33,6 +33,7 @@ export async function getNotificationsHandler(req: AuthRequest, res: Response) {
       ? allNotifications.filter(n => !n.read)
       : allNotifications;
 
+    filteredNotifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     // Manual pagination
     const total = filteredNotifications.length;
     const totalPages = Math.ceil(total / limitNum);

@@ -8,6 +8,8 @@ import ReportsAnalytics from '../pages/management/ReportsAnalytics'
 import ReportsAnalyticsMobile from '../pages/management/ReportsAnalyticsMobile'
 import AwardCredits from '../pages/management/AwardCredits'
 import AwardCreditsMobile from '../pages/management/AwardCreditsMobile'
+import ResourceAllocation from '../pages/management/ResourceAllocation'
+import UserManagement from '../pages/management/UserManagement'
 
 const ManagementDeviceDetector: React.FC = () => {
   const location = useLocation()
@@ -56,6 +58,12 @@ const ManagementDeviceDetector: React.FC = () => {
       if (location.pathname === '/management/awards') {
         return <AwardCreditsMobile />
       }
+      if (location.pathname === '/management/resources') {
+        return <ResourceAllocation />
+      }
+      if (location.pathname === '/management/users') {
+        return <UserManagement />
+      }
       // For other management routes, use the mobile dashboard
       return <ManagementDashboardMobile />
     }
@@ -69,6 +77,12 @@ const ManagementDeviceDetector: React.FC = () => {
     }
     if (location.pathname === '/management/awards') {
       return <AwardCredits />
+    }
+    if (location.pathname === '/management/resources') {
+      return <ResourceAllocation />
+    }
+    if (location.pathname === '/management/users') {
+      return <UserManagement />
     }
     return <ManagementDashboard />
   }

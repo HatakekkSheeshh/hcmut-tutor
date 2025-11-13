@@ -247,14 +247,14 @@ const SessionDetail: React.FC = () => {
               setClassSessions(classSess)
               
               if (classSess.length > 0) {
-                // Find the next upcoming session (confirmed or pending, not cancelled, in the future)
+                // Find the next upcoming session (confirmed, pending, or rescheduled, not cancelled, in the future)
                 const now = new Date()
                 let upcoming = classSess
                   .filter((s: any) => {
                     // Must include this student
                     if (!s.studentIds?.includes(userId)) return false
                     // Must have valid status
-                    if (s.status !== 'confirmed' && s.status !== 'pending') return false
+                    if (s.status !== 'confirmed' && s.status !== 'pending' && s.status !== 'rescheduled') return false
                     // Must not be cancelled
                     if (s.status === 'cancelled') return false
                     // Must be in the future
@@ -269,7 +269,7 @@ const SessionDetail: React.FC = () => {
                   upcoming = classSess
                     .filter((s: any) => {
                       if (!s.studentIds?.includes(userId)) return false
-                      return (s.status === 'confirmed' || s.status === 'pending') && s.status !== 'cancelled'
+                      return (s.status === 'confirmed' || s.status === 'pending' || s.status === 'rescheduled') && s.status !== 'cancelled'
                     })
                     .sort((a: any, b: any) => 
                       new Date(b.startTime).getTime() - new Date(a.startTime).getTime() // Most recent first
@@ -630,7 +630,9 @@ const SessionDetail: React.FC = () => {
                             {data.isOnline ? 'Online Video Call' : 'In-Person Meeting'}
                           </p>
                           <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {data.isOnline ? 'Virtual' : 'Physical Location'}
+                            {data.isOnline 
+                              ? (data.meetingLink || 'Virtual') 
+                              : (data.location || 'Physical Location - Chưa được phân bổ')}
                           </p>
                         </>
                       )}
@@ -729,7 +731,7 @@ const SessionDetail: React.FC = () => {
                   return classIsActive
                 } else {
                   // For individual session view
-                  return !!(session && (session.status === 'confirmed' || session.status === 'pending'))
+                  return !!(session && (session.status === 'confirmed' || session.status === 'pending' || session.status === 'rescheduled'))
                 }
               })() && (
                 <>
@@ -1354,7 +1356,7 @@ const SessionDetail: React.FC = () => {
 
       {/* Request Dialog */}
       {/* Show for individual sessions OR class */}
-      {((!isClassView && session && (session.status === 'confirmed' || session.status === 'pending')) ||
+      {((!isClassView && session && (session.status === 'confirmed' || session.status === 'pending' || session.status === 'rescheduled')) ||
         (isClassView && classData && isRequestDialogOpen)) && (() => {
           // Determine session object for RequestDialog
           let sessionForRequest: {

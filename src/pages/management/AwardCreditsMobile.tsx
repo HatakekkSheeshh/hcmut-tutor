@@ -68,6 +68,7 @@ const AwardCreditsMobile: React.FC = () => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/management' },
     { id: 'approval-requests', label: 'Approval Requests', icon: <Assignment />, path: '/management/approval' },
+    { id: 'resource-allocation', label: 'Resource Allocation', icon: <TrendingUp />, path: '/management/resources' },
     { id: 'reports-analytics', label: 'Reports & Analytics', icon: <BarChartIcon />, path: '/management/reports' },
     { id: 'award-credits', label: 'Award Credits', icon: <StarIcon />, path: '/management/awards' },
     { id: 'user-management', label: 'User Management', icon: <Person />, path: '/management/users' },
