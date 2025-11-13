@@ -16,3 +16,8 @@ const isProduction = typeof window !== 'undefined'
 
 export const API_BASE_URL = isProduction ? '/api' : 'http://localhost:3000/api';
 
+// WebSocket URL - use same origin as API
+export const WEBSOCKET_URL = isProduction 
+  ? (typeof window !== 'undefined' ? `wss://${window.location.hostname}` : 'wss://localhost')
+  : 'ws://localhost:3000';
+

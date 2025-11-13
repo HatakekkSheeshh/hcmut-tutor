@@ -396,6 +396,12 @@ export const usersAPI = {
     return fetchAPI(`/users/${id}`);
   },
 
+  async getByIds(ids: string[]) {
+    // Batch get users by IDs
+    const query = ids.length > 0 ? '?ids=' + ids.join(',') : '';
+    return fetchAPI(`/users${query}`);
+  },
+
   async update(id: string, data: any) {
     return fetchAPI(`/users/${id}`, {
       method: 'PUT',
@@ -816,6 +822,78 @@ export const sessionRequestsAPI = {
   }
 };
 
+// ===== CONVERSATIONS =====
+
+export const conversationsAPI = {
+  async list() {
+    return fetchAPI('/conversations');
+  },
+
+  async create(data: {
+    participantIds: string[];
+  }) {
+    return fetchAPI('/conversations', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async get(id: string) {
+    return fetchAPI(`/conversations/${id}`);
+  },
+
+  async delete(id: string) {
+    return fetchAPI(`/conversations/${id}`, { method: 'DELETE' });
+  }
+};
+
+// ===== UPLOAD =====
+
+export const uploadAPI = {
+  async uploadFile(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = getToken();
+    const headers: Record<string, string> = {};
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const url = `${API_BASE_URL}/upload`;
+    console.log('🌐 [API] Upload file:', file.name);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    const contentType = response.headers.get('content-type');
+    let data;
+    
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('⚠️ [API] Response is not JSON:', text.substring(0, 200));
+        return {
+          success: false,
+          error: `Server returned invalid response: ${response.status} ${response.statusText}`
+        };
+      }
+    }
+    
+    console.log('📡 [API] Upload response:', {
+      status: response.status,
+      data
+    });
+
+    return data;
 // ===== MANAGEMENT =====
 
 // ===== ROOMS =====
@@ -1391,6 +1469,8 @@ export const api = {
   classes: classesAPI,
   enrollments: enrollmentsAPI,
   sessionRequests: sessionRequestsAPI,
+  conversations: conversationsAPI,
+  upload: uploadAPI
   management: managementAPI
 };
 
