@@ -39,7 +39,16 @@ export async function connectMongo(): Promise<Db> {
     maxPoolSize: 10,
     minPoolSize: 2,
     maxIdleTimeMS: 30000,
-    serverSelectionTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 10000, // Increased timeout
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 10000,
+    // SSL/TLS configuration for MongoDB Atlas
+    tls: true,
+    tlsAllowInvalidCertificates: false,
+    tlsAllowInvalidHostnames: false,
+    // Retry configuration
+    retryWrites: true,
+    retryReads: true,
   };
 
   try {

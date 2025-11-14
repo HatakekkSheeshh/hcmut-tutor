@@ -59,12 +59,23 @@ export class MongoStorage {
       
       if (data.length > 0) {
         // Convert id to _id for MongoDB
+        // If id is valid ObjectId, use it; otherwise create new ObjectId and keep original id
         const documents = data.map(item => {
           const { id, ...rest } = item as any;
+          let _id: ObjectId;
+          
+          if (id && ObjectId.isValid(id) && id.length === 24) {
+            // Valid ObjectId format
+            _id = new ObjectId(id);
+          } else {
+            // Invalid ObjectId format - create new ObjectId but keep original id
+            _id = new ObjectId();
+          }
+          
           return {
             ...rest,
-            _id: id ? new ObjectId(id) : new ObjectId(),
-            id: id || undefined // Keep id field for compatibility
+            _id,
+            id: id || undefined // Always keep original id field for compatibility
           };
         });
         
@@ -86,10 +97,18 @@ export class MongoStorage {
     try {
       const collection = await this.getCollection<T>(filename);
       
-      // Try to find by _id first (MongoDB native)
-      let doc = await collection.findOne({ _id: new ObjectId(id) } as any);
+      let doc: any = null;
       
-      // If not found, try by id field
+      // Try to find by _id first (MongoDB native) - only if id is valid ObjectId
+      if (id && ObjectId.isValid(id) && id.length === 24) {
+        try {
+          doc = await collection.findOne({ _id: new ObjectId(id) } as any);
+        } catch (error) {
+          // Ignore ObjectId conversion errors
+        }
+      }
+      
+      // If not found, try by id field (for non-ObjectId IDs like "conv_abc123")
       if (!doc) {
         doc = await collection.findOne({ id } as any);
       }
@@ -193,9 +212,17 @@ export class MongoStorage {
       
       // Convert id to _id for MongoDB
       const { id, ...rest } = item as any;
+      let _id: ObjectId;
+      
+      if (id && ObjectId.isValid(id) && id.length === 24) {
+        _id = new ObjectId(id);
+      } else {
+        _id = new ObjectId();
+      }
+      
       const document = {
         ...rest,
-        _id: id ? new ObjectId(id) : new ObjectId(),
+        _id,
         id: id || undefined
       };
       
@@ -233,10 +260,20 @@ export class MongoStorage {
       // Convert items to MongoDB documents
       const documents = items.map(item => {
         const { id, ...rest } = item as any;
+        let _id: ObjectId;
+        
+        if (id && ObjectId.isValid(id) && id.length === 24) {
+          // Valid ObjectId format
+          _id = new ObjectId(id);
+        } else {
+          // Invalid ObjectId format - create new ObjectId but keep original id
+          _id = new ObjectId();
+        }
+        
         return {
           ...rest,
-          _id: id ? new ObjectId(id) : new ObjectId(),
-          id: id || undefined
+          _id,
+          id: id || undefined // Always keep original id field
         };
       });
       
@@ -263,14 +300,22 @@ export class MongoStorage {
       const { id: _, ...updateFields } = updates as any;
       const updateDoc: UpdateFilter<T> = { $set: updateFields as any };
       
-      // Try to find and update by _id first
-      let result = await collection.findOneAndUpdate(
-        { _id: new ObjectId(id) } as any,
-        updateDoc,
-        { returnDocument: 'after' }
-      );
+      let result: any = null;
       
-      // If not found, try by id field
+      // Try to find and update by _id first - only if id is valid ObjectId
+      if (id && ObjectId.isValid(id) && id.length === 24) {
+        try {
+          result = await collection.findOneAndUpdate(
+            { _id: new ObjectId(id) } as any,
+            updateDoc,
+            { returnDocument: 'after' }
+          );
+        } catch (error) {
+          // Ignore ObjectId conversion errors
+        }
+      }
+      
+      // If not found, try by id field (for non-ObjectId IDs)
       if (!result) {
         result = await collection.findOneAndUpdate(
           { id } as any,
@@ -301,11 +346,19 @@ export class MongoStorage {
     try {
       const collection = await this.getCollection<T>(filename);
       
-      // Try to delete by _id first
-      let result = await collection.deleteOne({ _id: new ObjectId(id) } as any);
+      let result: any = null;
       
-      // If not found, try by id field
-      if (result.deletedCount === 0) {
+      // Try to delete by _id first - only if id is valid ObjectId
+      if (id && ObjectId.isValid(id) && id.length === 24) {
+        try {
+          result = await collection.deleteOne({ _id: new ObjectId(id) } as any);
+        } catch (error) {
+          // Ignore ObjectId conversion errors
+        }
+      }
+      
+      // If not found or not ObjectId, try by id field
+      if (!result || result.deletedCount === 0) {
         result = await collection.deleteOne({ id } as any);
       }
       

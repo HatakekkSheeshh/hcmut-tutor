@@ -5,9 +5,11 @@
  * Run this after setting up MongoDB connection.
  * 
  * Usage:
- *   MONGODB_URI="mongodb://..." npm run migrate:mongodb
+ *   npm run migrate:mongodb
+ *   (MONGODB_URI should be in .env file)
  */
 
+import 'dotenv/config'; // Load .env file
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { readdir } from 'fs/promises';
