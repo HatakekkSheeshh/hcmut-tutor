@@ -19,7 +19,8 @@
     "seed:clean": "node -e \"require('fs').rmSync('data', {recursive: true, force: true})\" && npm run seed",
     "seed:forum": "tsx scripts/seed-forum.ts",
     "validate": "tsx scripts/validate.ts",
-    "stats": "tsx -e \"import('./lib/dataValidator').then(m => m.generateDataStats())\""
+    "stats": "tsx -e \"import('./lib/dataValidator').then(m => m.generateDataStats())\"",
+    "migrate:mongodb": "tsx scripts/migrate-to-mongodb.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -45,6 +46,7 @@
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.3",
     "lucide-react": "^0.294.0",
+    "mongodb": "^7.0.0",
     "nanoid": "^5.1.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

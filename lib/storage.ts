@@ -2,6 +2,8 @@ import { put, del, list } from '@vercel/blob';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { isMongoEnabled } from './mongodb.js';
+import { MongoStorage } from './mongoStorage.js';
 
 /**
  * JSONStorage - Quản lý việc đọc/ghi JSON files
@@ -412,10 +414,20 @@ export class JSONStorage {
   }
 }
 
-// Singleton instance - auto-detect if we should use Blob based on environment
-export const storage = new JSONStorage(
-  process.env.NODE_ENV === 'production' && !!process.env.BLOB_READ_WRITE_TOKEN
-);
+// Singleton instance - auto-detect storage type
+// Priority: MongoDB > Vercel Blob > Local File System
+let storageInstance: JSONStorage | MongoStorage;
+
+if (isMongoEnabled()) {
+  console.log('📦 Using MongoDB storage');
+  storageInstance = new MongoStorage();
+} else {
+  const useBlob = process.env.NODE_ENV === 'production' && !!process.env.BLOB_READ_WRITE_TOKEN;
+  console.log(`📦 Using ${useBlob ? 'Vercel Blob' : 'Local File System'} storage`);
+  storageInstance = new JSONStorage(useBlob);
+}
+
+export const storage = storageInstance;
 
 // Helper functions for common operations
 export const createRecord = <T extends { id: string }>(

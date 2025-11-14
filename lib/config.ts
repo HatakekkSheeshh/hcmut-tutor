@@ -17,6 +17,13 @@ export const config = {
     enabled: !!process.env.BLOB_READ_WRITE_TOKEN
   },
 
+  // MongoDB Configuration
+  mongodb: {
+    uri: process.env.MONGODB_URI || '',
+    enabled: !!process.env.MONGODB_URI,
+    database: process.env.MONGODB_DATABASE || 'tutor-support-system'
+  },
+
   // WebSocket Configuration
   websocket: {
     url: process.env.WEBSOCKET_URL || 'ws://localhost:3001'

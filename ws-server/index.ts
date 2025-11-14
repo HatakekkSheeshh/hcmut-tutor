@@ -11,6 +11,15 @@ import { verifyToken } from '../lib/utils.js';
 import { storage } from '../lib/storage.js';
 import { Message, Conversation } from '../lib/types.js';
 import { nanoid } from 'nanoid';
+import { connectMongo, isMongoEnabled } from '../lib/mongodb.js';
+
+// Initialize MongoDB connection if enabled
+if (isMongoEnabled()) {
+  connectMongo().catch(err => {
+    console.error('[WebSocket] Failed to connect to MongoDB:', err);
+    console.error('[WebSocket] Continuing without MongoDB...');
+  });
+}
 
 const app = express();
 const server = http.createServer(app);
