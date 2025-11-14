@@ -362,32 +362,130 @@ export const generateLibraryResources = (count: number = 30): LibraryResource[] 
 };
 
 /**
- * Generate mock forum posts
+ * Generate mock forum posts with various statuses
  */
-export const generateForumPosts = (users: User[], count: number = 20): ForumPost[] => {
+export const generateForumPosts = (users: User[], count: number = 30): ForumPost[] => {
   const posts: ForumPost[] = [];
+  const managementUsers = users.filter(u => u.role === 'management');
+  const statuses: ('pending' | 'approved' | 'rejected')[] = ['pending', 'approved', 'rejected'];
+  const statusWeights = [0.3, 0.6, 0.1]; // 30% pending, 60% approved, 10% rejected
+  
+  const forumCategories = [
+    'Programming',
+    'Mathematics',
+    'Physics',
+    'Chemistry',
+    'Biology',
+    'Study Groups',
+    'Career',
+    'General Discussion',
+    'Questions & Answers',
+    'Resources'
+  ];
+
+  const postTitles = [
+    'Best practices for learning React.js',
+    'Mathematics problem solving techniques',
+    'Study group for Physics students',
+    'Career advice for Computer Science graduates',
+    'How to prepare for technical interviews',
+    'Effective study methods for calculus',
+    'Resources for learning Python',
+    'Tips for time management during exams',
+    'Understanding data structures and algorithms',
+    'How to improve programming skills',
+    'Study schedule recommendations',
+    'Collaborative learning strategies',
+    'Job market trends in tech',
+    'Academic writing tips',
+    'How to stay motivated while studying',
+    'Mastering organic chemistry',
+    'Biology study techniques that work',
+    'Forming effective study groups',
+    'Career planning for students',
+    'Academic life discussion',
+    'Q&A: Getting help with homework',
+    'Useful learning resources',
+    'Note-taking strategies',
+    'Exam preparation guide',
+    'Balancing work and studies'
+  ];
+
+  const postContents = [
+    'I\'ve been teaching React for 3 years and here are some tips that have helped my students succeed. First, start with the basics and build a strong foundation. Understanding components, props, and state is crucial before moving to advanced topics like hooks and context.',
+    'When approaching complex mathematical problems, it\'s important to break them down into smaller, manageable parts. This technique has helped many students improve their problem-solving skills significantly.',
+    'Looking for fellow physics students to form a study group. We meet twice a week to discuss concepts and solve problems together. Anyone interested in joining?',
+    'As someone who has mentored many CS graduates, here\'s my advice on navigating the job market and building a successful career in technology. Focus on building a strong portfolio and networking.',
+    'Technical interviews can be challenging, but with proper preparation, you can excel. Here are some strategies that have worked for me and my students: practice coding problems daily, understand data structures deeply, and prepare for behavioral questions.',
+    'Calculus can be intimidating, but with the right approach, it becomes manageable. Let me share some effective study methods that have helped my students achieve better grades.',
+    'Python is a great language for beginners. Here are some excellent resources to get started and advance your skills: official documentation, interactive tutorials, and practice projects.',
+    'Time management is crucial during exam periods. Here are some proven strategies to help you stay organized and reduce stress: create a study schedule, take regular breaks, and prioritize difficult topics.',
+    'Data structures and algorithms form the foundation of computer science. Understanding them deeply will help you in interviews and real-world problems. Start with arrays and linked lists, then move to trees and graphs.',
+    'Improving programming skills requires consistent practice. Here are some exercises and projects that can help you grow: build small applications, contribute to open source, and solve coding challenges regularly.',
+    'Chemistry can be challenging, but understanding the periodic table and basic reactions is key. Here are some tips for mastering organic chemistry.',
+    'Biology requires memorization and understanding of concepts. Creating mind maps and using flashcards can be very effective study techniques.',
+    'Study groups are great for collaborative learning. We discuss difficult topics, share notes, and help each other understand complex concepts.',
+    'Career planning is important for students. Research different career paths, network with professionals, and gain relevant experience through internships.',
+    'General discussion about academic life, balancing studies with personal life, and maintaining mental health during stressful periods.',
+    'Questions and answers section for students to ask about specific topics, get help with homework, and clarify doubts.',
+    'Sharing useful resources like online courses, textbooks, study materials, and tools that can help in learning.',
+    'Tips for effective note-taking, active reading strategies, and improving memory retention for better academic performance.',
+    'Discussion about exam preparation strategies, dealing with test anxiety, and techniques for answering different types of exam questions.',
+    'Sharing experiences about internships, part-time jobs, and how to balance work with studies effectively.'
+  ];
 
   for (let i = 0; i < count; i++) {
     const author = randomItem(users);
+    const status = weightedRandom(statuses, statusWeights);
+    const createdAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+    const updatedAt = new Date(createdAt.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000);
+    
     const post: ForumPost = {
       id: generateId('post'),
       authorId: author.id,
-      title: `Câu hỏi về ${randomItem(SUBJECTS)}`,
-      content: `Mình đang gặp khó khăn với ${randomItem(SUBJECTS)}, mọi người có thể giúp mình được không?`,
-      category: randomItem(FORUM_CATEGORIES),
-      tags: randomItems(SUBJECTS, randomInt(1, 3)),
-      likes: randomItems(users.map(u => u.id), randomInt(0, 10)),
-      views: randomInt(10, 200),
-      pinned: Math.random() > 0.9,
+      title: randomItem(postTitles),
+      content: randomItem(postContents),
+      category: randomItem(forumCategories),
+      tags: randomItems(SUBJECTS, randomInt(1, 4)),
+      likes: status === 'approved' ? randomItems(users.map(u => u.id), randomInt(0, 15)) : [],
+      views: status === 'approved' ? randomInt(10, 300) : randomInt(0, 5),
+      pinned: status === 'approved' && Math.random() > 0.9,
       locked: false,
-      createdAt: now(),
-      updatedAt: now()
+      status: status,
+      createdAt: createdAt.toISOString(),
+      updatedAt: updatedAt.toISOString()
     };
+
+    // Add moderation info for approved/rejected posts
+    if (status !== 'pending' && managementUsers.length > 0) {
+      const moderator = randomItem(managementUsers);
+      post.moderatedBy = moderator.id;
+      post.moderatedAt = new Date(createdAt.getTime() + Math.random() * 2 * 24 * 60 * 60 * 1000).toISOString();
+      post.moderationNotes = status === 'approved' 
+        ? 'Content approved. Good quality post.'
+        : 'Content does not meet community guidelines.';
+    }
+
     posts.push(post);
   }
 
   return posts;
 };
+
+// Helper function for weighted random selection
+function weightedRandom<T>(items: T[], weights: number[]): T {
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (let i = 0; i < items.length; i++) {
+    random -= weights[i];
+    if (random <= 0) {
+      return items[i];
+    }
+  }
+  
+  return items[items.length - 1];
+}
 
 /**
  * Generate mock forum comments

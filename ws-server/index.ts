@@ -66,6 +66,9 @@ io.on('connection', (socket: any) => {
   io.emit('userOnline', userId);
   io.emit('onlineUsers', Array.from(onlineUsers.keys()));
 
+  // Send current online users list to the newly connected client
+  socket.emit('onlineUsers', Array.from(onlineUsers.keys()));
+
   // Join room for a conversation
   socket.on('join-room', async (conversationId: string) => {
     try {

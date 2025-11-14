@@ -240,13 +240,6 @@ const NotificationsCenter: React.FC = () => {
                   Back to Dashboard
                 </button>
                 <button 
-                  onClick={() => navigate('/common')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Login
-                </button>
-                <button 
                   onClick={() => navigate('/common/profile')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
@@ -637,16 +630,6 @@ const NotificationsCenter: React.FC = () => {
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Login
                 </button>
                 <button 
                   onClick={() => {

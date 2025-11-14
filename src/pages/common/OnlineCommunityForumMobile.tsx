@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -25,6 +25,37 @@ import {
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { navigateToDashboard } from '../../utils/navigation'
+import { forumAPI, usersAPI, authAPI } from '../../lib/api'
+import { formatDistanceToNow } from 'date-fns'
+
+// Forum types (matching backend types)
+interface ForumPost {
+  id: string
+  authorId: string
+  title: string
+  content: string
+  category: string
+  tags: string[]
+  likes: string[]
+  views: number
+  pinned: boolean
+  locked: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+interface ForumComment {
+  id: string
+  postId: string
+  authorId: string
+  content: string
+  parentCommentId?: string
+  likes: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+const BOOKMARKS_STORAGE_KEY = 'forum_bookmarks'
 
 const OnlineCommunityForumMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
@@ -35,7 +66,129 @@ const OnlineCommunityForumMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [posts, setPosts] = useState<ForumPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [users, setUsers] = useState<Record<string, any>>({})
+  const [bookmarks, setBookmarks] = useState<Set<string>>(new Set())
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showCommentModal, setShowCommentModal] = useState(false)
+  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null)
+  const [comments, setComments] = useState<Record<string, ForumComment[]>>({})
+  const [newPost, setNewPost] = useState({ title: '', content: '', category: 'Programming', tags: '' })
+  const [newComment, setNewComment] = useState('')
+  const [creatingPost, setCreatingPost] = useState(false)
+  const [postingComment, setPostingComment] = useState(false)
 
+  // Load bookmarks from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(BOOKMARKS_STORAGE_KEY)
+      if (stored) {
+        setBookmarks(new Set(JSON.parse(stored)))
+      }
+    } catch (error) {
+      console.error('Error loading bookmarks:', error)
+    }
+  }, [])
+
+  // Load current user
+  useEffect(() => {
+    const loadCurrentUser = async () => {
+      try {
+        const result = await authAPI.getMe()
+        if (result.success) {
+          setCurrentUser(result.data)
+        }
+      } catch (error) {
+        console.error('Error loading current user:', error)
+      }
+    }
+    loadCurrentUser()
+  }, [])
+
+  // Load posts
+  useEffect(() => {
+    loadPosts()
+  }, [selectedCategory, searchTerm, selectedSort])
+
+  const loadPosts = async () => {
+    try {
+      setLoading(true)
+      const params: any = {
+        page: 1,
+        limit: 20
+      }
+      
+      if (selectedCategory !== 'all') {
+        params.category = selectedCategory
+      }
+      
+      if (searchTerm) {
+        params.search = searchTerm
+      }
+
+      const response = await forumAPI.posts.list(params)
+      
+      if (response.success && response.data) {
+        const postsData = Array.isArray(response.data) ? response.data : response.data.data || []
+        setPosts(postsData)
+        
+        // Load user data for authors
+        const authorIds = [...new Set(postsData.map((p: ForumPost) => p.authorId))] as string[]
+        await loadUsers(authorIds)
+      } else {
+        setPosts([])
+      }
+    } catch (error) {
+      console.error('Error loading posts:', error)
+      setPosts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadUsers = async (userIds: string[]) => {
+    try {
+      const usersToLoad = userIds.filter(id => !users[id])
+      if (usersToLoad.length === 0) return
+
+      const usersList = await usersAPI.list({ limit: 1000 })
+      const usersArray = Array.isArray(usersList) 
+        ? usersList 
+        : usersList.success && Array.isArray(usersList.data) 
+          ? usersList.data 
+          : usersList.data?.data || []
+
+      const usersMap: Record<string, any> = {}
+      usersArray.forEach((user: any) => {
+        if (usersToLoad.includes(user.id)) {
+          usersMap[user.id] = user
+        }
+      })
+
+      setUsers(prev => ({ ...prev, ...usersMap }))
+    } catch (error) {
+      console.error('Error loading users:', error)
+    }
+  }
+
+  // Load comments for a post
+  const loadComments = async (postId: string) => {
+    try {
+      const response = await forumAPI.comments.list(postId, { page: 1, limit: 50 })
+      if (response.success && response.data) {
+        const commentsData = Array.isArray(response.data) ? response.data : response.data.data || []
+        setComments(prev => ({ ...prev, [postId]: commentsData }))
+        
+        // Load user data for comment authors
+        const authorIds = [...new Set(commentsData.map((c: ForumComment) => c.authorId))] as string[]
+        await loadUsers(authorIds)
+      }
+    } catch (error) {
+      console.error('Error loading comments:', error)
+    }
+  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -45,77 +198,172 @@ const OnlineCommunityForumMobile: React.FC = () => {
     toggleTheme()
   }
 
-
-  const forumPosts = [
-    {
-      id: 1,
-      title: 'Best practices for learning React.js',
-      author: 'Sarah Johnson',
-      authorRole: 'Tutor',
-      category: 'Programming',
-      content: 'I\'ve been teaching React for 3 years and here are some tips that have helped my students succeed...',
-      likes: 45,
-      comments: 12,
-      shares: 8,
-      isBookmarked: false,
-      isLiked: false,
-      timestamp: '2 hours ago',
-      tags: ['React', 'JavaScript', 'Frontend', 'Learning']
-    },
-    {
-      id: 2,
-      title: 'Mathematics problem solving techniques',
-      author: 'Dr. Mike Chen',
-      authorRole: 'Professor',
-      category: 'Mathematics',
-      content: 'When approaching complex mathematical problems, it\'s important to break them down into smaller, manageable parts...',
-      likes: 38,
-      comments: 15,
-      shares: 5,
-      isBookmarked: true,
-      isLiked: true,
-      timestamp: '4 hours ago',
-      tags: ['Mathematics', 'Problem Solving', 'Calculus', 'Study Tips']
-    },
-    {
-      id: 3,
-      title: 'Study group for Physics students',
-      author: 'Alice Brown',
-      authorRole: 'Student',
-      category: 'Study Groups',
-      content: 'Looking for fellow physics students to form a study group. We meet twice a week to discuss concepts and solve problems together.',
-      likes: 22,
-      comments: 8,
-      shares: 3,
-      isBookmarked: false,
-      isLiked: false,
-      timestamp: '1 day ago',
-      tags: ['Physics', 'Study Group', 'Collaboration', 'Learning']
-    },
-    {
-      id: 4,
-      title: 'Career advice for Computer Science graduates',
-      author: 'Prof. David Lee',
-      authorRole: 'Professor',
-      category: 'Career',
-      content: 'As someone who has mentored many CS graduates, here\'s my advice on navigating the job market and building a successful career...',
-      likes: 67,
-      comments: 23,
-      shares: 12,
-      isBookmarked: true,
-      isLiked: false,
-      timestamp: '2 days ago',
-      tags: ['Career', 'Computer Science', 'Job Market', 'Advice']
+  const handleLike = async (postId: string) => {
+    try {
+      const response = await forumAPI.posts.like(postId)
+      if (response.success) {
+        await loadPosts()
+      }
+    } catch (error) {
+      console.error('Error liking post:', error)
     }
-  ]
+  }
 
-  const categories = [
-    { name: 'All', value: 'all', count: forumPosts.length },
-    { name: 'Programming', value: 'Programming', count: 1 },
-    { name: 'Mathematics', value: 'Mathematics', count: 1 },
-    { name: 'Study Groups', value: 'Study Groups', count: 1 },
-    { name: 'Career', value: 'Career', count: 1 }
-  ]
+  const handleComment = async (post: ForumPost) => {
+    setSelectedPost(post)
+    setShowCommentModal(true)
+    if (!comments[post.id]) {
+      await loadComments(post.id)
+    }
+  }
+
+  const handleSubmitComment = async () => {
+    if (!selectedPost || !newComment.trim()) return
+
+    try {
+      setPostingComment(true)
+      const response = await forumAPI.comments.create(selectedPost.id, { content: newComment })
+      if (response.success) {
+        setNewComment('')
+        await loadComments(selectedPost.id)
+        await loadPosts()
+      }
+    } catch (error) {
+      console.error('Error posting comment:', error)
+    } finally {
+      setPostingComment(false)
+    }
+  }
+
+  const handleShare = (post: ForumPost) => {
+    if (navigator.share) {
+      navigator.share({
+        title: post.title,
+        text: post.content.substring(0, 200),
+        url: window.location.href
+      }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      alert('Link copied to clipboard!')
+    }
+  }
+
+  const handleBookmark = (postId: string) => {
+    const newBookmarks = new Set(bookmarks)
+    if (newBookmarks.has(postId)) {
+      newBookmarks.delete(postId)
+    } else {
+      newBookmarks.add(postId)
+    }
+    setBookmarks(newBookmarks)
+    localStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(Array.from(newBookmarks)))
+  }
+
+  const handleCreatePost = async () => {
+    if (!newPost.title.trim() || !newPost.content.trim()) {
+      alert('Please fill in title and content')
+      return
+    }
+
+    try {
+      setCreatingPost(true)
+      const tags = newPost.tags.split(',').map(t => t.trim()).filter(t => t)
+      const response = await forumAPI.posts.create({
+        title: newPost.title,
+        content: newPost.content,
+        category: newPost.category,
+        tags
+      })
+
+      if (response.success) {
+        setShowCreateModal(false)
+        setNewPost({ title: '', content: '', category: 'Programming', tags: '' })
+        await loadPosts()
+      }
+    } catch (error) {
+      console.error('Error creating post:', error)
+      alert('Failed to create post')
+    } finally {
+      setCreatingPost(false)
+    }
+  }
+
+  // Get categories from posts
+  const categories = useMemo(() => {
+    const categorySet = new Set<string>()
+    posts.forEach(post => {
+      if (post.category) {
+        categorySet.add(post.category)
+      }
+    })
+    const categoryList = Array.from(categorySet).map(cat => ({
+      name: cat,
+      value: cat,
+      count: posts.filter(p => p.category === cat).length
+    }))
+    return [
+      { name: 'All', value: 'all', count: posts.length },
+      ...categoryList
+    ]
+  }, [posts])
+
+  // Sort and filter posts
+  const filteredPosts = useMemo(() => {
+    let filtered = [...posts]
+
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      filtered = filtered.filter(post => 
+        post.title.toLowerCase().includes(searchLower) ||
+        post.content.toLowerCase().includes(searchLower) ||
+        (users[post.authorId]?.name || '').toLowerCase().includes(searchLower)
+      )
+    }
+
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(post => post.category === selectedCategory)
+    }
+
+    filtered.sort((a, b) => {
+      switch (selectedSort) {
+        case 'popular':
+          return (b.views || 0) - (a.views || 0)
+        case 'liked':
+          return (b.likes?.length || 0) - (a.likes?.length || 0)
+        case 'commented':
+          return (b.likes?.length || 0) - (a.likes?.length || 0)
+        case 'recent':
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      }
+    })
+
+    return filtered
+  }, [posts, searchTerm, selectedCategory, selectedSort, users])
+
+  const getAuthorInfo = (authorId: string) => {
+    const user = users[authorId]
+    if (!user) return { name: 'Unknown', role: 'User' }
+    
+    const roleMap: Record<string, string> = {
+      'student': 'Student',
+      'tutor': 'Tutor',
+      'management': 'Management'
+    }
+    
+    return {
+      name: user.name || user.email || 'Unknown',
+      role: roleMap[user.role] || 'User'
+    }
+  }
+
+  const isLiked = (post: ForumPost) => {
+    return currentUser && post.likes?.includes(currentUser.userId || currentUser.id)
+  }
+
+  const getCommentCount = (postId: string) => {
+    return comments[postId]?.length || 0
+  }
 
   const sortOptions = [
     { name: 'Most Recent', value: 'recent' },
@@ -123,34 +371,6 @@ const OnlineCommunityForumMobile: React.FC = () => {
     { name: 'Most Liked', value: 'liked' },
     { name: 'Most Commented', value: 'commented' }
   ]
-
-  const filteredPosts = forumPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        post.author.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
-
-  const handleLike = (postId: number) => {
-    console.log('Like post:', postId)
-  }
-
-  const handleComment = (postId: number) => {
-    console.log('Comment on post:', postId)
-  }
-
-  const handleShare = (postId: number) => {
-    console.log('Share post:', postId)
-  }
-
-  const handleBookmark = (postId: number) => {
-    console.log('Bookmark post:', postId)
-  }
-
-  const handleCreatePost = () => {
-    console.log('Create new post')
-  }
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} pb-16`}>
@@ -193,7 +413,6 @@ const OnlineCommunityForumMobile: React.FC = () => {
 
       {/* Mobile Content */}
       <div className="p-4 space-y-4">
-
         {/* Forum Stats - Mobile */}
         <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <h3 className={`text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -202,19 +421,19 @@ const OnlineCommunityForumMobile: React.FC = () => {
           <div className="grid grid-cols-3 gap-3">
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
-                <div className="text-xl font-bold text-blue-600 mb-1">{forumPosts.length}</div>
+                <div className="text-xl font-bold text-blue-600 mb-1">{posts.length}</div>
                 <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Posts</div>
               </div>
             </div>
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
-                <div className="text-xl font-bold text-green-600 mb-1">{forumPosts.filter(p => p.isBookmarked).length}</div>
+                <div className="text-xl font-bold text-green-600 mb-1">{bookmarks.size}</div>
                 <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked</div>
               </div>
             </div>
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
-                <div className="text-xl font-bold text-purple-600 mb-1">1,247</div>
+                <div className="text-xl font-bold text-purple-600 mb-1">-</div>
                 <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Active Users</div>
               </div>
             </div>
@@ -318,7 +537,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
         {/* Quick Actions - Mobile */}
         <div className="grid grid-cols-2 gap-3">
           <button 
-            onClick={handleCreatePost}
+            onClick={() => setShowCreateModal(true)}
             className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
               theme === 'dark'
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -341,148 +560,167 @@ const OnlineCommunityForumMobile: React.FC = () => {
         </div>
 
         {/* Posts List - Mobile */}
-        <div className="space-y-3">
-          {filteredPosts.map((post) => (
-            <Card 
-              key={post.id} 
-              className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-              style={{
-                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                boxShadow: 'none !important'
-              }}
-            >
-              <div className="p-4">
-                {/* Post Header */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className={`font-semibold text-base mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {post.title}
-                    </h3>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <div className="flex items-center">
-                        <Person className="w-3 h-3 text-gray-400 mr-1" />
-                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                          {post.author}
-                        </span>
-                        <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                          post.authorRole === 'Tutor' ? 'bg-blue-100 text-blue-800' :
-                          post.authorRole === 'Professor' ? 'bg-purple-100 text-purple-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {post.authorRole}
+        {loading ? (
+          <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            Loading posts...
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            No posts found. Be the first to create a post!
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredPosts.map((post) => {
+              const author = getAuthorInfo(post.authorId)
+              const liked = isLiked(post)
+              const bookmarked = bookmarks.has(post.id)
+              const commentCount = getCommentCount(post.id)
+
+              return (
+                <Card 
+                  key={post.id} 
+                  className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                  style={{
+                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                    boxShadow: 'none !important'
+                  }}
+                >
+                  <div className="p-4">
+                    {/* Post Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className={`font-semibold text-base mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {post.title}
+                        </h3>
+                        <div className="flex items-center space-x-3 mb-2">
+                          <div className="flex items-center">
+                            <Person className="w-3 h-3 text-gray-400 mr-1" />
+                            <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {author.name}
+                            </span>
+                            <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                              author.role === 'Tutor' ? 'bg-blue-100 text-blue-800' :
+                              author.role === 'Management' ? 'bg-purple-100 text-purple-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {author.role}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <Schedule className="w-3 h-3 text-gray-400 mr-1" />
+                            <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                            </span>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-1 text-xs rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                          {post.category}
                         </span>
                       </div>
-                      <div className="flex items-center">
-                        <Schedule className="w-3 h-3 text-gray-400 mr-1" />
-                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                          {post.timestamp}
-                        </span>
+                      <div className="flex space-x-1">
+                        <button
+                          onClick={() => handleBookmark(post.id)}
+                          className={`p-2 rounded-lg ${
+                            bookmarked 
+                              ? 'bg-yellow-100 text-yellow-600' 
+                              : `${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
+                          }`}
+                        >
+                          <Bookmark className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleShare(post)}
+                          className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+                        >
+                          <Share className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    <span className={`px-2 py-1 text-xs rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-                      {post.category}
-                    </span>
-                  </div>
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => handleBookmark(post.id)}
-                      className={`p-2 rounded-lg ${
-                        post.isBookmarked 
-                          ? 'bg-yellow-100 text-yellow-600' 
-                          : `${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
-                      }`}
-                    >
-                      <Bookmark className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleShare(post.id)}
-                      className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
-                    >
-                      <Share className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
 
-                {/* Post Content */}
-                <div className="mb-3">
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
-                    {post.content}
-                  </p>
-                </div>
+                    {/* Post Content */}
+                    <div className="mb-3">
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
+                        {post.content}
+                      </p>
+                    </div>
 
-                {/* Tags */}
-                <div className="mb-3">
-                  <div className="flex flex-wrap gap-1">
-                    {post.tags.slice(0, 3).map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {post.tags.length > 3 && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                        +{post.tags.length - 3} more
-                      </span>
+                    {/* Tags */}
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="mb-3">
+                        <div className="flex flex-wrap gap-1">
+                          {post.tags.slice(0, 3).map((tag, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                          {post.tags.length > 3 && (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                              +{post.tags.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
 
-                {/* Post Actions */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <button
-                      onClick={() => handleLike(post.id)}
-                      className={`flex items-center space-x-1 ${
-                        post.isLiked 
-                          ? 'text-blue-600' 
-                          : `${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`
-                      }`}
-                    >
-                      <ThumbUp className="w-4 h-4" />
-                      <span className="text-sm">{post.likes}</span>
-                    </button>
-                    <button
-                      onClick={() => handleComment(post.id)}
-                      className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
-                    >
-                      <Comment className="w-4 h-4" />
-                      <span className="text-sm">{post.comments}</span>
-                    </button>
-                    <button
-                      onClick={() => handleShare(post.id)}
-                      className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
-                    >
-                      <Share className="w-4 h-4" />
-                      <span className="text-sm">{post.shares}</span>
-                    </button>
+                    {/* Post Actions */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <button
+                          onClick={() => handleLike(post.id)}
+                          className={`flex items-center space-x-1 ${
+                            liked 
+                              ? 'text-blue-600' 
+                              : `${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`
+                          }`}
+                        >
+                          <ThumbUp className="w-4 h-4" />
+                          <span className="text-sm">{post.likes?.length || 0}</span>
+                        </button>
+                        <button
+                          onClick={() => handleComment(post)}
+                          className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
+                        >
+                          <Comment className="w-4 h-4" />
+                          <span className="text-sm">{commentCount}</span>
+                        </button>
+                        <button
+                          onClick={() => handleShare(post)}
+                          className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
+                        >
+                          <Share className="w-4 h-4" />
+                          <span className="text-sm">{post.views || 0}</span>
+                        </button>
+                      </div>
+                      <Button 
+                        size="small" 
+                        variant="outlined"
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                          color: theme === 'dark' ? '#ffffff' : '#000000',
+                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                          textTransform: 'none',
+                          fontWeight: '500'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                        }}
+                      >
+                        Read More
+                      </Button>
+                    </div>
                   </div>
-                  <Button 
-                    size="small" 
-                    variant="outlined"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#000000',
-                      borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                      textTransform: 'none',
-                      fontWeight: '500'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
-                    }}
-                  >
-                    Read More
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+                </Card>
+              )
+            })}
+          </div>
+        )}
 
         {/* Help Section - Mobile with Toggle */}
         <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -543,6 +781,185 @@ const OnlineCommunityForumMobile: React.FC = () => {
         </div>
       </div>
 
+      {/* Create Post Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className={`w-full max-w-lg rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 max-h-[90vh] overflow-y-auto`}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Create New Post
+              </h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={newPost.title}
+                  onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                  className={`w-full px-4 py-2 rounded-lg border ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                  placeholder="Enter post title..."
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Category
+                </label>
+                <select
+                  value={newPost.category}
+                  onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
+                  className={`w-full px-4 py-2 rounded-lg border ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                >
+                  {categories.filter(c => c.value !== 'all').map(cat => (
+                    <option key={cat.value} value={cat.value}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Content
+                </label>
+                <textarea
+                  value={newPost.content}
+                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                  rows={6}
+                  className={`w-full px-4 py-2 rounded-lg border ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                  placeholder="Write your post content..."
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Tags (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  value={newPost.tags}
+                  onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
+                  className={`w-full px-4 py-2 rounded-lg border ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                  placeholder="e.g., React, JavaScript, Learning"
+                />
+              </div>
+              <div className="flex justify-end space-x-3">
+                <Button
+                  onClick={() => setShowCreateModal(false)}
+                  className="bg-gray-500 hover:bg-gray-600 text-white"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreatePost}
+                  disabled={creatingPost}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {creatingPost ? 'Creating...' : 'Create Post'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Comment Modal */}
+      {showCommentModal && selectedPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className={`w-full max-w-lg rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 max-h-[80vh] overflow-y-auto`}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Comments
+              </h2>
+              <button
+                onClick={() => {
+                  setShowCommentModal(false)
+                  setSelectedPost(null)
+                  setNewComment('')
+                }}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <div className="mb-4">
+              <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                {selectedPost.title}
+              </h3>
+            </div>
+            <div className="space-y-4 mb-4">
+              {comments[selectedPost.id]?.map((comment) => {
+                const commentAuthor = getAuthorInfo(comment.authorId)
+                return (
+                  <div key={comment.id} className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {commentAuthor.name}
+                        </span>
+                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                    </div>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {comment.content}
+                    </p>
+                  </div>
+                )
+              })}
+              {(!comments[selectedPost.id] || comments[selectedPost.id].length === 0) && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  No comments yet. Be the first to comment!
+                </div>
+              )}
+            </div>
+            <div className="space-y-3">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                rows={3}
+                className={`w-full px-4 py-2 rounded-lg border ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-white' 
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
+                placeholder="Write a comment..."
+              />
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSubmitComment}
+                  disabled={postingComment || !newComment.trim()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {postingComment ? 'Posting...' : 'Post Comment'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50">
@@ -580,7 +997,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Posts:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {forumPosts.length}
+                        {posts.length}
                       </span>
                     </div>
                   </div>
@@ -588,14 +1005,14 @@ const OnlineCommunityForumMobile: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked:</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        {forumPosts.filter(p => p.isBookmarked).length}
+                        {bookmarks.size}
                       </span>
                     </div>
                   </div>
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Active Users:</span>
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1,247</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>-</span>
                     </div>
                   </div>
                 </div>
@@ -640,16 +1057,6 @@ const OnlineCommunityForumMobile: React.FC = () => {
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Login
                 </button>
                 <button 
                   onClick={() => {

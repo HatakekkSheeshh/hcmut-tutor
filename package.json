@@ -17,6 +17,7 @@
     "preview": "vite preview",
     "seed": "tsx lib/seed.ts",
     "seed:clean": "node -e \"require('fs').rmSync('data', {recursive: true, force: true})\" && npm run seed",
+    "seed:forum": "tsx scripts/seed-forum.ts",
     "validate": "tsx scripts/validate.ts",
     "stats": "tsx -e \"import('./lib/dataValidator').then(m => m.generateDataStats())\""
   },

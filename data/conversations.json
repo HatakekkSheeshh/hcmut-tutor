@@ -586,20 +586,20 @@
       "stu_FyRaYWIiysPh"
     ],
     "unreadCount": {
-      "stu_afp9r8MLsjE8": 0,
+      "stu_afp9r8MLsjE8": 1,
       "stu_FyRaYWIiysPh": 2
     },
     "createdAt": "2025-11-13T04:13:09.877Z",
-    "updatedAt": "2025-11-13T04:29:44.399Z",
+    "updatedAt": "2025-11-14T09:31:59.722Z",
     "lastMessage": {
-      "id": "msg_VTRZCFicEZY3ikXC1B8jf",
+      "id": "msg_nxaK2NqTngFK20jTg-Jzt",
       "conversationId": "conv_e7DO2Fnw6BEu0CQKy-cRD",
-      "senderId": "stu_afp9r8MLsjE8",
-      "receiverId": "stu_FyRaYWIiysPh",
-      "content": "😉",
+      "senderId": "stu_FyRaYWIiysPh",
+      "receiverId": "stu_afp9r8MLsjE8",
+      "content": "solo ?",
       "type": "text",
       "read": false,
-      "createdAt": "2025-11-13T04:29:44.399Z"
+      "createdAt": "2025-11-14T09:31:59.722Z"
     }
   }
 ]

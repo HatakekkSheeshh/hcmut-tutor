@@ -63,8 +63,8 @@ import { listProgressHandler, createProgressHandler, getProgressHandler } from '
 import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, updateEvaluationHandler, deleteEvaluationHandler } from './routes/evaluations/index.js';
 
 // Import handlers - Forum
-import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler } from './routes/forum/posts.js';
-import { getCommentsHandler, createCommentHandler, deleteCommentHandler } from './routes/forum/comments.js';
+import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler, approvePostHandler, rejectPostHandler } from './routes/forum/posts.js';
+import { getCommentsHandler, createCommentHandler, deleteCommentHandler, likeCommentHandler } from './routes/forum/comments.js';
 
 // import { listLibraryResourcesHandler, getLibraryResourceHandler, searchLibraryHandler } from './routes/library/index.ts';
 
@@ -265,8 +265,11 @@ app.get('/api/forum/posts/:id', getPostHandler);
 app.put('/api/forum/posts/:id', authenticate, updatePostHandler);
 app.delete('/api/forum/posts/:id', authenticate, deletePostHandler);
 app.post('/api/forum/posts/:id/like', authenticate, likePostHandler);
+app.post('/api/forum/posts/:id/approve', authenticate, approvePostHandler);
+app.post('/api/forum/posts/:id/reject', authenticate, rejectPostHandler);
 app.get('/api/forum/posts/:id/comments', getCommentsHandler);
 app.post('/api/forum/posts/:id/comments', authenticate, createCommentHandler);
+app.post('/api/forum/comments/:id/like', authenticate, likeCommentHandler);
 app.delete('/api/forum/comments/:id', authenticate, deleteCommentHandler);
 
 // ===== DIGITAL LIBRARY ROUTES =====
