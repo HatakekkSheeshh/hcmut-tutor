@@ -928,5 +928,25 @@
     "type": "text",
     "read": false,
     "createdAt": "2025-11-13T04:29:44.399Z"
+  },
+  {
+    "id": "msg_eLVqdmMV0Y3QI8v1qi6Kl",
+    "conversationId": "conv_e7DO2Fnw6BEu0CQKy-cRD",
+    "senderId": "stu_afp9r8MLsjE8",
+    "receiverId": "stu_FyRaYWIiysPh",
+    "content": "😗",
+    "type": "text",
+    "read": false,
+    "createdAt": "2025-11-13T08:35:20.880Z"
+  },
+  {
+    "id": "msg_dV46g3nOOdXHGgB39JXC4",
+    "conversationId": "conv__xOuDthdaE7lx9-ed7oph",
+    "senderId": "stu_FyRaYWIiysPh",
+    "receiverId": "tut_am6slkTzwGyq",
+    "content": "thầy ơi",
+    "type": "text",
+    "read": false,
+    "createdAt": "2025-11-13T08:36:05.155Z"
   }
 ]
