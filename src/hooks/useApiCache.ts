@@ -156,9 +156,11 @@ export function useSessionsList(params?: any, options?: Omit<UseQueryOptions<any
     queryKey: queryKeys.sessions.list(params),
     queryFn: async () => {
       const result = await sessionsAPI.list(params);
-      if (!result.success) {
+      // Sessions API returns { data: [...], pagination: {...} } without success field
+      if (result.success === false) {
         throw new Error(result.error || 'Failed to fetch sessions');
       }
+      // Return data array directly
       return result.data || [];
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - sessions change more frequently
@@ -172,8 +174,14 @@ export function useSessionsByStudent(studentId: string | null | undefined, param
     queryFn: async () => {
       if (!studentId) return { data: [], pagination: { total: 0 } };
       const result = await sessionsAPI.list({ ...params, studentId });
-      if (!result.success) {
+      // Sessions API returns { data: [...], pagination: {...} } without success field
+      // Enrollments API returns { success: true, data: [...], pagination: {...} }
+      if (result.success === false) {
         throw new Error(result.error || 'Failed to fetch sessions');
+      }
+      // If no success field, assume it's the sessions format
+      if (!result.success && result.data) {
+        return result; // Already in correct format
       }
       return result;
     },

@@ -1114,7 +1114,7 @@ const StudentDashboard: React.FC = () => {
                 </button>
               </div>
               
-              {Object.keys(tutors).length === 0 ? (
+              {Object.keys(allTutors).length === 0 ? (
                 <div className="text-center py-8">
                   <PersonSearch className={`w-12 h-12 mx-auto mb-2 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -1130,7 +1130,7 @@ const StudentDashboard: React.FC = () => {
               ) : (
                 <>
                   <div className="space-y-3">
-                    {Object.values(tutors).slice(0, 4).map((tutor: any, index: number) => (
+                    {Object.values(allTutors).slice(0, 4).map((tutor: any, index: number) => (
                       <div 
                         key={index} 
                         className="flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
