@@ -23,10 +23,22 @@ export async function normalizeUserId(userId: string): Promise<string> {
   // If ObjectId format, try to find user and get custom ID
   if (ObjectId.isValid(userId) && userId.length === 24) {
     try {
+      // Try to find by _id (ObjectId) first
       const user = await storage.findById('users.json', userId);
-      if (user && (user as any).id) {
-        // Return custom ID from user document
-        return (user as any).id;
+      if (user) {
+        const userAny = user as any;
+        // Check if user has custom id field (prefer custom ID)
+        if (userAny.id && userAny.id.includes('_')) {
+          // Custom ID found (e.g., "stu_xxx")
+          return userAny.id;
+        }
+        // If no custom ID, check if the id field is the ObjectId itself
+        // In this case, we need to find the user by _id and check the original id field
+        // But since we already found it, let's check if there's a different id in MongoDB
+        // Actually, MongoDB stores both _id and id, so we should have the custom id
+        // If we don't have it, it means the migration didn't preserve it properly
+        console.warn(`[ID Normalizer] User ${userId} found but no custom ID field. Using ObjectId as-is.`);
+        return userId;
       }
     } catch (error) {
       console.warn(`[ID Normalizer] Could not find user with ObjectId ${userId}, using as-is`);

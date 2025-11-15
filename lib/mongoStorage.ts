@@ -37,9 +37,12 @@ export class MongoStorage {
       const documents = await collection.find({}).toArray();
       
       // Convert _id to id for compatibility
+      // Priority: custom id field > _id (ObjectId)
       return documents.map(doc => {
         const { _id, ...rest } = doc as any;
-        return { ...rest, id: _id?.toString() || rest.id } as T;
+        // Prefer custom id field if exists, otherwise use _id
+        const finalId = rest.id || _id?.toString();
+        return { ...rest, id: finalId } as T;
       });
     } catch (error: any) {
       console.error(`Error reading ${filename} from MongoDB:`, error.message || error);
@@ -118,7 +121,9 @@ export class MongoStorage {
       }
       
       const { _id, ...rest } = doc as any;
-      return { ...rest, id: _id?.toString() || rest.id } as T;
+      // Prefer custom id field if exists, otherwise use _id
+      const finalId = rest.id || _id?.toString();
+      return { ...rest, id: finalId } as T;
     } catch (error: any) {
       console.error(`Error finding ${filename} by id ${id}:`, error.message);
       return null;
