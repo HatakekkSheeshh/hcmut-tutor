@@ -79,11 +79,11 @@ const StudentDashboard: React.FC = () => {
   const { data: tutors = {} } = useUsersByIds(tutorIds)
   const { data: classes = {} } = useClassesByIds(classIds)
   
-  // Get class tutor IDs and load them
+  // Get class tutor IDs and load them (use tutors, not allTutors)
   const classTutorIds = [...new Set(
     Object.values(classes)
       .map((c: any) => c?.tutorId)
-      .filter((id: string) => id && !allTutors[id])
+      .filter((id: string) => id && !tutors[id])
   )] as string[]
   const { data: classTutors = {} } = useUsersByIds(classTutorIds)
   
