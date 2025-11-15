@@ -6,6 +6,13 @@ import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import '../../styles/weather-animations.css'
 import api from '../../lib/api'
+import { 
+  useAuthMe, 
+  useSessionsByStudent, 
+  useEnrollmentsByStudent,
+  useUsersByIds,
+  useClassesByIds
+} from '../../hooks/useApiCache'
 import {
   Dashboard as DashboardIcon,
   Search as SearchIcon,
@@ -49,13 +56,42 @@ const StudentDashboard: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
   
-  // User data states
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [sessions, setSessions] = useState<any[]>([])
-  const [enrollments, setEnrollments] = useState<any[]>([])
-  const [classes, setClasses] = useState<{ [key: string]: any }>({})
-  const [tutors, setTutors] = useState<{ [key: string]: any }>({})
+  // User data with caching
+  const { data: user, isLoading: userLoading } = useAuthMe()
+  const { data: sessionsResult, isLoading: sessionsLoading } = useSessionsByStudent(user?.id, { limit: 100 })
+  const { data: enrollmentsResult, isLoading: enrollmentsLoading } = useEnrollmentsByStudent(user?.id, { status: 'active' })
+  
+  // Extract data from results
+  const sessions = sessionsResult?.data || []
+  const enrollments = enrollmentsResult?.data || []
+  
+  // Get unique IDs for batch loading
+  const tutorIds = [...new Set([
+    ...sessions.map((s: any) => s.tutorId).filter(Boolean),
+    ...(enrollments.map((e: any) => e.classId).filter(Boolean).length > 0 
+      ? [] // Will load class tutors separately
+      : [])
+  ])] as string[]
+  
+  const classIds = [...new Set(enrollments.map((e: any) => e.classId).filter(Boolean))] as string[]
+  
+  // Batch load tutors and classes with caching
+  const { data: tutors = {} } = useUsersByIds(tutorIds)
+  const { data: classes = {} } = useClassesByIds(classIds)
+  
+  // Get class tutor IDs and load them
+  const classTutorIds = [...new Set(
+    Object.values(classes)
+      .map((c: any) => c?.tutorId)
+      .filter((id: string) => id && !allTutors[id])
+  )] as string[]
+  const { data: classTutors = {} } = useUsersByIds(classTutorIds)
+  
+  // Merge tutors
+  const allTutors = { ...tutors, ...classTutors }
+  
+  // Combined loading state
+  const loading = userLoading || sessionsLoading || enrollmentsLoading
   
   // Time and weather states
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -78,132 +114,15 @@ const StudentDashboard: React.FC = () => {
     setShowThemeOptions(false)
   }
 
-  // Load user data and sessions from backend
-  const loadUserData = async () => {
-    try {
-      setLoading(true)
-      
-      // Get current user
-      const userResult = await api.auth.getMe()
-      if (userResult.success) {
-        const userData = userResult.data
-        setUser(userData)
-        
-        // Get user sessions and enrollments
-        const [sessionsResult, enrollmentsResult] = await Promise.all([
-          api.sessions.list({
-            studentId: userData.id,
-            limit: 100
-          }),
-          api.enrollments.list({
-            studentId: userData.id,
-            status: 'active'
-          })
-        ])
-        
-        console.log('Sessions API Response:', sessionsResult)
-        console.log('Enrollments API Response:', enrollmentsResult)
-        
-        if (sessionsResult.data && Array.isArray(sessionsResult.data)) {
-          const sessionsData = sessionsResult.data
-          setSessions(sessionsData)
-          console.log('Sessions loaded:', sessionsData.length)
-          
-          // Load tutor data for each session
-          const uniqueTutorIds = [...new Set(sessionsData.map((s: any) => s.tutorId))] as string[]
-          const tutorPromises = uniqueTutorIds.map(async (tutorId: string) => {
-            try {
-              const tutorResponse = await api.users.get(tutorId)
-              if (tutorResponse.success && tutorResponse.data) {
-                return { id: tutorId, data: tutorResponse.data }
-              }
-            } catch (err) {
-              console.error(`Failed to load tutor ${tutorId}:`, err)
-            }
-            return null
-          })
-          
-          const tutorResults = await Promise.all(tutorPromises)
-          let tutorsMap: { [key: string]: any } = {}
-          tutorResults.forEach(result => {
-            if (result) {
-              tutorsMap[result.id] = result.data
-            }
-          })
-          
-          // Load enrollments and classes
-          if (enrollmentsResult.success && enrollmentsResult.data && Array.isArray(enrollmentsResult.data)) {
-            const enrollmentsData = enrollmentsResult.data
-            setEnrollments(enrollmentsData)
-            console.log('Enrollments loaded:', enrollmentsData.length)
-
-            // Load class details for each enrollment
-            const uniqueClassIds = [...new Set(enrollmentsData.map((e: any) => e.classId))] as string[]
-            const classPromises = uniqueClassIds.map(async (classId: string) => {
-              try {
-                const classResponse = await api.classes.get(classId)
-                if (classResponse.success && classResponse.data) {
-                  return { id: classId, data: classResponse.data }
-                }
-              } catch (err) {
-                console.error(`Failed to load class ${classId}:`, err)
-              }
-              return null
-            })
-
-            const classResults = await Promise.all(classPromises)
-            const classesMap: { [key: string]: any } = {}
-            const classTutorIds: string[] = []
-            
-            classResults.forEach(result => {
-              if (result) {
-                classesMap[result.id] = result.data
-                if (result.data.tutorId && !tutorsMap[result.data.tutorId]) {
-                  classTutorIds.push(result.data.tutorId)
-                }
-              }
-            })
-            setClasses(classesMap)
-
-            // Load tutors for classes if needed
-            if (classTutorIds.length > 0) {
-              const classTutorPromises = classTutorIds.map(async (tutorId: string) => {
-                try {
-                  const tutorResponse = await api.users.get(tutorId)
-                  if (tutorResponse.success && tutorResponse.data) {
-                    return { id: tutorId, data: tutorResponse.data }
-                  }
-                } catch (err) {
-                  console.error(`Failed to load tutor ${tutorId}:`, err)
-                }
-                return null
-              })
-
-              const classTutorResults = await Promise.all(classTutorPromises)
-              classTutorResults.forEach(result => {
-                if (result) {
-                  tutorsMap[result.id] = result.data
-                }
-              })
-            }
-          }
-          
-          setTutors(tutorsMap)
-        }
-      } else {
-        // If auth fails, redirect to login
-        if (userResult.error?.includes('xác thực')) {
-          localStorage.removeItem('token')
-          localStorage.removeItem('user')
-          navigate('/login')
-        }
-      }
-    } catch (error) {
-      console.error('Error loading user data:', error)
-    } finally {
-      setLoading(false)
+  // Handle auth errors
+  useEffect(() => {
+    if (user === null && !userLoading) {
+      // Auth failed, redirect to login
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      navigate('/login')
     }
-  }
+  }, [user, userLoading, navigate])
 
   // Weather API function
   const fetchWeather = async () => {
@@ -301,11 +220,8 @@ const StudentDashboard: React.FC = () => {
     return 'Good Evening'
   }
 
-  // useEffect for data loading, time and weather
+  // useEffect for time and weather
   useEffect(() => {
-    // Load user data and sessions
-    loadUserData()
-    
     // Update time every second
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date())
@@ -325,8 +241,8 @@ const StudentDashboard: React.FC = () => {
 
   // Calculate stats from real data
   const totalSessions = sessions.length
-  const completedSessions = sessions.filter(s => s.status === 'completed').length
-  const upcomingSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed' || s.status === 'pending' || s.status === 'rescheduled').length
+  const completedSessions = sessions.filter((s: any) => s.status === 'completed').length
+  const upcomingSessions = sessions.filter((s: any) => s.status === 'scheduled' || s.status === 'confirmed' || s.status === 'pending' || s.status === 'rescheduled').length
   const totalClasses = enrollments.length
   
   const stats = [
@@ -338,12 +254,12 @@ const StudentDashboard: React.FC = () => {
   // Map sessions to course format for UI (only show upcoming/confirmed sessions)
   // Filter out class sessions (sessions with classId) - those belong to My Classes section
   const sessionsCourses = sessions
-    .filter(session => 
+    .filter((session: any) => 
       (session.status === 'confirmed' || session.status === 'pending' || session.status === 'rescheduled') &&
       !session.classId // Only show individual sessions, not class sessions
     )
-    .map(session => {
-      const tutor = tutors[session.tutorId]
+    .map((session: any) => {
+      const tutor = allTutors[session.tutorId]
       return {
         id: session.id,
         type: 'session' as const,
@@ -357,14 +273,14 @@ const StudentDashboard: React.FC = () => {
         sessionData: session // Keep original session data for reference
       }
     })
-    .sort((a, b) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
+    .sort((a: any, b: any) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
     .slice(0, 6) // Limit to 6 items for display
 
   // Map classes to course format
   const classesCourses = enrollments
-    .map(enrollment => {
+    .map((enrollment: any) => {
       const classItem = classes[enrollment.classId]
-      const tutor = classItem ? tutors[classItem.tutorId] : null
+      const tutor = classItem ? allTutors[classItem.tutorId] : null
       return {
         id: enrollment.classId,
         type: 'class' as const,
@@ -378,7 +294,7 @@ const StudentDashboard: React.FC = () => {
         classData: classItem // Keep original class data for reference
       }
     })
-    .sort((a, b) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
+    .sort((a: any, b: any) => new Date(a.nextSession).getTime() - new Date(b.nextSession).getTime())
     .slice(0, 6) // Limit to 6 items for display
 
   // Helper function to get initials from name
@@ -857,7 +773,7 @@ const StudentDashboard: React.FC = () => {
               </div>
             ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-              {sessionsCourses.map((course) => (
+              {sessionsCourses.map((course: any) => (
                 <div 
                   key={course.id}
                   className="cursor-pointer transition-all duration-200 hover:shadow-lg h-full"
@@ -975,7 +891,7 @@ const StudentDashboard: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-                {classesCourses.slice(0, 6).map((course) => (
+                {classesCourses.slice(0, 6).map((course: any) => (
                   <div 
                     key={course.id}
                     className="cursor-pointer transition-all duration-200 hover:shadow-lg h-full"
