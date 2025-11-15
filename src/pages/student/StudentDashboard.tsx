@@ -62,8 +62,40 @@ const StudentDashboard: React.FC = () => {
   const { data: enrollmentsResult, isLoading: enrollmentsLoading } = useEnrollmentsByStudent(user?.id, { status: 'active' })
   
   // Extract data from results
-  const sessions = sessionsResult?.data || []
-  const enrollments = enrollmentsResult?.data || []
+  // Handle both array and object formats
+  const sessions = React.useMemo(() => {
+    if (!sessionsResult) return [];
+    if (Array.isArray(sessionsResult.data)) {
+      return sessionsResult.data;
+    }
+    if (sessionsResult.data?.data && Array.isArray(sessionsResult.data.data)) {
+      return sessionsResult.data.data;
+    }
+    return [];
+  }, [sessionsResult]);
+  
+  const enrollments = React.useMemo(() => {
+    if (!enrollmentsResult) return [];
+    if (Array.isArray(enrollmentsResult.data)) {
+      return enrollmentsResult.data;
+    }
+    if (enrollmentsResult.data?.data && Array.isArray(enrollmentsResult.data.data)) {
+      return enrollmentsResult.data.data;
+    }
+    return [];
+  }, [enrollmentsResult]);
+  
+  // Debug logs (remove in production)
+  React.useEffect(() => {
+    if (sessionsResult) {
+      console.log('[Dashboard] Sessions result:', sessionsResult);
+      console.log('[Dashboard] Extracted sessions:', sessions);
+    }
+    if (enrollmentsResult) {
+      console.log('[Dashboard] Enrollments result:', enrollmentsResult);
+      console.log('[Dashboard] Extracted enrollments:', enrollments);
+    }
+  }, [sessionsResult, enrollmentsResult, sessions, enrollments]);
   
   // Get unique IDs for batch loading
   const tutorIds = [...new Set([
