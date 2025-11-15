@@ -29,7 +29,11 @@ export async function getCommentsHandler(req: AuthRequest, res: Response) {
       (comment) => comment.postId === id
     );
 
-    return res.json(result);
+    return res.json({
+      success: true,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (error: any) {
     return res.status(500).json(
       errorResponse('Lỗi lấy bình luận: ' + error.message)
@@ -71,6 +75,45 @@ export async function createCommentHandler(req: AuthRequest, res: Response) {
   } catch (error: any) {
     return res.status(500).json(
       errorResponse('Lỗi thêm bình luận: ' + error.message)
+    );
+  }
+}
+
+/**
+ * POST /api/forum/comments/:id/like
+ */
+export async function likeCommentHandler(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+    const currentUser = req.user!;
+
+    const comment = await storage.findById<ForumComment>('forum-comments.json', id);
+    if (!comment) {
+      return res.status(404).json(errorResponse('Không tìm thấy bình luận'));
+    }
+
+    const likes = comment.likes || [];
+    const userIndex = likes.indexOf(currentUser.userId);
+
+    if (userIndex > -1) {
+      // Unlike
+      likes.splice(userIndex, 1);
+    } else {
+      // Like
+      likes.push(currentUser.userId);
+    }
+
+    await storage.update<ForumComment>('forum-comments.json', id, { 
+      likes,
+      updatedAt: now()
+    });
+
+    return res.json(
+      successResponse({ liked: userIndex === -1, likesCount: likes.length })
+    );
+  } catch (error: any) {
+    return res.status(500).json(
+      errorResponse('Lỗi thích bình luận: ' + error.message)
     );
   }
 }

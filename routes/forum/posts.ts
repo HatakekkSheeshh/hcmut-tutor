@@ -19,12 +19,27 @@ import { successResponse, errorResponse, generateId, now } from '../../lib/utils
  */
 export async function listPostsHandler(req: AuthRequest, res: Response) {
   try {
-    const { category, search, page = '1', limit = '10' } = req.query;
+    const { category, search, page = '1', limit = '10', status } = req.query;
+    const currentUser = req.user;
 
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
 
     const filter = (post: ForumPost) => {
+      // Only show approved posts to regular users
+      // Managers can see all posts or filter by status
+      if (currentUser?.role !== 'management') {
+        // If post has no status, treat it as approved (for backward compatibility)
+        if (post.status && post.status !== 'approved') return false;
+      } else {
+        // Manager can filter by status if provided
+        if (status && status !== 'all') {
+          // If filtering by specific status, only show posts with that status
+          if (post.status !== status) return false;
+        }
+        // If no status filter or 'all', show all (including pending and posts without status)
+      }
+      
       if (category && post.category !== category) return false;
       
       if (search) {
@@ -45,7 +60,11 @@ export async function listPostsHandler(req: AuthRequest, res: Response) {
       filter
     );
 
-    return res.json(result);
+    return res.json({
+      success: true,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (error: any) {
     return res.status(500).json(
       errorResponse('Lỗi lấy danh sách bài viết: ' + error.message)
@@ -72,6 +91,7 @@ export async function createPostHandler(req: AuthRequest, res: Response) {
       views: 0,
       pinned: false,
       locked: false,
+      status: 'pending', // Posts need approval before appearing
       createdAt: now(),
       updatedAt: now()
     };
@@ -79,7 +99,7 @@ export async function createPostHandler(req: AuthRequest, res: Response) {
     await storage.create('forum-posts.json', newPost);
 
     return res.status(201).json(
-      successResponse(newPost, 'Tạo bài viết thành công')
+      successResponse(newPost, 'Tạo bài viết thành công. Bài viết đang chờ phê duyệt.')
     );
   } catch (error: any) {
     return res.status(500).json(
@@ -215,6 +235,76 @@ export async function likePostHandler(req: AuthRequest, res: Response) {
   } catch (error: any) {
     return res.status(500).json(
       errorResponse('Lỗi thích bài viết: ' + error.message)
+    );
+  }
+}
+
+/**
+ * POST /api/forum/posts/:id/approve
+ * Only management can approve posts
+ */
+export async function approvePostHandler(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+    const currentUser = req.user!;
+    const { notes } = req.body;
+
+    if (currentUser.role !== 'management') {
+      return res.status(403).json(errorResponse('Chỉ management mới có quyền phê duyệt bài viết'));
+    }
+
+    const post = await storage.findById<ForumPost>('forum-posts.json', id);
+    if (!post) {
+      return res.status(404).json(errorResponse('Không tìm thấy bài viết'));
+    }
+
+    await storage.update<ForumPost>('forum-posts.json', id, {
+      status: 'approved',
+      moderationNotes: notes || '',
+      moderatedBy: currentUser.userId,
+      moderatedAt: now(),
+      updatedAt: now()
+    });
+
+    return res.json(successResponse(null, 'Phê duyệt bài viết thành công'));
+  } catch (error: any) {
+    return res.status(500).json(
+      errorResponse('Lỗi phê duyệt bài viết: ' + error.message)
+    );
+  }
+}
+
+/**
+ * POST /api/forum/posts/:id/reject
+ * Only management can reject posts
+ */
+export async function rejectPostHandler(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+    const currentUser = req.user!;
+    const { notes } = req.body;
+
+    if (currentUser.role !== 'management') {
+      return res.status(403).json(errorResponse('Chỉ management mới có quyền từ chối bài viết'));
+    }
+
+    const post = await storage.findById<ForumPost>('forum-posts.json', id);
+    if (!post) {
+      return res.status(404).json(errorResponse('Không tìm thấy bài viết'));
+    }
+
+    await storage.update<ForumPost>('forum-posts.json', id, {
+      status: 'rejected',
+      moderationNotes: notes || '',
+      moderatedBy: currentUser.userId,
+      moderatedAt: now(),
+      updatedAt: now()
+    });
+
+    return res.json(successResponse(null, 'Từ chối bài viết thành công'));
+  } catch (error: any) {
+    return res.status(500).json(
+      errorResponse('Lỗi từ chối bài viết: ' + error.message)
     );
   }
 }

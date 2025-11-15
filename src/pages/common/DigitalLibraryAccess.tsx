@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -20,7 +20,7 @@ import {
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { navigateToDashboard } from '../../utils/navigation'
-
+import jsPDF from 'jspdf'
 const DigitalLibraryAccess: React.FC = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
@@ -33,92 +33,136 @@ const DigitalLibraryAccess: React.FC = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  const libraryResources = [
-    {
-      id: 1,
-      title: 'Advanced Mathematics for Engineers',
-      author: 'Dr. Sarah Wilson',
-      category: 'Mathematics',
-      format: 'PDF',
-      pages: 450,
-      rating: 4.8,
-      downloads: 1250,
-      description: 'Comprehensive guide to advanced mathematical concepts for engineering students.',
-      tags: ['Engineering', 'Calculus', 'Linear Algebra', 'Differential Equations'],
-      isBookmarked: false,
-      isDownloaded: false
-    },
-    {
-      id: 2,
-      title: 'Introduction to Machine Learning',
-      author: 'Prof. Mike Chen',
-      category: 'Computer Science',
-      format: 'Video',
-      duration: '12 hours',
-      rating: 4.9,
-      downloads: 2100,
-      description: 'Complete course on machine learning fundamentals and applications.',
-      tags: ['AI', 'Python', 'Data Science', 'Neural Networks'],
-      isBookmarked: true,
-      isDownloaded: true
-    },
-    {
-      id: 3,
-      title: 'Organic Chemistry Laboratory Manual',
-      author: 'Dr. Alice Brown',
-      category: 'Chemistry',
-      format: 'PDF',
-      pages: 320,
-      rating: 4.7,
-      downloads: 890,
-      description: 'Step-by-step laboratory procedures and safety guidelines.',
-      tags: ['Laboratory', 'Safety', 'Procedures', 'Organic Chemistry'],
-      isBookmarked: false,
-      isDownloaded: false
-    },
-    {
-      id: 4,
-      title: 'Physics Problem Solving Techniques',
-      author: 'Prof. David Lee',
-      category: 'Physics',
-      format: 'Interactive',
-      duration: '8 hours',
-      rating: 4.6,
-      downloads: 1560,
-      description: 'Interactive problem-solving methods for physics students.',
-      tags: ['Problem Solving', 'Mechanics', 'Thermodynamics', 'Electromagnetism'],
-      isBookmarked: true,
-      isDownloaded: false
-    }
-  ]
+  // Live resources fetched from backend
+  const [libraryResources, setLibraryResources] = useState<any[]>([])
+  const [isLoadingResources, setIsLoadingResources] = useState(false)
+  const [bookmarkPending, setBookmarkPending] = useState<string | null>(null)
 
   const categories = [
-    { name: 'All', value: 'all', count: libraryResources.length },
-    { name: 'Mathematics', value: 'Mathematics', count: 1 },
-    { name: 'Computer Science', value: 'Computer Science', count: 1 },
-    { name: 'Chemistry', value: 'Chemistry', count: 1 },
-    { name: 'Physics', value: 'Physics', count: 1 }
+    { name: 'All', value: 'all', count: libraryResources.length }
   ]
 
   const formats = [
     { name: 'All Formats', value: 'all' },
-    { name: 'PDF', value: 'PDF' },
+    { name: 'Document', value: 'Document' },
     { name: 'Video', value: 'Video' },
-    { name: 'Interactive', value: 'Interactive' }
+    { name: 'Book', value: 'Book' },
+    {name: 'Article', value: 'Article'}
   ]
 
+  // Filter resources locally for UI responsiveness; primary source is backend search
   const filteredResources = libraryResources.filter(resource => {
-    const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        resource.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        resource.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || resource.category === selectedCategory
-    const matchesFormat = selectedFormat === 'all' || resource.format === selectedFormat
+    const q = searchTerm.trim().toLowerCase()
+    const matchesSearch = !q || (
+      (resource.title || '').toLowerCase().includes(q) ||
+      (resource.author || '').toLowerCase().includes(q) ||
+      (resource.description || '').toLowerCase().includes(q) ||
+      ((resource.tags || []) as string[]).join(' ').toLowerCase().includes(q) ||
+      (resource.id || '').toLowerCase().includes(q)
+    )
+    const matchesCategory = selectedCategory === 'all' || (resource.subject || resource.category) === selectedCategory
+    const matchesFormat = selectedFormat === 'all' || (resource.type || resource.format).toLowerCase() === selectedFormat.toLowerCase()
     return matchesSearch && matchesCategory && matchesFormat
   })
 
-  const handleBookmark = (resourceId: number) => {
-    console.log('Bookmark resource:', resourceId)
+  // Fetch all materials from backend on mount or when searchTerm changes
+  useEffect(() => {
+    let mounted = true
+    const fetchResources = async () => {
+      try {
+        setIsLoadingResources(true)
+        //Check Local Storage for remain status
+        const saved = localStorage.getItem('libraryData')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0  ) {  
+            setLibraryResources(parsed)
+            setIsLoadingResources(false)
+            return
+        }
+      }
+        // Request a large limit to retrieve all materials; backend will paginate if needed
+        const params = new URLSearchParams()
+        if (searchTerm.trim()) params.set('q', searchTerm.trim())
+        params.set('limit', '1000')
+
+        // Primary: try backend search endpoint
+      try {
+          const res = await fetch(`/api/library/search?${params.toString()}`)
+          if (res.ok) {
+            const json = await res.json()
+            const data = json?.data || []
+          if (mounted && Array.isArray(data) && data.length > 0) {
+            const enriched = data.map((item: any) => ({
+              ...item,
+              isBookMarked: item.isBookMarked ?? false,
+            }))
+            setLibraryResources(enriched)
+            // 💾 Lưu lại vào localStorage
+            localStorage.setItem('libraryData', JSON.stringify(enriched))
+            return
+          }
+        } else {
+          console.warn('API /api/library/search returned status', res.status)
+        }
+      } catch (apiErr) {
+        console.warn('Primary library API fetch failed:', apiErr)
+      }
+
+
+        // Fallback: try loading static data file (useful during local development)
+      try {
+        const fallbackRes = await fetch('/data/library-materials.json')
+        if (fallbackRes.ok) {
+          const arr = await fallbackRes.json()
+          if (mounted && Array.isArray(arr)) {
+            const enriched = arr.map((item: any) => ({
+              ...item,
+              isBookMarked: item.isBookMarked ?? false,
+            }))
+            setLibraryResources(enriched)
+            // 💾 Lưu lại vào localStorage
+            localStorage.setItem('libraryData', JSON.stringify(enriched))
+            return
+          }
+        } else {
+          console.warn('Fallback /data/library-materials.json returned', fallbackRes.status)
+        }
+      } catch (fbErr) {
+        console.warn('Fallback fetch failed:', fbErr)
+      }
+
+        // If both methods failed, clear resources (maintain previous behavior)
+        if (mounted) setLibraryResources([])
+      } catch (e) {
+        console.error('Failed to fetch library resources', e)
+      } finally {
+        if (mounted) setIsLoadingResources(false)
+      }
+    }
+
+    // Debounce quick typing: small delay
+    const t = setTimeout(fetchResources, 250)
+    return () => {
+      mounted = false
+      clearTimeout(t)
+    }
+  }, [searchTerm])
+
+//Function toandle bookmark toggling
+  const handleBookmark = async (resourceId: string) => {
+    setLibraryResources(prevResources => {
+    const updatedResources = prevResources.map(r =>
+      r.id === resourceId
+        ? { ...r, isBookMarked: !r.isBookMarked }  // đảo giá trị
+        : r
+    )
+    // 💾 Lưu trạng thái vào localStorage để reload vẫn nhớ
+    localStorage.setItem('libraryData', JSON.stringify(updatedResources))
+    return updatedResources
+  })
   }
+  
 
   const handleDownload = (resourceId: number) => {
     console.log('Download resource:', resourceId)
@@ -127,6 +171,44 @@ const DigitalLibraryAccess: React.FC = () => {
   const handleShare = (resourceId: number) => {
     console.log('Share resource:', resourceId)
   }
+
+  const handleViewPDF = (resource: any) => {
+    const doc = new jsPDF()
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(18)
+    doc.text(resource.title || 'Untitled Document', 10, 20)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(12)
+    let y = 30
+
+    const info = [
+      ['ID', resource.id],
+      ['Author', resource.author],
+      ['Type', resource.type],
+      ['Subject', resource.subject],
+      ['Description', resource.description],
+      ['Downloads', resource.downloads?.toString()],
+      ['Views', resource.views?.toString()],
+      ['Tags', (resource.tags || []).join(', ')],
+      ['URL', resource.url],
+      ['Created At', new Date(resource.createdAt).toLocaleString()],
+      ['Updated At', new Date(resource.updatedAt).toLocaleString()]
+    ]
+
+    info.forEach(([label, value]) => {
+      doc.text(`${label}: ${value || 'N/A'}`, 10, y)
+      y += 10
+    })
+
+    // ✅ Mở file PDF trong tab mới (xem trực tiếp)
+    window.open(doc.output('bloburl'), '_blank')
+
+    // 👉 Nếu bạn muốn tải luôn, thay bằng:
+    // doc.save(`${resource.title || 'document'}.pdf`)
+}
+
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -165,7 +247,7 @@ const DigitalLibraryAccess: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {libraryResources.filter(r => r.isBookmarked).length}
+                      {libraryResources.filter(r => r.isBookMarked).length}
                     </span>
                   </div>
                 </div>
@@ -217,13 +299,6 @@ const DigitalLibraryAccess: React.FC = () => {
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
-                </button>
-                <button 
-                  onClick={() => navigate('/common')}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Login
                 </button>
                 <button 
                   onClick={() => navigate('/common/profile')}
@@ -391,7 +466,9 @@ const DigitalLibraryAccess: React.FC = () => {
                   {/* Resource Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h3 className={`font-semibold text-lg mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      <h3
+                        onClick={() => handleViewPDF(resource)}
+                        className={`font-semibold text-lg mb-2 cursor-pointer hover:underline ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {resource.title}
                       </h3>
                       <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -409,8 +486,9 @@ const DigitalLibraryAccess: React.FC = () => {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleBookmark(resource.id)}
-                        className={`p-2 rounded-lg ${
-                          resource.isBookmarked 
+                        disabled={bookmarkPending === resource.id}
+                        className={`p-2 rounded-lg transition-colors ${bookmarkPending === resource.id ? 'opacity-60 cursor-not-allowed' : ''} ${
+                          resource.isBookMarked 
                             ? 'bg-yellow-100 text-yellow-600' 
                             : `${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
                         }`}
@@ -456,7 +534,7 @@ const DigitalLibraryAccess: React.FC = () => {
                   {/* Tags */}
                   <div className="mb-4">
                     <div className="flex flex-wrap gap-1">
-                      {resource.tags.slice(0, 3).map((tag, index) => (
+                      {((resource.tags || []) as string[]).slice(0, 3).map((tag: string, index: number) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
@@ -603,16 +681,6 @@ const DigitalLibraryAccess: React.FC = () => {
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
                   Back to Dashboard
-                </button>
-                <button 
-                  onClick={() => {
-                    navigate('/common')
-                    setMobileOpen(false)
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Login
                 </button>
                 <button 
                   onClick={() => {

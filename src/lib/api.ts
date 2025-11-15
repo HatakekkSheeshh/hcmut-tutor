@@ -320,6 +320,7 @@ export const forumAPI = {
       search?: string;
       page?: number;
       limit?: number;
+      status?: string;
     }) {
       const query = params ? '?' + new URLSearchParams(params as any).toString() : '';
       return fetchAPI(`/forum/posts${query}`);
@@ -354,6 +355,20 @@ export const forumAPI = {
 
     async like(id: string) {
       return fetchAPI(`/forum/posts/${id}/like`, { method: 'POST' });
+    },
+
+    async approve(id: string, notes?: string) {
+      return fetchAPI(`/forum/posts/${id}/approve`, {
+        method: 'POST',
+        body: JSON.stringify({ notes })
+      });
+    },
+
+    async reject(id: string, notes?: string) {
+      return fetchAPI(`/forum/posts/${id}/reject`, {
+        method: 'POST',
+        body: JSON.stringify({ notes })
+      });
     }
   },
 
@@ -370,6 +385,12 @@ export const forumAPI = {
       return fetchAPI(`/forum/posts/${postId}/comments`, {
         method: 'POST',
         body: JSON.stringify(data)
+      });
+    },
+
+    async like(id: string) {
+      return fetchAPI(`/forum/comments/${id}/like`, {
+        method: 'POST'
       });
     },
 
@@ -840,6 +861,11 @@ export const conversationsAPI = {
 
   async get(id: string) {
     return fetchAPI(`/conversations/${id}`);
+  },
+
+  async getMessages(conversationId: string, params?: { page?: number; limit?: number }) {
+    const query = params ? '?' + new URLSearchParams(params as any).toString() : '';
+    return fetchAPI(`/conversations/${conversationId}/messages${query}`);
   },
 
   async delete(id: string) {

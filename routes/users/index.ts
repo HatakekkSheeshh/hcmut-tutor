@@ -46,7 +46,11 @@ export async function listUsersHandler(req: AuthRequest, res: Response) {
     // Remove passwords from all users
     result.data = result.data.map(({ password, ...user }) => user);
 
-    return res.json(result);
+    return res.json({
+      success: true,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (error: any) {
     console.error('List users error:', error);
     return res.status(500).json(

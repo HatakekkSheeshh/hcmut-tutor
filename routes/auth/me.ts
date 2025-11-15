@@ -28,6 +28,24 @@ export async function meHandler(req: AuthRequest, res: Response) {
     // Remove password
     const { password, ...userWithoutPassword } = user;
 
+    // Ensure we return the custom ID if available, not ObjectId
+    // MongoDB may return _id as id, but we want the original custom id
+    const userAny = userWithoutPassword as any;
+    if (userAny.id && !userAny.id.includes('_') && userAny.id.length === 24) {
+      // This is ObjectId, try to find custom ID
+      // Read all users to find the one with matching _id and get its custom id
+      const allUsers = await storage.read<User>('users.json');
+      const foundUser = allUsers.find(u => {
+        const uAny = u as any;
+        // Check if this user's _id matches the ObjectId, or if it has the custom id
+        return uAny.id === userAny.id || 
+               (uAny.id && uAny.id.includes('_') && uAny._id === userAny.id);
+      });
+      if (foundUser && (foundUser as any).id && (foundUser as any).id.includes('_')) {
+        userAny.id = (foundUser as any).id;
+      }
+    }
+
     return res.json(
       successResponse(userWithoutPassword)
     );

@@ -10,6 +10,7 @@ import { Session, SessionStatus, UserRole, Notification, NotificationType, Class
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
 import { queueNotification } from '../../lib/services/notificationQueue.js';
+import { normalizeUserId } from '../../lib/idNormalizer.js';
 /**
  * GET /api/sessions
  */
@@ -30,20 +31,29 @@ export async function listSessionsHandler(req: AuthRequest, res: Response) {
     const limitNum = parseInt(limit as string);
     const currentUser = req.user!;
 
+    // Normalize studentId if provided (convert ObjectId to custom ID)
+    let normalizedStudentId: string | undefined;
+    if (studentId) {
+      normalizedStudentId = await normalizeUserId(studentId as string);
+    }
+
+    // Normalize currentUser.userId (in case it's ObjectId)
+    const normalizedCurrentUserId = await normalizeUserId(currentUser.userId);
+
     // Build filter
     const filter = (session: Session) => {
       // Authorization: users can only see their own sessions unless management
       if (currentUser.role !== UserRole.MANAGEMENT) {
         if (
-          !session.studentIds?.includes(currentUser.userId) &&
-          session.tutorId !== currentUser.userId
+          !session.studentIds?.includes(normalizedCurrentUserId) &&
+          session.tutorId !== normalizedCurrentUserId
         ) {
           return false;
         }
       }
 
-      // Filter by studentId
-      if (studentId && !session.studentIds?.includes(studentId as string)) return false;
+      // Filter by studentId (use normalized ID)
+      if (normalizedStudentId && !session.studentIds?.includes(normalizedStudentId)) return false;
 
       // Filter by tutorId
       if (tutorId && session.tutorId !== tutorId) return false;

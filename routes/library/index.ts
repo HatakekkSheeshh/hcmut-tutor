@@ -1,99 +1,100 @@
 /**
- * Digital Library APIs
- * ...
+ * Library APIs
+ * GET  /api/library/search           - Search materials
+ * GET  /api/library/sync             - Sync from HCMUT Library (cron job)
+ * POST /api/library/bookmarks        - Bookmark material
+ * GET  /api/library/recommendations  - Get recommendations
  */
 
-import { Response } from 'express';
-import { storage } from '../../lib/storage.js';
-// ✅ Interface của bạn đã được import (giả sử từ types.ts)
-import { LibraryResource } from '../../lib/types.js'; 
-import { AuthRequest } from '../../lib/middleware.js';
-import { successResponse, errorResponse } from '../../lib/utils.js';
+import { Response } from 'express'
+import { AuthRequest } from '../../lib/middleware.js'
+import { storage } from '../../lib/storage.js'
+import { successResponse, errorResponse } from '../../lib/utils.ts'
+import libraryService from '../../lib/services/libraryService.ts'
 
-// ... (Hàm listLibraryResourcesHandler và getLibraryResourceHandler
-//      giữ nguyên như tin nhắn trước) ...
-
-export async function listLibraryResourcesHandler(req: AuthRequest, res: Response) {
-  // (Giữ nguyên code từ tin nhắn trước)
+/**
+ * GET /api/library/search
+ */
+export async function searchMaterialsHandler(req: AuthRequest, res: Response) {
   try {
-    const { page = '1', limit = '20' } = req.query;
-    const pageNum = parseInt(page as string);
-    const limitNum = parseInt(limit as string);
+    const { q, subject, type, tags, page = '1', limit = '10' } = req.query
 
-    const allResources = await storage.read<LibraryResource>('library.json');
-
-    allResources.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    const total = allResources.length;
-    const totalPages = Math.ceil(total / limitNum);
-    const start = (pageNum - 1) * limitNum;
-    const end = start + limitNum;
-    const paginatedData = allResources.slice(start, end);
-
-    const result = {
-      data: paginatedData,
-      pagination: {
-        page: pageNum,
-        limit: limitNum,
-        total,
-        totalPages
-      }
-    };
-    
-    return res.json(successResponse(result));
-  } catch (error: any) {
-    return res.status(500).json(errorResponse('Lỗi lấy tài nguyên thư viện: ' + error.message));
-  }
-}
-
-export async function getLibraryResourceHandler(req: AuthRequest, res: Response) {
-  // (Giữ nguyên code từ tin nhắn trước)
-  try {
-    const { id } = req.params;
-    const resource = await storage.findById<LibraryResource>('library.json', id);
-    
-    if (!resource) {
-      return res.status(404).json(errorResponse('Không tìm thấy tài nguyên'));
+    const filters: any = {
+      subject: subject as string | undefined,
+      type: type as string | undefined,
+      page: parseInt(page as string) || 1,
+      limit: parseInt(limit as string) || 10
     }
-    
-    return res.json(successResponse(resource));
+
+    if (tags) {
+      filters.tags = String(tags).split(',').map((t) => t.trim()).filter(Boolean)
+    }
+
+    const result = await libraryService.searchMaterials(q as string | undefined, filters)
+
+    return res.json(result)
   } catch (error: any) {
-    return res.status(500).json(errorResponse('Lỗi lấy chi tiết tài nguyên: ' + error.message));
+    return res.status(500).json(errorResponse('Lỗi tìm kiếm tài liệu: ' + error.message))
   }
 }
 
 /**
- * GET /api/library/search
- * Tìm kiếm tài nguyên (ĐÃ CẬP NHẬT để xử lý optional fields '?')
+ * GET /api/library/sync
+ * Note: Intended for cron/admin. Server should protect this endpoint (authorize) when registering the route.
  */
-export async function searchLibraryHandler(req: AuthRequest, res: Response) {
+export async function syncLibraryHandler(req: AuthRequest, res: Response) {
   try {
-    const { q } = req.query; // q = query
+    const result = await libraryService.syncFromHCMUTLibrary()
+    if (!result.success) {
+      return res.status(500).json(errorResponse('Đồng bộ thất bại: ' + result.error))
+    }
+    return res.json(successResponse({ imported: result.imported }, 'Đồng bộ thành công'))
+  } catch (error: any) {
+    return res.status(500).json(errorResponse('Lỗi khi đồng bộ thư viện: ' + error.message))
+  }
+}
 
-    if (!q || typeof q !== 'string') {
-      return res.status(400).json(errorResponse('Thiếu tham số tìm kiếm "q"'));
+/**
+ * POST /api/library/bookmarks
+ */
+export async function bookmarkMaterialHandler(req: AuthRequest, res: Response) {
+  try {
+    const currentUser = req.user
+    if (!currentUser) {
+      return res.status(401).json(errorResponse('Unauthorized', 401))
     }
 
-    const query = q.toLowerCase();
-    const allResources = await storage.read<LibraryResource>('library.json');
+    const { materialId } = req.body
+    if (!materialId) {
+      return res.status(400).json(errorResponse('materialId is required', 400))
+    }
 
-    // Logic tìm kiếm "an toàn"
-    const results = allResources.filter(r => {
-      const inTitle = r.title.toLowerCase().includes(query);
-      const inSubject = r.subject.toLowerCase().includes(query);
-      
-      // Kiểm tra trường optional trước khi truy cập
-      const inDescription = r.description ? r.description.toLowerCase().includes(query) : false;
-      const inAuthor = r.author ? r.author.toLowerCase().includes(query) : false;
-      const inTags = r.tags.some(tag => tag.toLowerCase().includes(query));
-      
-      return inTitle || inSubject || inDescription || inAuthor || inTags;
-    });
+    const result = await libraryService.bookmarkMaterial(currentUser.userId, materialId)
+    if (!result.success) {
+      return res.status(400).json(errorResponse(result.error || 'Unable to bookmark'))
+    }
 
-    return res.json(successResponse(results));
+    return res.status(201).json(successResponse(result.data, 'Đã bookmark tài liệu'))
   } catch (error: any) {
-    return res.status(500).json(errorResponse('Lỗi tìm kiếm tài nguyên: ' + error.message));
+    return res.status(500).json(errorResponse('Lỗi bookmark tài liệu: ' + error.message))
+  }
+}
+
+/**
+ * GET /api/library/recommendations
+ */
+export async function getRecommendationsHandler(req: AuthRequest, res: Response) {
+  try {
+    const { userId, subject, limit = '8' } = req.query
+    const limitNum = parseInt(limit as string) || 8
+
+    // Prefer authenticated user if available
+    const currentUser = req.user
+    const uid = currentUser ? currentUser.userId : (userId as string | undefined)
+
+    const result = await libraryService.getRecommendations(uid, subject as string | undefined, limitNum)
+    return res.json(result)
+  } catch (error: any) {
+    return res.status(500).json(errorResponse('Lỗi lấy gợi ý tài liệu: ' + error.message))
   }
 }

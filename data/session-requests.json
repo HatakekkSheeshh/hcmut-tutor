@@ -116,22 +116,6 @@
     "updatedAt": "2025-11-11T19:17:57.413Z"
   },
   {
-    "id": "req_Y_cLG8DaWEwT",
-    "sessionId": "ses_wrx1Hr3bFHhM",
-    "studentId": "stu_p8zzUZM5nqnx",
-    "tutorId": "tut_QAuiJWjIUx57",
-    "type": "cancel",
-    "status": "pending",
-    "reason": "dfdsadadsdcs",
-    "createdAt": "2025-11-11T19:29:48.300Z",
-    "updatedAt": "2025-11-11T19:29:48.300Z"
-    "reason": "Có việc gia đình cần giải quyết",
-    "preferredStartTime": "2025-12-14T10:00:00.000Z",
-    "preferredEndTime": "2025-12-14T11:00:00.000Z",
-    "createdAt": "2025-11-05T14:12:04.452Z",
-    "updatedAt": "2025-11-05T14:12:04.452Z"
-  },
-  {
     "id": "req_NMzyUPCpFUwH",
     "sessionId": "ses_qIhX8dOJIorL",
     "studentId": "stu_afp9r8MLsjE8",

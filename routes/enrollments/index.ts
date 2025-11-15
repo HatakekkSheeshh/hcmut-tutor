@@ -9,6 +9,7 @@ import { storage } from '../../lib/storage.js';
 import { Enrollment, EnrollmentStatus, Class, ClassStatus, UserRole, Notification, NotificationType, User } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
+import { normalizeUserId } from '../../lib/idNormalizer.js';
 
 /**
  * Helper function to check time conflict between two classes
@@ -49,13 +50,22 @@ export async function listEnrollmentsHandler(req: AuthRequest, res: Response) {
     const limitNum = parseInt(limit as string);
     const currentUser = req.user!;
 
+    // Normalize studentId if provided (convert ObjectId to custom ID)
+    let normalizedStudentId: string | undefined;
+    if (studentId) {
+      normalizedStudentId = await normalizeUserId(studentId as string);
+    }
+
+    // Normalize currentUser.userId (in case it's ObjectId)
+    const normalizedCurrentUserId = await normalizeUserId(currentUser.userId);
+
     // Special case: If student is querying by classId only (to see classmates)
     // Check if they are enrolled in that class
     let canViewAllClassEnrollments = false;
     if (currentUser.role === UserRole.STUDENT && classId && !studentId) {
       const allEnrollments = await storage.read<Enrollment>('enrollments.json');
       const studentEnrolledInClass = allEnrollments.some(
-        e => e.classId === classId && e.studentId === currentUser.userId && e.status === 'active'
+        e => e.classId === classId && e.studentId === normalizedCurrentUserId && e.status === 'active'
       );
       canViewAllClassEnrollments = studentEnrolledInClass;
     }
@@ -67,12 +77,13 @@ export async function listEnrollmentsHandler(req: AuthRequest, res: Response) {
       // - Students can see their own enrollments
       // - Students can see all enrollments in a class they're enrolled in
       if (currentUser.role === UserRole.STUDENT && 
-          enrollment.studentId !== currentUser.userId &&
+          enrollment.studentId !== normalizedCurrentUserId &&
           !canViewAllClassEnrollments) {
         return false;
       }
 
-      if (studentId && enrollment.studentId !== studentId) return false;
+      // Filter by studentId (use normalized ID)
+      if (normalizedStudentId && enrollment.studentId !== normalizedStudentId) return false;
       if (classId && enrollment.classId !== classId) return false;
       if (status && enrollment.status !== status) return false;
 
