@@ -863,6 +863,11 @@ export const conversationsAPI = {
     return fetchAPI(`/conversations/${id}`);
   },
 
+  async getMessages(conversationId: string, params?: { page?: number; limit?: number }) {
+    const query = params ? '?' + new URLSearchParams(params as any).toString() : '';
+    return fetchAPI(`/conversations/${conversationId}/messages${query}`);
+  },
+
   async delete(id: string) {
     return fetchAPI(`/conversations/${id}`, { method: 'DELETE' });
   }

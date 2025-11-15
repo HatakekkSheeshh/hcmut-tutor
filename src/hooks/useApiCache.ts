@@ -87,7 +87,7 @@ export function useAuthMe(options?: Omit<UseQueryOptions<any, Error>, 'queryKey'
 
 // ===== USER HOOKS =====
 
-export function useUsersList(params?: any, options?: Omit<UseQueryOptions<any, Error>, any, 'queryKey' | 'queryFn'>) {
+export function useUsersList(params?: any, options?: Omit<UseQueryOptions<any, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: queryKeys.users.list(params),
     queryFn: async () => {
