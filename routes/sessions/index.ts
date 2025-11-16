@@ -146,7 +146,7 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
   try {
     const currentUser = req.user!;
     const sessionData = req.body;
-
+    
     let studentIds: string[] = [];
     let tutorId: string = sessionData.tutorId;
     let subject: string = sessionData.subject;
@@ -162,13 +162,15 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       }
 
       // Get class details
+
       const classItem = await storage.findById<Class>('classes.json', sessionData.classId);
       if (!classItem) {
         return res.status(404).json(errorResponse('Không tìm thấy lớp học'));
       }
-
+      console.log('Class item:', classItem);
       // Verify tutor owns this class
-      if (classItem.tutorId !== currentUser.userId) {
+
+      if (classItem.tutorId !== sessionData.classId) {
         return res.status(403).json(
           errorResponse('Bạn không có quyền tạo buổi học cho lớp này')
         );
@@ -184,7 +186,8 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       tutorId = classItem.tutorId;
       subject = classItem.subject;
       isClassBased = true;
-    } else {
+    } 
+    else {
       // Manual session booking (students only)
       if (currentUser.role !== UserRole.STUDENT) {
         return res.status(403).json(
