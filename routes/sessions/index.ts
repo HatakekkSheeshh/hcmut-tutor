@@ -6,7 +6,7 @@
 
 import { Response } from 'express';
 import { storage } from '../../lib/storage.js';
-import { Session, SessionStatus, UserRole, Notification, NotificationType, Class, ClassStatus, Enrollment, User } from '../../lib/types.js';
+import { Session, SessionStatus, UserRole, NotificationType, Class, ClassStatus, User } from '../../lib/types.js';
 import { AuthRequest } from '../../lib/middleware.js';
 import { successResponse, errorResponse, generateId, now } from '../../lib/utils.js';
 import { queueNotification } from '../../lib/services/notificationQueue.js';
@@ -147,128 +147,90 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
     const currentUser = req.user!;
     const sessionData = req.body;
 
-    let studentIds: string[] = [];
-    let tutorId: string = sessionData.tutorId;
-    let subject: string = sessionData.subject;
-    let isClassBased = false;
-
-    // Check if this is a class-based session
-    if (sessionData.classId) {
-      // Class-based session creation (tutors only)
-      if (currentUser.role !== UserRole.TUTOR) {
-        return res.status(403).json(
-          errorResponse('Chỉ gia sư mới có thể tạo buổi học từ lớp')
-        );
-      }
-
-      // Get class details
-      const classItem = await storage.findById<Class>('classes.json', sessionData.classId);
-      if (!classItem) {
-        return res.status(404).json(errorResponse('Không tìm thấy lớp học'));
-      }
-
-      // Verify tutor owns this class
-      if (classItem.tutorId !== currentUser.userId) {
-        return res.status(403).json(
-          errorResponse('Bạn không có quyền tạo buổi học cho lớp này')
-        );
-      }
-
-      // Get all enrolled students
-      const enrollments = await storage.find<Enrollment>(
-        'enrollments.json',
-        (e: any) => e.classId === sessionData.classId && e.status === 'active'
+    // Only students can book sessions
+    if (currentUser.role !== UserRole.STUDENT) {
+      return res.status(403).json(
+        errorResponse('Chỉ sinh viên mới có thể đặt buổi học')
       );
+    }
 
-      studentIds = enrollments.map(e => e.studentId);
-      tutorId = classItem.tutorId;
-      subject = classItem.subject;
-      isClassBased = true;
-    } else {
-      // Manual session booking (students only)
-      if (currentUser.role !== UserRole.STUDENT) {
-        return res.status(403).json(
-          errorResponse('Chỉ sinh viên mới có thể đặt buổi học')
+    // Verify tutor exists
+    const tutor = await storage.findById<User>('users.json', sessionData.tutorId);
+    if (!tutor || tutor.role !== UserRole.TUTOR) {
+      return res.status(404).json(
+        errorResponse('Không tìm thấy gia sư')
+      );
+    }
+
+    const studentIds = [currentUser.userId];
+    const tutorId = sessionData.tutorId;
+    const subject = sessionData.subject;
+
+    // Check for conflicts with tutor's class schedules
+    const tutorClasses = await storage.find<Class>(
+      'classes.json',
+      (c) => c.tutorId === tutorId && c.status !== ClassStatus.INACTIVE
+    );
+
+    // Get day name from session start time
+    const sessionDate = new Date(sessionData.startTime);
+    const sessionDay = sessionDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const sessionStartTime = sessionDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const sessionEndTime = new Date(new Date(sessionData.startTime).getTime() + (sessionData.duration || 60) * 60000)
+      .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    // Check for conflicts with classes on the same day
+    for (const classItem of tutorClasses) {
+      if (hasTimeConflict(
+        sessionDay,
+        sessionStartTime,
+        sessionEndTime,
+        classItem.day.toLowerCase(),
+        classItem.startTime,
+        classItem.endTime
+      )) {
+        return res.status(400).json(
+          errorResponse(`Thời gian buổi học trùng với lớp ${classItem.code} (${classItem.day} ${classItem.startTime}-${classItem.endTime}). Vui lòng chọn thời gian khác.`)
         );
       }
+    }
 
-      // Verify tutor exists
-      const tutor = await storage.findById<User>('users.json', sessionData.tutorId);
-      if (!tutor || tutor.role !== UserRole.TUTOR) {
-        return res.status(404).json(
-          errorResponse('Không tìm thấy gia sư')
+    // Check for conflicts with existing sessions at the exact same date and time
+    // Include buffer time (30 minutes) between sessions
+    const existingSessions = await storage.find<Session>(
+      'sessions.json',
+      (s) => s.tutorId === tutorId && 
+             !s.classId && // Only check non-class-based sessions
+             (s.status === SessionStatus.CONFIRMED || s.status === SessionStatus.PENDING) // Only check confirmed/pending sessions
+    );
+
+    const newSessionStart = new Date(sessionData.startTime);
+    const newSessionEnd = new Date(newSessionStart.getTime() + (sessionData.duration || 60) * 60000);
+
+    // Buffer time between sessions (30 minutes)
+    const SESSION_BUFFER_MINUTES = 30;
+
+    for (const existingSession of existingSessions) {
+      const existingStart = new Date(existingSession.startTime);
+      const existingEnd = new Date(existingStart.getTime() + (existingSession.duration || 60) * 60000);
+
+      // Check if same date
+      if (existingStart.toDateString() !== newSessionStart.toDateString()) {
+        continue;
+      }
+
+      // Apply buffer time: new session must start at least 30 minutes after existing session ends
+      // and must end at least 30 minutes before existing session starts
+      const existingEndWithBuffer = new Date(existingEnd.getTime() + SESSION_BUFFER_MINUTES * 60 * 1000);
+      const existingStartWithBuffer = new Date(existingStart.getTime() - SESSION_BUFFER_MINUTES * 60 * 1000);
+
+      // Check if new session overlaps with existing session (including buffer)
+      if (
+        (newSessionStart < existingEndWithBuffer && newSessionEnd > existingStartWithBuffer)
+      ) {
+        return res.status(400).json(
+          errorResponse(`Thời gian buổi học trùng với buổi học khác hoặc không đủ thời gian nghỉ (cần ít nhất ${SESSION_BUFFER_MINUTES} phút giữa các buổi học). Vui lòng chọn thời gian khác.`)
         );
-      }
-
-      studentIds = [currentUser.userId];
-
-      // Check for conflicts with tutor's class schedules
-      // Only check if this is NOT a class-based session (manual booking)
-      const tutorClasses = await storage.find<Class>(
-        'classes.json',
-        (c) => c.tutorId === tutorId && c.status !== ClassStatus.INACTIVE
-      );
-
-      // Get day name from session start time
-      const sessionDate = new Date(sessionData.startTime);
-      const sessionDay = sessionDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-      const sessionStartTime = sessionDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-      const sessionEndTime = new Date(new Date(sessionData.startTime).getTime() + (sessionData.duration || 60) * 60000)
-        .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-
-      // Check for conflicts with classes on the same day
-      for (const classItem of tutorClasses) {
-        if (hasTimeConflict(
-          sessionDay,
-          sessionStartTime,
-          sessionEndTime,
-          classItem.day.toLowerCase(),
-          classItem.startTime,
-          classItem.endTime
-        )) {
-          return res.status(400).json(
-            errorResponse(`Thời gian buổi học trùng với lớp ${classItem.code} (${classItem.day} ${classItem.startTime}-${classItem.endTime}). Vui lòng chọn thời gian khác.`)
-          );
-        }
-      }
-
-      // Also check for conflicts with existing sessions at the exact same date and time
-      // Include buffer time (30 minutes) between sessions
-      const existingSessions = await storage.find<Session>(
-        'sessions.json',
-        (s) => s.tutorId === tutorId && 
-               !s.classId && // Only check non-class-based sessions
-               (s.status === SessionStatus.CONFIRMED || s.status === SessionStatus.PENDING) // Only check confirmed/pending sessions
-      );
-
-      const newSessionStart = new Date(sessionData.startTime);
-      const newSessionEnd = new Date(newSessionStart.getTime() + (sessionData.duration || 60) * 60000);
-
-      // Buffer time between sessions (30 minutes)
-      const SESSION_BUFFER_MINUTES = 30;
-
-      for (const existingSession of existingSessions) {
-        const existingStart = new Date(existingSession.startTime);
-        const existingEnd = new Date(existingStart.getTime() + (existingSession.duration || 60) * 60000);
-
-        // Check if same date
-        if (existingStart.toDateString() !== newSessionStart.toDateString()) {
-          continue;
-        }
-
-        // Apply buffer time: new session must start at least 30 minutes after existing session ends
-        // and must end at least 30 minutes before existing session starts
-        const existingEndWithBuffer = new Date(existingEnd.getTime() + SESSION_BUFFER_MINUTES * 60 * 1000);
-        const existingStartWithBuffer = new Date(existingStart.getTime() - SESSION_BUFFER_MINUTES * 60 * 1000);
-
-        // Check if new session overlaps with existing session (including buffer)
-        if (
-          (newSessionStart < existingEndWithBuffer && newSessionEnd > existingStartWithBuffer)
-        ) {
-          return res.status(400).json(
-            errorResponse(`Thời gian buổi học trùng với buổi học khác hoặc không đủ thời gian nghỉ (cần ít nhất ${SESSION_BUFFER_MINUTES} phút giữa các buổi học). Vui lòng chọn thời gian khác.`)
-          );
-        }
       }
     }
 
@@ -280,7 +242,7 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       subject: subject,
       topic: sessionData.topic,
       description: sessionData.description,
-      status: isClassBased ? SessionStatus.CONFIRMED : SessionStatus.PENDING,
+      status: SessionStatus.PENDING,
       startTime: sessionData.startTime,
       endTime: sessionData.endTime,
       duration: sessionData.duration,
@@ -288,62 +250,31 @@ export async function createSessionHandler(req: AuthRequest, res: Response) {
       meetingLink: sessionData.meetingLink,
       location: sessionData.location,
       notes: sessionData.notes || '',
-      classId: sessionData.classId,
+      classId: undefined, // Sessions are always individual (not class-based)
       createdAt: now(),
       updatedAt: now()
     };
 
     await storage.create('sessions.json', newSession);
 
-    // Create notification - batch create for class-based sessions
-    if (isClassBased) {
-      // Notify all enrolled students - batch create
-      if (studentIds.length > 0) {
-        const notifications: Notification[] = studentIds.map(studentId => ({
-          id: generateId('notif'),
-          userId: studentId,
-          type: NotificationType.SESSION_BOOKING,
-          title: 'Buổi học mới được tạo',
-          message: `Buổi học mới cho môn ${subject}`,
-          read: false,
-          link: `/sessions/${newSession.id}`,
-          createdAt: now()
-        }));
-        await storage.createMany('notifications.json', notifications);
-      }
-    } else {
-      // Notify tutor (single notification, no need for batch)
-      // const notification: Notification = {
-      //   id: generateId('notif'),
-      //   userId: tutorId,
-      //   type: NotificationType.SESSION_BOOKING,
-      //   title: 'Yêu cầu buổi học mới',
-      //   message: `${currentUser.email} đã đặt buổi học ${subject}`,
-      //   read: false,
-      //   link: `/sessions/${newSession.id}`,
-      //   createdAt: now()
-      // };
-      // await storage.create('notifications.json', notification);
-
-      const requester = await storage.findById<User>('users.json', currentUser.userId); 
-      const fallbackName = requester?.hcmutId || currentUser.email;
-      const displayName = requester?.name || fallbackName;
-      const type = NotificationType.SESSION_BOOKING;
-      const title = 'Yêu cầu buổi học mới';
-      const message = `${displayName} đã đặt buổi học ${subject}`;
-      const link = `/sessions/${newSession.id}`;
-      await queueNotification(
-      tutorId, // 1. Target: Gửi cho ai (biến 'tutorId' phải được định nghĩa ở trên)
+    // Notify tutor
+    const requester = await storage.findById<User>('users.json', currentUser.userId); 
+    const fallbackName = requester?.hcmutId || currentUser.email;
+    const displayName = requester?.name || fallbackName;
+    const type = NotificationType.SESSION_BOOKING;
+    const title = 'Yêu cầu buổi học mới';
+    const message = `${displayName} đã đặt buổi học ${subject}`;
+    const link = `/sessions/${newSession.id}`;
+    await queueNotification(
+      tutorId,
       {
-      // 2. Payload: Nội dung
         type: type,
         title: title,
         message: message,
         link: link
       },
-      5 // 3. Delay: 5 phút
-);
-    }
+      5 // Delay: 5 phút
+    );
 
     return res.status(201).json(
       successResponse(newSession, 'Đặt buổi học thành công')

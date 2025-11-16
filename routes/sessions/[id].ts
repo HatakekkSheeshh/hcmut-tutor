@@ -262,7 +262,7 @@ export async function cancelSessionHandler(req: AuthRequest, res: Response) {
     
     if (notifyUserIds.length > 0) {
       const notifications: Notification[] = notifyUserIds.map(notifyUserId => ({
-        id: require('../../lib/utils.js').generateId('notif'),
+        id: generateId('notif'),
         userId: notifyUserId,
         type: NotificationType.SESSION_CANCELLED,
         title: 'Buổi học đã bị hủy',
@@ -326,7 +326,7 @@ export async function rescheduleSessionHandler(req: AuthRequest, res: Response) 
     
     if (notifyUserIds.length > 0) {
       const notifications: Notification[] = notifyUserIds.map(notifyUserId => ({
-        id: require('../../lib/utils.js').generateId('notif'),
+        id: generateId('notif'),
         userId: notifyUserId,
         type: NotificationType.SESSION_RESCHEDULED,
         title: 'Buổi học đã được đổi lịch',

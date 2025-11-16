@@ -249,6 +249,9 @@ npm run validate         # Validate data integrity
 npm run stats            # Generate data statistics
 
 # Testing
+npm test                 # Run all unit tests (Vitest)
+npm run test:ui          # Run tests with UI interface
+npm run test:coverage    # Run tests with coverage report
 npm run test:api         # Test API endpoints
 npm run test:management # Test management APIs
 ```
@@ -387,6 +390,138 @@ npm run test:management # Test management APIs
   - `notifications.json` - Created notifications
   - `notification_queue.json` - Pending jobs awaiting processing
 - **Types**: 12+ different notification types
+
+## Testing
+
+The project includes comprehensive unit tests for all API endpoints using Vitest. Tests are organized by feature area and cover authentication, user management, sessions, classes, notifications, conversations, forum, management features, library, progress tracking, and integration scenarios.
+
+### Test Structure
+
+Tests are located in the `testcase/` directory:
+
+```
+testcase/
+├── 01-authentication.test.ts        # Authentication API tests
+├── 02-user-management.test.ts       # User management tests
+├── 03-session-management.test.ts    # Session management tests
+├── 04-class-enrollment.test.ts      # Class & enrollment tests
+├── 05-notifications.test.ts         # Notification system tests
+├── 06-conversations.test.ts         # Chat & messaging tests
+├── 07-forum.test.ts                 # Forum feature tests
+├── 08-management.test.ts            # Management feature tests
+├── 09-library-progress.test.ts      # Library & progress tests
+└── 10-integration.test.ts           # Integration workflow tests
+```
+
+### Running Tests
+
+**Run all tests:**
+```bash
+npm test
+```
+
+**Run tests with UI (interactive):**
+```bash
+npm run test:ui
+```
+
+**Run tests with coverage report:**
+```bash
+npm run test:coverage
+```
+
+**Run specific test file:**
+```bash
+# Syntax
+npx vitest testcase/<file_name>.test.ts
+
+# Example
+npx vitest testcase/02-user-management.test.ts
+```
+
+**Run tests in watch mode:**
+```bash
+npx vitest --watch
+```
+
+**Run tests matching a pattern:**
+```bash
+npx vitest --grep "authentication"
+```
+
+### Test Coverage
+
+The test suite covers:
+
+- **Authentication**: Login, registration, token refresh, logout (15 test cases)
+- **User Management**: CRUD operations, authorization, filtering (18 test cases)
+- **Session Management**: Booking, cancellation, rescheduling, conflicts (12 test cases)
+- **Class & Enrollment**: Class management, enrollment workflow (10 test cases)
+- **Notifications**: Notification delivery, read status, filtering (6 test cases)
+- **Conversations**: Chat creation, messaging, file sharing (9 test cases)
+- **Forum**: Post creation, comments, moderation (9 test cases)
+- **Management**: Approvals, permissions, analytics, credits (12 test cases)
+- **Library & Progress**: Resource search, progress tracking, evaluations (10 test cases)
+- **Integration**: End-to-end workflows, data consistency (6 test cases)
+
+**Total**: 107+ test cases covering all major features and edge cases.
+
+### Test Configuration
+
+Tests are configured in `vitest.config.ts`:
+- **Environment**: Node.js
+- **Framework**: Vitest
+- **Coverage**: v8 provider with HTML, JSON, and text reports
+- **Test Pattern**: `testcase/**/*.test.ts`
+
+### Writing New Tests
+
+When adding new features, follow these patterns:
+
+1. **Create test file** in `testcase/` directory following naming convention
+2. **Mock dependencies** using Vitest's `vi.mock()`
+3. **Use helper functions** for creating mock requests/responses
+4. **Test success cases, error cases, and authorization**
+5. **Follow naming convention**: `TC-FEATURE-XXX: Test Description`
+
+Example test structure:
+```typescript
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { handlerFunction } from '../routes/feature/handler.js';
+import * as storageModule from '../lib/storage.js';
+
+vi.mock('../lib/storage.js', () => ({
+  storage: {
+    find: vi.fn(),
+    findById: vi.fn(),
+    // ... other methods
+  }
+}));
+
+describe('Feature API Tests', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should handle success case', async () => {
+    // Test implementation
+  });
+
+  it('should handle error case', async () => {
+    // Test implementation
+  });
+});
+```
+
+### Test Best Practices
+
+- ✅ Mock external dependencies (storage, services)
+- ✅ Test both success and error scenarios
+- ✅ Verify authorization and permissions
+- ✅ Test input validation
+- ✅ Clean up mocks between tests
+- ✅ Use descriptive test names
+- ✅ Group related tests with `describe` blocks
 
 ## Documentation
 
@@ -604,4 +739,3 @@ MIT License - See LICENSE file for details.
 **Version**: 1.0  
 **Status**: Near Completion - Production Ready  
 **Last Updated**: November 2025
-

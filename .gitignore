@@ -10,6 +10,7 @@ build/
 md/
 docs/
 ./cursor
+.cursor
 
 # Environment variables
 .env

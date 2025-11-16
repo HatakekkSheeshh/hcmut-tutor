@@ -80,6 +80,37 @@ export async function createPostHandler(req: AuthRequest, res: Response) {
     const currentUser = req.user!;
     const { title, content, category, tags } = req.body;
 
+    // Validation
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return res.status(400).json(
+        errorResponse('Tiêu đề là bắt buộc và không được để trống')
+      );
+    }
+
+    if (!content || typeof content !== 'string' || content.trim().length === 0) {
+      return res.status(400).json(
+        errorResponse('Nội dung là bắt buộc và không được để trống')
+      );
+    }
+
+    if (title.trim().length < 5) {
+      return res.status(400).json(
+        errorResponse('Tiêu đề phải có ít nhất 5 ký tự')
+      );
+    }
+
+    if (content.trim().length < 20) {
+      return res.status(400).json(
+        errorResponse('Nội dung phải có ít nhất 20 ký tự')
+      );
+    }
+
+    if (!category || typeof category !== 'string' || category.trim().length === 0) {
+      return res.status(400).json(
+        errorResponse('Danh mục là bắt buộc')
+      );
+    }
+
     const newPost: ForumPost = {
       id: generateId('post'),
       authorId: currentUser.userId,
