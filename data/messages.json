@@ -928,5 +928,15 @@
     "type": "text",
     "read": false,
     "createdAt": "2025-11-13T04:29:44.399Z"
+  },
+  {
+    "id": "msg_nxaK2NqTngFK20jTg-Jzt",
+    "conversationId": "conv_e7DO2Fnw6BEu0CQKy-cRD",
+    "senderId": "stu_FyRaYWIiysPh",
+    "receiverId": "stu_afp9r8MLsjE8",
+    "content": "solo ?",
+    "type": "text",
+    "read": false,
+    "createdAt": "2025-11-14T09:31:59.722Z"
   }
 ]
