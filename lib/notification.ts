@@ -42,7 +42,8 @@ export async function createNotification(data: CreateNotificationData): Promise<
     console.log(`Đã tạo thông báo thành công: ${created.id}`);
     return created;
 
-  } catch (error) {
+  } 
+  catch (error) {
     console.error('Lỗi nghiêm trọng khi tạo thông báo:', error);
     throw new Error('Không thể tạo thông báo');
   }

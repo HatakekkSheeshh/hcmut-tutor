@@ -29,7 +29,8 @@ export async function processNotificationQueue() {
       const processAtTime = new Date(job.processAt);
       if (processAtTime <= now) {
         jobsToProcess.push(job);
-      } else {
+      } 
+      else {
         jobsToKeep.push(job);
       }
     }
@@ -47,7 +48,8 @@ export async function processNotificationQueue() {
         // 3. GỌI HÀM CỦA BẠN (lib/notifications.ts)
         await createNotification(job.data);
         console.log(`[Cron] Đã xử lý thành công job ${job.id}`);
-      } catch (error) {
+      } 
+      catch (error) {
         console.error(`[Cron] Lỗi khi xử lý job ${job.id}:`, error);
         // Quyết định: có thể giữ lại job để thử lại sau, hoặc bỏ qua
       }
