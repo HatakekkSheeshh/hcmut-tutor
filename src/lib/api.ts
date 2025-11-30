@@ -1483,25 +1483,6 @@ export const managementAPI = {
   }
 };
 
-// ===== CHATBOT =====
-
-export const chatbotAPI = {
-  async chat(message: string, conversationId?: string) {
-    return fetchAPI('/chatbot/chat', {
-      method: 'POST',
-      body: JSON.stringify({ message, conversationId })
-    });
-  },
-
-  async getHistory(conversationId?: string, limit?: number) {
-    const params: any = {};
-    if (conversationId) params.conversationId = conversationId;
-    if (limit) params.limit = limit;
-    const query = Object.keys(params).length > 0 ? '?' + new URLSearchParams(params).toString() : '';
-    return fetchAPI(`/chatbot/history${query}`);
-  }
-};
-
 // ===== LIBRARY =====
 
 export const libraryAPI = {
