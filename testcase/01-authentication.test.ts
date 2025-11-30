@@ -1,11 +1,6 @@
 /**
  * Unit Tests for Authentication APIs
  * Based on test cases from 01-authentication.md
- * 
- * To run these tests:
- * 1. Install vitest: npm install -D vitest @vitest/ui
- * 2. Run: npx vitest testcase/01-authentication.test.ts
- * 3. Or add to package.json: "test": "vitest"
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
