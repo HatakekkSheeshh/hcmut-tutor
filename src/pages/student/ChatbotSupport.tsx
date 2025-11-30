@@ -288,7 +288,13 @@ const ChatbotSupport: React.FC = () => {
     }, 100)
 
     try {
-      const response = await chatbotAPI.chat(currentInput, conversationId)
+      // Prepare conversation history for context
+      const conversationHistory = messages.slice(-10).map(msg => ({
+        sender: msg.sender,
+        text: msg.text
+      }))
+      
+      const response = await chatbotAPI.sendMessage(currentInput, conversationHistory)
       
       if (response.success) {
       const botResponse: Message = {

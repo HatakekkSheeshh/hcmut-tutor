@@ -27,38 +27,47 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     body: options.body ? JSON.parse(options.body as string) : undefined
   });
 
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
 
-  // Check if response is JSON
-  const contentType = response.headers.get('content-type');
-  let data;
-  
-  if (contentType && contentType.includes('application/json')) {
-    data = await response.json();
-  } else {
-    // If not JSON, get text and try to parse
-    const text = await response.text();
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error('⚠️ [API] Response is not JSON:', text.substring(0, 200));
-      return {
-        success: false,
-        error: `Server returned invalid response: ${response.status} ${response.statusText}`
-      };
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    let data;
+    
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      // If not JSON, get text and try to parse
+      const text = await response.text();
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('⚠️ [API] Response is not JSON:', text.substring(0, 200));
+        return {
+          success: false,
+          error: `Server returned invalid response: ${response.status} ${response.statusText}`
+        };
+      }
     }
-  }
-  
-  console.log('📡 [API] Response:', {
-    status: response.status,
-    url,
-    data
-  });
+    
+    console.log('📡 [API] Response:', {
+      status: response.status,
+      url,
+      data
+    });
 
-  return data;
+    return data;
+  } catch (error: any) {
+    // Handle network errors (Failed to fetch, CORS, etc.)
+    console.error('❌ [API] Network error:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to fetch. Please check your connection and ensure the server is running.'
+    };
+  }
 }
 
 // ===== AUTHENTICATION =====
@@ -956,6 +965,22 @@ export const chatbotAPI = {
       method: 'POST',
       body: JSON.stringify({ message, conversationHistory })
     });
+  },
+
+  async chat(message: string, conversationId?: string) {
+    // Convert to sendMessage format for compatibility
+    return fetchAPI('/chatbot', {
+      method: 'POST',
+      body: JSON.stringify({ message, conversationId })
+    });
+  },
+
+  async getHistory(conversationId?: string, limit?: number) {
+    const params: any = {};
+    if (conversationId) params.conversationId = conversationId;
+    if (limit) params.limit = limit;
+    const query = Object.keys(params).length > 0 ? '?' + new URLSearchParams(params).toString() : '';
+    return fetchAPI(`/chatbot/history${query}`);
   }
 };
 

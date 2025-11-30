@@ -74,7 +74,7 @@ import { listConversationsHandler, createConversationHandler, getConversationHan
 import { getMessagesHandler, sendMessageHandler } from './routes/conversations/[id]/messages.js';
 
 // Import handlers - Chatbot
-import { chatbotHandler } from './routes/chatbot/index.js';
+import { chatbotHandler, getHistoryHandler } from './routes/chatbot/index.js';
 
 // Import handlers - Session Requests
 import { listSessionRequestsHandler, createSessionRequestHandler } from './routes/session-requests/index.js';
@@ -250,6 +250,8 @@ app.post('/api/conversations/:id/messages', authenticate, sendMessageHandler);
 // ===== CHATBOT ROUTES =====
 
 app.post('/api/chatbot', authenticate, chatbotHandler);
+app.post('/api/chatbot/chat', authenticate, chatbotHandler); // Alias for compatibility
+app.get('/api/chatbot/history', authenticate, getHistoryHandler);
 
 // ===== PROGRESS ROUTES =====
 

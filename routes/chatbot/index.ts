@@ -1,32 +1,19 @@
 /**
  * Chatbot API Route
- * Handles chatbot requests using Gemini API
+ * Handles chatbot requests using Gemini API with user context
  */
 
 import 'dotenv/config'; // Load .env file
-import { Request, Response } from 'express';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-// Initialize Gemini AI (will be initialized when handler is called)
-let genAI: GoogleGenerativeAI | null = null;
-
-function getGenAI(): GoogleGenerativeAI {
-  if (!genAI) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY is not set');
-    }
-    genAI = new GoogleGenerativeAI(apiKey);
-  }
-  return genAI;
-}
+import { Response } from 'express';
+import { AuthRequest } from '../../lib/middleware.js';
+import { generateAIResponse, isGeminiConfigured } from '../../lib/services/geminiService.js';
 
 /**
- * Chatbot handler - sends message to Gemini and returns response
+ * Chatbot handler - sends message to Gemini and returns response with user context
  */
-export async function chatbotHandler(req: Request, res: Response) {
+export async function chatbotHandler(req: AuthRequest, res: Response) {
   try {
-    const { message, conversationHistory = [] } = req.body;
+    const { message, conversationHistory = [], conversationId } = req.body;
 
     if (!message || typeof message !== 'string' || message.trim() === '') {
       return res.status(400).json({
@@ -35,58 +22,45 @@ export async function chatbotHandler(req: Request, res: Response) {
       });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey || apiKey.trim() === '') {
+    // Check if user is authenticated
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    // Check if Gemini is configured
+    if (!isGeminiConfigured()) {
       console.error('GEMINI_API_KEY is not set in environment variables');
-      console.error('Current env keys:', Object.keys(process.env).filter(k => k.includes('GEMINI')));
       return res.status(500).json({
         success: false,
         error: 'Chatbot service is not configured. GEMINI_API_KEY is missing.'
       });
     }
 
-    // Get the Gemini model - using gemini-1.5-flash (free tier)
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Convert conversation history format from frontend to geminiService format
+    // Frontend format: { sender: 'user' | 'bot', text: string }
+    // geminiService format: { role: 'user' | 'assistant', content: string }
+    const formattedHistory = conversationHistory.map((msg: any) => ({
+      role: msg.sender === 'user' ? 'user' as const : 'assistant' as const,
+      content: msg.text || msg.content || ''
+    }));
 
-    // Build conversation context
-    const systemPrompt = `You are a helpful AI learning assistant for HCMUT (Ho Chi Minh City University of Technology) tutoring system. 
-Your role is to help students with:
-- Booking tutoring sessions
-- Finding tutors by subject
-- Tracking learning progress
-- Rescheduling or canceling sessions
-- Contacting tutors
-- General questions about the platform
-
-Be friendly, professional, and concise. If you don't know something specific about the platform, guide them to the appropriate page or feature.
-Always respond in a helpful and encouraging manner.`;
-
-    // Build conversation history for context
-    let conversationText = systemPrompt + '\n\n';
-    
-    // Add conversation history (last 5 messages for context)
-    const recentHistory = conversationHistory.slice(-5);
-    for (const msg of recentHistory) {
-      if (msg.sender === 'user') {
-        conversationText += `User: ${msg.text}\n`;
-      } else if (msg.sender === 'bot') {
-        conversationText += `Assistant: ${msg.text}\n`;
-      }
-    }
-    
-    conversationText += `User: ${message}\nAssistant:`;
-
-    // Generate response
-    const result = await model.generateContent(conversationText);
-    const response = await result.response;
-    const text = response.text();
+    // Generate AI response with user context
+    const userId = req.user.userId;
+    const aiResponse = await generateAIResponse(
+      message.trim(),
+      userId,
+      formattedHistory
+    );
 
     return res.json({
       success: true,
       data: {
-        message: text.trim(),
-        timestamp: new Date().toISOString()
+        message: aiResponse,
+        timestamp: new Date().toISOString(),
+        conversationId: conversationId || undefined // Return conversationId if provided
       }
     });
 
@@ -94,14 +68,14 @@ Always respond in a helpful and encouraging manner.`;
     console.error('Chatbot API error:', error);
     
     // Handle specific Gemini API errors
-    if (error.message?.includes('API_KEY') || error.status === 401) {
+    if (error.message?.includes('API_KEY') || error.message?.includes('cấu hình API') || error.status === 401) {
       return res.status(401).json({
         success: false,
         error: 'Invalid API key. Please check your GEMINI_API_KEY.'
       });
     }
 
-    if (error.message?.includes('quota') || error.message?.includes('rate limit') || error.status === 429) {
+    if (error.message?.includes('quota') || error.message?.includes('rate limit') || error.message?.includes('giới hạn API') || error.status === 429) {
       return res.status(429).json({
         success: false,
         error: 'Rate limit exceeded. Please try again later.'
@@ -122,9 +96,33 @@ Always respond in a helpful and encouraging manner.`;
       });
     }
 
+    // Return error message from geminiService (may be in Vietnamese)
     return res.status(500).json({
       success: false,
       error: error.message || 'Failed to generate response. Please try again.'
+    });
+  }
+}
+
+/**
+ * Get conversation history handler
+ * For now, returns empty array as we're not storing conversation history
+ */
+export async function getHistoryHandler(req: AuthRequest, res: Response) {
+  try {
+    // For now, return empty conversations list
+    // In the future, this can be implemented to fetch from storage
+    return res.json({
+      success: true,
+      data: {
+        conversations: []
+      }
+    });
+  } catch (error: any) {
+    console.error('Get history error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to get conversation history'
     });
   }
 }
