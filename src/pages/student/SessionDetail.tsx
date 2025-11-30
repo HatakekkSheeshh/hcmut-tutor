@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import api from '../../lib/api'
@@ -32,7 +33,8 @@ import {
   Grade as GradeIcon,
   People as PeopleIcon,
   Info as InfoIcon,
-  NavigateNext as NavigateNextIcon
+  NavigateNext as NavigateNextIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -46,11 +48,22 @@ import {
 } from '@mui/icons-material'
 
 const SessionDetail: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { id } = useParams()
   const { theme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+  
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false)
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false)
   const [requestType, setRequestType] = useState<'cancel' | 'reschedule'>('cancel')
@@ -424,18 +437,7 @@ const SessionDetail: React.FC = () => {
   }
 
   const getStatusLabel = (status: string) => {
-    const statusMap: any = {
-      pending: 'Pending',
-      confirmed: 'Confirmed',
-      active: 'Active',
-      completed: 'Completed',
-      cancelled: 'Cancelled',
-      rescheduled: 'Rescheduled',
-      dropped: 'Dropped',
-      inactive: 'Inactive',
-      full: 'Full'
-    }
-    return statusMap[status] || status
+    return t(`sessionDetail.statusLabels.${status}`, status)
   }
 
   const getStatusColor = (status: string) => {
@@ -487,7 +489,7 @@ const SessionDetail: React.FC = () => {
         setRequestType('cancel')
         setIsRequestDialogOpen(true)
       } else {
-        alert('Không thể tạo yêu cầu. Vui lòng thử lại sau.')
+        alert(t('sessionDetail.requestError'))
       }
     } else {
       // For individual session
@@ -508,7 +510,7 @@ const SessionDetail: React.FC = () => {
         setRequestType('reschedule')
         setIsRequestDialogOpen(true)
       } else {
-        alert('Không thể tạo yêu cầu. Vui lòng thử lại sau.')
+        alert(t('sessionDetail.requestError'))
       }
     } else {
       // For individual session
@@ -541,7 +543,7 @@ const SessionDetail: React.FC = () => {
                 }}
               >
             <h2 className={`text-xl font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {isClassView ? 'Class Information' : 'Session Information'}
+                    {isClassView ? t('sessionDetail.classInformation') : t('sessionDetail.sessionInformation')}
                   </h2>
 
                 {/* Tutor Info */}
@@ -586,15 +588,15 @@ const SessionDetail: React.FC = () => {
                 <Schedule className={`w-5 h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} mr-3 mt-0.5`} />
                     <div>
                   <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Schedule
+                    {t('sessionDetail.schedule')}
                   </p>
                       {isClassView ? (
                         <>
                       <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            Every {data.day.charAt(0).toUpperCase() + data.day.slice(1)}
+                            {t('sessionDetail.every')} {data.day.charAt(0).toUpperCase() + data.day.slice(1)}
                       </p>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {data.startTime} - {data.endTime} ({data.duration} minutes)
+                            {data.startTime} - {data.endTime} ({data.duration} {t('sessionDetail.minutes')})
                           </p>
                         </>
                       ) : (
@@ -603,7 +605,7 @@ const SessionDetail: React.FC = () => {
                             {formatDateTime(data.startTime)}
                           </p>
                           <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Duration: {data.duration} minutes
+                            {t('sessionDetail.duration')} {data.duration} {t('sessionDetail.minutes')}
                           </p>
                         </>
                       )}
@@ -613,26 +615,26 @@ const SessionDetail: React.FC = () => {
                 <Person className={`w-5 h-5 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'} mr-3 mt-0.5`} />
                     <div>
                   <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {isClassView ? 'Enrollment' : 'Type'}
+                    {isClassView ? t('sessionDetail.enrollment') : t('sessionDetail.type')}
                   </p>
                       {isClassView ? (
                         <>
                       <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            {data.currentEnrollment} / {data.maxStudents} Students
+                            {data.currentEnrollment} / {data.maxStudents} {t('sessionDetail.students')}
                       </p>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Class capacity
+                            {t('sessionDetail.classCapacity')}
                           </p>
                         </>
                       ) : (
                         <>
                           <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            {data.isOnline ? 'Online Video Call' : 'In-Person Meeting'}
+                            {data.isOnline ? t('sessionDetail.onlineVideoCall') : t('sessionDetail.inPersonMeeting')}
                           </p>
                           <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             {data.isOnline 
-                              ? (data.meetingLink || 'Virtual') 
-                              : (data.location || 'Physical Location - Chưa được phân bổ')}
+                              ? (data.meetingLink || t('sessionDetail.virtual')) 
+                              : (data.location || t('sessionDetail.physicalLocation'))}
                           </p>
                         </>
                       )}
@@ -644,7 +646,7 @@ const SessionDetail: React.FC = () => {
                 {(isClassView ? data.description : data.notes) && (
                 <div className="mb-6">
                 <h4 className={`text-base font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                {isClassView ? 'Class Description' : 'Session Notes'}
+                {isClassView ? t('sessionDetail.classDescription') : t('sessionDetail.sessionNotes')}
                   </h4>
                   <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                 {isClassView ? data.description : data.notes}
@@ -656,7 +658,7 @@ const SessionDetail: React.FC = () => {
                 {isClassView && (
                 <div className="mb-6">
                 <h4 className={`text-base font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Semester Period
+                {t('sessionDetail.semesterPeriod')}
                   </h4>
                   <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     {new Date(data.semesterStart).toLocaleDateString('vi-VN')} - {new Date(data.semesterEnd).toLocaleDateString('vi-VN')}
@@ -668,7 +670,7 @@ const SessionDetail: React.FC = () => {
                 {tutor.subjects && tutor.subjects.length > 0 && (
                 <div>
                 <h4 className={`text-base font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Tutor Specialties
+                {t('sessionDetail.tutorSpecialties')}
                   </h4>
                   <div className="flex flex-wrap gap-2">
                   {tutor.subjects.map((subject: string, index: number) => (
@@ -700,7 +702,7 @@ const SessionDetail: React.FC = () => {
                 }}
               >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Session Actions
+                  {isClassView ? t('sessionDetail.classActions') : t('sessionDetail.sessionActions')}
                 </h3>
                 <div className="space-y-3">
               <Button 
@@ -710,7 +712,7 @@ const SessionDetail: React.FC = () => {
                 onClick={handleJoinSession}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Join Video Call
+                {t('sessionDetail.joinVideoCall')}
               </Button>
               {/* Show buttons for individual sessions OR upcoming class session */}
               {(() => {
@@ -754,7 +756,7 @@ const SessionDetail: React.FC = () => {
                       e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                     }}
                   >
-                    Request Reschedule
+                    {t('sessionDetail.requestReschedule')}
                   </Button>
                   <Button 
                     fullWidth 
@@ -775,7 +777,7 @@ const SessionDetail: React.FC = () => {
                       e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                     }}
                   >
-                    Request Cancel
+                    {t('sessionDetail.requestCancel')}
                   </Button>
                 </>
               )}
@@ -797,7 +799,7 @@ const SessionDetail: React.FC = () => {
                   e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                 }}
               >
-                Send Message
+                {t('sessionDetail.sendMessage')}
               </Button>
               <Button 
                 fullWidth 
@@ -817,7 +819,7 @@ const SessionDetail: React.FC = () => {
                   e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                 }}
               >
-                Download Materials
+                {t('sessionDetail.downloadMaterials')}
               </Button>
               <Button 
                 fullWidth 
@@ -838,7 +840,7 @@ const SessionDetail: React.FC = () => {
                   e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                 }}
               >
-                End Session & Rate
+                {t('sessionDetail.endSessionRate')}
               </Button>
                 </div>
           </Card>
@@ -853,11 +855,11 @@ const SessionDetail: React.FC = () => {
                 }}
               >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Session Details
+                  {t('sessionDetail.sessionDetails')}
                 </h3>
                 <div className="space-y-3">
               <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Status:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('sessionDetail.status')}</span>
                 <span className={`text-sm font-medium px-2 py-1 rounded ${
                   data.status === 'confirmed' || data.status === 'active'
                     ? theme === 'dark' ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800'
@@ -867,7 +869,7 @@ const SessionDetail: React.FC = () => {
                     </span>
                   </div>
               <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{isClassView ? 'Code' : 'Type'}:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{isClassView ? t('sessionDetail.code') : t('sessionDetail.type')}:</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {isClassView ? data.code : data.type}
                     </span>
@@ -885,7 +887,7 @@ const SessionDetail: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            Loading session details...
+            {isClassView ? t('sessionDetail.loadingClass') : t('sessionDetail.loading')}
           </p>
         </div>
       </div>
@@ -897,13 +899,13 @@ const SessionDetail: React.FC = () => {
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
         <div className="text-center">
           <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
-            {isClassView ? 'Class' : 'Session'} not found
+            {isClassView ? t('sessionDetail.classNotFound') : t('sessionDetail.notFound')}
           </p>
           <Button
             onClick={() => navigate('/student')}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Back to Dashboard
+            {t('sessionDetail.backToDashboard')}
           </Button>
         </div>
       </div>
@@ -934,7 +936,7 @@ const SessionDetail: React.FC = () => {
             {/* Status */}
             <div className="mb-8">
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                {isClassView ? 'CLASS STATUS' : 'SESSION STATUS'}
+                {isClassView ? t('sessionDetail.classStatus') : t('sessionDetail.sessionStatus')}
               </h3>
               <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                 <div className="flex items-center mb-2">
@@ -944,7 +946,7 @@ const SessionDetail: React.FC = () => {
                   </span>
                 </div>
                 <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {isClassView ? `Class Code: ${displayData.code}` : `Session ID: ${displayData.id}`}
+                  {isClassView ? `${t('sessionDetail.classCode')} ${displayData.code}` : `${t('sessionDetail.sessionId')} ${displayData.id}`}
                 </p>
               </div>
             </div>
@@ -952,7 +954,7 @@ const SessionDetail: React.FC = () => {
             {/* Quick Actions */}
             <div className="mb-8">
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                QUICK ACTIONS
+                {t('sessionDetail.quickActions')}
               </h3>
               <div className="space-y-2">
                 <button 
@@ -960,7 +962,14 @@ const SessionDetail: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Dashboard
+                  {t('sessionDetail.backToDashboard')}
+                </button>
+                <button 
+                  onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <LanguageIcon className="mr-3 w-4 h-4" />
+                  {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                 </button>
               </div>
             </div>
@@ -968,7 +977,7 @@ const SessionDetail: React.FC = () => {
             {/* My Sessions & Classes */}
             <div>
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                MY SESSIONS ({mySessions.length}) & CLASSES ({myClasses.length})
+                {t('sessionDetail.mySessions')} ({mySessions.length}) & {t('sessionDetail.myClasses')} ({myClasses.length})
               </h3>
               {sessionsLoading ? (
                 <div className="text-center py-4">
@@ -980,7 +989,7 @@ const SessionDetail: React.FC = () => {
                   {mySessions.length > 0 && (
                     <div>
                       <p className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>
-                        Sessions
+                        {t('sessionDetail.sessions')}
                       </p>
                       <div className="space-y-2">
                   {mySessions.map((sess: any) => (
@@ -1014,7 +1023,7 @@ const SessionDetail: React.FC = () => {
                   {myClasses.length > 0 && (
                     <div>
                       <p className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>
-                        Classes
+                        {t('sessionDetail.classes')}
                       </p>
                       <div className="space-y-2">
                         {myClasses.map((cls: any) => (
@@ -1046,7 +1055,7 @@ const SessionDetail: React.FC = () => {
 
                   {mySessions.length === 0 && myClasses.length === 0 && (
                     <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      No sessions or classes found
+                      {t('sessionDetail.noSessionsOrClasses')}
                     </p>
                   )}
                 </div>
@@ -1074,14 +1083,14 @@ const SessionDetail: React.FC = () => {
                 onClick={() => navigate('/student/session')}
                 className={`text-sm hover:underline ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'}`}
               >
-                LMS
+                {t('sessionDetail.lms')}
               </button>
               <NavigateNextIcon sx={{ fontSize: 16, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
               <button
                 onClick={() => navigate(isClassView ? '/student/session?view=classes' : '/student/session')}
                 className={`text-sm hover:underline ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'}`}
               >
-                {isClassView ? 'My Classes' : 'My Sessions'}
+                {isClassView ? t('sessionDetail.myClassesLabel') : t('sessionDetail.mySessionsLabel')}
               </button>
               <NavigateNextIcon sx={{ fontSize: 16, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
               <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -1093,7 +1102,7 @@ const SessionDetail: React.FC = () => {
           {/* Header */}
           <div className="mb-8">
             <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              {isClassView ? 'Class Details' : 'Session Details'}
+              {isClassView ? t('sessionDetail.classDetails') : t('sessionDetail.sessionDetails')}
             </h1>
             <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               {isClassView 
@@ -1199,7 +1208,7 @@ const SessionDetail: React.FC = () => {
               {/* Mobile Status */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {isClassView ? 'CLASS STATUS' : 'SESSION STATUS'}
+                  {isClassView ? t('sessionDetail.classStatus') : t('sessionDetail.sessionStatus')}
                 </h3>
                 <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                   <div className="flex items-center mb-2">
@@ -1209,7 +1218,7 @@ const SessionDetail: React.FC = () => {
                     </span>
                   </div>
                   <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {isClassView ? `Class Code: ${displayData.code}` : `Session ID: ${displayData.id}`}
+                    {isClassView ? `${t('sessionDetail.classCode')} ${displayData.code}` : `${t('sessionDetail.sessionId')} ${displayData.id}`}
                   </p>
                 </div>
               </div>
@@ -1224,7 +1233,7 @@ const SessionDetail: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  Book Another Session
+                  {t('sessionDetail.bookAnotherSession')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1234,7 +1243,7 @@ const SessionDetail: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <TrendingUpIcon className="mr-3 w-4 h-4" />
-                  View Progress
+                  {t('sessionDetail.viewProgress')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1244,7 +1253,17 @@ const SessionDetail: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Dashboard
+                  {t('sessionDetail.backToDashboard')}
+                </button>
+                <button 
+                  onClick={() => {
+                    changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                    setMobileOpen(false)
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <LanguageIcon className="mr-3 w-4 h-4" />
+                  {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                 </button>
               </div>
             </div>
@@ -1254,10 +1273,10 @@ const SessionDetail: React.FC = () => {
 
       {/* Join Dialog */}
       <Dialog open={isJoinDialogOpen} onClose={() => setIsJoinDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{isClassView ? 'Join Class' : 'Join Session'}</DialogTitle>
+        <DialogTitle>{isClassView ? t('sessionDetail.joinClass') : t('sessionDetail.joinSession')}</DialogTitle>
         <DialogContent>
           <Typography variant="body1" gutterBottom>
-            You are about to join the {isClassView ? 'class' : 'session'} with {tutor?.name}.
+            {isClassView ? t('sessionDetail.joinClassTitle') : t('sessionDetail.joinSessionTitle')} {tutor?.name}.
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {isClassView 
@@ -1268,8 +1287,8 @@ const SessionDetail: React.FC = () => {
           <div className="mt-4">
             <TextField
               fullWidth
-              label="Meeting Link"
-              value={displayData?.meetingLink || 'No meeting link available'}
+              label={t('sessionDetail.meetingLink')}
+              value={displayData?.meetingLink || t('sessionDetail.noMeetingLink')}
               InputProps={{ readOnly: true }}
             />
           </div>
@@ -1284,7 +1303,7 @@ const SessionDetail: React.FC = () => {
               fontWeight: '500'
             }}
           >
-            Cancel
+            {t('sessionDetail.cancel')}
           </MuiButton>
           <MuiButton 
             onClick={handleStartSession} 
@@ -1296,18 +1315,18 @@ const SessionDetail: React.FC = () => {
               fontWeight: '500'
             }}
           >
-            Join Now
+            {t('sessionDetail.joinNow')}
           </MuiButton>
         </DialogActions>
       </Dialog>
 
       {/* Feedback Dialog */}
       <Dialog open={isFeedbackDialogOpen} onClose={() => setIsFeedbackDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Rate Your Session</DialogTitle>
+        <DialogTitle>{t('sessionDetail.rateYourSession')}</DialogTitle>
         <DialogContent>
           <div className="mt-4">
             <Typography variant="h6" gutterBottom>
-              How would you rate this session?
+              {t('sessionDetail.howWouldYouRate')}
             </Typography>
             <Rating
               value={rating}
@@ -1318,12 +1337,12 @@ const SessionDetail: React.FC = () => {
           <div className="mt-4">
             <TextField
               fullWidth
-              label="Additional Feedback"
+              label={t('sessionDetail.additionalFeedback')}
               multiline
               rows={4}
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Share your thoughts about the session..."
+              placeholder={t('sessionDetail.shareYourThoughts')}
             />
           </div>
         </DialogContent>
@@ -1337,7 +1356,7 @@ const SessionDetail: React.FC = () => {
               fontWeight: '500'
             }}
           >
-            Cancel
+            {t('sessionDetail.cancel')}
           </MuiButton>
           <MuiButton 
             onClick={handleSubmitFeedback} 
@@ -1349,7 +1368,7 @@ const SessionDetail: React.FC = () => {
               fontWeight: '500'
             }}
           >
-            Submit Feedback
+            {t('sessionDetail.submitFeedback')}
           </MuiButton>
         </DialogActions>
       </Dialog>

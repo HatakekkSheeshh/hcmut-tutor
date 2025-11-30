@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -24,7 +25,8 @@ import {
   EmojiEvents as EmojiEventsIcon,
   Flag as FlagIcon,
   Notifications as NotificationsIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import { 
   Box,
@@ -67,8 +69,15 @@ const achievements = [
 ]
 
 const ViewProgressMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
   
   // --- State ---
   const [loading, setLoading] = useState(true)
@@ -209,6 +218,11 @@ const ViewProgressMobile: React.FC = () => {
     loadData() // Gọi hàm loadData đã tách
   }, [navigate])
 
+  // Sync currentLang with i18n.language
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -255,20 +269,20 @@ const ViewProgressMobile: React.FC = () => {
 
   // Helper vars
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
-    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
-    { id: 'book-session', label: 'Book Session', icon: <School />, path: '/student/book' },
-    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
+    { id: 'dashboard', label: t('dashboard.menu.dashboard'), icon: <DashboardIcon />, path: '/student' },
+    { id: 'search-tutors', label: t('dashboard.menu.findTutors'), icon: <PersonSearch />, path: '/student/search' },
+    { id: 'book-session', label: t('dashboard.menu.bookSession'), icon: <School />, path: '/student/book' },
+    { id: 'view-progress', label: t('dashboard.menu.viewProgress'), icon: <BarChartIcon />, path: '/student/progress' },
+    { id: 'session-detail', label: t('dashboard.menu.sessionDetails'), icon: <Class />, path: '/student/session' },
+    { id: 'chatbot-support', label: t('dashboard.menu.aiSupport'), icon: <SmartToyIcon />, path: '/student/chatbot' },
+    { id: 'messages', label: t('dashboard.menu.messages'), icon: <ChatIcon />, path: '/student/messages' }
   ]
 
   const timeRangeOptions = [
-    { value: '1month', label: 'Last Month' },
-    { value: '3months', label: 'Last 3 Months' },
-    { value: '6months', label: 'Last 6 Months' },
-    { value: '1year', label: 'Last Year' }
+    { value: '1month', label: t('viewProgress.timeRange.lastMonth') },
+    { value: '3months', label: t('viewProgress.timeRange.last3Months') },
+    { value: '6months', label: t('viewProgress.timeRange.last6Months') },
+    { value: '1year', label: t('viewProgress.timeRange.lastYear') }
   ]
 
   const getSelectedTimeRange = () => {
@@ -283,10 +297,10 @@ const ViewProgressMobile: React.FC = () => {
   const totalSessions = subjectsProgress.reduce((sum, s) => sum + s.totalRecords, 0)
 
   const stats = [
-    { title: 'Total Sessions', value: totalSessions.toString(), icon: <Schedule />, color: 'primary' },
-    { title: 'Subjects Studied', value: subjectsProgress.length.toString(), icon: <School />, color: 'success' },
-    { title: 'Overall Progress', value: `${overallProgress}%`, icon: <TrendingUp />, color: 'info' },
-    { title: 'Progress Records', value: progressRecords.length.toString(), icon: <Assignment />, color: 'secondary' },
+    { title: t('viewProgress.stats.totalSessions'), value: totalSessions.toString(), icon: <Schedule />, color: 'primary' },
+    { title: t('viewProgress.stats.subjectsStudied'), value: subjectsProgress.length.toString(), icon: <School />, color: 'success' },
+    { title: t('viewProgress.stats.overallProgress'), value: `${overallProgress}%`, icon: <TrendingUp />, color: 'info' },
+    { title: t('viewProgress.stats.progressRecords'), value: progressRecords.length.toString(), icon: <Assignment />, color: 'secondary' },
   ]
 
   // Loading state
@@ -295,7 +309,7 @@ const ViewProgressMobile: React.FC = () => {
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Loading your progress...</p>
+          <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t('viewProgress.loading')}</p>
         </div>
       </div>
     )
@@ -315,7 +329,7 @@ const ViewProgressMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-base font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Progress
+                {t('viewProgress.title')}
               </h1>
             </div>
           </div>
@@ -359,7 +373,7 @@ const ViewProgressMobile: React.FC = () => {
         {/* Time Range Selector */}
           <div className="flex items-center justify-between mb-4 relative time-range-dropdown-container">
             <Typography variant="body2" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
-              Time Range
+              {t('viewProgress.timeRange.label')}
             </Typography>
               <button
                 onClick={() => setShowTimeRangeDropdown(!showTimeRangeDropdown)}
@@ -448,7 +462,7 @@ const ViewProgressMobile: React.FC = () => {
         >
           <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
             <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
-              Overall Performance
+              {t('viewProgress.overallPerformance')}
             </Typography>
             <Chip 
               label={`${overallProgress}%`} 
@@ -475,7 +489,7 @@ const ViewProgressMobile: React.FC = () => {
             }} 
           />
           <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', mt: 1, display: 'block' }}>
-            Average across all subjects
+            {t('viewProgress.averageAcrossSubjects')}
           </Typography>
         </Paper>
 
@@ -491,7 +505,7 @@ const ViewProgressMobile: React.FC = () => {
         >
           <Box display="flex" alignItems="center" gap={1} mb={2}>
             <FlagIcon sx={{ color: '#ef4444' }} />
-            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>My Goals</Typography>
+            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>{t('viewProgress.myGoals')}</Typography>
           </Box>
           {subjectsProgress.slice(0, 2).map((subj, i) => (
             <Box key={i} mb={2}>
@@ -523,7 +537,7 @@ const ViewProgressMobile: React.FC = () => {
               color: theme === 'dark' ? '#e5e7eb' : '#374151'
             }}
           >
-            Set New Goals
+            {t('viewProgress.setNewGoals')}
           </Button>
         </Paper>
 
@@ -539,7 +553,7 @@ const ViewProgressMobile: React.FC = () => {
         >
           <Box display="flex" alignItems="center" gap={1} mb={2}>
             <EmojiEventsIcon sx={{ color: '#f59e0b' }} />
-            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>Achievements</Typography>
+            <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>{t('viewProgress.achievements')}</Typography>
           </Box>
           <div className="grid grid-cols-3 gap-2">
             {achievements.map((badge) => (
@@ -568,7 +582,7 @@ const ViewProgressMobile: React.FC = () => {
           }}
         >
           <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 2 }}>
-            Subject Performance
+            {t('viewProgress.subjectPerformance')}
           </Typography>
           {subjectsProgress.length === 0 ? (
             <Box 
@@ -581,7 +595,7 @@ const ViewProgressMobile: React.FC = () => {
             >
               <School sx={{ fontSize: 40, color: theme === 'dark' ? '#6b7280' : '#9ca3af', mb: 1 }} />
               <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
-                No progress records yet
+                {t('viewProgress.noProgressRecords')}
               </Typography>
             </Box>
           ) : (
@@ -629,13 +643,13 @@ const ViewProgressMobile: React.FC = () => {
                     <Box display="flex" alignItems="center" gap={0.5}>
                       <Assignment sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
                       <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: '0.7rem' }}>
-                        {subject.totalRecords} sessions
+                        {subject.totalRecords} {t('viewProgress.sessions')}
                       </Typography>
                     </Box>
                     <Box display="flex" alignItems="center" gap={0.5}>
                       <School sx={{ fontSize: 14, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} />
                       <Typography variant="caption" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: '0.7rem' }}>
-                        {subject.topics.length} topics
+                        {subject.topics.length} {t('viewProgress.topics')}
                       </Typography>
                     </Box>
                   </Box>
@@ -656,7 +670,7 @@ const ViewProgressMobile: React.FC = () => {
           }}
         >
           <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827', mb: 2 }}>
-              Recent Sessions
+              {t('viewProgress.recentSessions')}
           </Typography>
           {progressRecords.length === 0 ? (
             <Box 
@@ -669,7 +683,7 @@ const ViewProgressMobile: React.FC = () => {
             >
               <CalendarTodayIcon sx={{ fontSize: 40, color: theme === 'dark' ? '#6b7280' : '#9ca3af', mb: 1 }} />
               <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
-                No sessions completed yet
+                {t('viewProgress.noSessionsCompleted')}
               </Typography>
             </Box>
           ) : (
@@ -740,12 +754,12 @@ const ViewProgressMobile: React.FC = () => {
           <Box display="flex" alignItems="center" gap={1} mb={2}>
             <CheckCircleIcon sx={{ color: '#10b981', fontSize: 20 }} />
             <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
-              Improvements
+              {t('viewProgress.improvements')}
             </Typography>
           </Box>
           {progressRecords.length === 0 || progressRecords.filter(r => r.improvements && r.improvements.length > 0).length === 0 ? (
             <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', textAlign: 'center', py: 3 }}>
-              No improvements recorded yet
+              {t('viewProgress.noImprovements')}
             </Typography>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -789,12 +803,12 @@ const ViewProgressMobile: React.FC = () => {
           <Box display="flex" alignItems="center" gap={1} mb={2}>
             <WarningIcon sx={{ color: '#f59e0b', fontSize: 20 }} />
             <Typography variant="subtitle1" fontWeight="600" sx={{ color: theme === 'dark' ? '#ffffff' : '#111827' }}>
-              Areas to Focus
+              {t('viewProgress.areasToFocus')}
             </Typography>
           </Box>
           {progressRecords.length === 0 || progressRecords.filter(r => r.challenges && r.challenges.length > 0).length === 0 ? (
             <Typography variant="body2" sx={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280', textAlign: 'center', py: 3 }}>
-              No challenges recorded yet
+              {t('viewProgress.noChallenges')}
             </Typography>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -858,7 +872,7 @@ const ViewProgressMobile: React.FC = () => {
                 {/* Quick Actions */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    QUICK ACTIONS
+                    {t('viewProgress.quickActions')}
                   </h3>
                   <div className="space-y-2">
                     <button 
@@ -869,7 +883,17 @@ const ViewProgressMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                     >
                       <ArrowBackIcon className="mr-3 w-4 h-4" />
-                      Back to Dashboard
+                      {t('viewProgress.backToDashboard')}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                     </button>
                   </div>
                 </div>
@@ -877,7 +901,7 @@ const ViewProgressMobile: React.FC = () => {
                 {/* Mobile Progress Overview */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    PROGRESS OVERVIEW
+                    {t('viewProgress.progressOverview')}
                   </h3>
                   <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="text-center mb-3">
@@ -885,7 +909,7 @@ const ViewProgressMobile: React.FC = () => {
                         {overallProgress}%
                       </div>
                       <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Overall Progress
+                        {t('viewProgress.overallProgress')}
                       </div>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -922,14 +946,14 @@ const ViewProgressMobile: React.FC = () => {
 
       {/*  Dialog Set Goal */}
       <Dialog open={openGoalDialog} onClose={handleCloseGoalDialog} fullWidth maxWidth="xs">
-        <DialogTitle>Set Goal</DialogTitle>
+        <DialogTitle>{t('viewProgress.setGoal')}</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2, fontSize: '0.9rem' }}>
-            Set your target score for a subject.
+            {t('viewProgress.setGoalDescriptionShort')}
           </DialogContentText>
           <TextField
             select
-            label="Subject"
+            label={t('viewProgress.subject')}
             fullWidth
             value={selectedSubject}
             onChange={handleSubjectChange}
@@ -941,7 +965,7 @@ const ViewProgressMobile: React.FC = () => {
             ))}
           </TextField>
           <TextField
-            label="Target Score (%)"
+            label={t('viewProgress.targetScore')}
             type="number"
             fullWidth
             value={targetInput}
@@ -951,8 +975,8 @@ const ViewProgressMobile: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseGoalDialog}>Cancel</Button>
-          <Button onClick={handleSaveGoal} variant="contained">Save</Button>
+          <Button onClick={handleCloseGoalDialog}>{t('viewProgress.cancel')}</Button>
+          <Button onClick={handleSaveGoal} variant="contained">{t('viewProgress.save')}</Button>
         </DialogActions>
       </Dialog>
     </div>

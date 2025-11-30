@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
@@ -14,17 +15,29 @@ import {
   CheckCircle as CheckCircleIcon,
   BarChart as BarChartIcon,
   RateReview as RateReviewIcon,
-  ThumbUpAlt as ThumbUpAltIcon
+  ThumbUpAlt as ThumbUpAltIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import api from '../../lib/api'
 
 const EvaluateSession: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme } = useTheme()
   const navigate = useNavigate()
   const { id } = useParams()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
   const [loading, setLoading] = useState(true)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+  
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [submitting, setSubmitting] = useState(false)
   const [session, setSession] = useState<any>(null)
   const [tutor, setTutor] = useState<any>(null)
@@ -130,13 +143,13 @@ const EvaluateSession: React.FC = () => {
   }
 
   const improvementOptions = [
-    'More practice problems',
-    'Clearer explanations',
-    'Better pacing',
-    'More visual aids',
-    'Interactive activities',
-    'Homework assignments',
-    'Follow-up materials'
+    t('evaluateSession.improvements.morePractice'),
+    t('evaluateSession.improvements.clearerExplanations'),
+    t('evaluateSession.improvements.betterPacing'),
+    t('evaluateSession.improvements.moreVisualAids'),
+    t('evaluateSession.improvements.interactiveActivities'),
+    t('evaluateSession.improvements.homeworkAssignments'),
+    t('evaluateSession.improvements.followUpMaterials')
   ]
 
   const handleImprovementChange = (improvement: string) => {
@@ -151,7 +164,7 @@ const EvaluateSession: React.FC = () => {
     if (!id || !session) return
 
     if (overallRating === 0) {
-      alert('Please provide an overall rating before submitting.')
+      alert(t('evaluateSession.alert.provideRating'))
       return
     }
 
@@ -181,11 +194,11 @@ const EvaluateSession: React.FC = () => {
           navigate('/student/evaluate')
         }, 2000)
       } else {
-        alert('Failed to submit evaluation: ' + (response.error || 'Unknown error'))
+        alert(t('evaluateSession.alert.submitFailed') + ' ' + (response.error || 'Unknown error'))
       }
     } catch (error: any) {
       console.error('Failed to submit evaluation:', error)
-      alert('Failed to submit evaluation. Please try again.')
+      alert(t('evaluateSession.alert.submitFailedRetry'))
     } finally {
       setSubmitting(false)
     }
@@ -216,7 +229,7 @@ const EvaluateSession: React.FC = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Loading session details...
+              {t('evaluateSession.loading')}
             </p>
           </div>
         </div>
@@ -230,13 +243,13 @@ const EvaluateSession: React.FC = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Session not found
+              {t('evaluateSession.sessionNotFound')}
             </p>
             <Button 
               onClick={() => navigate('/student/evaluate')}
               className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
             >
-              Back to Sessions
+              {t('evaluateSession.backToSessions')}
             </Button>
           </div>
         </div>
@@ -266,7 +279,7 @@ const EvaluateSession: React.FC = () => {
             {/* Session Info */}
             <div className="mb-8">
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                SESSION INFO
+                {t('evaluateSession.sessionInfo')}
               </h3>
               <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                 <div className="flex items-center mb-3">
@@ -299,7 +312,7 @@ const EvaluateSession: React.FC = () => {
             {/* Quick Actions */}
             <div>
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                QUICK ACTIONS
+                {t('evaluateSession.quickActions')}
               </h3>
               <div className="space-y-2">
               <button 
@@ -307,7 +320,14 @@ const EvaluateSession: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Dashboard
+                  {t('evaluateSession.backToDashboard')}
+                </button>
+                <button 
+                  onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <LanguageIcon className="mr-3 w-4 h-4" />
+                  {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                 </button>
               </div>
             </div>
@@ -332,24 +352,24 @@ const EvaluateSession: React.FC = () => {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            {existingEvaluation ? 'Your Evaluation' : 'Evaluate Session'}
+            {existingEvaluation ? t('evaluateSession.yourEvaluation') : t('evaluateSession.title')}
                   </h1>
                   {existingEvaluation && (
                     <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center">
                       <CheckCircleIcon className="w-4 h-4 mr-1" />
-                      Submitted
+                      {t('evaluateSession.submitted')}
                     </span>
                   )}
                 </div>
                 <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {existingEvaluation ? 'Review your submitted feedback' : 'Share your feedback about the tutoring session'}
+                  {existingEvaluation ? t('evaluateSession.reviewFeedback') : t('evaluateSession.shareFeedback')}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center">
                   <RateReviewIcon className="w-5 h-5 text-blue-600 mr-2" />
                   <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Session #{id}
+                    {t('evaluateSession.sessionNumber')}{id}
                   </span>
                 </div>
               </div>
@@ -369,7 +389,7 @@ const EvaluateSession: React.FC = () => {
                 }}
               >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Session Summary
+                  {t('evaluateSession.sessionSummary')}
                 </h3>
                 <div className="flex items-center mb-4">
                   <Avatar
@@ -395,20 +415,20 @@ const EvaluateSession: React.FC = () => {
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.date')}</span>
                     <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{new Date(session.startTime).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Time:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.time')}</span>
                     <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{new Date(session.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date(session.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Topic:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.topic')}</span>
                     <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.topic}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
-                    <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.duration} mins</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.duration')}</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.duration} {t('evaluateSession.minutes')}</span>
                   </div>
                 </div>
           </Card>
@@ -426,7 +446,7 @@ const EvaluateSession: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Session Evaluation
+                    {t('evaluateSession.sessionEvaluation')}
                   </h3>
               <Button 
                 onClick={existingEvaluation ? () => navigate('/student/evaluate') : handleSubmit}
@@ -453,7 +473,7 @@ const EvaluateSession: React.FC = () => {
                   }
                 }}
               >
-                {existingEvaluation ? 'Back to Sessions' : 'Submit Evaluation'}
+                {existingEvaluation ? t('evaluateSession.backToSessions') : t('evaluateSession.submitEvaluation')}
               </Button>
                 </div>
 
@@ -461,7 +481,7 @@ const EvaluateSession: React.FC = () => {
               {/* Overall Rating */}
                   <div>
                     <h4 className={`text-lg font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Overall Session Rating
+                  {t('evaluateSession.overallSessionRating')}
                     </h4>
                     <div className="flex items-center mb-4">
                   <Rating
@@ -482,7 +502,7 @@ const EvaluateSession: React.FC = () => {
                         }}
                   />
                       <span className={`ml-3 text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {overallRating > 0 ? `${overallRating}/5` : 'Rate this session'}
+                    {overallRating > 0 ? `${overallRating}/5` : t('evaluateSession.rateThisSession')}
                       </span>
                     </div>
                   </div>
@@ -493,7 +513,7 @@ const EvaluateSession: React.FC = () => {
                       <div className="flex items-center mb-2">
                         <Person className="w-4 h-4 text-blue-600 mr-2" />
                         <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Tutor Performance
+                  {t('evaluateSession.tutorPerformance')}
                         </span>
                       </div>
                 <Rating
@@ -518,7 +538,7 @@ const EvaluateSession: React.FC = () => {
                       <div className="flex items-center mb-2">
                         <School className="w-4 h-4 text-blue-600 mr-2" />
                         <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Content Quality
+                  {t('evaluateSession.contentQuality')}
                         </span>
                       </div>
                 <Rating
@@ -543,7 +563,7 @@ const EvaluateSession: React.FC = () => {
                       <div className="flex items-center mb-2">
                         <ThumbUpAltIcon className="w-4 h-4 text-blue-600 mr-2" />
                         <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Communication
+                  {t('evaluateSession.communication')}
                         </span>
                       </div>
                 <Rating
@@ -573,7 +593,7 @@ const EvaluateSession: React.FC = () => {
                         className="w-4 h-4 text-blue-600 rounded mr-2"
                       />
                       <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Would you recommend this tutor?
+                        {t('evaluateSession.wouldRecommend')}
                       </span>
                     </div>
                   </div>
@@ -581,12 +601,12 @@ const EvaluateSession: React.FC = () => {
               {/* Feedback */}
                   <div>
                     <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Additional Comments
+                      {t('evaluateSession.additionalComments')}
                     </label>
                     <textarea
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Share your thoughts about the session..."
+                  placeholder={t('evaluateSession.commentsPlaceholder')}
                       rows={4}
                       readOnly={!!existingEvaluation}
                       className={`w-full px-3 py-2 border rounded-lg ${
@@ -600,7 +620,7 @@ const EvaluateSession: React.FC = () => {
               {/* Improvements */}
                   <div>
                     <label className={`block text-sm font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  What could be improved? (Select all that apply)
+                  {t('evaluateSession.whatCouldBeImproved')}
                     </label>
                     <div className="flex flex-wrap gap-2">
                   {improvementOptions.map((option) => (
@@ -655,7 +675,7 @@ const EvaluateSession: React.FC = () => {
               {/* Mobile Session Info */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  SESSION INFO
+                  {t('evaluateSession.sessionInfo')}
                 </h3>
                 <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                   <div className="flex items-center mb-3">
@@ -695,7 +715,7 @@ const EvaluateSession: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Dashboard
+                  {t('evaluateSession.backToDashboard')}
                 </button>
                 <button 
                   onClick={() => {
@@ -705,7 +725,7 @@ const EvaluateSession: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <BarChartIcon className="mr-3 w-4 h-4" />
-                  View Progress
+                  {t('evaluateSession.viewProgress')}
                 </button>
                 <button 
                   onClick={() => {
@@ -715,7 +735,17 @@ const EvaluateSession: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <CheckCircleIcon className="mr-3 w-4 h-4" />
-                  Book Another Session
+                  {t('evaluateSession.bookAnotherSession')}
+                </button>
+                <button 
+                  onClick={() => {
+                    changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                    setMobileOpen(false)
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <LanguageIcon className="mr-3 w-4 h-4" />
+                  {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                 </button>
               </div>
             </div>

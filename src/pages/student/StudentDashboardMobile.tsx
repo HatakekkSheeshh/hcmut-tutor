@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card'
@@ -39,16 +40,24 @@ import {
   ChevronRight as ChevronRightIcon,
   Logout as LogoutIcon,
   MenuBook as MenuBookIcon,
-  Forum as ForumIcon
+  Forum as ForumIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 
 const StudentDashboardMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [activeMenu, setActiveMenu] = useState('dashboard')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
   const [currentTab, setCurrentTab] = useState('home')
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
   
   // User data states
   const [user, setUser] = useState<any>(null)
@@ -296,9 +305,9 @@ const StudentDashboardMobile: React.FC = () => {
   // Get greeting based on time
   const getGreeting = () => {
     const hour = currentTime.getHours()
-    if (hour < 12) return 'Good Morning'
-    if (hour < 18) return 'Good Afternoon'
-    return 'Good Evening'
+    if (hour < 12) return t('dashboard.greetingMorning')
+    if (hour < 18) return t('dashboard.greetingAfternoon')
+    return t('dashboard.greetingEvening')
   }
 
   // useEffect for data loading, time and weather
@@ -319,15 +328,20 @@ const StudentDashboardMobile: React.FC = () => {
     }
   }, [])
 
+  // Sync currentLang with i18n.language
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
+
   // Calculate stats from real data
   const totalSessions = sessions.length
   const totalClasses = enrollments.length
   const upcomingSessions = sessions.filter(s => s.status === 'scheduled' || s.status === 'confirmed' || s.status === 'pending' || s.status === 'rescheduled').length
   
   const stats = [
-    { title: 'Total Sessions', value: totalSessions.toString(), icon: <SchoolIcon /> },
-    { title: 'Enrolled Classes', value: totalClasses.toString(), icon: <CheckCircleIcon /> },
-    { title: 'Upcoming', value: upcomingSessions.toString(), icon: <AutorenewIcon /> }
+    { title: t('dashboard.totalSessions'), value: totalSessions.toString(), icon: <SchoolIcon /> },
+    { title: t('dashboard.enrolledClasses'), value: totalClasses.toString(), icon: <CheckCircleIcon /> },
+    { title: t('dashboard.upcoming'), value: upcomingSessions.toString(), icon: <AutorenewIcon /> }
   ]
   
   // User name and avatar from backend
@@ -380,24 +394,24 @@ const StudentDashboardMobile: React.FC = () => {
   }
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
-    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
-    { id: 'book-session', label: 'Book Session', icon: <SchoolIcon />, path: '/student/book' },
-    { id: 'calendar', label: 'Calendar', icon: <CalendarMonth />, path: '/student/calendar' },
-    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
-    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' },
-    { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
-    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' }
+    { id: 'dashboard', label: t('dashboard.menu.dashboard'), icon: <DashboardIcon />, path: '/student' },
+    { id: 'search-tutors', label: t('dashboard.menu.findTutors'), icon: <PersonSearch />, path: '/student/search' },
+    { id: 'book-session', label: t('dashboard.menu.bookSession'), icon: <SchoolIcon />, path: '/student/book' },
+    { id: 'calendar', label: t('dashboard.menu.calendar'), icon: <CalendarMonth />, path: '/student/calendar' },
+    { id: 'view-progress', label: t('dashboard.menu.viewProgress'), icon: <BarChartIcon />, path: '/student/progress' },
+    { id: 'evaluate-session', label: t('dashboard.menu.evaluateSession'), icon: <StarIcon />, path: '/student/evaluate' },
+    { id: 'session-detail', label: t('dashboard.menu.sessionDetails'), icon: <Class />, path: '/student/session' },
+    { id: 'chatbot-support', label: t('dashboard.menu.aiSupport'), icon: <SmartToyIcon />, path: '/student/chatbot' },
+    { id: 'messages', label: t('dashboard.menu.messages'), icon: <ChatIcon />, path: '/student/messages' },
+    { id: 'library', label: t('dashboard.menu.digitalLibrary'), icon: <MenuBookIcon />, path: '/common/library' },
+    { id: 'forum', label: t('dashboard.menu.communityForum'), icon: <ForumIcon />, path: '/common/forum' }
   ]
 
   const bottomNavItems = [
-    { id: 'home', label: 'Home', icon: <HomeIcon /> },
-    { id: 'courses', label: 'Courses', icon: <BookmarkIcon /> },
-    { id: 'progress', label: 'Progress', icon: <TrendingUpIcon /> },
-    { id: 'profile', label: 'Profile', icon: <PersonIcon /> }
+    { id: 'home', label: t('dashboard.bottomNav.home'), icon: <HomeIcon /> },
+    { id: 'courses', label: t('dashboard.bottomNav.courses'), icon: <BookmarkIcon /> },
+    { id: 'progress', label: t('dashboard.bottomNav.progress'), icon: <TrendingUpIcon /> },
+    { id: 'profile', label: t('dashboard.bottomNav.profile'), icon: <PersonIcon /> }
   ]
 
   // Show loading state
@@ -410,7 +424,7 @@ const StudentDashboardMobile: React.FC = () => {
         height: '100vh',
         color: theme === 'dark' ? '#fff' : '#000'
       }}>
-        <div>Đang tải...</div>
+        <div>{t('dashboard.loading')}</div>
       </div>
     )
   }
@@ -483,7 +497,7 @@ const StudentDashboardMobile: React.FC = () => {
           <div className="mb-3">
             <div className="flex items-center mb-1">
               <AccessTimeIcon className={`w-4 h-4 mr-1 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-              <span className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Current Time</span>
+              <span className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('dashboard.currentTime')}</span>
             </div>
             <div className={`text-2xl font-bold mb-1 font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               {formatTime(currentTime)}
@@ -521,7 +535,7 @@ const StudentDashboardMobile: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Weather unavailable</div>
+              <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('dashboard.weatherUnavailable')}</div>
             )}
           </div>
         </div>
@@ -574,13 +588,13 @@ const StudentDashboardMobile: React.FC = () => {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            My Courses
+            {t('dashboard.home.myCourses')}
           </h2>
           <button 
             onClick={() => setCurrentTab('courses')}
             className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
           >
-            See All
+            {t('dashboard.home.seeAll')}
           </button>
         </div>
 
@@ -661,7 +675,7 @@ const StudentDashboardMobile: React.FC = () => {
     <div className="space-y-4">
       <div>
         <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          All Courses
+          {t('dashboard.home.allCourses')}
         </h2>
       </div>
 
@@ -669,7 +683,7 @@ const StudentDashboardMobile: React.FC = () => {
       {registeredCourses.length > 0 && (
         <div>
           <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Sessions
+            {t('dashboard.home.sessions')}
           </h3>
       <div className="space-y-3">
         {registeredCourses.map((course) => (
@@ -727,7 +741,7 @@ const StudentDashboardMobile: React.FC = () => {
       {classesCourses.length > 0 && (
         <div>
           <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Classes
+            {t('dashboard.home.classes')}
           </h3>
           <div className="space-y-3">
             {classesCourses.map((course) => (
@@ -786,10 +800,10 @@ const StudentDashboardMobile: React.FC = () => {
         <div className="text-center py-12">
           <SchoolIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
           <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            No Courses Yet
+            {t('dashboard.home.noCourses')}
           </h3>
           <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            You don't have any courses yet.
+            {t('dashboard.home.noCoursesDesc')}
           </p>
         </div>
       )}
@@ -799,13 +813,13 @@ const StudentDashboardMobile: React.FC = () => {
   const renderProgressTab = () => (
     <div className="space-y-4">
       <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-        Your Progress
+        {t('dashboard.yourProgress')}
       </h2>
 
       {/* Progress Chart */}
       <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <h3 className={`font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          Weekly Progress
+          {t('dashboard.weeklyProgress')}
         </h3>
         <div className="flex items-end space-x-2 h-20">
           {[40, 70, 90, 100, 85].map((height, index) => (
@@ -821,20 +835,20 @@ const StudentDashboardMobile: React.FC = () => {
       {/* My Tutor List */}
       <div>
         <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          My Tutor
+          {t('dashboard.myTutor')}
         </h3>
         
         {Object.keys(tutors).length === 0 ? (
           <div className="text-center py-8">
             <PersonSearch className={`w-12 h-12 mx-auto mb-2 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-3`}>
-              No tutors yet
+              {t('dashboard.noTutors')}
             </p>
             <button 
               onClick={() => navigate('/student/search')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
             >
-              Find Tutors
+              {t('dashboard.findTutors')}
             </button>
           </div>
         ) : (
@@ -902,7 +916,7 @@ const StudentDashboardMobile: React.FC = () => {
               {userName}
             </h4>
             <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              {user?.role || 'Student'}
+              {user?.role || t('dashboard.student')}
             </p>
           </div>
         </div>
@@ -914,7 +928,7 @@ const StudentDashboardMobile: React.FC = () => {
           >
             <PersonIcon className="w-4 h-4 text-blue-600 mb-1" />
             <p className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Profile
+              {t('dashboard.profile')}
             </p>
           </button>
           <button 
@@ -923,7 +937,7 @@ const StudentDashboardMobile: React.FC = () => {
           >
             <NotificationsIcon className="w-4 h-4 text-blue-600 mb-1" />
             <p className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Notifications
+              {t('dashboard.notifications')}
             </p>
           </button>
         </div>
@@ -932,7 +946,7 @@ const StudentDashboardMobile: React.FC = () => {
       {/* Social Links */}
       <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          Social Links
+          {t('dashboard.socialLinks')}
         </h3>
         <div className="flex justify-center space-x-4">
           <button className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
@@ -962,7 +976,7 @@ const StudentDashboardMobile: React.FC = () => {
           }`}
         >
           <LogoutIcon className="mr-2 w-5 h-5" />
-          Logout
+          {t('dashboard.logout')}
         </button>
       </div>
     </div>
@@ -1080,7 +1094,7 @@ const StudentDashboardMobile: React.FC = () => {
                 {/* Mobile Settings */}
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    SETTINGS
+                    {t('dashboard.settings')}
                   </h3>
                   <div className="space-y-2">
                     <button 
@@ -1091,7 +1105,7 @@ const StudentDashboardMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <PersonIcon className="mr-3 w-4 h-4" />
-                      Profile
+                      {t('dashboard.profile')}
                     </button>
                     <button 
                       onClick={() => {
@@ -1101,14 +1115,24 @@ const StudentDashboardMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <NotificationsIcon className="mr-3 w-4 h-4" />
-                      Notifications
+                      {t('dashboard.notifications')}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                     </button>
                     <button 
                       onClick={() => setShowThemeOptions(!showThemeOptions)}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <PaletteIcon className="mr-3 w-4 h-4" />
-                      Theme
+                      {t('dashboard.theme')}
                     </button>
                     <button 
                       onClick={() => {
@@ -1119,7 +1143,7 @@ const StudentDashboardMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
                     >
                       <LogoutIcon className="mr-3 w-4 h-4" />
-                      Logout
+                      {t('dashboard.logout')}
                     </button>
                   </div>
 
@@ -1139,10 +1163,10 @@ const StudentDashboardMobile: React.FC = () => {
                           }`}
                         >
                           {theme === 'dark' ? <LightModeIcon className="mr-3 w-4 h-4" /> : <DarkModeIcon className="mr-3 w-4 h-4" />}
-                          {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                          {theme === 'dark' ? t('dashboard.switchToLight') : t('dashboard.switchToDark')}
                         </button>
                         <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} px-3 py-1`}>
-                          Current: {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                          {t('dashboard.currentMode')}: {theme === 'dark' ? t('dashboard.darkMode') : t('dashboard.lightMode')}
                         </div>
                       </div>
                     </div>

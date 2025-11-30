@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -32,6 +33,7 @@ import { Session, CalendarFilters } from '../../types/calendar'
 import { api } from '../../lib/api'
 
 const Calendar: React.FC = () => {
+  const { t } = useTranslation()
   const { theme } = useTheme()
   const navigate = useNavigate()
   
@@ -65,7 +67,15 @@ const Calendar: React.FC = () => {
   })
 
   // Days of the week
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  const days = [
+    t('calendar.days.mon'),
+    t('calendar.days.tue'),
+    t('calendar.days.wed'),
+    t('calendar.days.thu'),
+    t('calendar.days.fri'),
+    t('calendar.days.sat'),
+    t('calendar.days.sun')
+  ]
 
   // Get week start date (Monday)
   const getWeekStart = (date: Date) => {
@@ -562,7 +572,7 @@ const Calendar: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-            Loading calendar...
+            {t('calendar.loading')}
           </p>
         </div>
       </div>
@@ -592,7 +602,7 @@ const Calendar: React.FC = () => {
                       fontWeight: 600
                     }}
                   >
-                    Calendar
+                    {t('calendar.title')}
                   </Typography>
                 </div>
                 <Button
@@ -609,7 +619,7 @@ const Calendar: React.FC = () => {
                     }
                   }}
                 >
-                  Filters
+                  {t('calendar.filters')}
                 </Button>
               </div>
 
@@ -677,7 +687,7 @@ const Calendar: React.FC = () => {
                       }
                     }}
                   >
-                    Today
+                    {t('calendar.today')}
                   </Button>
                   <ToggleButtonGroup
                     size="small"
@@ -709,8 +719,8 @@ const Calendar: React.FC = () => {
                       }
                     }}
                   >
-                    <ToggleButton value="week" aria-label="Week view">Week</ToggleButton>
-                    <ToggleButton value="day" aria-label="Day view">Day</ToggleButton>
+                    <ToggleButton value="week" aria-label="Week view">{t('calendar.week')}</ToggleButton>
+                    <ToggleButton value="day" aria-label="Day view">{t('calendar.day')}</ToggleButton>
                   </ToggleButtonGroup>
                   </div>
                 </CardContent>
@@ -741,7 +751,7 @@ const Calendar: React.FC = () => {
                         mb: 2
                       }}
                     >
-                      Filters
+                      {t('calendar.filters')}
                     </Typography>
                     
                     <div className="space-y-3">
@@ -754,12 +764,12 @@ const Calendar: React.FC = () => {
                             }
                           }}
                         >
-                          Subject
+                          {t('calendar.filter.subject')}
                         </InputLabel>
                         <Select
                           value={filters.subject || ''}
                           onChange={(e) => handleFilterChange('subject', e.target.value)}
-                          label="Subject"
+                          label={t('calendar.filter.subject')}
                           sx={{
                             color: theme === 'dark' ? '#ffffff' : '#111827',
                             '& .MuiOutlinedInput-notchedOutline': {
@@ -776,7 +786,7 @@ const Calendar: React.FC = () => {
                             }
                           }}
                         >
-                          <MenuItem value="">All Subjects</MenuItem>
+                          <MenuItem value="">{t('calendar.filter.allSubjects')}</MenuItem>
                           {subjects.map((subject) => (
                             <MenuItem key={subject} value={subject}>
                               {subject}
@@ -794,12 +804,12 @@ const Calendar: React.FC = () => {
                             }
                           }}
                         >
-                          Tutor
+                          {t('calendar.filter.tutor')}
                         </InputLabel>
                         <Select
                           value={filters.tutor || ''}
                           onChange={(e) => handleFilterChange('tutor', e.target.value)}
-                          label="Tutor"
+                          label={t('calendar.filter.tutor')}
                           sx={{
                             color: theme === 'dark' ? '#ffffff' : '#111827',
                             '& .MuiOutlinedInput-notchedOutline': {
@@ -816,7 +826,7 @@ const Calendar: React.FC = () => {
                             }
                           }}
                         >
-                          <MenuItem value="">All Tutors</MenuItem>
+                          <MenuItem value="">{t('calendar.filter.allTutors')}</MenuItem>
                           {Object.values(tutors).map((tutor: any) => (
                             <MenuItem key={tutor.id} value={tutor.id}>
                               {tutor.name}
@@ -834,12 +844,12 @@ const Calendar: React.FC = () => {
                             }
                           }}
                         >
-                          Status
+                          {t('calendar.filter.status')}
                         </InputLabel>
                         <Select
                           value={filters.status || ''}
                           onChange={(e) => handleFilterChange('status', e.target.value)}
-                          label="Status"
+                          label={t('calendar.filter.status')}
                           sx={{
                             color: theme === 'dark' ? '#ffffff' : '#111827',
                             '& .MuiOutlinedInput-notchedOutline': {
@@ -856,11 +866,11 @@ const Calendar: React.FC = () => {
                             }
                           }}
                         >
-                          <MenuItem value="">All Status</MenuItem>
-                          <MenuItem value="scheduled">Scheduled</MenuItem>
-                          <MenuItem value="completed">Completed</MenuItem>
-                          <MenuItem value="cancelled">Cancelled</MenuItem>
-                          <MenuItem value="rescheduled">Rescheduled</MenuItem>
+                          <MenuItem value="">{t('calendar.filter.allStatus')}</MenuItem>
+                          <MenuItem value="scheduled">{t('calendar.status.scheduled')}</MenuItem>
+                          <MenuItem value="completed">{t('calendar.status.completed')}</MenuItem>
+                          <MenuItem value="cancelled">{t('calendar.status.cancelled')}</MenuItem>
+                          <MenuItem value="rescheduled">{t('calendar.status.rescheduled')}</MenuItem>
                         </Select>
                       </FormControl>
 
@@ -874,7 +884,7 @@ const Calendar: React.FC = () => {
                           color: theme === 'dark' ? '#ffffff' : '#111827'
                         }}
                       >
-                        Clear Filters
+                        {t('calendar.filter.clearFilters')}
                       </Button>
                     </div>
                   </CardContent>
@@ -897,14 +907,14 @@ const Calendar: React.FC = () => {
                       fontWeight: 600,
                       mb: 2
                     }}
-                  >
-                    {viewMode === 'day' ? 'Today' : 'This Week'}
-                  </Typography>
+                    >
+                      {viewMode === 'day' ? t('calendar.stats.today') : t('calendar.stats.thisWeek')}
+                    </Typography>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Total Sessions:
+                        {t('calendar.stats.totalSessions')}
                       </span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {sessions.length}
@@ -912,7 +922,7 @@ const Calendar: React.FC = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Scheduled:
+                        {t('calendar.stats.scheduled')}
                       </span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {sessions.filter(s => s.status === 'scheduled').length}
@@ -920,7 +930,7 @@ const Calendar: React.FC = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Completed:
+                        {t('calendar.stats.completed')}
                       </span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {sessions.filter(s => s.status === 'completed').length}
@@ -945,7 +955,7 @@ const Calendar: React.FC = () => {
                       fontWeight: 600
                     }}
                   >
-                    {viewMode === 'day' ? 'Day Schedule' : 'Weekly Schedule'}
+                    {viewMode === 'day' ? t('calendar.daySchedule') : t('calendar.weeklySchedule')}
                   </Typography>
                   <Button
                     variant="contained"
@@ -958,7 +968,7 @@ const Calendar: React.FC = () => {
                       }
                     }}
                   >
-                    Add Event
+                    {t('calendar.addEvent')}
                   </Button>
                 </div>
               </div>
@@ -979,7 +989,7 @@ const Calendar: React.FC = () => {
                   {/* Days Header */}
                   <div className="grid grid-cols-8 border-b border-gray-200 dark:border-gray-700">
                     <div className={`p-3 text-center font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      Time
+                      {t('calendar.time')}
                     </div>
                     {days.map((day, index) => {
                       const date = new Date(getWeekStart(currentWeek))

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { Avatar } from '@mui/material'
@@ -24,14 +25,22 @@ import {
   Class,
   SmartToy as SmartToyIcon,
   LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon
+  DarkMode as DarkModeIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 
 const SearchTutorsMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
   const [searchTerm, setSearchTerm] = useState('')
   const [subject, setSubject] = useState('')
   const [rating, setRating] = useState('')
@@ -148,30 +157,35 @@ const SearchTutorsMobile: React.FC = () => {
 
   // Day of week options
   const dayOptions = [
-    { value: '', label: 'Tất cả các ngày' },
-    { value: 'monday', label: 'Thứ Hai' },
-    { value: 'tuesday', label: 'Thứ Ba' },
-    { value: 'wednesday', label: 'Thứ Tư' },
-    { value: 'thursday', label: 'Thứ Năm' },
-    { value: 'friday', label: 'Thứ Sáu' },
-    { value: 'saturday', label: 'Thứ Bảy' },
-    { value: 'sunday', label: 'Chủ Nhật' }
+    { value: '', label: t('searchTutors.allDays') },
+    { value: 'monday', label: t('searchTutors.days.monday') },
+    { value: 'tuesday', label: t('searchTutors.days.tuesday') },
+    { value: 'wednesday', label: t('searchTutors.days.wednesday') },
+    { value: 'thursday', label: t('searchTutors.days.thursday') },
+    { value: 'friday', label: t('searchTutors.days.friday') },
+    { value: 'saturday', label: t('searchTutors.days.saturday') },
+    { value: 'sunday', label: t('searchTutors.days.sunday') }
   ]
 
   // Filter options
   const subjectOptions = [
-    { value: '', label: 'Tất cả môn học' },
+    { value: '', label: t('searchTutors.allSubjects') },
     ...subjects.map(sub => ({ value: sub, label: sub }))
   ]
 
   const ratingOptions = [
-    { value: '', label: 'Bất kỳ rating' },
-    { value: '4+', label: '4+ Sao' },
-    { value: '4.5+', label: '4.5+ Sao' },
-    { value: '5', label: '5 Sao' }
+    { value: '', label: t('searchTutors.anyRating') },
+    { value: '4+', label: t('searchTutors.ratingOptions.4plus') },
+    { value: '4.5+', label: t('searchTutors.ratingOptions.4dot5plus') },
+    { value: '5', label: t('searchTutors.ratingOptions.5') }
   ]
 
   const availabilityOptions = dayOptions
+
+  // Sync currentLang with i18n.language
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
 
   const getSelectedSubject = () => {
     return subjectOptions.find(option => option.value === subject) || subjectOptions[0]
@@ -389,10 +403,10 @@ const SearchTutorsMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Search Tutors
+                {t('searchTutors.title')}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Find the perfect tutor
+                {t('searchTutors.subtitle')}
               </p>
             </div>
           </div>
@@ -426,7 +440,7 @@ const SearchTutorsMobile: React.FC = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search tutors by name, subject, or expertise..."
+            placeholder={t('searchTutors.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full px-4 py-3 pl-10 rounded-lg border ${
@@ -450,7 +464,7 @@ const SearchTutorsMobile: React.FC = () => {
               {/* Subject Dropdown */}
               <div className="relative subject-dropdown-container">
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Subject
+                  {t('searchTutors.subject')}
                 </label>
                 <button
                   onClick={() => setShowSubjectDropdown(!showSubjectDropdown)}
@@ -512,7 +526,7 @@ const SearchTutorsMobile: React.FC = () => {
               {/* Rating Dropdown */}
               <div className="relative rating-dropdown-container">
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Rating
+                  {t('searchTutors.rating')}
                 </label>
                 <button
                   onClick={() => setShowRatingDropdown(!showRatingDropdown)}
@@ -574,7 +588,7 @@ const SearchTutorsMobile: React.FC = () => {
               {/* Availability Dropdown */}
               <div className="relative availability-dropdown-container">
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Availability
+                  {t('searchTutors.dayOfWeek')}
                 </label>
                 <button
                   onClick={() => setShowAvailabilityDropdown(!showAvailabilityDropdown)}
@@ -639,7 +653,7 @@ const SearchTutorsMobile: React.FC = () => {
         {/* Results Header */}
         <div className="flex items-center justify-between">
           <h2 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Available Tutors ({tutors.length})
+            {t('searchTutors.availableTutors')} ({tutors.length})
           </h2>
           <div className="flex space-x-2">
             <button 
@@ -666,13 +680,13 @@ const SearchTutorsMobile: React.FC = () => {
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-              Đang tải gia sư...
+              {t('searchTutors.loading')}
             </div>
           </div>
         ) : tutors.length === 0 ? (
           <div className="flex justify-center items-center py-20">
             <div className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Không tìm thấy gia sư phù hợp
+              {t('searchTutors.noTutorsFound')}
             </div>
           </div>
         ) : (
@@ -732,7 +746,7 @@ const SearchTutorsMobile: React.FC = () => {
                       ? 'bg-green-100 text-green-800' 
                       : 'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {tutor.verified ? 'Verified' : 'Pending'}
+                    {tutor.verified ? t('searchTutors.verified') : t('searchTutors.pending')}
                   </span>
                 </div>
 
@@ -749,7 +763,7 @@ const SearchTutorsMobile: React.FC = () => {
                 {tutor.subjects && tutor.subjects.length > 0 && (
                   <div className="mb-3">
                     <p className={`text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Môn dạy:
+                      {t('searchTutors.subjectsTaught')}:
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {tutor.subjects.slice(0, 3).map((subject: string, index: number) => (
@@ -793,7 +807,7 @@ const SearchTutorsMobile: React.FC = () => {
                       e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                     }}
                   >
-                    Xem hồ sơ
+                    {t('searchTutors.viewProfile')}
                   </Button>
                   <Button 
                     size="small" 
@@ -802,7 +816,7 @@ const SearchTutorsMobile: React.FC = () => {
                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                     onClick={() => navigate('/student/book', { state: { tutorId: tutor.id } })}
                   >
-                    Đặt lịch
+                    {t('searchTutors.bookSession')}
                   </Button>
                 </div>
               </div>
@@ -818,7 +832,7 @@ const SearchTutorsMobile: React.FC = () => {
             className={`w-full flex items-center justify-between p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
           >
             <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Need Help?
+              {t('searchTutors.needHelp')}
             </h3>
             <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
               <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
@@ -833,21 +847,21 @@ const SearchTutorsMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'} transition-colors`}
                 >
                   <ChatIcon className="mr-3 w-4 h-4" />
-                  Contact Support
+                  {t('searchTutors.contactSupport')}
                 </button>
                 <button 
                   onClick={() => navigate('/student/progress')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'} transition-colors`}
                 >
                   <VideoCallIcon className="mr-3 w-4 h-4" />
-                  Video Tutorial
+                  {t('searchTutors.videoTutorial')}
                 </button>
                 <button 
                   onClick={() => navigate('/common/profile')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'} transition-colors`}
                 >
                   <PersonIcon className="mr-3 w-4 h-4" />
-                  Find Centers
+                  {t('searchTutors.findCenters')}
                 </button>
               </div>
             </div>
@@ -888,9 +902,19 @@ const SearchTutorsMobile: React.FC = () => {
                 {/* Quick Actions - Moved to top */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    QUICK ACTIONS
+                    {t('searchTutors.quickActions')}
                   </h3>
                   <div className="space-y-2">
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
+                    </button>
                     <button 
                       onClick={() => {
                         navigate('/student')
@@ -899,7 +923,7 @@ const SearchTutorsMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                     >
                       <ArrowBackIcon className="mr-3 w-4 h-4" />
-                      Back to Dashboard
+                      {t('searchTutors.backToDashboard')}
                     </button>
                   </div>
                 </div>
@@ -907,17 +931,17 @@ const SearchTutorsMobile: React.FC = () => {
                 {/* Search Tips */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    SEARCH TIPS
+                    {t('searchTutors.searchTips').toUpperCase()}
                   </h3>
                   <div className="space-y-3">
                     <div className="flex items-start">
                       <CheckCircleIcon className="w-4 h-4 text-green-500 mr-3 mt-0.5" />
                       <div>
                         <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Use specific subjects
+                          {t('searchTutors.tips.useSpecificSubjects')}
                         </p>
                         <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Search for "Calculus" or "Physics"
+                          {t('searchTutors.tips.useSpecificSubjectsDesc')}
                         </p>
                       </div>
                     </div>
@@ -925,10 +949,10 @@ const SearchTutorsMobile: React.FC = () => {
                       <CheckCircleIcon className="w-4 h-4 text-green-500 mr-3 mt-0.5" />
                       <div>
                         <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Check availability
+                          {t('searchTutors.tips.checkAvailability')}
                         </p>
                         <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Look for "Available Now"
+                          {t('searchTutors.tips.checkAvailabilityDesc')}
                         </p>
                       </div>
                     </div>
@@ -936,10 +960,10 @@ const SearchTutorsMobile: React.FC = () => {
                       <CheckCircleIcon className="w-4 h-4 text-green-500 mr-3 mt-0.5" />
                       <div>
                         <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Read reviews
+                          {t('searchTutors.tips.readReviews')}
                         </p>
                         <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Check ratings before booking
+                          {t('searchTutors.tips.readReviewsDesc')}
                         </p>
                       </div>
                     </div>
@@ -949,7 +973,7 @@ const SearchTutorsMobile: React.FC = () => {
                 {/* Popular Subjects */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    POPULAR SUBJECTS
+                    {t('searchTutors.popularSubjects').toUpperCase()}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {subjects.slice(0, 6).map((subjectItem, index) => (
@@ -1004,7 +1028,7 @@ const SearchTutorsMobile: React.FC = () => {
               {/* Modal Header */}
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Hồ sơ Gia sư
+                  {t('searchTutors.modal.tutorProfile')}
                 </h2>
                 <button 
                   onClick={() => setShowTutorModal(false)}
@@ -1060,7 +1084,7 @@ const SearchTutorsMobile: React.FC = () => {
               {selectedTutor.subjects && selectedTutor.subjects.length > 0 && (
                 <div className="mb-4">
                   <h4 className={`font-semibold text-sm mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Môn học
+                    {t('searchTutors.modal.subjects')}
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedTutor.subjects.map((sub: string, idx: number) => (
@@ -1079,7 +1103,7 @@ const SearchTutorsMobile: React.FC = () => {
               {selectedTutor.education && (
                 <div className="mb-4">
                   <h4 className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Học vấn
+                    {t('searchTutors.modal.education')}
                   </h4>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     {selectedTutor.education}
@@ -1091,7 +1115,7 @@ const SearchTutorsMobile: React.FC = () => {
               {selectedTutor.experience && (
                 <div className="mb-4">
                   <h4 className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Kinh nghiệm
+                    {t('searchTutors.modal.experience')}
                   </h4>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     {selectedTutor.experience}
@@ -1103,7 +1127,7 @@ const SearchTutorsMobile: React.FC = () => {
               {selectedTutor.languages && selectedTutor.languages.length > 0 && (
                 <div className="mb-4">
                   <h4 className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Ngôn ngữ
+                    {t('searchTutors.modal.languages')}
                   </h4>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     {selectedTutor.languages.join(', ')}
@@ -1122,7 +1146,7 @@ const SearchTutorsMobile: React.FC = () => {
                   }}
                   disabled={!selectedTutor.verified}
                 >
-                  Đặt lịch học
+                  {t('searchTutors.modal.bookSession')}
                 </Button>
                 <Button 
                   variant="outlined"
@@ -1137,7 +1161,7 @@ const SearchTutorsMobile: React.FC = () => {
                     borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
                   }}
                 >
-                  Nhắn tin
+                  {t('searchTutors.modal.sendMessage')}
                 </Button>
               </div>
             </div>

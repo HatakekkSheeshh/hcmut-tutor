@@ -67,7 +67,7 @@ import { listEvaluationsHandler, createEvaluationHandler, getEvaluationHandler, 
 import { listPostsHandler, createPostHandler, getPostHandler, updatePostHandler, deletePostHandler, likePostHandler, approvePostHandler, rejectPostHandler } from './routes/forum/posts.js';
 import { getCommentsHandler, createCommentHandler, deleteCommentHandler, likeCommentHandler } from './routes/forum/comments.js';
 
-// import { listLibraryResourcesHandler, getLibraryResourceHandler, searchLibraryHandler } from './routes/library/index.ts';
+import { searchMaterialsHandler, syncLibraryHandler, bookmarkMaterialHandler, getRecommendationsHandler, createMaterialHandler, updateMaterialHandler, deleteMaterialHandler, previewPDFHandler, fixPDFIdsHandler } from './routes/library/index.js';
 
 // Import handlers - Conversations
 import { listConversationsHandler, createConversationHandler, getConversationHandler, deleteConversationHandler } from './routes/conversations/index.js';
@@ -281,9 +281,17 @@ app.post('/api/forum/comments/:id/like', authenticate, likeCommentHandler);
 app.delete('/api/forum/comments/:id', authenticate, deleteCommentHandler);
 
 // ===== DIGITAL LIBRARY ROUTES =====
-// app.get('/api/library/resources', authenticate, listLibraryResourcesHandler);
-// app.get('/api/library/resources/:id', authenticate, getLibraryResourceHandler);
-// app.get('/api/library/search', authenticate, searchLibraryHandler);
+app.get('/api/library/search', authenticate, searchMaterialsHandler);
+app.get('/api/library/sync', authenticate, syncLibraryHandler);
+app.post('/api/library/bookmarks', authenticate, bookmarkMaterialHandler);
+app.get('/api/library/recommendations', authenticate, getRecommendationsHandler);
+app.post('/api/library/materials', authenticate, authorize(UserRole.MANAGEMENT), ...createMaterialHandler);
+app.put('/api/library/materials/:id', authenticate, authorize(UserRole.MANAGEMENT), ...updateMaterialHandler);
+app.delete('/api/library/materials/:id', authenticate, authorize(UserRole.MANAGEMENT), deleteMaterialHandler);
+// Preview PDF handler has its own authentication (supports query param token)
+app.get('/api/library/preview/:id', previewPDFHandler);
+// Fix PDF IDs endpoint (temporary, for data migration)
+app.get('/api/library/fix-pdf-ids', authenticate, authorize(UserRole.MANAGEMENT), fixPDFIdsHandler);
 
 // ===== SESSION REQUESTS ROUTES =====
 

@@ -28,7 +28,8 @@
     "seed:forum": "tsx scripts/seed-forum.ts",
     "validate": "tsx scripts/validate.ts",
     "stats": "tsx -e \"import('./lib/dataValidator').then(m => m.generateDataStats())\"",
-    "migrate:mongodb": "tsx scripts/migrate-to-mongodb.ts"
+    "migrate:mongodb": "tsx scripts/migrate-to-mongodb.ts",
+    "export:mongodb": "tsx scripts/export-mongodb-to-json.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -41,6 +42,7 @@
     "@mui/x-date-pickers": "^8.14.1",
     "@mui/x-date-pickers-pro": "^8.14.1",
     "@tanstack/react-query": "^5.90.9",
+    "@types/multer": "^2.0.0",
     "@vercel/blob": "^2.0.0",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.0",
@@ -57,6 +59,7 @@
     "jspdf": "^3.0.3",
     "lucide-react": "^0.294.0",
     "mongodb": "^7.0.0",
+    "multer": "^2.0.2",
     "nanoid": "^5.1.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
