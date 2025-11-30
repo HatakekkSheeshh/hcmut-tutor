@@ -93,11 +93,14 @@ describe('Conversations & Messaging API Tests', () => {
     it('should create conversation successfully', async () => {
       const req = createMockAuthRequest(
         { userId: 'stu_abc123', role: UserRole.STUDENT },
-        { participants: ['stu_abc123', 'tut_xyz789'] }
+        { participantIds: ['tut_xyz789'] } // Only send other participants, handler will add current user
       ) as AuthRequest;
       const res = createMockResponse() as Response;
 
-      vi.mocked(storageModule.storage.read).mockResolvedValue([{ id: 'stu_abc123' }, { id: 'tut_xyz789' }]);
+      // Mock storage.read for users validation (line 71 in handler)
+      vi.mocked(storageModule.storage.read)
+        .mockResolvedValueOnce([{ id: 'stu_abc123' }, { id: 'tut_xyz789' }]) // First call: validate users
+        .mockResolvedValueOnce([]); // Second call: check existing conversations (line 86)
       vi.mocked(storageModule.storage.create).mockResolvedValue(mockConversation);
 
       await createConversationHandler(req, res);

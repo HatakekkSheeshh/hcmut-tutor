@@ -569,7 +569,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
             No posts found. Be the first to create a post!
           </div>
         ) : (
-          <div className="space-y-3">
+        <div className="space-y-3">
             {filteredPosts.map((post) => {
               const author = getAuthorInfo(post.authorId)
               const liked = isLiked(post)
@@ -577,149 +577,149 @@ const OnlineCommunityForumMobile: React.FC = () => {
               const commentCount = getCommentCount(post.id)
 
               return (
-                <Card 
-                  key={post.id} 
-                  className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                  style={{
-                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                    boxShadow: 'none !important'
-                  }}
-                >
-                  <div className="p-4">
-                    {/* Post Header */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className={`font-semibold text-base mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {post.title}
-                        </h3>
-                        <div className="flex items-center space-x-3 mb-2">
-                          <div className="flex items-center">
-                            <Person className="w-3 h-3 text-gray-400 mr-1" />
-                            <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            <Card 
+              key={post.id} 
+              className={`overflow-hidden border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{
+                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                boxShadow: 'none !important'
+              }}
+            >
+              <div className="p-4">
+                {/* Post Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h3 className={`font-semibold text-base mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {post.title}
+                    </h3>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="flex items-center">
+                        <Person className="w-3 h-3 text-gray-400 mr-1" />
+                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                               {author.name}
-                            </span>
-                            <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                        </span>
+                        <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
                               author.role === 'Tutor' ? 'bg-blue-100 text-blue-800' :
                               author.role === 'Management' ? 'bg-purple-100 text-purple-800' :
-                              'bg-green-100 text-green-800'
-                            }`}>
+                          'bg-green-100 text-green-800'
+                        }`}>
                               {author.role}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            <Schedule className="w-3 h-3 text-gray-400 mr-1" />
-                            <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
-                            </span>
-                          </div>
-                        </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-                          {post.category}
                         </span>
                       </div>
-                      <div className="flex space-x-1">
-                        <button
-                          onClick={() => handleBookmark(post.id)}
-                          className={`p-2 rounded-lg ${
+                      <div className="flex items-center">
+                        <Schedule className="w-3 h-3 text-gray-400 mr-1" />
+                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-1 text-xs rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                      {post.category}
+                    </span>
+                  </div>
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => handleBookmark(post.id)}
+                      className={`p-2 rounded-lg ${
                             bookmarked 
-                              ? 'bg-yellow-100 text-yellow-600' 
-                              : `${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
-                          }`}
-                        >
-                          <Bookmark className="w-4 h-4" />
-                        </button>
-                        <button
+                          ? 'bg-yellow-100 text-yellow-600' 
+                          : `${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
+                      }`}
+                    >
+                      <Bookmark className="w-4 h-4" />
+                    </button>
+                    <button
                           onClick={() => handleShare(post)}
-                          className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
-                        >
-                          <Share className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
+                      className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+                    >
+                      <Share className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
 
-                    {/* Post Content */}
-                    <div className="mb-3">
-                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
-                        {post.content}
-                      </p>
-                    </div>
+                {/* Post Content */}
+                <div className="mb-3">
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
+                    {post.content}
+                  </p>
+                </div>
 
-                    {/* Tags */}
+                {/* Tags */}
                     {post.tags && post.tags.length > 0 && (
-                      <div className="mb-3">
-                        <div className="flex flex-wrap gap-1">
-                          {post.tags.slice(0, 3).map((tag, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                          {post.tags.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                              +{post.tags.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                <div className="mb-3">
+                  <div className="flex flex-wrap gap-1">
+                    {post.tags.slice(0, 3).map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                    {post.tags.length > 3 && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                        +{post.tags.length - 3} more
+                      </span>
+                    )}
+                  </div>
+                </div>
                     )}
 
-                    {/* Post Actions */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <button
-                          onClick={() => handleLike(post.id)}
-                          className={`flex items-center space-x-1 ${
+                {/* Post Actions */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => handleLike(post.id)}
+                      className={`flex items-center space-x-1 ${
                             liked 
-                              ? 'text-blue-600' 
-                              : `${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`
-                          }`}
-                        >
-                          <ThumbUp className="w-4 h-4" />
+                          ? 'text-blue-600' 
+                          : `${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`
+                      }`}
+                    >
+                      <ThumbUp className="w-4 h-4" />
                           <span className="text-sm">{post.likes?.length || 0}</span>
-                        </button>
-                        <button
+                    </button>
+                    <button
                           onClick={() => handleComment(post)}
-                          className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
-                        >
-                          <Comment className="w-4 h-4" />
+                      className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
+                    >
+                      <Comment className="w-4 h-4" />
                           <span className="text-sm">{commentCount}</span>
-                        </button>
-                        <button
+                    </button>
+                    <button
                           onClick={() => handleShare(post)}
-                          className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
-                        >
-                          <Share className="w-4 h-4" />
+                      className={`flex items-center space-x-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'}`}
+                    >
+                      <Share className="w-4 h-4" />
                           <span className="text-sm">{post.views || 0}</span>
-                        </button>
-                      </div>
-                      <Button 
-                        size="small" 
-                        variant="outlined"
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
-                          color: theme === 'dark' ? '#ffffff' : '#000000',
-                          borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
-                          textTransform: 'none',
-                          fontWeight: '500'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
-                        }}
-                      >
-                        Read More
-                      </Button>
-                    </div>
+                    </button>
                   </div>
-                </Card>
+                  <Button 
+                    size="small" 
+                    variant="outlined"
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#000000' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#000000',
+                      borderColor: theme === 'dark' ? '#000000' : '#d1d5db',
+                      textTransform: 'none',
+                      fontWeight: '500'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#f3f4f6'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
+                    }}
+                  >
+                    Read More
+                  </Button>
+                </div>
+              </div>
+            </Card>
               )
             })}
-          </div>
+        </div>
         )}
 
         {/* Help Section - Mobile with Toggle */}

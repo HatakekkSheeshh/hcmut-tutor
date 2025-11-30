@@ -213,6 +213,20 @@ describe('Library & Progress API Tests', () => {
       ) as AuthRequest;
       const res = createMockResponse() as Response;
 
+      // Mock session that belongs to this tutor
+      const mockSession = {
+        id: 'ses_xyz789',
+        tutorId: 'tut_abc123', // Must match currentUser.userId
+        studentIds: ['stu_abc123'],
+        subject: 'Mathematics',
+        status: SessionStatus.CONFIRMED
+      };
+
+      // Mock storage.findById for session (line 93 in handler)
+      vi.mocked(storageModule.storage.findById).mockResolvedValue(mockSession);
+      // Mock storage.find to return empty array (no existing progress, line 101-104)
+      vi.mocked(storageModule.storage.find).mockResolvedValue([]);
+      // Mock storage.create for progress entry
       vi.mocked(storageModule.storage.create).mockResolvedValue(mockProgressEntry);
 
       await createProgressHandler(req, res);

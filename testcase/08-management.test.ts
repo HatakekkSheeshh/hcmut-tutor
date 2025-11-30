@@ -21,6 +21,7 @@ vi.mock('../lib/storage.js', () => ({
   storage: {
     find: vi.fn(),
     findById: vi.fn(),
+    findByIds: vi.fn(), // Add findByIds mock
     create: vi.fn(),
     read: vi.fn(),
     write: vi.fn(),
@@ -90,7 +91,21 @@ describe('Management Features API Tests', () => {
       ) as AuthRequest;
       const res = createMockResponse() as Response;
 
+      // Mock requester user
+      const mockRequester: User = {
+        id: 'tut_abc123',
+        email: 'tutor@hcmut.edu.vn',
+        name: 'Test Tutor',
+        role: UserRole.TUTOR,
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z'
+      };
+
       vi.mocked(storageModule.storage.read).mockResolvedValue([mockApprovalRequest]);
+      // Mock findByIds to return users map
+      vi.mocked(storageModule.storage.findByIds).mockResolvedValue(
+        new Map([[mockRequester.id, mockRequester]])
+      );
 
       await listApprovalRequestsHandler(req, res);
 
@@ -109,7 +124,7 @@ describe('Management Features API Tests', () => {
           type: 'resource_allocation',
           title: 'Request room allocation',
           description: 'Need room for offline session',
-          metadata: {
+          resourceAllocationData: {
             sessionId: 'ses_abc123',
             roomId: 'room_xyz'
           }
@@ -117,7 +132,12 @@ describe('Management Features API Tests', () => {
       ) as AuthRequest;
       const res = createMockResponse() as Response;
 
-      vi.mocked(storageModule.storage.create).mockResolvedValue(mockApprovalRequest);
+      // Mock storage.find for management users (line 271-273 in handler)
+      vi.mocked(storageModule.storage.find).mockResolvedValue([mockManagement]);
+      // Mock storage.create for approval request
+      vi.mocked(storageModule.storage.create)
+        .mockResolvedValueOnce(mockApprovalRequest) // First call: create approval request
+        .mockResolvedValueOnce({ id: 'notif_1' }); // Second call: create notification
 
       await createApprovalRequestHandler(req, res);
 
@@ -161,21 +181,34 @@ describe('Management Features API Tests', () => {
     it('should reject request successfully', async () => {
       const req = createMockAuthRequest(
         { userId: mockManagement.id, role: UserRole.MANAGEMENT },
-        { reason: 'Room not available at requested time' },
+        { reviewNotes: 'Room not available at requested time. Please choose another time slot.' }, // Must be at least 10 characters
         { id: 'appr_abc123' }
       ) as AuthRequest;
       const res = createMockResponse() as Response;
+
+      // Mock requester user
+      const mockRequester: User = {
+        id: 'tut_abc123',
+        email: 'tutor@hcmut.edu.vn',
+        name: 'Test Tutor',
+        role: UserRole.TUTOR,
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z'
+      };
 
       const rejectedRequest = {
         ...mockApprovalRequest,
         status: ApprovalRequestStatus.REJECTED,
         reviewerId: mockManagement.id,
-        reviewNotes: 'Room not available at requested time',
+        reviewNotes: 'Room not available at requested time. Please choose another time slot.',
         updatedAt: '2025-01-02T00:00:00Z'
       };
 
-      vi.mocked(storageModule.storage.findById).mockResolvedValue(mockApprovalRequest);
+      vi.mocked(storageModule.storage.findById)
+        .mockResolvedValueOnce(mockApprovalRequest) // First call: get approval request
+        .mockResolvedValueOnce(mockRequester); // Second call: get requester user (line 256)
       vi.mocked(storageModule.storage.update).mockResolvedValue(rejectedRequest);
+      vi.mocked(storageModule.storage.create).mockResolvedValue({ id: 'notif_1' }); // Create notification
 
       await rejectApprovalRequestHandler(req, res);
 

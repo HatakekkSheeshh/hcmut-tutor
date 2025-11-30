@@ -358,7 +358,7 @@ describe('Class & Enrollment API Tests', () => {
   describe('TC-ENROLL-005: Update Enrollment', () => {
     it('should update enrollment successfully', async () => {
       const req = createMockAuthRequest(
-        {},
+        { userId: 'stu_abc123', role: UserRole.STUDENT }, // Student owns this enrollment
         { notes: 'Updated notes', status: 'completed' },
         { id: 'enr_abc123' }
       ) as AuthRequest;
@@ -371,7 +371,9 @@ describe('Class & Enrollment API Tests', () => {
         completedAt: '2025-01-02T00:00:00Z'
       };
 
-      vi.mocked(storageModule.storage.findById).mockResolvedValue(mockEnrollment);
+      vi.mocked(storageModule.storage.findById)
+        .mockResolvedValueOnce(mockEnrollment) // First call: get enrollment
+        .mockResolvedValueOnce(mockClass); // Second call: get class (if status changes to DROPPED/CANCELLED)
       vi.mocked(storageModule.storage.update).mockResolvedValue(updatedEnrollment);
 
       await updateEnrollmentHandler(req, res);

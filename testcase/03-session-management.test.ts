@@ -405,48 +405,29 @@ describe('Session Management API Tests', () => {
     });
   });
 
-  // ===== TC-SESSION-010: Create Group Session =====
-  describe('TC-SESSION-010: Create Group Session', () => {
-    it('should create group session with multiple students', async () => {
+  // ===== TC-SESSION-010: Tutor Cannot Create Session =====
+  describe('TC-SESSION-010: Tutor Cannot Create Session', () => {
+    it('should return 403 when tutor tries to create session', async () => {
       const req = createMockAuthRequest(
         { userId: mockTutor.id, role: UserRole.TUTOR },
         {
           tutorId: 'tut_61QAuOdQbyZS',
-          studentIds: ['stu_123', 'stu_456', 'stu_789'],
           subject: 'Mathematics',
           startTime: '2025-01-20T10:00:00Z',
           endTime: '2025-01-20T11:00:00Z',
-          classId: 'class_dZNX-q0aBBZP'
+          duration: 60,
+          isOnline: true
         }
       ) as AuthRequest;
       const res = createMockResponse() as Response;
 
-      const groupSession: Session = {
-        ...mockSession,
-        id: 'ses_group',
-        studentIds: ['stu_123', 'stu_456', 'stu_789']
-      };
-
-      vi.mocked(storageModule.storage.findById).mockResolvedValue(mockTutor);
-      vi.mocked(storageModule.storage.find).mockResolvedValue([]);
-      vi.mocked(storageModule.storage.create).mockResolvedValue(groupSession);
-      vi.mocked(notificationQueueModule.queueNotification).mockResolvedValue(undefined);
-
       await createSessionHandler(req, res);
 
-      // Log the actual response for debugging
-      const jsonCalls = vi.mocked(res.json).mock.calls;
-      if (jsonCalls.length > 0) {
-        console.log('Response data:', JSON.stringify(jsonCalls[0][0], null, 2));
-      }
-      const statusCalls = vi.mocked(res.status).mock.calls;
-      if (statusCalls.length > 0) {
-        console.log('Status code:', statusCalls[0][0]);
-      }
-
+      expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalled();
       const responseData = vi.mocked(res.json).mock.calls[0][0];
-      expect(responseData.success).toBe(true);
+      expect(responseData.success).toBe(false);
+      expect(responseData.error).toContain('Chỉ sinh viên mới có thể đặt buổi học');
     });
   });
 
