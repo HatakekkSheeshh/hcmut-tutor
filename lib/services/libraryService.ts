@@ -17,6 +17,7 @@ interface LibraryMaterial {
   tags: string[]
   hcmutId: string
   syncedAt: string
+  pdfFileId?: string // ObjectId of PDF in GridFS
 }
 
 // Filename used to persist materials
@@ -261,6 +262,65 @@ export const libraryService = {
     } catch (error: any) {
       // If duplicate id error or other, return as failure
       console.error('bookmarkMaterial error:', error)
+      return { success: false, error: String(error?.message || error) }
+    }
+  },
+
+  /**
+   * Create a new material (admin only)
+   */
+  async createMaterial(material: Omit<LibraryMaterial, 'id' | 'syncedAt'>) {
+    try {
+      const newMaterial: LibraryMaterial = {
+        ...material,
+        id: generateId('lib'),
+        syncedAt: now()
+      }
+      await storage.create(MATERIALS_FILE, newMaterial as any)
+      return { success: true, data: newMaterial }
+    } catch (error: any) {
+      console.error('createMaterial error:', error)
+      return { success: false, error: String(error?.message || error) }
+    }
+  },
+
+  /**
+   * Update a material (admin only)
+   */
+  async updateMaterial(materialId: string, updates: Partial<LibraryMaterial>) {
+    try {
+      const material = await storage.findById(MATERIALS_FILE, materialId)
+      if (!material) {
+        return { success: false, error: 'Material not found' }
+      }
+
+      const updated = {
+        ...material,
+        ...updates,
+        id: materialId // Ensure ID doesn't change
+      }
+      await updateRecord(MATERIALS_FILE, materialId, updated as any)
+      return { success: true, data: updated }
+    } catch (error: any) {
+      console.error('updateMaterial error:', error)
+      return { success: false, error: String(error?.message || error) }
+    }
+  },
+
+  /**
+   * Delete a material (admin only)
+   */
+  async deleteMaterial(materialId: string) {
+    try {
+      const material = await storage.findById(MATERIALS_FILE, materialId)
+      if (!material) {
+        return { success: false, error: 'Material not found' }
+      }
+
+      await deleteRecord(MATERIALS_FILE, materialId)
+      return { success: true }
+    } catch (error: any) {
+      console.error('deleteMaterial error:', error)
       return { success: false, error: String(error?.message || error) }
     }
   }

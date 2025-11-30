@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import {
@@ -20,13 +21,25 @@ import {
   MoreHoriz as MoreHorizIcon,
   ArrowBack as ArrowBackIcon,
   Close as CloseIcon,
-  ArrowForward as ArrowForwardIcon
+  ArrowForward as ArrowForwardIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 
 const MessagesMobile: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
   const [activeMenu, setActiveMenu] = useState('messages')
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [mobileOpen, setMobileOpen] = useState(false)
   const [selectedChat, setSelectedChat] = useState<any>(null)
   const [newMessage, setNewMessage] = useState('')
@@ -165,14 +178,21 @@ const MessagesMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Messages
+                {t('messages.title')}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Chat with your tutors
+                {t('messages.subtitleStudent')}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
+            <button
+              onClick={() => changeLanguage(currentLang === 'en' ? 'vi' : 'en')}
+              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+              title={t('messages.switchLanguage')}
+            >
+              <LanguageIcon className="w-5 h-5" />
+            </button>
             <button
               onClick={handleThemeToggle}
               className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
@@ -195,7 +215,7 @@ const MessagesMobile: React.FC = () => {
         {/* Active Status Section - Mobile */}
         <div className={`rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}>
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Active Now
+            {t('messages.activeNow')}
           </h3>
           <div className="flex space-x-4 overflow-x-auto pb-2">
             {/* Your Status */}
@@ -208,7 +228,7 @@ const MessagesMobile: React.FC = () => {
                 </div>
               </div>
               <span className={`text-xs text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                Your story
+                {t('messages.yourStory')}
               </span>
             </div>
 
@@ -242,7 +262,7 @@ const MessagesMobile: React.FC = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search conversations..."
+            placeholder={t('messages.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full px-4 py-3 pl-10 rounded-lg border ${
@@ -313,7 +333,7 @@ const MessagesMobile: React.FC = () => {
                         ? 'bg-purple-100 text-purple-800' 
                         : 'bg-green-100 text-green-800'
                     }`}>
-                      {conversation.type === 'tutor' ? 'Tutor' : 'Student'}
+                      {conversation.type === 'tutor' ? t('messages.tutor') : t('messages.student')}
                     </span>
                     <span className={`text-xs ml-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                       {conversation.subject}
@@ -332,7 +352,7 @@ const MessagesMobile: React.FC = () => {
             className={`w-full flex items-center justify-between p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
           >
             <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Need Help?
+              {t('messages.needHelp')}
             </h3>
             <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
               <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
@@ -348,7 +368,7 @@ const MessagesMobile: React.FC = () => {
                 >
                   <BarChartIcon className="w-6 h-6 text-blue-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Progress
+                    {t('messages.trackProgress')}
                   </span>
                 </button>
                 <button 
@@ -357,7 +377,7 @@ const MessagesMobile: React.FC = () => {
                 >
                   <ChatIcon className="w-6 h-6 text-green-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    AI Support
+                    {t('messages.aiSupport')}
                   </span>
                 </button>
               </div>
@@ -401,7 +421,7 @@ const MessagesMobile: React.FC = () => {
                       {selectedChat.name}
                     </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {selectedChat.online ? 'Online' : 'Offline'} • {selectedChat.subject}
+                      {selectedChat.online ? t('messages.online') : t('messages.offline')} • {selectedChat.subject}
                     </p>
                   </div>
                 </div>
@@ -464,7 +484,7 @@ const MessagesMobile: React.FC = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type a message..."
+                  placeholder={t('messages.typeMessage')}
                   className={`w-full px-4 py-2 rounded-lg border ${
                     theme === 'dark' 
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -527,6 +547,37 @@ const MessagesMobile: React.FC = () => {
               {/* Quick Actions - Moved to top */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {t('messages.language')}
+                </h3>
+                <div className="space-y-2 mb-8">
+                  <button
+                    onClick={() => changeLanguage('en')}
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
+                      currentLang === 'en'
+                        ? 'bg-blue-600 text-white'
+                        : theme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-700'
+                          : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <LanguageIcon className="mr-3 w-4 h-4" />
+                    English
+                  </button>
+                  <button
+                    onClick={() => changeLanguage('vi')}
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
+                      currentLang === 'vi'
+                        ? 'bg-blue-600 text-white'
+                        : theme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-700'
+                          : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <LanguageIcon className="mr-3 w-4 h-4" />
+                    Tiếng Việt
+                  </button>
+                </div>
+                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                   QUICK ACTIONS
                 </h3>
                 <div className="space-y-2">
@@ -538,7 +589,7 @@ const MessagesMobile: React.FC = () => {
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                   >
                     <ArrowBackIcon className="mr-3 w-4 h-4" />
-                    Back to Dashboard
+                    {t('messages.backToDashboard')}
                   </button>
                 </div>
               </div>

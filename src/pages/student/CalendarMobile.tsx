@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -44,6 +45,7 @@ import { useCalendarAnimations } from '../../utils/calendarAnimations'
 import { api } from '../../lib/api'
 
 const CalendarMobile: React.FC = () => {
+  const { t } = useTranslation()
   const { theme } = useTheme()
   const navigate = useNavigate()
   const containerRef = useCalendarAnimations()
@@ -436,8 +438,8 @@ const CalendarMobile: React.FC = () => {
     const isToday = date.toDateString() === today.toDateString()
     const isTomorrow = date.toDateString() === new Date(today.getTime() + 24 * 60 * 60 * 1000).toDateString()
     
-    if (isToday) return 'Today'
-    if (isTomorrow) return 'Tomorrow'
+    if (isToday) return t('calendar.stats.today')
+    if (isTomorrow) return t('calendar.tomorrow')
     
     return date.toLocaleDateString('en-US', { 
       weekday: 'long', 
@@ -548,7 +550,7 @@ const CalendarMobile: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-            Loading calendar...
+            {t('calendar.loading')}
           </p>
         </div>
       </div>
@@ -578,7 +580,7 @@ const CalendarMobile: React.FC = () => {
                   fontWeight: 600
                 }}
               >
-                Calendar
+                {t('calendar.title')}
               </Typography>
             </div>
             <div className="flex items-center gap-2">
@@ -673,7 +675,7 @@ const CalendarMobile: React.FC = () => {
                   }
                 }}
               >
-                Today
+                {t('calendar.today')}
               </Button>
               <ToggleButtonGroup
                 size="small"
@@ -710,8 +712,8 @@ const CalendarMobile: React.FC = () => {
                   }
                 }}
               >
-                <ToggleButton value="week" aria-label="Week view">Week</ToggleButton>
-                <ToggleButton value="day" aria-label="Day view">Day</ToggleButton>
+                <ToggleButton value="week" aria-label="Week view">{t('calendar.week')}</ToggleButton>
+                <ToggleButton value="day" aria-label="Day view">{t('calendar.day')}</ToggleButton>
               </ToggleButtonGroup>
             </div>
           </div>
@@ -760,7 +762,7 @@ const CalendarMobile: React.FC = () => {
                       {formatDateDisplay(date)}
                     </Typography>
                     <Chip
-                      label={`${dateSessions.length} sessions`}
+                      label={`${dateSessions.length} ${t('calendar.sessions')}`}
                       size="small"
                       sx={{
                         backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
@@ -792,7 +794,7 @@ const CalendarMobile: React.FC = () => {
                           color: theme === 'dark' ? '#9ca3af' : '#6b7280'
                         }}
                       >
-                        No sessions scheduled
+                        {t('calendar.noSessions')}
                       </Typography>
                     </div>
                   )}
@@ -838,7 +840,7 @@ const CalendarMobile: React.FC = () => {
                     fontWeight: 600
                   }}
                 >
-                  Filters
+                  {t('calendar.filters')}
                 </Typography>
                 <IconButton
                   onClick={() => setIsFilterOpen(false)}
@@ -858,12 +860,12 @@ const CalendarMobile: React.FC = () => {
                       }
                     }}
                   >
-                    Subject
+                    {t('calendar.filter.subject')}
                   </InputLabel>
                   <Select
                     value={filters.subject || ''}
                     onChange={(e) => handleFilterChange('subject', e.target.value)}
-                    label="Subject"
+                    label={t('calendar.filter.subject')}
                     sx={{
                       color: theme === 'dark' ? '#ffffff' : '#111827',
                       '& .MuiOutlinedInput-notchedOutline': {
@@ -880,7 +882,7 @@ const CalendarMobile: React.FC = () => {
                       }
                     }}
                   >
-                    <MenuItem value="">All Subjects</MenuItem>
+                    <MenuItem value="">{t('calendar.filter.allSubjects')}</MenuItem>
                     {subjects.map((subject) => (
                       <MenuItem key={subject} value={subject}>
                         {subject}
@@ -898,12 +900,12 @@ const CalendarMobile: React.FC = () => {
                       }
                     }}
                   >
-                    Tutor
+                    {t('calendar.filter.tutor')}
                   </InputLabel>
                   <Select
                     value={filters.tutor || ''}
                     onChange={(e) => handleFilterChange('tutor', e.target.value)}
-                    label="Tutor"
+                    label={t('calendar.filter.tutor')}
                     sx={{
                       color: theme === 'dark' ? '#ffffff' : '#111827',
                       '& .MuiOutlinedInput-notchedOutline': {
@@ -920,7 +922,7 @@ const CalendarMobile: React.FC = () => {
                       }
                     }}
                   >
-                    <MenuItem value="">All Tutors</MenuItem>
+                    <MenuItem value="">{t('calendar.filter.allTutors')}</MenuItem>
                     {Object.values(tutors).map((tutor: any) => (
                       <MenuItem key={tutor.id} value={tutor.id}>
                         {tutor.name}
@@ -938,12 +940,12 @@ const CalendarMobile: React.FC = () => {
                       }
                     }}
                   >
-                    Status
+                    {t('calendar.filter.status')}
                   </InputLabel>
                   <Select
                     value={filters.status || ''}
                     onChange={(e) => handleFilterChange('status', e.target.value)}
-                    label="Status"
+                    label={t('calendar.filter.status')}
                     sx={{
                       color: theme === 'dark' ? '#ffffff' : '#111827',
                       '& .MuiOutlinedInput-notchedOutline': {
@@ -960,11 +962,11 @@ const CalendarMobile: React.FC = () => {
                       }
                     }}
                   >
-                    <MenuItem value="">All Status</MenuItem>
-                    <MenuItem value="scheduled">Scheduled</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                    <MenuItem value="cancelled">Cancelled</MenuItem>
-                    <MenuItem value="rescheduled">Rescheduled</MenuItem>
+                    <MenuItem value="">{t('calendar.filter.allStatus')}</MenuItem>
+                    <MenuItem value="scheduled">{t('calendar.status.scheduled')}</MenuItem>
+                    <MenuItem value="completed">{t('calendar.status.completed')}</MenuItem>
+                    <MenuItem value="cancelled">{t('calendar.status.cancelled')}</MenuItem>
+                    <MenuItem value="rescheduled">{t('calendar.status.rescheduled')}</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -977,7 +979,7 @@ const CalendarMobile: React.FC = () => {
                     color: theme === 'dark' ? '#ffffff' : '#111827'
                   }}
                 >
-                  Clear Filters
+                  {t('calendar.filter.clearFilters')}
                 </Button>
               </div>
             </div>
@@ -1000,7 +1002,7 @@ const CalendarMobile: React.FC = () => {
                     fontWeight: 600
                   }}
                 >
-                  Menu
+                  {t('calendar.menu.menu')}
                 </Typography>
                 <IconButton
                   onClick={() => setIsMenuOpen(false)}
@@ -1021,7 +1023,7 @@ const CalendarMobile: React.FC = () => {
                   }`}
                 >
                   <span className="mr-3">{<DashboardIcon />}</span>
-                  Dashboard
+                  {t('calendar.menu.dashboard')}
                   <ChevronRightIcon className="ml-auto w-4 h-4" />
                 </button>
                 <button
@@ -1034,7 +1036,7 @@ const CalendarMobile: React.FC = () => {
                   }`}
                 >
                   <span className="mr-3">{<PersonSearch />}</span>
-                  Find Tutors
+                  {t('calendar.menu.findTutors')}
                   <ChevronRightIcon className="ml-auto w-4 h-4" />
                 </button>
                 <button
@@ -1047,7 +1049,7 @@ const CalendarMobile: React.FC = () => {
                   }`}
                 >
                   <span className="mr-3">{<SchoolIcon />}</span>
-                  Add Event
+                  {t('calendar.menu.addEvent')}
                   <ChevronRightIcon className="ml-auto w-4 h-4" />
                 </button>
                 <button
@@ -1060,7 +1062,7 @@ const CalendarMobile: React.FC = () => {
                   }`}
                 >
                   <span className="mr-3">{<BarChartIcon />}</span>
-                  View Progress
+                  {t('calendar.menu.viewProgress')}
                   <ChevronRightIcon className="ml-auto w-4 h-4" />
                 </button>
               </div>

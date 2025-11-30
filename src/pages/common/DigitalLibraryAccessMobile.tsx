@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { 
   Search,
   FilterList,
@@ -19,11 +20,13 @@ import {
   Close as CloseIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
-  ArrowForward as ArrowForwardIcon
+  ArrowForward as ArrowForwardIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { navigateToDashboard } from '../../utils/navigation'
+import { libraryAPI } from '../../lib/api'
 
 interface LibraryResource {
   id: string;
@@ -48,6 +51,7 @@ interface LibraryResource {
 }
 
 const DigitalLibraryAccessMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -57,10 +61,22 @@ const DigitalLibraryAccessMobile: React.FC = () => {
   const [showHelp, setShowHelp] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [showFormatDropdown, setShowFormatDropdown] = useState(false)
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
 
   const [libraryResources, setLibraryResources] = useState<LibraryResource[]>([])
-  const [isLoadingResources, setIsLoadingResources] = useState(false)
-  const [bookmarkPending, setBookmarkPending] = useState<string | null>(null)
+  const [isLoadingResources, setIsLoadingResources] = useState(false)
+  const [bookmarkPending, setBookmarkPending] = useState<string | null>(null)
+  const [recommendations, setRecommendations] = useState<LibraryResource[]>([])
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -167,12 +183,12 @@ const DigitalLibraryAccessMobile: React.FC = () => {
   // ]
 
   const formats = [
-    { name: 'All Formats', value: 'all' },
-    { name: 'Document', value: 'document' },
-    { name: 'Video', value: 'video' },
-    { name: 'Book', value: 'book' },
-    { name: 'Article', value: 'article' }
-  ]
+    { name: t('digitalLibrary.allFormats'), value: 'all' },
+    { name: t('digitalLibrary.document'), value: 'document' },
+    { name: t('digitalLibrary.video'), value: 'video' },
+    { name: t('digitalLibrary.book'), value: 'book' },
+    { name: t('digitalLibrary.article'), value: 'article' }
+  ]
 
   const getSelectedFormat = () => {
     return formats.find(format => format.value === selectedFormat) || formats[0]
@@ -187,97 +203,102 @@ const DigitalLibraryAccessMobile: React.FC = () => {
   ]
 
   useEffect(() => {
-    let mounted = true
-    const fetchResources = async () => {
-      try {
-        setIsLoadingResources(true)
-
-        // 1. Check Local Storage for remain status
-        const saved = localStorage.getItem('libraryData')
-        if (saved) {
-          const parsed = JSON.parse(saved)
-          if (mounted && Array.isArray(parsed) && parsed.length > 0) {  
-            setLibraryResources(parsed as LibraryResource[])
-            setIsLoadingResources(false)
-            // Không return ở đây để luôn cố gắng fetch mới nếu không có searchTerm
-            // Nếu có searchTerm, ta vẫn cần fetch mới, nên logic này của desktop không thay đổi
-            if (!searchTerm.trim()) return; // Chỉ giữ lại local data nếu không search
-        }
-      }
+    let mounted = true
+    const fetchResources = async () => {
+      try {
+        setIsLoadingResources(true)
         
-        // Setup params cho API
-        const params = new URLSearchParams()
-        if (searchTerm.trim()) params.set('q', searchTerm.trim())
-        params.set('limit', '1000')
+        // Use libraryAPI.search with proper filters
+        const response = await libraryAPI.search({
+          q: searchTerm.trim() || undefined,
+          type: selectedFormat !== 'all' ? selectedFormat : undefined,
+          subject: selectedCategory !== 'all' ? selectedCategory : undefined,
+          limit: 100 // Get more results for better UX
+        })
 
-        // 2. Primary: try backend search endpoint
-      try {
-          const res = await fetch(`/api/library/search?${params.toString()}`)
-          if (res.ok) {
-            const json = await res.json()
-            const data = json?.data || []
-          if (mounted && Array.isArray(data) && data.length > 0) {
-            const enriched = data.map((item: any) => ({
-              ...item,
-              id: item.id.toString(), // Đảm bảo ID là string để đồng bộ
-              isBookMarked: item.isBookMarked ?? false,
-              isDownloaded: item.isDownloaded ?? false,
-            }))
-            setLibraryResources(enriched)
-            // 💾 Lưu lại vào localStorage chỉ khi fetch thành công
-            localStorage.setItem('libraryData', JSON.stringify(enriched))
-            return
-          }
-        } else {
-          console.warn('API /api/library/search returned status', res.status)
-        }
-      } catch (apiErr) {
-        console.warn('Primary library API fetch failed:', apiErr)
-      }
+        if (mounted && response.success) {
+          const data = response.data?.materials || response.data || []
+          const enriched = Array.isArray(data) ? data.map((item: any) => ({
+            ...item,
+            id: item.id?.toString() || item.id, // Ensure ID is string
+            isBookMarked: item.isBookMarked ?? false,
+            isDownloaded: item.isDownloaded ?? false,
+          })) : []
+          
+          setLibraryResources(enriched)
+          localStorage.setItem('libraryData', JSON.stringify(enriched))
+        } else if (mounted) {
+          // Fallback: try loading from localStorage
+          const saved = localStorage.getItem('libraryData')
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved)
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                setLibraryResources(parsed as LibraryResource[])
+                return
+              }
+            } catch (e) {
+              console.warn('Failed to parse localStorage data:', e)
+            }
+          }
+          setLibraryResources([])
+        }
+      } catch (e) {
+        console.error('Failed to fetch library resources', e)
+        // Fallback to localStorage on error
+        if (mounted) {
+          const saved = localStorage.getItem('libraryData')
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved)
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                setLibraryResources(parsed as LibraryResource[])
+                return
+              }
+            } catch (parseErr) {
+              console.warn('Failed to parse localStorage data:', parseErr)
+            }
+          }
+          setLibraryResources([])
+        }
+      } finally {
+        if (mounted) setIsLoadingResources(false)
+      }
+    }
 
+    // Debounce quick typing: small delay
+    const t = setTimeout(fetchResources, 250)
+    return () => {
+      mounted = false
+      clearTimeout(t)
+    }
+  }, [searchTerm, selectedFormat, selectedCategory])
 
-        // 3. Fallback: try loading static data file (Chỉ chạy khi không search và API thất bại)
-      if (!searchTerm.trim()) {
-        try {
-          const fallbackRes = await fetch('/data/library-materials.json')
-          if (fallbackRes.ok) {
-            const arr = await fallbackRes.json()
-            if (mounted && Array.isArray(arr)) {
-              const enriched = arr.map((item: any) => ({
-                ...item,
-                id: item.id.toString(), // Đảm bảo ID là string
-                isBookMarked: item.isBookMarked ?? false,
-                isDownloaded: item.isDownloaded ?? false,
-              }))
-              setLibraryResources(enriched)
-              // 💾 Lưu lại vào localStorage
-              localStorage.setItem('libraryData', JSON.stringify(enriched))
-              return
-            }
-          } else {
-            console.warn('Fallback /data/library-materials.json returned', fallbackRes.status)
-        }
-      } catch (fbErr) {
-        console.warn('Fallback fetch failed:', fbErr)
-      }
-      }
+  // Fetch recommendations on mount
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        setIsLoadingRecommendations(true)
+        const response = await libraryAPI.getRecommendations({ limit: 6 })
+        if (response.success) {
+          const data = response.data?.materials || response.data || []
+          const enriched = Array.isArray(data) ? data.map((item: any) => ({
+            ...item,
+            id: item.id?.toString() || item.id,
+            isBookMarked: item.isBookMarked ?? false,
+            isDownloaded: item.isDownloaded ?? false,
+          })) : []
+          setRecommendations(enriched)
+        }
+      } catch (error) {
+        console.error('Failed to fetch recommendations:', error)
+      } finally {
+        setIsLoadingRecommendations(false)
+      }
+    }
 
-        // 4. If all methods failed, clear resources (maintain previous behavior)
-        if (mounted) setLibraryResources([])
-      } catch (e) {
-        console.error('Failed to fetch library resources', e)
-      } finally {
-        if (mounted) setIsLoadingResources(false)
-      }
-    }
-
-    // Debounce quick typing: small delay
-    const t = setTimeout(fetchResources, 250)
-    return () => {
-      mounted = false
-      clearTimeout(t)
-    }
-  }, [searchTerm])
+    fetchRecommendations()
+  }, [])
 
   const filteredResources = libraryResources.filter(resource => {
     const q = searchTerm.trim().toLowerCase()
@@ -299,19 +320,49 @@ const DigitalLibraryAccessMobile: React.FC = () => {
     return matchesSearch && matchesCategory && matchesFormat && matchesBookmark
   })
 
-  const handleBookmark = (resourceId: string) => {
-    // Tạm thời bỏ qua setBookmarkPending vì đây là mobile và chưa có call API thực sự
-    setLibraryResources(prevResources => {
-      const updatedResources = prevResources.map(r =>
-        r.id === resourceId
-          ? { ...r, isBookMarked: !r.isBookMarked }  // đảo giá trị
-          : r
-      )
-      // 💾 Lưu trạng thái vào localStorage để reload vẫn nhớ
-      localStorage.setItem('libraryData', JSON.stringify(updatedResources))
-      return updatedResources
-    })
-  }
+  const handleBookmark = async (resourceId: string) => {
+    if (bookmarkPending === resourceId) return
+    
+    setBookmarkPending(resourceId)
+    
+    try {
+      // Optimistic update
+      const previousResources = [...libraryResources]
+      setLibraryResources(prevResources => {
+        const updatedResources = prevResources.map(r =>
+          r.id === resourceId
+            ? { ...r, isBookMarked: !r.isBookMarked }
+            : r
+        )
+        localStorage.setItem('libraryData', JSON.stringify(updatedResources))
+        return updatedResources
+      })
+
+      // Call API to bookmark/unbookmark
+      const response = await libraryAPI.bookmark(resourceId)
+      
+      if (!response.success) {
+        // Revert on error
+        setLibraryResources(previousResources)
+        localStorage.setItem('libraryData', JSON.stringify(previousResources))
+        console.error('Failed to bookmark:', response.error)
+      }
+    } catch (error: any) {
+      console.error('Bookmark error:', error)
+      // Revert on error
+      const saved = localStorage.getItem('libraryData')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          setLibraryResources(parsed)
+        } catch (e) {
+          console.error('Failed to revert bookmark state:', e)
+        }
+      }
+    } finally {
+      setBookmarkPending(null)
+    }
+  }
 
   const handleDownload = (resourceId: string) => {
     setLibraryResources(prevResources => {
@@ -350,14 +401,21 @@ const DigitalLibraryAccessMobile: React.FC = () => {
             </div>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Digital Library
+                {t('digitalLibrary.title')}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Educational resources & materials
+                {t('digitalLibrary.subtitle')}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
+            <button
+              onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+              title={t('digitalLibrary.switchLanguage')}
+            >
+              <LanguageIcon className="w-5 h-5" />
+            </button>
             <button
               onClick={handleThemeToggle}
               className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
@@ -381,25 +439,25 @@ const DigitalLibraryAccessMobile: React.FC = () => {
         {/* Library Stats - Mobile */}
         <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <h3 className={`text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Library Statistics
+            {t('digitalLibrary.libraryStatistics')}
           </h3>
           <div className="grid grid-cols-3 gap-3">
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
                 <div className="text-xl font-bold text-blue-600 mb-1">{libraryResources.length}</div>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total</div>
+                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('digitalLibrary.total')}</div>
               </div>
             </div>
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
                 <div className="text-xl font-bold text-yellow-600 mb-1">{libraryResources.filter(r => r.isBookMarked).length}</div>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked</div>
+                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('digitalLibrary.bookmarked')}</div>
               </div>
             </div>
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
                 <div className="text-xl font-bold text-green-600 mb-1">{libraryResources.filter(r => r.isDownloaded).length}</div>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Downloaded</div>
+                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('digitalLibrary.downloaded')}</div>
               </div>
             </div>
           </div>
@@ -416,12 +474,12 @@ const DigitalLibraryAccessMobile: React.FC = () => {
           }}
         >
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Search Resources
+            {t('digitalLibrary.searchResources')}
           </h3>
           <div className="relative mb-4">
             <input
               type="text"
-              placeholder="Search by title, author, or description..."
+              placeholder={t('digitalLibrary.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full px-4 py-3 pl-10 rounded-lg border ${
@@ -506,7 +564,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
             } transition-colors`}
           >
             <FilterList className="w-4 h-4 mr-2" />
-            Advanced Filters
+            {t('digitalLibrary.advancedFilters')}
             <div className={`ml-2 transform transition-transform ${showFilters ? 'rotate-180' : ''}`}>
               <ArrowForwardIcon className="w-4 h-4" />
             </div>
@@ -518,7 +576,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
               <div className="space-y-3">
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Category
+                    {t('digitalLibrary.category')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {categories.map((category) => (
@@ -545,16 +603,16 @@ const DigitalLibraryAccessMobile: React.FC = () => {
         <div className="grid grid-cols-2 gap-3">
           <button 
             onClick={() => {
-              setSelectedCategory('bookmarked') // Đặt category thành 'bookmarked'
-              setShowFilters(false) // Đóng advanced filters nếu đang mở
-            }}
+              setSelectedCategory('bookmarked') // Đặt category thành 'bookmarked'
+              setShowFilters(false) // Đóng advanced filters nếu đang mở
+            }}
             className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
             theme === 'dark'
               ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           } transition-colors`}>
             <Bookmark className="w-4 h-4 mr-2" />
-            My Bookmarks
+            {t('digitalLibrary.myBookmarks')}
           </button>
           <button className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
             theme === 'dark'
@@ -562,7 +620,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           } transition-colors`}>
             <Download className="w-4 h-4 mr-2" />
-            Downloads
+            {t('digitalLibrary.downloads')}
           </button>
           <button className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
             theme === 'dark'
@@ -570,7 +628,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           } transition-colors`}>
             <TrendingUp className="w-4 h-4 mr-2" />
-            Trending
+            {t('digitalLibrary.trending')}
           </button>
           <button className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
             theme === 'dark'
@@ -578,7 +636,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           } transition-colors`}>
             <Share className="w-4 h-4 mr-2" />
-            Share
+            {t('digitalLibrary.share')}
           </button>
         </div>
 
@@ -608,14 +666,14 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                       </button>
                     </h3>
                     <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      by {resource.author}
+                      {t('digitalLibrary.by')} {resource.author}
                     </p>
                     <div className="flex items-center space-x-2 mb-2">
                       <span className={`px-2 py-1 text-xs rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-                        {resource.category}
+                        {resource.category || resource.subject}
                       </span>
                       <span className={`px-2 py-1 text-xs rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-                        {resource.format}
+                        {resource.format || resource.type}
                       </span>
                     </div>
                   </div>
@@ -660,7 +718,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                     <div className="flex items-center">
                       <AccessTime className="w-4 h-4 text-gray-400 mr-1" />
                       <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {resource.format === 'PDF' ? `${resource.pages} pages` : resource.duration}
+                        {resource.format === 'PDF' || resource.type === 'book' ? `${resource.pages || 'N/A'} ${t('digitalLibrary.pages')}` : resource.duration || 'N/A'}
                       </span>
                     </div>
                   </div>
@@ -679,7 +737,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                     ))}
                     {resource.tags.length > 2 && (
                       <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                        +{resource.tags.length - 2} more
+                        +{resource.tags.length - 2} {t('digitalLibrary.more')}
                       </span>
                     )}
                   </div>
@@ -709,7 +767,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                     }}
                   >
                     <Download className="w-4 h-4 mr-1" />
-                    {resource.isDownloaded ? 'Downloaded' : 'Download'}
+                    {resource.isDownloaded ? t('digitalLibrary.downloaded') : t('digitalLibrary.download')}
                   </Button>
                   <Button 
                     size="small" 
@@ -730,7 +788,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                     }}
                   >
                     <Person className="w-4 h-4 mr-1" />
-                    Author
+                    {t('digitalLibrary.by')}
                   </Button>
                 </div>
               </div>
@@ -745,7 +803,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
             className={`w-full flex items-center justify-between p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
           >
             <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Need Help?
+              {t('digitalLibrary.needHelp')}
             </h3>
             <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
               <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
@@ -761,7 +819,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                 >
                   <PersonIcon className="w-6 h-6 text-blue-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Profile
+                    {t('digitalLibrary.profile')}
                   </span>
                 </button>
                 <button 
@@ -770,7 +828,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                 >
                   <ForumIcon className="w-6 h-6 text-green-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Forum
+                    {t('digitalLibrary.forum')}
                   </span>
                 </button>
                 <button 
@@ -779,7 +837,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                 >
                   <NotificationsIcon className="w-6 h-6 text-orange-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Notifications
+                    {t('digitalLibrary.notifications')}
                   </span>
                 </button>
                 <button 
@@ -788,7 +846,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                 >
                   <ArrowBackIcon className="w-6 h-6 text-purple-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Login
+                    {t('digitalLibrary.login')}
                   </span>
                 </button>
               </div>
@@ -827,12 +885,12 @@ const DigitalLibraryAccessMobile: React.FC = () => {
               {/* Mobile Library Stats */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  LIBRARY STATS
+                  {t('digitalLibrary.libraryStats')}
                 </h3>
                 <div className="space-y-3">
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Resources:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('digitalLibrary.totalResources')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {libraryResources.length}
                       </span>
@@ -840,7 +898,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                   </div>
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('digitalLibrary.bookmarked')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {libraryResources.filter(r => r.isBookMarked).length}
                       </span>
@@ -848,7 +906,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                   </div>
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Downloaded:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('digitalLibrary.downloaded')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {libraryResources.filter(r => r.isDownloaded).length}
                       </span>
@@ -860,7 +918,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
               {/* Mobile Categories */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  CATEGORIES
+                  {t('digitalLibrary.categories')}
                 </h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
@@ -895,7 +953,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PersonIcon className="mr-3 w-4 h-4" />
-                  Profile Management
+                  {t('digitalLibrary.profileManagement')}
                 </button>
                 <button 
                   onClick={() => {
@@ -905,7 +963,7 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <ForumIcon className="mr-3 w-4 h-4" />
-                  Community Forum
+                  {t('digitalLibrary.communityForum')}
                 </button>
                 <button 
                   onClick={() => {
@@ -915,14 +973,14 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <NotificationsIcon className="mr-3 w-4 h-4" />
-                  Notifications
+                  {t('digitalLibrary.notifications')}
                 </button>
               </div>
 
               {/* Mobile Settings */}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  SETTINGS
+                  {t('digitalLibrary.settings')}
                 </h3>
                 <div className="space-y-2">
                   <button 
@@ -930,8 +988,34 @@ const DigitalLibraryAccessMobile: React.FC = () => {
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   >
                     {theme === 'dark' ? <LightModeIcon className="mr-3 w-4 h-4" /> : <DarkModeIcon className="mr-3 w-4 h-4" />}
-                    {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                    {theme === 'dark' ? t('digitalLibrary.switchToLight') : t('digitalLibrary.switchToDark')}
                   </button>
+                  <div className="flex items-center space-x-2 pt-2">
+                    <button
+                      onClick={() => changeLanguage('en')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentLang === 'en'
+                          ? 'bg-blue-600 text-white'
+                          : theme === 'dark'
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {t('digitalLibrary.english')}
+                    </button>
+                    <button
+                      onClick={() => changeLanguage('vi')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentLang === 'vi'
+                          ? 'bg-blue-600 text-white'
+                          : theme === 'dark'
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {t('digitalLibrary.vietnamese')}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

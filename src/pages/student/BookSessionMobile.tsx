@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { 
@@ -51,17 +52,25 @@ import {
   DarkMode as DarkModeIcon,
   Group as GroupIcon,
   AccessTime,
-  Event as EventIcon
+  Event as EventIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 
 const BookSessionMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const [bookingMode, setBookingMode] = useState<'session' | 'class'>('session') // Default to session mode
   const [activeStep, setActiveStep] = useState(0)
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
   
   // Refs for GSAP animations
   const containerRef = useRef<HTMLDivElement>(null)
@@ -530,12 +539,17 @@ const BookSessionMobile: React.FC = () => {
   }, [tutorIdFromState])
 
   const steps = [
-    { label: 'Select Tutor', icon: <Person />, shortLabel: 'Tutor' },
-    { label: 'Select Subject', icon: <SchoolIcon />, shortLabel: 'Subject' },
-    { label: 'Select Duration', icon: <Schedule />, shortLabel: 'Duration' },
-    { label: 'Choose Date & Time', icon: <CalendarToday />, shortLabel: 'Time' },
-    { label: 'Session Details', icon: <Schedule />, shortLabel: 'Details' },
+    { label: t('bookSession.steps.selectTutor'), icon: <Person />, shortLabel: 'Tutor' },
+    { label: t('bookSession.steps.selectSubject'), icon: <SchoolIcon />, shortLabel: 'Subject' },
+    { label: t('bookSession.steps.selectDuration'), icon: <Schedule />, shortLabel: 'Duration' },
+    { label: t('bookSession.steps.chooseDateTime'), icon: <CalendarToday />, shortLabel: 'Time' },
+    { label: t('bookSession.steps.sessionDetails'), icon: <Schedule />, shortLabel: 'Details' },
   ]
+
+  // Sync currentLang with i18n.language
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
 
   // Load availability when tutor is selected
   useEffect(() => {
@@ -864,7 +878,7 @@ const BookSessionMobile: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Choose a Tutor
+                {t('bookSession.tutor.chooseTutor')}
               </h2>
               {!loading && totalTutorPages > 1 && (
                 <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -874,7 +888,7 @@ const BookSessionMobile: React.FC = () => {
             </div>
             {loading ? (
               <div className="text-center py-8">
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading tutors...</p>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>{t('bookSession.tutor.loading')}</p>
               </div>
             ) : (
             <>
@@ -1023,7 +1037,7 @@ const BookSessionMobile: React.FC = () => {
                     minWidth: '70px'
                   }}
                 >
-                  Trước
+                  {t('bookSession.tutor.previous')}
                 </Button>
                 <span className={`px-3 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   {tutorPage}/{totalTutorPages}
@@ -1040,7 +1054,7 @@ const BookSessionMobile: React.FC = () => {
                     minWidth: '70px'
                   }}
                 >
-                  Sau
+                  {t('bookSession.tutor.next')}
                 </Button>
               </div>
             )}
@@ -1056,16 +1070,16 @@ const BookSessionMobile: React.FC = () => {
         return (
           <div className="space-y-4">
             <h2 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Select Subject
+              {t('bookSession.subject.selectSubject')}
             </h2>
             <p className={`text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Choose subject for{' '}
-              <span className="font-semibold">{selectedTutorData?.name || 'this tutor'}</span>:
+              {t('bookSession.subject.chooseFor')}{' '}
+              <span className="font-semibold">{selectedTutorData?.name || t('bookSession.subject.thisTutor')}</span>:
             </p>
             {tutorSubjects.length === 0 ? (
               <div className="text-center py-8">
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  No subjects available
+                  {t('bookSession.tutor.noSubjects')}
                 </p>
               </div>
             ) : (
@@ -1128,19 +1142,19 @@ const BookSessionMobile: React.FC = () => {
       case 2:
         // Duration Selection
         const durationOptions = [
-          { value: 30, label: '30 min', description: 'Quick review' },
-          { value: 60, label: '60 min', description: 'Standard' },
-          { value: 90, label: '90 min', description: 'In-depth' },
-          { value: 120, label: '120 min', description: 'Intensive' },
+          { value: 30, label: t('bookSession.duration.30min'), description: t('bookSession.duration.quickReview') },
+          { value: 60, label: t('bookSession.duration.60min'), description: t('bookSession.duration.standardLesson') },
+          { value: 90, label: t('bookSession.duration.90min'), description: t('bookSession.duration.inDepth') },
+          { value: 120, label: t('bookSession.duration.120min'), description: t('bookSession.duration.intensive') },
         ]
 
         return (
           <div className="space-y-4">
             <h2 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Select Duration
+              {t('bookSession.duration.selectDuration')}
             </h2>
             <p className={`text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Choose session length:
+              {t('bookSession.duration.chooseLength')}
             </p>
             <div className="grid grid-cols-2 gap-3">
               {durationOptions.map((option) => {
@@ -1193,7 +1207,7 @@ const BookSessionMobile: React.FC = () => {
                       )}
                       {option.value === 60 && selectedDuration !== option.value && (
                         <span className="inline-block mt-2 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                          Popular
+                          {t('bookSession.duration.mostPopular')}
                         </span>
                       )}
                     </div>
@@ -1204,7 +1218,7 @@ const BookSessionMobile: React.FC = () => {
             
             <div className={`mt-4 p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
               <p className={`text-xs ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
-                💡 60-min sessions work best for most topics
+                💡 {t('bookSession.duration.tipText')}
               </p>
             </div>
           </div>
@@ -1215,7 +1229,7 @@ const BookSessionMobile: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                {dateSelectionStep === 'date' ? 'Select Date' : 'Select Time'}
+                {dateSelectionStep === 'date' ? t('bookSession.dateTime.selectDate') : t('bookSession.dateTime.selectTime')}
             </h2>
               {dateSelectionStep === 'time' && selectedDate && (
                 <Button
@@ -1234,37 +1248,37 @@ const BookSessionMobile: React.FC = () => {
                     padding: '4px 8px'
                   }}
                 >
-                  ← Change
+                  {t('bookSession.dateTime.changeDate')}
                 </Button>
               )}
             </div>
             {!selectedTutor ? (
               <div className="text-center py-8">
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Please select a tutor first
+                  {t('bookSession.dateTime.pleaseSelectTutor')}
                 </p>
               </div>
             ) : availabilityLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3"></div>
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Loading available time slots...
+                  {t('bookSession.dateTime.loadingSlots')}
                 </p>
               </div>
             ) : availableSlots.length === 0 ? (
               <div className="text-center py-8">
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  No available time slots found
+                  {t('bookSession.dateTime.noSlots')}
                 </p>
                 <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                  The tutor may not have set their availability yet
+                  {t('bookSession.dateTime.noAvailability')}
                 </p>
               </div>
             ) : dateSelectionStep === 'date' ? (
               // Step 1: Select Date
               <div>
                 <p className={`text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Choose an available date:
+                  {t('bookSession.dateTime.chooseDate')}
                 </p>
             <div className="grid grid-cols-2 gap-3">
                   {(() => {
@@ -1329,7 +1343,7 @@ const BookSessionMobile: React.FC = () => {
                             <p className={`text-xs mt-1 px-2 py-0.5 rounded-full ${
                               theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'
                             }`}>
-                              {dateInfo.count} slots
+                              {dateInfo.count} {t('bookSession.dateTime.slots')}
                             </p>
                           </div>
                         </div>
@@ -1351,7 +1365,7 @@ const BookSessionMobile: React.FC = () => {
                   </p>
                 </div>
                 <p className={`text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Choose a time slot:
+                  {t('bookSession.dateTime.chooseTime')}
                 </p>
                 <div className="grid grid-cols-3 gap-2">
                   {availableSlots
@@ -1409,7 +1423,7 @@ const BookSessionMobile: React.FC = () => {
                               ? 'text-blue-700'
                               : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                           }`}>
-                            ({selectedDuration}m)
+                            ({selectedDuration}{t('bookSession.duration.minutes').charAt(0)})
                           </p>
                   </div>
                 </div>
@@ -1424,41 +1438,41 @@ const BookSessionMobile: React.FC = () => {
         return (
           <div className="space-y-4">
             <h2 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Session Details
+              {t('bookSession.sessionDetails.title')}
             </h2>
             
             {/* Summary */}
             <div className={`mb-4 p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
               <h3 className={`text-xs font-semibold mb-2 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
-                📋 Session Summary
+                📋 {t('bookSession.sessionDetails.summary')}
               </h3>
               <div className="space-y-1.5">
                 <div className="flex justify-between">
-                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tutor:</span>
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('bookSession.sessionDetails.tutor')}</span>
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {selectedTutorData?.name || 'Not selected'}
+                    {selectedTutorData?.name || t('bookSession.sessionDetails.notSelected')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Subject:</span>
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('bookSession.sessionDetails.subject')}</span>
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {selectedSubject || 'Not selected'}
+                    {selectedSubject || t('bookSession.sessionDetails.notSelected')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Duration:</span>
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('bookSession.sessionDetails.duration')}</span>
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {selectedDuration} minutes
+                    {selectedDuration} {t('bookSession.duration.minutes')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Date:</span>
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('bookSession.sessionDetails.date')}</span>
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {selectedDate || 'Not selected'}
+                    {selectedDate || t('bookSession.sessionDetails.notSelected')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Time:</span>
+                  <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('bookSession.sessionDetails.time')}</span>
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {selectedTime ? (
                       <>
@@ -1467,7 +1481,7 @@ const BookSessionMobile: React.FC = () => {
                           ` - ${availableSlots.find(s => s.time === selectedTime)?.endTime}`
                         }
                       </>
-                    ) : 'Not selected'}
+                    ) : t('bookSession.sessionDetails.notSelected')}
                   </span>
                 </div>
               </div>
@@ -1476,7 +1490,7 @@ const BookSessionMobile: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className={`block text-sm font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Session Type
+                  {t('bookSession.sessionDetails.sessionType')}
                 </label>
                 <div className="space-y-3">
                   <label 
@@ -1523,7 +1537,7 @@ const BookSessionMobile: React.FC = () => {
                           ? 'text-blue-900' 
                           : theme === 'dark' ? 'text-white' : 'text-gray-900'
                       }`}>
-                        Online Video Call
+                        {t('bookSession.sessionDetails.online')}
                       </span>
                       <p className={`text-xs ${
                         sessionType === 'online' 
@@ -1578,7 +1592,7 @@ const BookSessionMobile: React.FC = () => {
                           ? 'text-blue-900' 
                           : theme === 'dark' ? 'text-white' : 'text-gray-900'
                       }`}>
-                        In-Person Meeting
+                        {t('bookSession.sessionDetails.inPerson')}
                       </span>
                       <p className={`text-xs ${
                         sessionType === 'in-person' 
@@ -1594,13 +1608,13 @@ const BookSessionMobile: React.FC = () => {
               
               <div>
                 <label className={`block text-sm font-medium mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Additional Notes (Optional)
+                  {t('bookSession.sessionDetails.additionalNotes')}
                 </label>
                 <textarea
                   rows={4}
                   value={sessionNotes}
                   onChange={(e) => setSessionNotes(e.target.value)}
-                  placeholder="Any specific topics you'd like to focus on?"
+                  placeholder={t('bookSession.sessionDetails.notesPlaceholder')}
                   className={`w-full px-4 py-3 border-2 rounded-xl transition-all ${
                     theme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500'
@@ -1621,37 +1635,37 @@ const BookSessionMobile: React.FC = () => {
     return (
       <div className={`p-5 rounded-xl border shadow-md ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          📋 Session Summary
+          📋 {t('bookSession.sessionDetails.summary')}
         </h3>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tutor:</span>
+            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.sessionDetails.tutor')}</span>
             <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              {selectedTutorData?.name || 'Not selected'}
+              {selectedTutorData?.name || t('bookSession.sessionDetails.notSelected')}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
+            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.sessionDetails.date')}</span>
             <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              {selectedDate || 'Not selected'}
+              {selectedDate || t('bookSession.sessionDetails.notSelected')}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Time:</span>
+            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.sessionDetails.time')}</span>
             <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              {selectedTime || 'Not selected'}
+              {selectedTime || t('bookSession.sessionDetails.notSelected')}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
+            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.sessionDetails.duration')}</span>
             <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              {selectedDuration} minutes
+              {selectedDuration} {t('bookSession.duration.minutes')}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Type:</span>
+            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.sessionDetails.type')}</span>
             <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              {sessionType || 'Not selected'}
+              {sessionType || t('bookSession.sessionDetails.notSelected')}
             </span>
           </div>
         </div>
@@ -1673,11 +1687,11 @@ const BookSessionMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                {bookingMode === 'session' ? 'Book Session' : 'Browse Classes'}
+                {bookingMode === 'session' ? t('bookSession.title') : t('bookSession.browseClasses')}
               </h1>
               {bookingMode === 'session' && (
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Step {activeStep + 1} of {steps.length}
+                {t('bookSession.steps.selectTutor')} {activeStep + 1} {t('bookSession.tutor.of')} {steps.length}
               </p>
               )}
             </div>
@@ -1744,13 +1758,13 @@ const BookSessionMobile: React.FC = () => {
           >
             <Tab 
               icon={<Schedule />} 
-              label="Book Session" 
+              label={t('bookSession.title')} 
               iconPosition="start"
               sx={{ textTransform: 'none', fontWeight: 600, minWidth: 0, px: 1 }}
             />
             <Tab 
               icon={<ClassIcon />} 
-              label="Browse Classes" 
+              label={t('bookSession.browseClasses')} 
               iconPosition="start"
               sx={{ textTransform: 'none', fontWeight: 600, minWidth: 0, px: 1 }}
             />
@@ -1812,7 +1826,7 @@ const BookSessionMobile: React.FC = () => {
           >
             <p className={`text-sm font-medium flex items-center ${theme === 'dark' ? 'text-green-300' : 'text-green-700'}`}>
               <CheckCircleIcon className="w-5 h-5 mr-2" />
-              {bookingMode === 'session' ? 'Session booked successfully!' : 'Enrolled successfully!'}
+              {bookingMode === 'session' ? t('bookSession.success.sessionBooked') : t('bookSession.success.enrolled')}
             </p>
           </div>
         )}
@@ -1859,7 +1873,7 @@ const BookSessionMobile: React.FC = () => {
                 className={`w-full flex items-center justify-between p-3 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-all`}
               >
                 <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Need Help?
+                  {t('bookSession.help.needHelp')}
                 </h3>
                 <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
                   <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
@@ -1872,13 +1886,13 @@ const BookSessionMobile: React.FC = () => {
                     <button className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}>
                       <ChatIcon className="w-6 h-6 text-blue-600 mb-2" />
                       <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Support
+                        {t('bookSession.help.contactSupport')}
                       </span>
                     </button>
                     <button className={`flex flex-col items-center p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}>
                       <VideoCallIcon className="w-6 h-6 text-green-600 mb-2" />
                       <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Tutorial
+                        {t('bookSession.help.videoTutorial')}
                       </span>
                     </button>
                   </div>
@@ -1903,18 +1917,18 @@ const BookSessionMobile: React.FC = () => {
                 <>
               <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    🎉 Đặt lịch thành công!
+                    🎉 {t('bookSession.success.sessionBooked')}
               </h2>
                   <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Buổi học của bạn đã được đặt thành công. Gia sư sẽ nhận được thông báo ngay.
+                    {t('bookSession.success.sessionBookedDesc')}
                   </p>
                   {bookedSessionId && (
                     <div className={`mb-6 p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
                       <p className={`text-xs ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
-                        <strong>Session ID:</strong> {bookedSessionId}
+                        <strong>{t('bookSession.success.sessionId')}</strong> {bookedSessionId}
                       </p>
                       <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Bạn có thể xem chi tiết buổi học trong Calendar hoặc Session Details
+                        {t('bookSession.success.viewDetails')}
                       </p>
                     </div>
                   )}
@@ -1930,7 +1944,7 @@ const BookSessionMobile: React.FC = () => {
                     fontWeight: '500'
                   }}
                 >
-                      Đặt buổi học khác
+                      {t('bookSession.success.bookAnother')}
                 </Button>
                 <Button 
                   onClick={() => navigate('/student')} 
@@ -1943,7 +1957,7 @@ const BookSessionMobile: React.FC = () => {
                         fontWeight: '500'
                       }}
                     >
-                      Về Dashboard
+                      {t('bookSession.success.backToDashboard')}
                     </Button>
                     <Button 
                       onClick={() => navigate('/student/calendar')} 
@@ -1956,7 +1970,7 @@ const BookSessionMobile: React.FC = () => {
                         fontWeight: '500'
                       }}
                     >
-                      Xem Calendar
+                      {t('dashboard.menu.calendar')}
                 </Button>
               </div>
                 </>
@@ -1966,7 +1980,7 @@ const BookSessionMobile: React.FC = () => {
                     <CloseIcon className="w-10 h-10 text-red-500" />
                   </div>
                   <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    ❌ Đặt lịch thất bại
+                    ❌ {t('bookSession.error.bookingFailed')}
                   </h2>
                   <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
                     {bookingError}
@@ -1986,7 +2000,7 @@ const BookSessionMobile: React.FC = () => {
                         fontWeight: '500'
                       }}
                     >
-                      Thử lại
+                      {t('bookSession.error.tryAgain')}
                     </Button>
                     <Button 
                       onClick={() => navigate('/student')} 
@@ -1999,7 +2013,7 @@ const BookSessionMobile: React.FC = () => {
                         fontWeight: '500'
                       }}
                     >
-                      Về Dashboard
+                      {t('bookSession.success.backToDashboard')}
                     </Button>
                   </div>
                 </>
@@ -2009,10 +2023,10 @@ const BookSessionMobile: React.FC = () => {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                   </div>
                   <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Đang xử lý...
+                    {t('dashboard.loading')}
                   </h2>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Vui lòng chờ trong giây lát
+                    {t('dashboard.loading')}
                   </p>
                 </>
               )}
@@ -2034,7 +2048,7 @@ const BookSessionMobile: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-4">
                   <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Choose a Tutor
+                    {t('bookSession.classes.chooseTutor')}
                   </h2>
                   {availableTutors.length > classTutorsPerPage && (
                     <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -2044,7 +2058,7 @@ const BookSessionMobile: React.FC = () => {
       </div>
                 {availableTutors.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading tutors...</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>{t('bookSession.tutor.loading')}</p>
                   </div>
                 ) : (
                   <>
@@ -2163,7 +2177,7 @@ const BookSessionMobile: React.FC = () => {
                             minWidth: '70px'
                           }}
                         >
-                          Trước
+                          {t('bookSession.tutor.previous')}
                         </Button>
                         <span className={`px-3 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                           {classTutorPage}/{Math.ceil(availableTutors.length / classTutorsPerPage)}
@@ -2180,7 +2194,7 @@ const BookSessionMobile: React.FC = () => {
                             minWidth: '70px'
                           }}
                         >
-                          Sau
+                          {t('bookSession.tutor.next')}
                         </Button>
                       </div>
                     )}
@@ -2200,10 +2214,10 @@ const BookSessionMobile: React.FC = () => {
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Classes by {selectedClassTutor?.name || 'Tutor'}
+                        {t('bookSession.classes.classesBy')} {selectedClassTutor?.name || t('bookSession.tutor.chooseTutor')}
                       </h2>
                       <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Select a class to enroll
+                        {t('bookSession.classes.selectClass')}
                       </p>
                     </div>
                     <Button
@@ -2222,7 +2236,7 @@ const BookSessionMobile: React.FC = () => {
                         padding: '4px 8px'
                       }}
                     >
-                      ← Change
+                      {t('bookSession.classes.changeTutor')}
                     </Button>
             </div>
 
@@ -2230,7 +2244,7 @@ const BookSessionMobile: React.FC = () => {
                 <div className="text-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                   <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Loading classes...
+                    {t('bookSession.classes.loading')}
                   </p>
                 </div>
               ) : classes.length === 0 ? (
@@ -2244,7 +2258,7 @@ const BookSessionMobile: React.FC = () => {
                 >
                   <ClassIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
                   <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        No classes available for this tutor
+                        {t('bookSession.classes.noClasses')}
                   </p>
                 </Card>
               ) : (
@@ -2295,14 +2309,14 @@ const BookSessionMobile: React.FC = () => {
                               </h4>
                               {isEnrolled && (
                                 <Chip 
-                                  label="Enrolled" 
+                                  label={t('bookSession.classes.alreadyEnrolled')} 
                                   size="small"
                                   color="success"
                                 />
                               )}
                               {isFull && !isEnrolled && (
                                 <Chip 
-                                  label="Full" 
+                                  label={t('bookSession.classes.classFull')} 
                                   size="small"
                                   color="warning"
                                 />
@@ -2330,7 +2344,7 @@ const BookSessionMobile: React.FC = () => {
                           </div>
                           <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             <GroupIcon className="w-4 h-4" />
-                            <span>{cls.currentEnrollment || 0} / {cls.maxStudents} students</span>
+                            <span>{cls.currentEnrollment || 0} / {cls.maxStudents} {t('bookSession.classes.students')}</span>
                           </div>
                           <div className={`flex items-center gap-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             <EventIcon className="w-4 h-4" />
@@ -2351,7 +2365,7 @@ const BookSessionMobile: React.FC = () => {
                             textTransform: 'none'
                           }}
                         >
-                          {isEnrolled ? 'Already Enrolled' : isFull ? 'Class Full' : 'Enroll Now'}
+                          {isEnrolled ? t('bookSession.classes.alreadyEnrolled') : isFull ? t('bookSession.classes.classFull') : t('bookSession.classes.enrollNow')}
                         </Button>
                       </Card>
                       </div>
@@ -2367,7 +2381,7 @@ const BookSessionMobile: React.FC = () => {
             {myEnrollments.length > 0 && (
               <div>
                 <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  My Enrolled Classes
+                  {t('bookSession.classes.myEnrolledClasses')}
                 </h3>
                 {enrollmentsLoading ? (
                   <div className="text-center py-12">
@@ -2428,7 +2442,7 @@ const BookSessionMobile: React.FC = () => {
                               textTransform: 'none'
                             }}
                           >
-                            View Class LMS
+                            {t('bookSession.classes.viewClassLMS')}
                           </Button>
                         )}
                       </Card>
@@ -2449,7 +2463,7 @@ const BookSessionMobile: React.FC = () => {
         fullWidth
       >
         <DialogTitle className={theme === 'dark' ? 'bg-gray-800 text-white' : ''}>
-          Confirm Enrollment
+          {t('bookSession.classes.confirmEnrollment')}
         </DialogTitle>
         <DialogContent className={theme === 'dark' ? 'bg-gray-800' : ''}>
           {selectedClass && (
@@ -2467,34 +2481,34 @@ const BookSessionMobile: React.FC = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Schedule:</span>
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.classes.schedule')}</span>
                   <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {selectedClass.day} {selectedClass.startTime} - {selectedClass.endTime}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.sessionDetails.duration')}</span>
                   <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {selectedClass.duration} minutes
+                    {selectedClass.duration} {t('bookSession.duration.minutes')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Semester:</span>
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.classes.semester')}</span>
                   <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {new Date(selectedClass.semesterStart).toLocaleDateString()} - {new Date(selectedClass.semesterEnd).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Capacity:</span>
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('bookSession.classes.capacity')}</span>
                   <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {selectedClass.currentEnrollment || 0} / {selectedClass.maxStudents} students
+                    {selectedClass.currentEnrollment || 0} / {selectedClass.maxStudents} {t('bookSession.classes.students')}
                   </span>
                 </div>
               </div>
 
               <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
                 <p className={`text-sm ${theme === 'dark' ? 'text-blue-300' : 'text-blue-900'}`}>
-                  ℹ️ You will be enrolled for the entire semester. Sessions will be automatically created.
+                  ℹ️ {t('bookSession.classes.enrollmentNote')}
                 </p>
               </div>
             </div>
@@ -2508,7 +2522,7 @@ const BookSessionMobile: React.FC = () => {
               textTransform: 'none'
             }}
           >
-            Cancel
+            {t('bookSession.classes.cancel')}
           </Button>
           <Button 
             onClick={handleEnrollClass}
@@ -2519,7 +2533,7 @@ const BookSessionMobile: React.FC = () => {
               textTransform: 'none'
             }}
           >
-            {enrolling ? 'Enrolling...' : 'Confirm Enrollment'}
+            {enrolling ? t('bookSession.classes.enrolling') : t('bookSession.classes.confirmEnrollment')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -2566,7 +2580,7 @@ const BookSessionMobile: React.FC = () => {
               }}
             >
               <ArrowBackIcon className="w-5 h-5 mr-2" />
-              Back
+              {t('bookSession.navigation.back')}
             </Button>
             <Button
               onClick={handleNext}
@@ -2610,11 +2624,11 @@ const BookSessionMobile: React.FC = () => {
               {bookingLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Đang xử lý...
+                  {t('dashboard.loading')}
                 </>
               ) : (
                 <>
-              {activeStep === steps.length - 1 ? 'Hoàn thành' : 'Tiếp tục'}
+              {activeStep === steps.length - 1 ? t('bookSession.navigation.completeBooking') : t('bookSession.navigation.continue')}
               <ArrowForwardIcon className="w-5 h-5 ml-2" />
                 </>
               )}
@@ -2655,9 +2669,19 @@ const BookSessionMobile: React.FC = () => {
                 {/* Quick Actions - Moved to top */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    QUICK ACTIONS
+                    {t('bookSession.quickActions')}
                   </h3>
                   <div className="space-y-2">
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
+                    </button>
                     <button 
                       onClick={() => {
                         navigate('/student')
@@ -2666,7 +2690,7 @@ const BookSessionMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                     >
                       <ArrowBackIcon className="mr-3 w-4 h-4" />
-                      Back to Dashboard
+                      {t('bookSession.backToDashboard')}
                     </button>
                   </div>
                 </div>
@@ -2674,7 +2698,7 @@ const BookSessionMobile: React.FC = () => {
                 {/* Mobile Progress Steps */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    BOOKING PROGRESS
+                    {t('bookSession.bookingProgress')}
                   </h3>
                   <div className="space-y-3">
                     {steps.map((step, index) => (
@@ -2698,7 +2722,7 @@ const BookSessionMobile: React.FC = () => {
                         <div>
                           <p className="text-sm font-medium">{step.label}</p>
                           {index === activeStep && (
-                            <p className="text-xs opacity-75">Current step</p>
+                            <p className="text-xs opacity-75">{t('bookSession.steps.currentStep')}</p>
                           )}
                         </div>
                       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Button from '../../components/ui/Button'
 import { Avatar } from '@mui/material'
 import { useLongPolling } from '../../hooks/useLongPolling'
@@ -33,13 +34,25 @@ import {
   MoreHoriz as MoreHorizIcon,
   OnlinePrediction as OnlinePredictionIcon,
   Close as CloseIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 
 const Messages: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
   const [activeMenu, setActiveMenu] = useState('messages')
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
@@ -782,7 +795,7 @@ const Messages: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            {isCheckingAuth ? 'Đang kiểm tra đăng nhập...' : 'Đang tải dữ liệu...'}
+            {isCheckingAuth ? t('messages.loading') : t('messages.loading')}
           </p>
         </div>
       </div>
@@ -955,11 +968,11 @@ const Messages: React.FC = () => {
         setShowNewConversationModal(false)
         setSearchUserQuery('')
       } else {
-        alert('Failed to create conversation: ' + (response.error || 'Unknown error'))
+        alert(t('messages.failedToCreate', { error: response.error || 'Unknown error' }))
       }
     } catch (error: any) {
       console.error('Failed to create conversation:', error)
-      alert('Failed to create conversation: ' + (error.message || 'Unknown error'))
+      alert(t('messages.failedToCreate', { error: error.message || 'Unknown error' }))
     } finally {
       setCreatingConversation(false)
     }
@@ -974,7 +987,7 @@ const Messages: React.FC = () => {
 
   // Delete conversation (hide for current user only)
   const handleDeleteConversation = async (conversationId: string) => {
-    if (!confirm('Are you sure you want to delete this conversation? This will only hide it for you.')) {
+    if (!confirm(t('messages.deleteConversation'))) {
       return
     }
 
@@ -1003,7 +1016,7 @@ const Messages: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to delete conversation:', error)
-      alert('Failed to delete conversation: ' + (error.message || 'Unknown error'))
+      alert(t('messages.failedToDelete', { error: error.message || 'Unknown error' }))
     }
   }
 
@@ -1028,7 +1041,7 @@ const Messages: React.FC = () => {
     
     // If no conversation selected, we need to create one first
     if (!selectedConversationId) {
-      alert('Please select or create a conversation before sending a message')
+      alert(t('messages.selectConversation'))
       return
     }
 
@@ -1072,7 +1085,7 @@ const Messages: React.FC = () => {
       reloadConversations()
     } catch (error: any) {
       console.error('Failed to send message:', error)
-      alert('Failed to send message: ' + (error.message || 'Unknown error'))
+      alert(t('messages.failedToSend', { error: error.message || 'Unknown error' }))
       // Restore message if sending failed
       setNewMessage(messageContent)
     } finally {
@@ -1104,14 +1117,14 @@ const Messages: React.FC = () => {
     // Validate file size (5MB)
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
-      alert(`File is too large. Maximum size is 5MB.`)
+      alert(t('messages.fileTooLarge'))
       return
     }
 
     // Validate file type
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
     if (!allowedTypes.includes(file.type)) {
-      alert(`File type not supported. Supported file types: PDF, JPG, PNG, GIF, DOC, DOCX`)
+      alert(t('messages.fileTypeNotSupported'))
       return
     }
 
@@ -1150,7 +1163,7 @@ const Messages: React.FC = () => {
       reloadConversations()
     } catch (error: any) {
       console.error('Failed to upload file:', error)
-      alert('Failed to upload file: ' + (error.message || 'Unknown error'))
+      alert(t('messages.uploadFailed', { error: error.message || 'Unknown error' }))
     } finally {
       setUploadingFile(false)
     }
@@ -1199,23 +1212,23 @@ const Messages: React.FC = () => {
             {/* Settings */}
             <div>
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                SETTINGS
+                {t('messages.settings')}
               </h3>
               <div className="space-y-2">
                 <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
                   <PersonIcon className="mr-3 w-4 h-4" />
-                  Profile
+                  {t('messages.profile')}
                 </button>
                 <button className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}>
                   <NotificationsIcon className="mr-3 w-4 h-4" />
-                  Notifications
+                  {t('messages.notifications')}
                 </button>
                 <button 
                   onClick={() => setShowThemeOptions(!showThemeOptions)}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PaletteIcon className="mr-3 w-4 h-4" />
-                  Theme
+                  {t('messages.theme')}
                 </button>
                 {showThemeOptions && (
                   <div className={`mt-2 ml-4 p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
@@ -1229,14 +1242,47 @@ const Messages: React.FC = () => {
                         }`}
                       >
                         {theme === 'dark' ? <LightModeIcon className="mr-3 w-4 h-4" /> : <DarkModeIcon className="mr-3 w-4 h-4" />}
-                        {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                        {theme === 'dark' ? t('messages.switchToLight') : t('messages.switchToDark')}
                       </button>
                       <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} px-3 py-1`}>
-                        Current: {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                        {t('messages.currentTheme', { theme: theme === 'dark' ? t('messages.darkMode') : t('messages.lightMode') })}
                       </div>
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Language Toggle */}
+            <div className="mb-8">
+              <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                {t('messages.language')}
+              </h3>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => changeLanguage('en')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLang === 'en'
+                      ? 'bg-blue-600 text-white'
+                      : theme === 'dark'
+                        ? 'text-gray-300 hover:bg-gray-700'
+                        : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => changeLanguage('vi')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLang === 'vi'
+                      ? 'bg-blue-600 text-white'
+                      : theme === 'dark'
+                        ? 'text-gray-300 hover:bg-gray-700'
+                        : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  Tiếng Việt
+                </button>
               </div>
             </div>
 
@@ -1270,7 +1316,7 @@ const Messages: React.FC = () => {
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="Search conversations..."
+                  placeholder={t('messages.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={`w-full px-4 py-3 pl-10 rounded-lg border ${
@@ -1285,7 +1331,7 @@ const Messages: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
-                  Search
+                  {t('messages.search')}
                 </Button>
                 
                 {/* Desktop Theme Toggle */}
@@ -1305,11 +1351,11 @@ const Messages: React.FC = () => {
           <div className="mb-6">
             <div className={`rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4`}>
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Active Now
+                {t('messages.activeNow')}
               </h3>
               {loadingActiveUsers ? (
                 <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} py-4`}>
-                  Loading...
+                  {t('messages.loading')}
                       </div>
               ) : activeUsers.length > 0 ? (
                 <div 
@@ -1374,7 +1420,7 @@ const Messages: React.FC = () => {
               </div>
               ) : (
                 <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} py-4`}>
-                  No online users
+                  {t('messages.noOnlineUsers')}
                 </div>
               )}
             </div>
@@ -1391,12 +1437,12 @@ const Messages: React.FC = () => {
                  }}>
               <div className={`p-4 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
                 <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Messages
+                  {t('messages.conversations')}
                 </h2>
                 <button
                   onClick={handleOpenNewConversation}
                   className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'} text-white transition-colors`}
-                  title="Tạo cuộc trò chuyện mới"
+                  title={t('messages.newConversationTitle')}
                 >
                   <ChatIcon className="w-5 h-5" />
                 </button>
@@ -1405,20 +1451,20 @@ const Messages: React.FC = () => {
               <div className="overflow-y-auto h-[540px]">
                 {loading ? (
                   <div className="p-4 text-center">
-                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading...</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>{t('messages.loading')}</p>
                   </div>
                 ) : filteredConversations.length === 0 ? (
                   <div className="p-4 text-center">
                       <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                         {conversations.length === 0 
-                         ? 'No conversations yet. Start a new conversation!' 
-                         : 'No conversations found matching your search.'}
+                         ? t('messages.noConversations')
+                         : t('messages.noConversationsFound')}
                       </p>
                     <button
                       onClick={handleOpenNewConversation}
                       className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                      + New Conversation
+                      + {t('messages.newConversation')}
                     </button>
                   </div>
                 ) : (
@@ -1477,7 +1523,7 @@ const Messages: React.FC = () => {
                               ? 'bg-green-100 text-green-800' 
                               : 'bg-purple-100 text-purple-800'
                           }`}>
-                            {conversation.type === 'student' ? 'Student' : 'Tutor'}
+                            {conversation.type === 'student' ? t('messages.student') : t('messages.tutor')}
                           </span>
                           <span className={`text-xs ml-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                             {conversation.subject}
@@ -1540,7 +1586,7 @@ const Messages: React.FC = () => {
                         style={{
                           color: theme === 'dark' ? '#ffffff' : '#374151'
                         }}
-                          title="More options"
+                          title={t('messages.moreOptions')}
                       >
                           <MoreHorizIcon className="w-5 h-5" />
                       </button>
@@ -1567,7 +1613,7 @@ const Messages: React.FC = () => {
                                 }`}
                       >
                                 <DeleteIcon className="w-4 h-4" />
-                                <span>Delete</span>
+                                <span>{t('messages.delete')}</span>
                       </button>
                             </div>
                           </>
@@ -1588,13 +1634,13 @@ const Messages: React.FC = () => {
                     {!selectedConversationId ? (
                       <div className="text-center py-8">
                         <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                          Chọn một cuộc trò chuyện để xem tin nhắn
+                          {t('messages.selectToView')}
                         </p>
                       </div>
                     ) : messages.length === 0 ? (
                       <div className="text-center py-8">
                         <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                          Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!
+                          {t('messages.noMessages')}
                         </p>
                       </div>
                     ) : (
@@ -1712,7 +1758,7 @@ const Messages: React.FC = () => {
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           onKeyPress={handleKeyPress}
-                          placeholder="Type a message..."
+                          placeholder={t('messages.typeMessage')}
                           className={`w-full px-4 py-2 rounded-lg border ${
                             theme === 'dark' 
                               ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -1751,7 +1797,7 @@ const Messages: React.FC = () => {
                         }}
                       >
                         {sending || uploadingFile ? (
-                          <span className="text-sm">{uploadingFile ? 'Đang upload...' : 'Đang gửi...'}</span>
+                          <span className="text-sm">{uploadingFile ? t('messages.uploading') : t('messages.sending')}</span>
                         ) : (
                           <SendIcon className="w-4 h-4" />
                         )}
@@ -1764,10 +1810,10 @@ const Messages: React.FC = () => {
                   <div className="text-center">
                     <ChatIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
                     <h3 className={`text-lg font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Select a conversation
+                      {t('messages.selectConversation')}
                     </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      Choose a conversation from the list to start messaging
+                      {t('messages.selectConversationDesc')}
                     </p>
                   </div>
                 </div>
@@ -1782,7 +1828,7 @@ const Messages: React.FC = () => {
             {/* Profile Header */}
             <div className="flex items-center justify-between mb-6">
               <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Your Profile
+                {t('messages.yourProfile')}
               </h3>
               <button className="p-1">
                 <MoreVertIcon className="w-5 h-5 text-gray-400" />
@@ -1838,15 +1884,15 @@ const Messages: React.FC = () => {
             {/* Online Status */}
             <div className="mb-8">
               <h4 className={`font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Online Status
+                {t('messages.onlineStatus')}
               </h4>
               <div className="flex items-center justify-between">
                 <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Available for messages
+                  {t('messages.availableForMessages')}
                 </span>
                 <div className="flex items-center">
                   <OnlinePredictionIcon className="w-4 h-4 text-green-500 mr-2" />
-                  <span className="text-sm text-green-500">Online</span>
+                  <span className="text-sm text-green-500">{t('messages.online')}</span>
                 </div>
               </div>
             </div>
@@ -1855,7 +1901,7 @@ const Messages: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Recent Contacts
+                  {t('messages.recentContacts')}
                 </h4>
                 <button className="text-sm text-blue-600">
                   <MoreVertIcon className="w-4 h-4" />
@@ -1957,7 +2003,7 @@ const Messages: React.FC = () => {
               {/* Mobile Settings */}
               <div className="mt-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  SETTINGS
+                  {t('messages.settings')}
                 </h3>
                 <div className="space-y-2">
                   <button 
@@ -1968,7 +2014,7 @@ const Messages: React.FC = () => {
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   >
                     <PersonIcon className="mr-3 w-4 h-4" />
-                    Profile
+                    {t('messages.profile')}
                   </button>
                   <button 
                     onClick={() => {
@@ -1978,14 +2024,14 @@ const Messages: React.FC = () => {
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   >
                     <NotificationsIcon className="mr-3 w-4 h-4" />
-                    Notifications
+                    {t('messages.notifications')}
                   </button>
                   <button 
                     onClick={() => setShowThemeOptions(!showThemeOptions)}
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   >
                     <PaletteIcon className="mr-3 w-4 h-4" />
-                    Theme
+                    {t('messages.theme')}
                   </button>
                   {showThemeOptions && (
                     <div className={`mt-2 ml-4 p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
@@ -2002,14 +2048,21 @@ const Messages: React.FC = () => {
                           }`}
                         >
                           {theme === 'dark' ? <LightModeIcon className="mr-3 w-4 h-4" /> : <DarkModeIcon className="mr-3 w-4 h-4" />}
-                          {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                          {theme === 'dark' ? t('messages.switchToLight') : t('messages.switchToDark')}
                         </button>
                         <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} px-3 py-1`}>
-                          Current: {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                          {t('messages.currentTheme', { theme: theme === 'dark' ? t('messages.darkMode') : t('messages.lightMode') })}
                         </div>
                       </div>
                     </div>
                   )}
+                  <button 
+                    onClick={() => changeLanguage(currentLang === 'en' ? 'vi' : 'en')}
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  >
+                    <LanguageIcon className="mr-3 w-4 h-4" />
+                    {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -2027,7 +2080,7 @@ const Messages: React.FC = () => {
             <div className={`p-6 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Tạo cuộc trò chuyện mới
+                  {t('messages.newConversationTitle')}
                 </h3>
                 <button
                   onClick={() => {
@@ -2046,7 +2099,7 @@ const Messages: React.FC = () => {
               <div className="mb-4">
                 <input
                   type="text"
-                  placeholder="Tìm kiếm người dùng (student, tutor, management)..."
+                  placeholder={t('messages.searchUsers')}
                   value={searchUserQuery}
                   onChange={(e) => setSearchUserQuery(e.target.value)}
                   className={`w-full px-4 py-2 rounded-lg border ${
@@ -2061,7 +2114,7 @@ const Messages: React.FC = () => {
               <div className="max-h-96 overflow-y-auto">
                 {loadingUsers ? (
                   <div className="text-center py-8">
-                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Đang tải...</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>{t('messages.loadingUsers')}</p>
                   </div>
                 ) : (
                   <>
@@ -2111,14 +2164,14 @@ const Messages: React.FC = () => {
                                         ? theme === 'dark' ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-700'
                                         : theme === 'dark' ? 'bg-purple-900 text-purple-200' : 'bg-purple-100 text-purple-700'
                                     }`}>
-                                      {user.role === 'tutor' ? 'Tutor' : user.role === 'student' ? 'Student' : 'Management'}
+                                      {user.role === 'tutor' ? t('messages.tutor') : user.role === 'student' ? t('messages.student') : t('messages.management')}
                                     </span>
                                   )}
                                   {hasConversation && (
                                     <span className={`px-2 py-0.5 text-xs rounded-full ${
                                       theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'
                                     }`}>
-                                      Đã có cuộc trò chuyện
+                                      {t('messages.alreadyHasConversation')}
                                     </span>
                                   )}
                                 </div>
@@ -2139,7 +2192,7 @@ const Messages: React.FC = () => {
                     ).length === 0 && (
                         <div className="text-center py-8">
                           <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                           {searchUserQuery ? 'No users found' : 'No users available'}
+                           {searchUserQuery ? t('messages.noUsersFound') : t('messages.noUsersAvailable')}
                           </p>
                         </div>
                     )}

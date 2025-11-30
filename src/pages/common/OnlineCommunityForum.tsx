@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { 
   Search,
   FilterList,
@@ -19,7 +20,8 @@ import {
   NotificationsActive as NotificationsIcon,
   Close as CloseIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -92,12 +94,23 @@ const getAvatarColor = (name: string | undefined | null) => {
 }
 
 const OnlineCommunityForum: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme } = useTheme()
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedSort, setSelectedSort] = useState('recent')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [posts, setPosts] = useState<ForumPost[]>([])
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<any>(null)
@@ -518,7 +531,7 @@ const OnlineCommunityForum: React.FC = () => {
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href)
-      alert('Link copied to clipboard!')
+      alert(t('forum.linkCopied'))
     }
   }
 
@@ -535,12 +548,12 @@ const OnlineCommunityForum: React.FC = () => {
 
   const handleCreatePost = async () => {
     if (!newPost.title.trim() || !newPost.content.trim()) {
-      alert('Please fill in title and content')
+      alert(t('forum.fillTitleAndContent'))
       return
     }
 
     if (!newPost.category || newPost.category === 'all') {
-      alert('Please select a category')
+      alert(t('forum.selectCategory'))
       return
     }
 
@@ -557,7 +570,7 @@ const OnlineCommunityForum: React.FC = () => {
       if (response.success) {
         setShowCreateModal(false)
         setNewPost({ title: '', content: '', category: 'Programming', tags: '' })
-        alert('Post created successfully! It is pending approval and will appear after management reviews it.')
+        alert(t('forum.postCreated'))
         await loadPosts()
         if (currentUser?.role === 'management') {
           await loadPendingPosts()
@@ -565,7 +578,7 @@ const OnlineCommunityForum: React.FC = () => {
       }
     } catch (error) {
       console.error('Error creating post:', error)
-      alert('Failed to create post')
+      alert(t('forum.failedToCreate'))
     } finally {
       setCreatingPost(false)
     }
@@ -593,7 +606,7 @@ const OnlineCommunityForum: React.FC = () => {
       }
     } catch (error) {
       console.error('Error moderating post:', error)
-      alert('Failed to moderate post')
+      alert(t('forum.failedToModerate'))
     } finally {
       setIsModerating(false)
     }
@@ -698,10 +711,10 @@ const OnlineCommunityForum: React.FC = () => {
   }
 
   const sortOptions = [
-    { name: 'Most Recent', value: 'recent' },
-    { name: 'Most Popular', value: 'popular' },
-    { name: 'Most Liked', value: 'liked' },
-    { name: 'Most Commented', value: 'commented' }
+    { name: t('forum.mostRecent'), value: 'recent' },
+    { name: t('forum.mostPopular'), value: 'popular' },
+    { name: t('forum.mostLiked'), value: 'liked' },
+    { name: t('forum.mostCommented'), value: 'commented' }
   ]
 
   return (
@@ -726,12 +739,12 @@ const OnlineCommunityForum: React.FC = () => {
             {/* Forum Stats */}
             <div className="mb-8">
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                FORUM STATS
+                {t('forum.forumStats')}
               </h3>
               <div className="space-y-3">
                 <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                   <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Posts:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.totalPosts')}</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {posts.length}
                     </span>
@@ -739,7 +752,7 @@ const OnlineCommunityForum: React.FC = () => {
                 </div>
                 <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                   <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.bookmarked')}</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {bookmarks.size}
                     </span>
@@ -747,7 +760,7 @@ const OnlineCommunityForum: React.FC = () => {
                 </div>
                 <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                   <div className="flex justify-between items-center">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Active Users:</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.activeUsers')}</span>
                     <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>-</span>
                   </div>
                 </div>
@@ -757,7 +770,7 @@ const OnlineCommunityForum: React.FC = () => {
             {/* Categories */}
             <div className="mb-8">
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                CATEGORIES
+                {t('forum.categories')}
               </h3>
               <div className="space-y-2">
                 {categories.map((category) => (
@@ -782,7 +795,7 @@ const OnlineCommunityForum: React.FC = () => {
             {/* Quick Actions */}
             <div>
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                QUICK ACTIONS
+                {t('forum.quickActions')}
               </h3>
               <div className="space-y-2">
                 <button 
@@ -790,28 +803,35 @@ const OnlineCommunityForum: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Dashboard
+                  {t('forum.backToDashboard')}
                 </button>
                 <button 
                   onClick={() => navigate('/common/profile')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PersonIcon className="mr-3 w-4 h-4" />
-                  Profile Management
+                  {t('forum.profileManagement')}
                 </button>
                 <button 
                   onClick={() => navigate('/common/library')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <LibraryIcon className="mr-3 w-4 h-4" />
-                  Digital Library
+                  {t('forum.digitalLibrary')}
                 </button>
                 <button 
                   onClick={() => navigate('/common/notifications')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <NotificationsIcon className="mr-3 w-4 h-4" />
-                  Notifications
+                  {t('forum.notifications')}
+                </button>
+                <button 
+                  onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <LanguageIcon className="mr-3 w-4 h-4" />
+                  {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                 </button>
               </div>
             </div>
@@ -835,10 +855,10 @@ const OnlineCommunityForum: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className={`text-3xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Community Forum
+                  {t('forum.title')}
                 </h1>
                 <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Connect, learn, and share knowledge with the community
+                  {t('forum.subtitle')}
                 </p>
               </div>
               <div className="flex space-x-2">
@@ -849,7 +869,7 @@ const OnlineCommunityForum: React.FC = () => {
                         onClick={() => setShowPendingFilter(!showPendingFilter)}
                         className="bg-orange-600 hover:bg-orange-700 text-white"
                       >
-                        Pending ({pendingPosts.length})
+                        {t('forum.pendingPosts')} ({pendingPosts.length})
                       </Button>
                     )}
                     <Button 
@@ -861,7 +881,7 @@ const OnlineCommunityForum: React.FC = () => {
                       }}
                       className="bg-purple-600 hover:bg-purple-700 text-white"
                     >
-                      Manage Posts
+                      {t('forum.managePosts')}
                     </Button>
                   </>
                 )}
@@ -870,7 +890,7 @@ const OnlineCommunityForum: React.FC = () => {
                   className="bg-green-600 hover:bg-green-700 text-white"
                 >
                   <Add className="w-4 h-4 mr-2" />
-                  Create Post
+                  {t('forum.createPost')}
                 </Button>
               </div>
             </div>
@@ -889,7 +909,7 @@ const OnlineCommunityForum: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-4">
                   <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Pending Posts ({pendingPosts.length})
+                    {t('forum.pendingPosts')} ({pendingPosts.length})
                   </h2>
                   <button
                     onClick={() => setShowPendingFilter(false)}
@@ -912,7 +932,7 @@ const OnlineCommunityForum: React.FC = () => {
                               {post.title}
                             </h3>
                             <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                              by {author.name} • {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                              {t('forum.by')} {author.name} • {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
                             </p>
                             <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
                               {post.content}
@@ -924,13 +944,13 @@ const OnlineCommunityForum: React.FC = () => {
                             onClick={() => openModerationModal(post, 'approve')}
                             className="bg-green-600 hover:bg-green-700 text-white text-sm"
                           >
-                            Approve
+                            {t('forum.approve')}
                           </Button>
                           <Button
                             onClick={() => openModerationModal(post, 'reject')}
                             className="bg-red-600 hover:bg-red-700 text-white text-sm"
                           >
-                            Reject
+                            {t('forum.reject')}
                           </Button>
                           <span className={`px-2 py-1 text-xs rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
                             {post.category}
@@ -957,7 +977,7 @@ const OnlineCommunityForum: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-4">
                   <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Post Management
+                    {t('forum.postManagement')}
                   </h2>
                   <button
                     onClick={() => setShowManagementPanel(false)}
@@ -979,7 +999,7 @@ const OnlineCommunityForum: React.FC = () => {
                           : `${theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
                       }`}
                     >
-                      {status === 'all' ? 'All Posts' : status.charAt(0).toUpperCase() + status.slice(1)}
+                      {status === 'all' ? t('forum.allPosts') : t(`forum.${status}`)}
                       {status !== 'all' && (
                         <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
                           {allPosts.filter(p => p.status === status).length}
@@ -1018,7 +1038,7 @@ const OnlineCommunityForum: React.FC = () => {
                                 </span>
                               </div>
                               <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                                by {author.name} • {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                                {t('forum.by')} {author.name} • {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
                               </p>
                               <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
                                 {post.content}
@@ -1033,7 +1053,7 @@ const OnlineCommunityForum: React.FC = () => {
                               </div>
                               {post.moderationNotes && (
                                 <div className={`mt-2 p-2 rounded text-xs ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-                                  <strong>Moderation Note:</strong> {post.moderationNotes}
+                                  <strong>{t('forum.moderationNote')}</strong> {post.moderationNotes}
                                 </div>
                               )}
                             </div>
@@ -1077,7 +1097,7 @@ const OnlineCommunityForum: React.FC = () => {
                     })}
                   {allPosts.filter(post => managementFilter === 'all' || post.status === managementFilter).length === 0 && (
                     <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      No posts found with status: {managementFilter}
+                      {t('forum.noPostsFound')} {managementFilter !== 'all' && `(${t(`forum.${managementFilter}`)})`}
                     </div>
                   )}
                 </div>
@@ -1098,12 +1118,12 @@ const OnlineCommunityForum: React.FC = () => {
                 }}
               >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Search Posts
+                  {t('forum.searchPosts')}
                 </h3>
                 <div className="relative mb-4">
                   <input
                     type="text"
-                    placeholder="Search by title, content, or author..."
+                    placeholder={t('forum.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={`w-full px-4 py-3 pl-10 rounded-lg border ${
@@ -1137,7 +1157,7 @@ const OnlineCommunityForum: React.FC = () => {
                   <div>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                       <FilterList className="w-4 h-4 mr-2" />
-                      Advanced Filters
+                      {t('forum.advancedFilters')}
                     </Button>
                   </div>
                 </div>
@@ -1155,7 +1175,7 @@ const OnlineCommunityForum: React.FC = () => {
                 }}
               >
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Quick Actions
+                  {t('forum.quickActionsTitle')}
                 </h3>
                 <div className="space-y-3">
                   <button 
@@ -1170,7 +1190,7 @@ const OnlineCommunityForum: React.FC = () => {
                     } transition-colors`}
                   >
                     <Bookmark className="mr-3 w-4 h-4" />
-                    My Bookmarks ({bookmarks.size})
+                    {t('forum.myBookmarks')} ({bookmarks.size})
                   </button>
                   <button className={`w-full flex items-center px-4 py-3 rounded-lg border ${
                     theme === 'dark'
@@ -1178,7 +1198,7 @@ const OnlineCommunityForum: React.FC = () => {
                       : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                   } transition-colors`}>
                     <TrendingUp className="mr-3 w-4 h-4" />
-                    Trending Posts
+                    {t('forum.trendingPosts')}
                   </button>
                   <button 
                     onClick={() => {
@@ -1194,7 +1214,7 @@ const OnlineCommunityForum: React.FC = () => {
                     } transition-colors`}
                   >
                     <Person className="mr-3 w-4 h-4" />
-                    My Posts
+                    {t('forum.myPosts')}
                   </button>
                 </div>
               </Card>
@@ -1204,11 +1224,11 @@ const OnlineCommunityForum: React.FC = () => {
           {/* Posts List */}
           {loading ? (
             <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Loading posts...
+              {t('forum.loadingPosts')}
             </div>
           ) : filteredPosts.length === 0 ? (
             <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              No posts found. Be the first to create a post!
+              {t('forum.noPostsFound')}
             </div>
           ) : (
           <div className="space-y-6">
@@ -1299,9 +1319,9 @@ const OnlineCommunityForum: React.FC = () => {
                           {tag}
                         </span>
                       ))}
-                      {post.tags.length > 4 && (
+                        {post.tags.length > 4 && (
                         <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                          +{post.tags.length - 4} more
+                          +{post.tags.length - 4} {t('forum.more')}
                         </span>
                       )}
                     </div>
@@ -1348,7 +1368,7 @@ const OnlineCommunityForum: React.FC = () => {
                             <span className="text-sm font-medium">{post.views || 0}</span>
                       </button>
                     </div>
-                    <Button 
+                      <Button 
                       size="small" 
                       variant="outlined"
                       style={{
@@ -1365,7 +1385,7 @@ const OnlineCommunityForum: React.FC = () => {
                         e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                       }}
                     >
-                      Read More
+                      {t('forum.readMore')}
                     </Button>
                   </div>
                 </div>
@@ -1383,7 +1403,7 @@ const OnlineCommunityForum: React.FC = () => {
           <div className={`w-full max-w-2xl mx-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Create New Post
+                {t('forum.createNewPost')}
               </h2>
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -1395,7 +1415,7 @@ const OnlineCommunityForum: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Title
+                  {t('forum.title')}
                 </label>
                 <input
                   type="text"
@@ -1406,12 +1426,12 @@ const OnlineCommunityForum: React.FC = () => {
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
-                  placeholder="Enter post title..."
+                  placeholder={t('forum.titlePlaceholder')}
                 />
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Category
+                  {t('forum.category')}
                 </label>
                 <select
                   value={newPost.category}
@@ -1429,7 +1449,7 @@ const OnlineCommunityForum: React.FC = () => {
           </div>
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Content
+                  {t('forum.content')}
                 </label>
                 <textarea
                   value={newPost.content}
@@ -1440,12 +1460,12 @@ const OnlineCommunityForum: React.FC = () => {
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
-                  placeholder="Write your post content..."
+                  placeholder={t('forum.contentPlaceholder')}
                 />
         </div>
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Tags (comma-separated)
+                  {t('forum.tags')}
                 </label>
                 <input
                   type="text"
@@ -1456,7 +1476,7 @@ const OnlineCommunityForum: React.FC = () => {
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
-                  placeholder="e.g., React, JavaScript, Learning"
+                  placeholder={t('forum.tagsPlaceholder')}
                 />
       </div>
               <div className="flex justify-end space-x-3">
@@ -1464,14 +1484,14 @@ const OnlineCommunityForum: React.FC = () => {
                   onClick={() => setShowCreateModal(false)}
                   className="bg-gray-500 hover:bg-gray-600 text-white"
                 >
-                  Cancel
+                  {t('forum.cancel')}
                 </Button>
                 <Button
                   onClick={handleCreatePost}
                   disabled={creatingPost}
                   className="bg-green-600 hover:bg-green-700 text-white"
                 >
-                  {creatingPost ? 'Creating...' : 'Create Post'}
+                  {creatingPost ? t('forum.creating') : t('forum.createPost')}
                 </Button>
               </div>
             </div>
@@ -1485,7 +1505,7 @@ const OnlineCommunityForum: React.FC = () => {
           <div className={`w-full max-w-lg mx-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                {moderationAction === 'approve' ? 'Approve Post' : 'Reject Post'}
+                {moderationAction === 'approve' ? t('forum.approvePost') : t('forum.rejectPost')}
               </h2>
               <button
                 onClick={() => {
@@ -1510,7 +1530,7 @@ const OnlineCommunityForum: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Notes (optional)
+                  {t('forum.notes')}
                 </label>
                 <textarea
                   value={moderationNotes}
@@ -1521,7 +1541,7 @@ const OnlineCommunityForum: React.FC = () => {
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
-                  placeholder={`Add notes for ${moderationAction === 'approve' ? 'approval' : 'rejection'}...`}
+                  placeholder={t('forum.notesPlaceholder', { action: moderationAction === 'approve' ? t('forum.approve').toLowerCase() : t('forum.reject').toLowerCase() })}
                 />
               </div>
               <div className="flex justify-end space-x-3">
@@ -1534,7 +1554,7 @@ const OnlineCommunityForum: React.FC = () => {
                   }}
                   className="bg-gray-500 hover:bg-gray-600 text-white"
                 >
-                  Cancel
+                  {t('forum.cancel')}
                 </Button>
                 <Button
                   onClick={handleModeratePost}
@@ -1545,8 +1565,8 @@ const OnlineCommunityForum: React.FC = () => {
                   }
                 >
                   {isModerating 
-                    ? (moderationAction === 'approve' ? 'Approving...' : 'Rejecting...')
-                    : (moderationAction === 'approve' ? 'Approve' : 'Reject')
+                    ? (moderationAction === 'approve' ? t('forum.approving') : t('forum.rejecting'))
+                    : (moderationAction === 'approve' ? t('forum.approve') : t('forum.reject'))
                   }
                 </Button>
               </div>
@@ -1561,7 +1581,7 @@ const OnlineCommunityForum: React.FC = () => {
           <div className={`w-full max-w-2xl mx-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 max-h-[80vh] overflow-y-auto`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Comments
+                {t('forum.comments')}
               </h2>
               <button
                 onClick={() => {
@@ -1631,7 +1651,7 @@ const OnlineCommunityForum: React.FC = () => {
                               : theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                           }`}
                         >
-                          Like
+                          {t('forum.like')}
                         </button>
                         <button
                           type="button"
@@ -1645,14 +1665,14 @@ const OnlineCommunityForum: React.FC = () => {
                             theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                           }`}
                         >
-                          Reply
+                          {t('forum.reply')}
                         </button>
                         <span className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                           {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                         </span>
                         {commentLikesCount > 0 && (
                           <span className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {commentLikesCount} {commentLikesCount === 1 ? 'like' : 'likes'}
+                            {commentLikesCount} {t('forum.likes')}
                           </span>
                         )}
                       </div>
@@ -1670,7 +1690,7 @@ const OnlineCommunityForum: React.FC = () => {
                               className={`w-full resize-none bg-transparent text-sm ${
                                 theme === 'dark' ? 'text-white placeholder-gray-400' : 'text-gray-900 placeholder-gray-500'
                               } focus:outline-none`}
-                              placeholder="Write a reply..."
+                              placeholder={t('forum.writeReply')}
                               style={{ minHeight: '48px', maxHeight: '120px' }}
                               onInput={(e) => {
                                 const target = e.target as HTMLTextAreaElement
@@ -1702,7 +1722,7 @@ const OnlineCommunityForum: React.FC = () => {
                               disabled={postingReply || !replyContent.trim()}
                               className="text-sm font-medium px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              {postingReply ? 'Posting...' : 'Reply'}
+                              {postingReply ? t('forum.postingReply') : t('forum.reply')}
                             </button>
                           </div>
                         </div>
@@ -1713,7 +1733,7 @@ const OnlineCommunityForum: React.FC = () => {
               })}
               {(!comments[selectedPost.id] || comments[selectedPost.id].length === 0) && (
                 <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  No comments yet. Be the first to comment!
+                  {t('forum.noCommentsYet')}
                 </div>
               )}
             </div>
@@ -1742,7 +1762,7 @@ const OnlineCommunityForum: React.FC = () => {
                     className={`w-full resize-none bg-transparent text-sm ${
                       theme === 'dark' ? 'text-white placeholder-gray-400' : 'text-gray-900 placeholder-gray-500'
                     } focus:outline-none`}
-                    placeholder="Write a comment..."
+                    placeholder={t('forum.writeComment')}
                     style={{ minHeight: '36px', maxHeight: '120px' }}
                     onInput={(e) => {
                       const target = e.target as HTMLTextAreaElement
@@ -1771,7 +1791,7 @@ const OnlineCommunityForum: React.FC = () => {
                       disabled={postingComment || !newComment.trim()}
                       className="text-sm font-medium px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {postingComment ? 'Posting...' : 'Post'}
+                      {postingComment ? t('forum.posting') : t('forum.postComment')}
                     </button>
                   </div>
                 )}
@@ -1808,12 +1828,12 @@ const OnlineCommunityForum: React.FC = () => {
               {/* Mobile Forum Stats */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  FORUM STATS
+                  {t('forum.forumStats')}
                 </h3>
                 <div className="space-y-3">
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Posts:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.totalPosts')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {posts.length}
                       </span>
@@ -1821,7 +1841,7 @@ const OnlineCommunityForum: React.FC = () => {
                   </div>
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.bookmarked')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {bookmarks.size}
                       </span>
@@ -1833,7 +1853,7 @@ const OnlineCommunityForum: React.FC = () => {
               {/* Mobile Categories */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  CATEGORIES
+                  {t('forum.categories')}
                 </h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
@@ -1868,7 +1888,7 @@ const OnlineCommunityForum: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Dashboard
+                  {t('forum.backToDashboard')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1878,7 +1898,7 @@ const OnlineCommunityForum: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PersonIcon className="mr-3 w-4 h-4" />
-                  Profile Management
+                  {t('forum.profileManagement')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1888,7 +1908,7 @@ const OnlineCommunityForum: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <LibraryIcon className="mr-3 w-4 h-4" />
-                  Digital Library
+                  {t('forum.digitalLibrary')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1898,7 +1918,7 @@ const OnlineCommunityForum: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <NotificationsIcon className="mr-3 w-4 h-4" />
-                  Notifications
+                  {t('forum.notifications')}
                 </button>
               </div>
             </div>

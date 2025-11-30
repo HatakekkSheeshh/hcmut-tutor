@@ -1472,6 +1472,178 @@ export const managementAPI = {
   }
 };
 
+// ===== CHATBOT =====
+
+export const chatbotAPI = {
+  async chat(message: string, conversationId?: string) {
+    return fetchAPI('/chatbot/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, conversationId })
+    });
+  },
+
+  async getHistory(conversationId?: string, limit?: number) {
+    const params: any = {};
+    if (conversationId) params.conversationId = conversationId;
+    if (limit) params.limit = limit;
+    const query = Object.keys(params).length > 0 ? '?' + new URLSearchParams(params).toString() : '';
+    return fetchAPI(`/chatbot/history${query}`);
+  }
+};
+
+// ===== LIBRARY =====
+
+export const libraryAPI = {
+  async search(params?: {
+    q?: string;
+    subject?: string;
+    type?: string;
+    tags?: string[];
+    page?: number;
+    limit?: number;
+  }) {
+    const queryParams: any = {};
+    if (params?.q) queryParams.q = params.q;
+    if (params?.subject) queryParams.subject = params.subject;
+    if (params?.type) queryParams.type = params.type;
+    if (params?.tags && params.tags.length > 0) queryParams.tags = params.tags.join(',');
+    if (params?.page) queryParams.page = params.page.toString();
+    if (params?.limit) queryParams.limit = params.limit.toString();
+    
+    const query = Object.keys(queryParams).length > 0 ? '?' + new URLSearchParams(queryParams).toString() : '';
+    return fetchAPI(`/library/search${query}`);
+  },
+
+  async bookmark(materialId: string) {
+    return fetchAPI('/library/bookmarks', {
+      method: 'POST',
+      body: JSON.stringify({ materialId })
+    });
+  },
+
+  async getRecommendations(params?: {
+    userId?: string;
+    subject?: string;
+    limit?: number;
+  }) {
+    const queryParams: any = {};
+    if (params?.userId) queryParams.userId = params.userId;
+    if (params?.subject) queryParams.subject = params.subject;
+    if (params?.limit) queryParams.limit = params.limit.toString();
+    
+    const query = Object.keys(queryParams).length > 0 ? '?' + new URLSearchParams(queryParams).toString() : '';
+    return fetchAPI(`/library/recommendations${query}`);
+  },
+
+  async sync() {
+    return fetchAPI('/library/sync');
+  },
+
+  async createMaterial(material: {
+    title: string;
+    author: string;
+    subject: string;
+    type: 'book' | 'article' | 'thesis' | 'video' | 'other';
+    description?: string;
+    tags?: string[];
+    url?: string;
+    thumbnail?: string;
+    pdfFile?: File;
+  }) {
+    const formData = new FormData();
+    formData.append('title', material.title);
+    formData.append('author', material.author);
+    formData.append('subject', material.subject);
+    formData.append('type', material.type);
+    if (material.description) formData.append('description', material.description);
+    if (material.tags) formData.append('tags', Array.isArray(material.tags) ? material.tags.join(',') : material.tags);
+    if (material.url) formData.append('url', material.url);
+    if (material.thumbnail) formData.append('thumbnail', material.thumbnail);
+    if (material.pdfFile) formData.append('pdfFile', material.pdfFile);
+
+    const token = getToken();
+    const headers: Record<string, string> = {};
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const url = `${API_BASE_URL}/library/materials`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    const data = await response.json();
+    return data;
+  },
+
+  async updateMaterial(materialId: string, updates: {
+    title?: string;
+    author?: string;
+    subject?: string;
+    type?: 'book' | 'article' | 'thesis' | 'video' | 'other';
+    description?: string;
+    tags?: string[];
+    url?: string;
+    thumbnail?: string;
+    pdfFile?: File;
+  }) {
+    const formData = new FormData();
+    if (updates.title) formData.append('title', updates.title);
+    if (updates.author) formData.append('author', updates.author);
+    if (updates.subject) formData.append('subject', updates.subject);
+    if (updates.type) formData.append('type', updates.type);
+    if (updates.description) formData.append('description', updates.description);
+    if (updates.tags) formData.append('tags', Array.isArray(updates.tags) ? updates.tags.join(',') : updates.tags);
+    if (updates.url) formData.append('url', updates.url);
+    if (updates.thumbnail) formData.append('thumbnail', updates.thumbnail);
+    if (updates.pdfFile) formData.append('pdfFile', updates.pdfFile);
+
+    const token = getToken();
+    const headers: Record<string, string> = {};
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const url = `${API_BASE_URL}/library/materials/${materialId}`;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers,
+      body: formData
+    });
+
+    const data = await response.json();
+    return data;
+  },
+
+  async deleteMaterial(materialId: string) {
+    return fetchAPI(`/library/materials/${materialId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  getPreviewUrl(materialId: string, filename?: string): string {
+    const token = getToken();
+    const params = new URLSearchParams();
+    if (token) params.append('token', token);
+    if (filename) params.append('filename', filename);
+    const queryString = params.toString();
+    return `${API_BASE_URL}/library/preview/${materialId}${queryString ? `?${queryString}` : ''}`;
+  },
+
+  getDownloadUrl(materialId: string): string {
+    const token = getToken();
+    const params = new URLSearchParams();
+    if (token) params.append('token', token);
+    params.append('download', 'true');
+    const queryString = params.toString();
+    return `${API_BASE_URL}/library/preview/${materialId}?${queryString}`;
+  }
+};
+
 // ===== EXPORT ALL =====
 
 export const api = {
@@ -1498,7 +1670,9 @@ export const api = {
   sessionRequests: sessionRequestsAPI,
   conversations: conversationsAPI,
   upload: uploadAPI,
-  management: managementAPI
+  management: managementAPI,
+  chatbot: chatbotAPI,
+  library: libraryAPI
 };
 
 export default api;

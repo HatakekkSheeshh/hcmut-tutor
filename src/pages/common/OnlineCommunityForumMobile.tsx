@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { 
   Search,
   FilterList,
@@ -20,7 +21,8 @@ import {
   Close as CloseIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
-  ArrowForward as ArrowForwardIcon
+  ArrowForward as ArrowForwardIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -58,6 +60,7 @@ interface ForumComment {
 const BOOKMARKS_STORAGE_KEY = 'forum_bookmarks'
 
 const OnlineCommunityForumMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -66,6 +69,16 @@ const OnlineCommunityForumMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [posts, setPosts] = useState<ForumPost[]>([])
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<any>(null)
@@ -244,7 +257,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
       }).catch(() => {})
     } else {
       navigator.clipboard.writeText(window.location.href)
-      alert('Link copied to clipboard!')
+      alert(t('forum.linkCopied'))
     }
   }
 
@@ -261,7 +274,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
 
   const handleCreatePost = async () => {
     if (!newPost.title.trim() || !newPost.content.trim()) {
-      alert('Please fill in title and content')
+      alert(t('forum.fillTitleAndContent'))
       return
     }
 
@@ -282,7 +295,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
       }
     } catch (error) {
       console.error('Error creating post:', error)
-      alert('Failed to create post')
+      alert(t('forum.failedToCreate'))
     } finally {
       setCreatingPost(false)
     }
@@ -366,10 +379,10 @@ const OnlineCommunityForumMobile: React.FC = () => {
   }
 
   const sortOptions = [
-    { name: 'Most Recent', value: 'recent' },
-    { name: 'Most Popular', value: 'popular' },
-    { name: 'Most Liked', value: 'liked' },
-    { name: 'Most Commented', value: 'commented' }
+    { name: t('forum.mostRecent'), value: 'recent' },
+    { name: t('forum.mostPopular'), value: 'popular' },
+    { name: t('forum.mostLiked'), value: 'liked' },
+    { name: t('forum.mostCommented'), value: 'commented' }
   ]
 
   return (
@@ -386,14 +399,21 @@ const OnlineCommunityForumMobile: React.FC = () => {
             </div>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Community Forum
+                {t('forum.title')}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Connect and share knowledge
+                {t('forum.subtitle')}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
+            <button
+              onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+              title={t('forum.language')}
+            >
+              <LanguageIcon className="w-5 h-5" />
+            </button>
             <button
               onClick={handleThemeToggle}
               className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
@@ -416,25 +436,25 @@ const OnlineCommunityForumMobile: React.FC = () => {
         {/* Forum Stats - Mobile */}
         <div className={`p-4 rounded-lg border ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <h3 className={`text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Forum Statistics
+            {t('forum.forumStatistics')}
           </h3>
           <div className="grid grid-cols-3 gap-3">
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
                 <div className="text-xl font-bold text-blue-600 mb-1">{posts.length}</div>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Posts</div>
+                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.total')}</div>
               </div>
             </div>
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
                 <div className="text-xl font-bold text-green-600 mb-1">{bookmarks.size}</div>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked</div>
+                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.bookmarked')}</div>
               </div>
             </div>
             <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="text-center">
                 <div className="text-xl font-bold text-purple-600 mb-1">-</div>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Active Users</div>
+                <div className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.activeUsers')}</div>
               </div>
             </div>
           </div>
@@ -450,12 +470,12 @@ const OnlineCommunityForumMobile: React.FC = () => {
           }}
         >
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Search & Filter
+            {t('forum.searchAndFilter')}
           </h3>
           <div className="relative mb-4">
             <input
               type="text"
-              placeholder="Search posts..."
+              placeholder={t('forum.searchPostsPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full px-4 py-3 pl-10 rounded-lg border ${
@@ -479,7 +499,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
             } transition-colors`}
           >
             <FilterList className="w-4 h-4 mr-2" />
-            Advanced Filters
+            {t('forum.advancedFilters')}
             <div className={`ml-2 transform transition-transform ${showFilters ? 'rotate-180' : ''}`}>
               <ArrowForwardIcon className="w-4 h-4" />
             </div>
@@ -491,7 +511,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
               <div className="space-y-3">
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Category
+                    {t('forum.category')}
                   </label>
                   <div className="grid grid-cols-1 gap-2">
                     {categories.map((category) => (
@@ -511,7 +531,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                 </div>
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Sort By
+                    {t('forum.sortBy')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {sortOptions.map((option) => (
@@ -545,7 +565,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
             } transition-colors`}
           >
             <Add className="w-4 h-4 mr-2" />
-            Create Post
+            {t('forum.createPost')}
           </button>
           <button 
             className={`flex items-center justify-center px-4 py-3 rounded-lg border ${
@@ -555,18 +575,18 @@ const OnlineCommunityForumMobile: React.FC = () => {
             } transition-colors`}
           >
             <TrendingUp className="w-4 h-4 mr-2" />
-            Trending
+            {t('forum.trendingPosts')}
           </button>
         </div>
 
         {/* Posts List - Mobile */}
         {loading ? (
           <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            Loading posts...
+            {t('forum.loadingPosts')}
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            No posts found. Be the first to create a post!
+            {t('forum.noPostsFound')}
           </div>
         ) : (
         <div className="space-y-3">
@@ -659,7 +679,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                     ))}
                     {post.tags.length > 3 && (
                       <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                        +{post.tags.length - 3} more
+                        +{post.tags.length - 3} {t('forum.more')}
                       </span>
                     )}
                   </div>
@@ -695,7 +715,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                           <span className="text-sm">{post.views || 0}</span>
                     </button>
                   </div>
-                  <Button 
+                    <Button 
                     size="small" 
                     variant="outlined"
                     style={{
@@ -712,7 +732,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                       e.currentTarget.style.backgroundColor = theme === 'dark' ? '#000000' : '#ffffff'
                     }}
                   >
-                    Read More
+                    {t('forum.readMore')}
                   </Button>
                 </div>
               </div>
@@ -729,7 +749,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
             className={`w-full flex items-center justify-between p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
           >
             <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Need Help?
+              {t('forum.needHelp')}
             </h3>
             <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
               <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
@@ -745,7 +765,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                 >
                   <ArrowBackIcon className="w-6 h-6 text-blue-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Dashboard
+                    {t('forum.dashboard')}
                   </span>
                 </button>
                 <button 
@@ -754,7 +774,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                 >
                   <PersonIcon className="w-6 h-6 text-green-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Profile
+                    {t('forum.profile')}
                   </span>
                 </button>
                 <button 
@@ -763,7 +783,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                 >
                   <LibraryIcon className="w-6 h-6 text-purple-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Library
+                    {t('forum.library')}
                   </span>
                 </button>
                 <button 
@@ -772,7 +792,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                 >
                   <NotificationsIcon className="w-6 h-6 text-orange-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Notifications
+                    {t('forum.notifications')}
                   </span>
                 </button>
               </div>
@@ -787,7 +807,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
           <div className={`w-full max-w-lg rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 max-h-[90vh] overflow-y-auto`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Create New Post
+                {t('forum.createNewPost')}
               </h2>
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -799,7 +819,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Title
+                  {t('forum.title')}
                 </label>
                 <input
                   type="text"
@@ -810,12 +830,12 @@ const OnlineCommunityForumMobile: React.FC = () => {
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
-                  placeholder="Enter post title..."
+                  placeholder={t('forum.titlePlaceholder')}
                 />
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Category
+                  {t('forum.category')}
                 </label>
                 <select
                   value={newPost.category}
@@ -833,7 +853,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Content
+                  {t('forum.content')}
                 </label>
                 <textarea
                   value={newPost.content}
@@ -844,12 +864,12 @@ const OnlineCommunityForumMobile: React.FC = () => {
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
-                  placeholder="Write your post content..."
+                  placeholder={t('forum.contentPlaceholder')}
                 />
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Tags (comma-separated)
+                  {t('forum.tags')}
                 </label>
                 <input
                   type="text"
@@ -860,7 +880,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
-                  placeholder="e.g., React, JavaScript, Learning"
+                  placeholder={t('forum.tagsPlaceholder')}
                 />
               </div>
               <div className="flex justify-end space-x-3">
@@ -868,14 +888,14 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   onClick={() => setShowCreateModal(false)}
                   className="bg-gray-500 hover:bg-gray-600 text-white"
                 >
-                  Cancel
+                  {t('forum.cancel')}
                 </Button>
                 <Button
                   onClick={handleCreatePost}
                   disabled={creatingPost}
                   className="bg-green-600 hover:bg-green-700 text-white"
                 >
-                  {creatingPost ? 'Creating...' : 'Create Post'}
+                  {creatingPost ? t('forum.creating') : t('forum.createPost')}
                 </Button>
               </div>
             </div>
@@ -889,7 +909,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
           <div className={`w-full max-w-lg rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 max-h-[80vh] overflow-y-auto`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Comments
+                {t('forum.comments')}
               </h2>
               <button
                 onClick={() => {
@@ -930,7 +950,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
               })}
               {(!comments[selectedPost.id] || comments[selectedPost.id].length === 0) && (
                 <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  No comments yet. Be the first to comment!
+                  {t('forum.noCommentsYet')}
                 </div>
               )}
             </div>
@@ -944,7 +964,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                     ? 'bg-gray-700 border-gray-600 text-white' 
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
-                placeholder="Write a comment..."
+                placeholder={t('forum.writeComment')}
               />
               <div className="flex justify-end">
                 <Button
@@ -952,7 +972,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   disabled={postingComment || !newComment.trim()}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  {postingComment ? 'Posting...' : 'Post Comment'}
+                  {postingComment ? t('forum.posting') : t('forum.postComment')}
                 </Button>
               </div>
             </div>
@@ -990,12 +1010,12 @@ const OnlineCommunityForumMobile: React.FC = () => {
               {/* Mobile Forum Stats */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  FORUM STATS
+                  {t('forum.forumStats')}
                 </h3>
                 <div className="space-y-3">
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Total Posts:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.totalPosts')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {posts.length}
                       </span>
@@ -1003,7 +1023,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   </div>
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Bookmarked:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.bookmarked')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         {bookmarks.size}
                       </span>
@@ -1011,7 +1031,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   </div>
                   <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Active Users:</span>
+                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('forum.activeUsers')}</span>
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>-</span>
                     </div>
                   </div>
@@ -1021,7 +1041,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
               {/* Mobile Categories */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  CATEGORIES
+                  {t('forum.categories')}
                 </h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
@@ -1056,7 +1076,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                 >
                   <ArrowBackIcon className="mr-3 w-4 h-4" />
-                  Back to Dashboard
+                  {t('forum.backToDashboard')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1066,7 +1086,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PersonIcon className="mr-3 w-4 h-4" />
-                  Profile Management
+                  {t('forum.profileManagement')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1076,7 +1096,7 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <LibraryIcon className="mr-3 w-4 h-4" />
-                  Digital Library
+                  {t('forum.digitalLibrary')}
                 </button>
                 <button 
                   onClick={() => {
@@ -1086,14 +1106,14 @@ const OnlineCommunityForumMobile: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <NotificationsIcon className="mr-3 w-4 h-4" />
-                  Notifications
+                  {t('forum.notifications')}
                 </button>
               </div>
 
               {/* Mobile Settings */}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  SETTINGS
+                  {t('forum.settings')}
                 </h3>
                 <div className="space-y-2">
                   <button 
@@ -1101,8 +1121,34 @@ const OnlineCommunityForumMobile: React.FC = () => {
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   >
                     {theme === 'dark' ? <LightModeIcon className="mr-3 w-4 h-4" /> : <DarkModeIcon className="mr-3 w-4 h-4" />}
-                    {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                    {theme === 'dark' ? t('forum.switchToLight') : t('forum.switchToDark')}
                   </button>
+                  <div className="flex items-center space-x-2 pt-2">
+                    <button
+                      onClick={() => changeLanguage('en')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentLang === 'en'
+                          ? 'bg-blue-600 text-white'
+                          : theme === 'dark'
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {t('forum.english')}
+                    </button>
+                    <button
+                      onClick={() => changeLanguage('vi')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentLang === 'vi'
+                          ? 'bg-blue-600 text-white'
+                          : theme === 'dark'
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {t('forum.vietnamese')}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

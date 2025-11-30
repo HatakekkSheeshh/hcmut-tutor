@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import api from '../../lib/api'
@@ -28,14 +29,17 @@ import {
   BarChart as BarChartIcon,
   Star,
   Group as GroupIcon,
-  AccessTime
+  AccessTime,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import { Tabs, Tab, Box } from '@mui/material'
 
 const SessionsListMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
   
   // Check URL params for initial tab
   const initialTab = searchParams.get('view') === 'classes' ? 1 : 0
@@ -48,6 +52,15 @@ const SessionsListMobile: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [tutors, setTutors] = useState<{ [key: string]: any }>({})
   const [activeMenu, setActiveMenu] = useState('session-detail')
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+  
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
 
   // Sync tab with URL params
   useEffect(() => {
@@ -77,14 +90,14 @@ const SessionsListMobile: React.FC = () => {
 
   // Menu items for navigation
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
-    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
-    { id: 'book-session', label: 'Book Session', icon: <School />, path: '/student/book' },
-    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'evaluate-session', label: 'Evaluate Session', icon: <Star />, path: '/student/evaluate' },
-    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
+    { id: 'dashboard', label: t('dashboard.menu.dashboard'), icon: <DashboardIcon />, path: '/student' },
+    { id: 'search-tutors', label: t('dashboard.menu.findTutors'), icon: <PersonSearch />, path: '/student/search' },
+    { id: 'book-session', label: t('dashboard.menu.bookSession'), icon: <School />, path: '/student/book' },
+    { id: 'view-progress', label: t('dashboard.menu.viewProgress'), icon: <BarChartIcon />, path: '/student/progress' },
+    { id: 'evaluate-session', label: t('dashboard.menu.evaluateSession'), icon: <Star />, path: '/student/evaluate' },
+    { id: 'session-detail', label: t('dashboard.menu.sessionDetails'), icon: <Class />, path: '/student/session' },
+    { id: 'chatbot-support', label: t('dashboard.menu.aiSupport'), icon: <SmartToyIcon />, path: '/student/chatbot' },
+    { id: 'messages', label: t('dashboard.menu.messages'), icon: <ChatIcon />, path: '/student/messages' }
   ]
 
   useEffect(() => {
@@ -205,14 +218,7 @@ const SessionsListMobile: React.FC = () => {
   }
 
   const getStatusLabel = (status: string) => {
-    const labels: any = {
-      pending: 'Pending',
-      confirmed: 'Confirmed',
-      completed: 'Completed',
-      cancelled: 'Cancelled',
-      rescheduled: 'Rescheduled'
-    }
-    return labels[status] || status
+    return t(`sessionsList.statusLabels.${status}`, status)
   }
 
   const formatDate = (isoString: string) => {
@@ -267,7 +273,7 @@ const SessionsListMobile: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            Loading sessions...
+            {t('sessionsList.loading')}
           </p>
         </div>
       </div>
@@ -288,12 +294,12 @@ const SessionsListMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                {currentTab === 0 ? 'My Sessions' : 'My Classes'}
+                {currentTab === 0 ? t('sessionsList.title') : t('sessionsList.titleClasses')}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                 {currentTab === 0 
-                  ? `${filteredSessions.length} session${filteredSessions.length !== 1 ? 's' : ''}`
-                  : `${filteredEnrollments.length} class${filteredEnrollments.length !== 1 ? 'es' : ''} enrolled`
+                  ? `${filteredSessions.length} ${filteredSessions.length !== 1 ? t('sessionsList.sessionsPlural') : t('sessionsList.session')}`
+                  : `${filteredEnrollments.length} ${filteredEnrollments.length !== 1 ? t('sessionsList.classesPlural') : t('sessionsList.class')} ${t('sessionsList.enrolled')}`
                 }
               </p>
             </div>
@@ -338,13 +344,13 @@ const SessionsListMobile: React.FC = () => {
           >
             <Tab 
               icon={<Schedule sx={{ fontSize: 20 }} />} 
-              label="Sessions" 
+              label={t('sessionsList.sessions')} 
               iconPosition="start"
               sx={{ textTransform: 'none', fontWeight: 600, minWidth: 0, px: 1 }}
             />
             <Tab 
               icon={<ClassIcon sx={{ fontSize: 20 }} />} 
-              label="Classes" 
+              label={t('sessionsList.classes')} 
               iconPosition="start"
               sx={{ textTransform: 'none', fontWeight: 600, minWidth: 0, px: 1 }}
             />
@@ -356,14 +362,14 @@ const SessionsListMobile: React.FC = () => {
       <div className="p-4 pt-0">
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
-            <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total</p>
+            <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('sessionsList.totalSessions')}</p>
             <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               {currentTab === 0 ? stats.total : classStats.total}
             </p>
           </div>
           <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
             <p className={`text-xs mb-1 text-green-500`}>
-              {currentTab === 0 ? 'Confirmed' : 'Active'}
+              {currentTab === 0 ? t('sessionsList.statusLabels.confirmed') : t('sessionsList.statusLabels.active')}
             </p>
             <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               {currentTab === 0 ? stats.confirmed : classStats.active}
@@ -381,19 +387,19 @@ const SessionsListMobile: React.FC = () => {
           <div className="text-center py-12">
             <Schedule className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
             <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              No sessions found
+              {t('sessionsList.noSessionsFound')}
             </h3>
             <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               {filter === 'all' 
-                ? "You haven't booked any sessions yet."
-                : `No ${filter} sessions at the moment.`
+                ? t('sessionsList.noSessionsBooked')
+                : t('sessionsList.noFilterSessions', { filter: getStatusLabel(filter) })
               }
             </p>
             <button
               onClick={() => navigate('/student/book')}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
             >
-              Book Your First Session
+              {t('sessionsList.bookFirstSession')}
             </button>
           </div>
         ) : (
@@ -446,7 +452,7 @@ const SessionsListMobile: React.FC = () => {
                       <LocationOn className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                     )}
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {session.isOnline ? 'Online' : 'In-Person'} • {session.duration} mins
+                      {session.isOnline ? t('sessionsList.online') : t('sessionsList.inPerson')} • {session.duration} {t('sessionsList.minutes')}
                     </p>
                   </div>
                 </div>
@@ -460,16 +466,16 @@ const SessionsListMobile: React.FC = () => {
             <div className="text-center py-12">
               <ClassIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
               <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                No classes enrolled
+                {t('sessionsList.noClassesEnrolled')}
               </h3>
               <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                You haven't enrolled in any classes yet.
+                {t('sessionsList.noClassesYet')}
               </p>
               <button
                 onClick={() => navigate('/student/book')}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
               >
-                Browse Classes
+                {t('sessionsList.browseClasses')}
               </button>
             </div>
           ) : (
@@ -518,21 +524,21 @@ const SessionsListMobile: React.FC = () => {
                       <div className="flex items-center">
                         <CalendarToday className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                          Every {classData.day.charAt(0).toUpperCase() + classData.day.slice(1)} • {classData.startTime} - {classData.endTime}
+                          {t('sessionsList.every')} {classData.day.charAt(0).toUpperCase() + classData.day.slice(1)} • {classData.startTime} - {classData.endTime}
                         </p>
                       </div>
 
                       <div className="flex items-center">
                         <AccessTime className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                          {classData.duration} minutes per session
+                          {classData.duration} {t('sessionsList.minutes')} {t('sessionsList.perSession')}
                         </p>
                       </div>
 
                       <div className="flex items-center">
                         <GroupIcon className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                          {classData.currentEnrollment} / {classData.maxStudents} students enrolled
+                          {classData.currentEnrollment} / {classData.maxStudents} {t('sessionsList.studentsEnrolled')}
                         </p>
                       </div>
                     </div>
@@ -576,7 +582,7 @@ const SessionsListMobile: React.FC = () => {
                 {/* Quick Actions - Moved to top */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    QUICK ACTIONS
+                    {t('sessionsList.quickActions')}
                   </h3>
                   <div className="space-y-2">
                     <button 
@@ -587,7 +593,17 @@ const SessionsListMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                     >
                       <ArrowBackIcon className="mr-3 w-4 h-4" />
-                      Back to Dashboard
+                      {t('sessionsList.backToDashboard')}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                     </button>
                   </div>
                 </div>
@@ -595,20 +611,20 @@ const SessionsListMobile: React.FC = () => {
               {/* Overview */}
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Overview
+                  {t('sessionsList.overview')}
                 </h3>
                 <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-blue-50'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Total Sessions</span>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('sessionsList.totalSessions')}</span>
                     <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-blue-900'}`}>{stats.total}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     <div className={`text-center p-2 rounded ${theme === 'dark' ? 'bg-gray-600' : 'bg-white'}`}>
-                      <p className="text-xs text-green-500 font-medium">Confirmed</p>
+                      <p className="text-xs text-green-500 font-medium">{t('sessionsList.statusLabels.confirmed')}</p>
                       <p className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.confirmed}</p>
                     </div>
                     <div className={`text-center p-2 rounded ${theme === 'dark' ? 'bg-gray-600' : 'bg-white'}`}>
-                      <p className="text-xs text-yellow-500 font-medium">Pending</p>
+                      <p className="text-xs text-yellow-500 font-medium">{t('sessionsList.statusLabels.pending')}</p>
                       <p className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.pending}</p>
                     </div>
                   </div>
@@ -619,7 +635,7 @@ const SessionsListMobile: React.FC = () => {
               <div className="mb-8">
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                   <FilterListIcon className="w-4 h-4 inline mr-1" />
-                  Filters
+                  {t('sessionsList.filters')}
                 </h3>
                 <div className="space-y-2">
                   <button
@@ -635,7 +651,7 @@ const SessionsListMobile: React.FC = () => {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <span className="text-sm font-medium">All Sessions</span>
+                    <span className="text-sm font-medium">{t('sessionsList.allSessions')}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       filter === 'all'
                         ? 'bg-blue-500 text-white'
@@ -657,7 +673,7 @@ const SessionsListMobile: React.FC = () => {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <span className="text-sm font-medium">Pending</span>
+                    <span className="text-sm font-medium">{t('sessionsList.statusLabels.pending')}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       filter === 'pending'
                         ? 'bg-yellow-500 text-white'
@@ -679,7 +695,7 @@ const SessionsListMobile: React.FC = () => {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <span className="text-sm font-medium">Confirmed</span>
+                    <span className="text-sm font-medium">{t('sessionsList.statusLabels.confirmed')}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       filter === 'confirmed'
                         ? 'bg-green-500 text-white'
@@ -701,7 +717,7 @@ const SessionsListMobile: React.FC = () => {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <span className="text-sm font-medium">Completed</span>
+                    <span className="text-sm font-medium">{t('sessionsList.statusLabels.completed')}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       filter === 'completed'
                         ? 'bg-blue-500 text-white'
@@ -723,7 +739,7 @@ const SessionsListMobile: React.FC = () => {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <span className="text-sm font-medium">Cancelled</span>
+                    <span className="text-sm font-medium">{t('sessionsList.statusLabels.cancelled')}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       filter === 'cancelled'
                         ? 'bg-red-500 text-white'

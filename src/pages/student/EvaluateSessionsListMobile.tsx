@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { Avatar } from '@mui/material'
@@ -21,19 +22,31 @@ import {
   Class,
   SmartToy as SmartToyIcon,
   Chat as ChatIcon,
-  BarChart as BarChartIcon
+  BarChart as BarChartIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import api from '../../lib/api'
 
 const EvaluateSessionsListMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
   const [filterStatus, setFilterStatus] = useState<'all' | 'evaluated' | 'pending'>('pending')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeMenu, setActiveMenu] = useState('evaluate-session')
   const [loading, setLoading] = useState(true)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+  
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [sessions, setSessions] = useState<any[]>([])
   const [tutors, setTutors] = useState<{ [key: string]: any }>({})
   const [evaluations, setEvaluations] = useState<{ [key: string]: any }>({})
@@ -129,14 +142,14 @@ const EvaluateSessionsListMobile: React.FC = () => {
 
   // Menu items for navigation
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
-    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
-    { id: 'book-session', label: 'Book Session', icon: <School />, path: '/student/book' },
-    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
-    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
+    { id: 'dashboard', label: t('dashboard.menu.dashboard'), icon: <DashboardIcon />, path: '/student' },
+    { id: 'search-tutors', label: t('dashboard.menu.findTutors'), icon: <PersonSearch />, path: '/student/search' },
+    { id: 'book-session', label: t('dashboard.menu.bookSession'), icon: <School />, path: '/student/book' },
+    { id: 'view-progress', label: t('dashboard.menu.viewProgress'), icon: <BarChartIcon />, path: '/student/progress' },
+    { id: 'evaluate-session', label: t('dashboard.menu.evaluateSession'), icon: <StarIcon />, path: '/student/evaluate' },
+    { id: 'session-detail', label: t('dashboard.menu.sessionDetails'), icon: <Class />, path: '/student/session' },
+    { id: 'chatbot-support', label: t('dashboard.menu.aiSupport'), icon: <SmartToyIcon />, path: '/student/chatbot' },
+    { id: 'messages', label: t('dashboard.menu.messages'), icon: <ChatIcon />, path: '/student/messages' }
   ]
 
   // Filter sessions based on evaluation status
@@ -207,10 +220,10 @@ const EvaluateSessionsListMobile: React.FC = () => {
             </button>
             <div>
               <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Evaluate Sessions
+                {t('evaluateSessionsList.title')}
               </h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Rate your completed sessions
+                {t('evaluateSessionsList.subtitle')}
               </p>
             </div>
           </div>
@@ -240,7 +253,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Loading sessions...
+                {t('evaluateSessionsList.loading')}
               </p>
             </div>
           </div>
@@ -253,7 +266,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
               {stats.total}
             </div>
             <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Total
+              {t('evaluateSessionsList.totalSessions')}
             </div>
           </div>
           <div className={`p-3 rounded-lg text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-green-50'}`}>
@@ -261,7 +274,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
               {stats.evaluated}
             </div>
             <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Evaluated
+              {t('evaluateSessionsList.evaluated')}
             </div>
           </div>
           <div className={`p-3 rounded-lg text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-yellow-50'}`}>
@@ -269,7 +282,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
               {stats.pending}
             </div>
             <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Pending
+              {t('evaluateSessionsList.pending')}
             </div>
           </div>
         </div>
@@ -287,7 +300,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
                     : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Pending ({stats.pending})
+              {t('evaluateSessionsList.filters.pending')} ({stats.pending})
             </button>
             <button
               onClick={() => setFilterStatus('evaluated')}
@@ -299,7 +312,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
                     : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Done ({stats.evaluated})
+              {t('evaluateSessionsList.filters.done')} ({stats.evaluated})
             </button>
             <button
               onClick={() => setFilterStatus('all')}
@@ -311,7 +324,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
                     : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              All ({stats.total})
+              {t('evaluateSessionsList.filters.all')} ({stats.total})
             </button>
           </div>
         </div>
@@ -321,18 +334,18 @@ const EvaluateSessionsListMobile: React.FC = () => {
           <div className="text-center py-16">
             <RateReviewIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
             <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              No Sessions Found
+              {t('evaluateSessionsList.noSessionsFound')}
             </h3>
             <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              {filterStatus === 'pending' && 'All sessions have been evaluated!'}
-              {filterStatus === 'evaluated' && 'No evaluations yet.'}
-              {filterStatus === 'all' && 'No completed sessions available.'}
+              {filterStatus === 'pending' && t('evaluateSessionsList.allEvaluated')}
+              {filterStatus === 'evaluated' && t('evaluateSessionsList.noEvaluations')}
+              {filterStatus === 'all' && t('evaluateSessionsList.noCompletedSessions')}
             </p>
             <Button 
               onClick={() => navigate('/student')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
             >
-              Back to Dashboard
+              {t('evaluateSessionsList.backToDashboard')}
             </Button>
           </div>
         ) : (
@@ -381,12 +394,12 @@ const EvaluateSessionsListMobile: React.FC = () => {
                     {hasEvaluation ? (
                       <div className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded-full ml-2 flex-shrink-0">
                         <CheckCircleIcon className="w-3 h-3 mr-1" />
-                        <span className="text-xs font-medium">Done</span>
+                        <span className="text-xs font-medium">{t('evaluateSessionsList.filters.done')}</span>
                       </div>
                     ) : (
                       <div className="flex items-center bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full ml-2 flex-shrink-0">
                         <RateReviewIcon className="w-3 h-3 mr-1" />
-                        <span className="text-xs font-medium">Pending</span>
+                        <span className="text-xs font-medium">{t('evaluateSessionsList.pending')}</span>
                       </div>
                     )}
                   </div>
@@ -417,14 +430,14 @@ const EvaluateSessionsListMobile: React.FC = () => {
                         <>
                           <VideoCallIcon className={`w-3.5 h-3.5 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                           <span className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            Online Session
+                            {t('evaluateSessionsList.onlineSession')}
                           </span>
                         </>
                       ) : (
                         <>
                           <LocationOnIcon className={`w-3.5 h-3.5 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                           <span className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            {session.location || 'In-Person'}
+                            {session.location || t('evaluateSessionsList.inPerson')}
                           </span>
                         </>
                       )}
@@ -436,7 +449,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
                     <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} mb-3`}>
                       <div className="flex items-center justify-between">
                         <span className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                          Your Rating:
+                          {t('evaluateSessionsList.yourRating')}
                         </span>
                         <div className="flex items-center">
                           {[...Array(5)].map((_, i) => (
@@ -468,7 +481,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
                       navigate(`/student/evaluate/${session.id}`)
                     }}
                   >
-                    {hasEvaluation ? 'View Evaluation' : 'Evaluate Session'}
+                    {hasEvaluation ? t('evaluateSessionsList.viewEvaluation') : t('evaluateSessionsList.evaluateSession')}
                   </Button>
                 </div>
               </Card>
@@ -512,7 +525,7 @@ const EvaluateSessionsListMobile: React.FC = () => {
                 {/* Quick Actions - Moved to top */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    QUICK ACTIONS
+                    {t('evaluateSessionsList.quickActions')}
                   </h3>
                   <div className="space-y-2">
                     <button 
@@ -523,7 +536,17 @@ const EvaluateSessionsListMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                     >
                       <ArrowBackIcon className="mr-3 w-4 h-4" />
-                      Back to Dashboard
+                      {t('evaluateSessionsList.backToDashboard')}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                     </button>
                   </div>
                 </div>

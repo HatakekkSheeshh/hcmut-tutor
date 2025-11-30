@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card'
@@ -46,15 +47,23 @@ import {
   CalendarMonth,
   Logout as LogoutIcon,
   MenuBook as MenuBookIcon,
-  Forum as ForumIcon
+  Forum as ForumIcon,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 
 const StudentDashboard: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [activeMenu, setActiveMenu] = useState('dashboard')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showThemeOptions, setShowThemeOptions] = useState(false)
+  const [currentLang, setCurrentLang] = useState(i18n.language)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
   
   // User data with caching
   const { data: user, isLoading: userLoading } = useAuthMe()
@@ -156,6 +165,11 @@ const StudentDashboard: React.FC = () => {
     }
   }, [user, userLoading, navigate])
 
+  // Sync currentLang with i18n.language
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
+
   // Weather API function
   const fetchWeather = async () => {
     try {
@@ -247,9 +261,9 @@ const StudentDashboard: React.FC = () => {
   // Get greeting based on time
   const getGreeting = () => {
     const hour = currentTime.getHours()
-    if (hour < 12) return 'Good Morning'
-    if (hour < 18) return 'Good Afternoon'
-    return 'Good Evening'
+    if (hour < 12) return t('dashboard.greetingMorning')
+    if (hour < 18) return t('dashboard.greetingAfternoon')
+    return t('dashboard.greetingEvening')
   }
 
   // useEffect for time and weather
@@ -278,9 +292,9 @@ const StudentDashboard: React.FC = () => {
   const totalClasses = enrollments.length
   
   const stats = [
-    { title: 'Enrolled Classes', value: totalClasses.toString(), icon: <SchoolIcon /> },
-    { title: 'Total Sessions', value: totalSessions.toString(), icon: <CheckCircleIcon /> },
-    { title: 'Upcoming', value: upcomingSessions.toString(), icon: <AutorenewIcon /> }
+    { title: t('dashboard.enrolledClasses'), value: totalClasses.toString(), icon: <SchoolIcon /> },
+    { title: t('dashboard.totalSessions'), value: totalSessions.toString(), icon: <CheckCircleIcon /> },
+    { title: t('dashboard.upcoming'), value: upcomingSessions.toString(), icon: <AutorenewIcon /> }
   ]
 
   // Map sessions to course format for UI (only show upcoming/confirmed sessions)
@@ -419,17 +433,17 @@ const StudentDashboard: React.FC = () => {
   }
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
-    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
-    { id: 'book-session', label: 'Book Session', icon: <SchoolIcon />, path: '/student/book' },
-    { id: 'calendar', label: 'Calendar', icon: <CalendarMonth />, path: '/student/calendar' },
-    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'evaluate-session', label: 'Evaluate Session', icon: <StarIcon />, path: '/student/evaluate' },
-    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' },
-    { id: 'library', label: 'Digital Library', icon: <MenuBookIcon />, path: '/common/library' },
-    { id: 'forum', label: 'Community Forum', icon: <ForumIcon />, path: '/common/forum' }
+    { id: 'dashboard', label: t('dashboard.menu.dashboard'), icon: <DashboardIcon />, path: '/student' },
+    { id: 'search-tutors', label: t('dashboard.menu.findTutors'), icon: <PersonSearch />, path: '/student/search' },
+    { id: 'book-session', label: t('dashboard.menu.bookSession'), icon: <SchoolIcon />, path: '/student/book' },
+    { id: 'calendar', label: t('dashboard.menu.calendar'), icon: <CalendarMonth />, path: '/student/calendar' },
+    { id: 'view-progress', label: t('dashboard.menu.viewProgress'), icon: <BarChartIcon />, path: '/student/progress' },
+    { id: 'evaluate-session', label: t('dashboard.menu.evaluateSession'), icon: <StarIcon />, path: '/student/evaluate' },
+    { id: 'session-detail', label: t('dashboard.menu.sessionDetails'), icon: <Class />, path: '/student/session' },
+    { id: 'chatbot-support', label: t('dashboard.menu.aiSupport'), icon: <SmartToyIcon />, path: '/student/chatbot' },
+    { id: 'messages', label: t('dashboard.menu.messages'), icon: <ChatIcon />, path: '/student/messages' },
+    { id: 'library', label: t('dashboard.menu.digitalLibrary'), icon: <MenuBookIcon />, path: '/common/library' },
+    { id: 'forum', label: t('dashboard.menu.communityForum'), icon: <ForumIcon />, path: '/common/forum' }
   ]
 
   // User name and avatar are now from backend
@@ -457,7 +471,7 @@ const StudentDashboard: React.FC = () => {
         height: '100vh',
         color: theme === 'dark' ? '#fff' : '#000'
       }}>
-        <div>Đang tải...</div>
+        <div>{t('dashboard.loading')}</div>
       </div>
     )
   }
@@ -504,7 +518,7 @@ const StudentDashboard: React.FC = () => {
             {/* Settings */}
             <div>
               <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                SETTINGS
+                {t('dashboard.settings')}
               </h3>
               <div className="space-y-2">
                 <button 
@@ -512,21 +526,28 @@ const StudentDashboard: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PersonIcon className="mr-3 w-4 h-4" />
-                  Profile
+                  {t('dashboard.profile')}
                 </button>
                 <button 
                   onClick={() => navigate('/common/notifications')}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <NotificationsIcon className="mr-3 w-4 h-4" />
-                  Notifications
+                  {t('dashboard.notifications')}
+                </button>
+                <button 
+                  onClick={() => changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <LanguageIcon className="mr-3 w-4 h-4" />
+                  {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                 </button>
                 <button 
                   onClick={() => setShowThemeOptions(!showThemeOptions)}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   <PaletteIcon className="mr-3 w-4 h-4" />
-                  Theme
+                  {t('dashboard.theme')}
                 </button>
                 <button 
                   onClick={() => {
@@ -537,7 +558,7 @@ const StudentDashboard: React.FC = () => {
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
                 >
                   <LogoutIcon className="mr-3 w-4 h-4" />
-                  Logout
+                  {t('dashboard.logout')}
                 </button>
               </div>
 
@@ -554,10 +575,10 @@ const StudentDashboard: React.FC = () => {
                       }`}
                     >
                       {theme === 'dark' ? <LightModeIcon className="mr-3 w-4 h-4" /> : <DarkModeIcon className="mr-3 w-4 h-4" />}
-                      {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                      {theme === 'dark' ? t('dashboard.switchToLight') : t('dashboard.switchToDark')}
                     </button>
                     <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} px-3 py-1`}>
-                      Current: {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                      {t('dashboard.currentMode')}: {theme === 'dark' ? t('dashboard.darkMode') : t('dashboard.lightMode')}
                     </div>
                   </div>
                 </div>
@@ -594,7 +615,7 @@ const StudentDashboard: React.FC = () => {
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="Search courses, instructors, or topics..."
+                  placeholder={t('dashboard.searchPlaceholder')}
                   className={`w-full px-4 py-3 pl-10 rounded-lg border ${
                     theme === 'dark' 
                       ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
@@ -607,7 +628,7 @@ const StudentDashboard: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
-                  Search
+                  {t('dashboard.search')}
                 </Button>
                 
                 {/* Desktop Theme Toggle */}
@@ -693,7 +714,7 @@ const StudentDashboard: React.FC = () => {
                 <div className="flex-1 mb-4 lg:mb-0">
                   <div className="flex items-center mb-2">
                     <AccessTimeIcon className={`w-5 h-5 mr-2 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Current Time</span>
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('dashboard.currentTime')}</span>
                   </div>
                   <div className={`text-3xl lg:text-4xl font-bold mb-1 font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {formatTime(currentTime)}
@@ -732,12 +753,12 @@ const StudentDashboard: React.FC = () => {
                         </div>
                       </div>
                       <div className={`text-right text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                        <div>Humidity: {weather.main.humidity}%</div>
-                        <div>Feels like: {Math.round(weather.main.feels_like)}°C</div>
+                        <div>{t('dashboard.humidity')}: {weather.main.humidity}%</div>
+                        <div>{t('dashboard.feelsLike')}: {Math.round(weather.main.feels_like)}°C</div>
                       </div>
                     </div>
                   ) : (
-                    <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Weather unavailable</div>
+                    <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('dashboard.weatherUnavailable')}</div>
                   )}
                 </div>
               </div>
@@ -775,7 +796,7 @@ const StudentDashboard: React.FC = () => {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                My Upcoming Sessions
+                {t('dashboard.myUpcomingSessions')}
               </h2>
               <div className="flex space-x-2">
                 <button className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
@@ -791,16 +812,16 @@ const StudentDashboard: React.FC = () => {
               <div className="text-center py-12">
                 <SchoolIcon className={`w-16 h-16 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
                 <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  No Upcoming Sessions
+                  {t('dashboard.noUpcomingSessions')}
                 </h3>
                 <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  You don't have any confirmed or pending sessions yet.
+                  {t('dashboard.noUpcomingSessionsDesc')}
                 </p>
                 <Button 
                   onClick={() => navigate('/student/book')}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
                 >
-                  Book a Session
+                  {t('dashboard.bookSession')}
                 </Button>
               </div>
             ) : (
@@ -830,7 +851,7 @@ const StudentDashboard: React.FC = () => {
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {(course as any).type === 'session' && (course as any).sessionData?.status === 'confirmed' ? 'Confirmed' : (course as any).type === 'class' ? 'Active' : 'Pending'}
+                        {(course as any).type === 'session' && (course as any).sessionData?.status === 'confirmed' ? t('dashboard.confirmed') : (course as any).type === 'class' ? t('dashboard.active') : t('dashboard.pending')}
                       </span>
                     </div>
                   </div>
@@ -859,7 +880,7 @@ const StudentDashboard: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4 mb-3">
                       <div>
                         <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Duration
+                          {t('dashboard.duration')}
                         </p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {course.duration}
@@ -867,12 +888,12 @@ const StudentDashboard: React.FC = () => {
                       </div>
                       <div>
                         <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Type
+                          {t('dashboard.type')}
                         </p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {(course as any).type === 'class' 
-                            ? ((course as any).classData?.isOnline ? 'Online' : 'In-Person')
-                            : ((course as any).sessionData?.isOnline ? 'Online' : 'In-Person')}
+                            ? ((course as any).classData?.isOnline ? t('dashboard.online') : t('dashboard.inPerson'))
+                            : ((course as any).sessionData?.isOnline ? t('dashboard.online') : t('dashboard.inPerson'))}
                         </p>
                       </div>
                     </div>
@@ -896,7 +917,7 @@ const StudentDashboard: React.FC = () => {
                         variant="contained"
                         className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1"
                       >
-                        View Details
+                        {t('dashboard.viewDetails')}
                       </Button>
                     </div>
                   </div>
@@ -912,13 +933,13 @@ const StudentDashboard: React.FC = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  My Classes
+                  {t('dashboard.myClasses')}
                 </h2>
                 <Button 
                   onClick={() => navigate('/student/session?view=classes')}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm"
                 >
-                  View All
+                  {t('dashboard.viewAll')}
                 </Button>
               </div>
 
@@ -948,7 +969,7 @@ const StudentDashboard: React.FC = () => {
                               ? 'bg-green-100 text-green-800' 
                               : 'bg-gray-100 text-gray-800'
                           }`}>
-                            {course.status === 'active' ? 'Active' : 'Inactive'}
+                            {course.status === 'active' ? t('dashboard.active') : t('dashboard.inactive')}
                           </span>
                         </div>
                       </div>
@@ -1030,7 +1051,7 @@ const StudentDashboard: React.FC = () => {
             {/* Profile Header */}
             <div className="flex items-center justify-between mb-6">
               <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Your Profile
+                {t('dashboard.yourProfile')}
               </h3>
               <button className="p-1">
                 <MoreVertIcon className="w-5 h-5 text-gray-400" />
@@ -1067,7 +1088,7 @@ const StudentDashboard: React.FC = () => {
                 className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
                 onClick={onPickAvatar}
               >
-                Change Avatar
+                {t('dashboard.changeAvatar')}
               </Button>
             </div>
 
@@ -1087,7 +1108,7 @@ const StudentDashboard: React.FC = () => {
             {/* Progress Chart */}
             <div className="mb-8">
               <h4 className={`font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Your Progress
+                {t('dashboard.yourProgress')}
               </h4>
               <div className="flex items-end space-x-2 h-20">
                 {[40, 70, 90, 100, 85].map((height, index) => (
@@ -1104,7 +1125,7 @@ const StudentDashboard: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  My Tutor
+                  {t('dashboard.myTutor')}
                 </h4>
                 <button 
                   onClick={() => navigate('/student/search')}
@@ -1118,13 +1139,13 @@ const StudentDashboard: React.FC = () => {
                 <div className="text-center py-8">
                   <PersonSearch className={`w-12 h-12 mx-auto mb-2 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    No tutors yet
+                    {t('dashboard.noTutors')}
                   </p>
                   <Button 
                     onClick={() => navigate('/student/search')}
                     className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 text-xs"
                   >
-                    Find Tutors
+                    {t('dashboard.findTutors')}
                   </Button>
                 </div>
               ) : (
@@ -1184,7 +1205,7 @@ const StudentDashboard: React.FC = () => {
                       e.currentTarget.style.backgroundColor = '#000000'
                     }}
                   >
-                    View All Tutors
+                    {t('dashboard.viewAllTutors')}
                   </Button>
                 </>
               )}
@@ -1268,7 +1289,7 @@ const StudentDashboard: React.FC = () => {
                 {/* Mobile Settings */}
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    SETTINGS
+                    {t('dashboard.settings')}
                   </h3>
                   <div className="space-y-2">
                     <button 
@@ -1279,7 +1300,7 @@ const StudentDashboard: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <PersonIcon className="mr-3 w-4 h-4" />
-                      Profile
+                      {t('dashboard.profile')}
                     </button>
                     <button 
                       onClick={() => {
@@ -1289,14 +1310,24 @@ const StudentDashboard: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <NotificationsIcon className="mr-3 w-4 h-4" />
-                      Notifications
+                      {t('dashboard.notifications')}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                     </button>
                     <button 
                       onClick={() => setShowThemeOptions(!showThemeOptions)}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <PaletteIcon className="mr-3 w-4 h-4" />
-                      Theme
+                      {t('dashboard.theme')}
                     </button>
                     <button 
                       onClick={() => {
@@ -1307,7 +1338,7 @@ const StudentDashboard: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50 ${theme === 'dark' ? 'hover:bg-red-900/20' : ''}`}
                     >
                       <LogoutIcon className="mr-3 w-4 h-4" />
-                      Logout
+                      {t('dashboard.logout')}
                     </button>
                   </div>
 
@@ -1327,10 +1358,10 @@ const StudentDashboard: React.FC = () => {
                           }`}
                         >
                           {theme === 'dark' ? <LightModeIcon className="mr-3 w-4 h-4" /> : <DarkModeIcon className="mr-3 w-4 h-4" />}
-                          {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                          {theme === 'dark' ? t('dashboard.switchToLight') : t('dashboard.switchToDark')}
                         </button>
                         <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} px-3 py-1`}>
-                          Current: {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                          {t('dashboard.currentMode')}: {theme === 'dark' ? t('dashboard.darkMode') : t('dashboard.lightMode')}
                         </div>
                       </div>
                     </div>

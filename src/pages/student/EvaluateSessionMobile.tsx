@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
@@ -23,17 +24,29 @@ import {
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
   Chat as ChatIcon,
-  Star
+  Star,
+  Language as LanguageIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import api from '../../lib/api'
 
 const EvaluateSessionMobile: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const { id } = useParams()
+  const [currentLang, setCurrentLang] = useState(i18n.language)
   const [loading, setLoading] = useState(true)
+  
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+  }
+  
+  useEffect(() => {
+    setCurrentLang(i18n.language)
+  }, [i18n.language])
   const [submitting, setSubmitting] = useState(false)
   const [session, setSession] = useState<any>(null)
   const [tutor, setTutor] = useState<any>(null)
@@ -132,14 +145,14 @@ const EvaluateSessionMobile: React.FC = () => {
 
   // Menu items for navigation
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/student' },
-    { id: 'search-tutors', label: 'Find Tutors', icon: <PersonSearch />, path: '/student/search' },
-    { id: 'book-session', label: 'Book Session', icon: <School />, path: '/student/book' },
-    { id: 'view-progress', label: 'View Progress', icon: <BarChartIcon />, path: '/student/progress' },
-    { id: 'evaluate-session', label: 'Evaluate Session', icon: <Star />, path: '/student/evaluate' },
-    { id: 'session-detail', label: 'Session Details', icon: <Class />, path: '/student/session' },
-    { id: 'chatbot-support', label: 'AI Support', icon: <SmartToyIcon />, path: '/student/chatbot' },
-    { id: 'messages', label: 'Messages', icon: <ChatIcon />, path: '/student/messages' }
+    { id: 'dashboard', label: t('dashboard.menu.dashboard'), icon: <DashboardIcon />, path: '/student' },
+    { id: 'search-tutors', label: t('dashboard.menu.findTutors'), icon: <PersonSearch />, path: '/student/search' },
+    { id: 'book-session', label: t('dashboard.menu.bookSession'), icon: <School />, path: '/student/book' },
+    { id: 'view-progress', label: t('dashboard.menu.viewProgress'), icon: <BarChartIcon />, path: '/student/progress' },
+    { id: 'evaluate-session', label: t('dashboard.menu.evaluateSession'), icon: <Star />, path: '/student/evaluate' },
+    { id: 'session-detail', label: t('dashboard.menu.sessionDetails'), icon: <Class />, path: '/student/session' },
+    { id: 'chatbot-support', label: t('dashboard.menu.aiSupport'), icon: <SmartToyIcon />, path: '/student/chatbot' },
+    { id: 'messages', label: t('dashboard.menu.messages'), icon: <ChatIcon />, path: '/student/messages' }
   ]
 
   // Helper function to get initials from name
@@ -165,13 +178,13 @@ const EvaluateSessionMobile: React.FC = () => {
   }
 
   const improvementOptions = [
-    'More practice problems',
-    'Clearer explanations',
-    'Better pacing',
-    'More visual aids',
-    'Interactive activities',
-    'Homework assignments',
-    'Follow-up materials'
+    t('evaluateSession.improvements.morePractice'),
+    t('evaluateSession.improvements.clearerExplanations'),
+    t('evaluateSession.improvements.betterPacing'),
+    t('evaluateSession.improvements.moreVisualAids'),
+    t('evaluateSession.improvements.interactiveActivities'),
+    t('evaluateSession.improvements.homeworkAssignments'),
+    t('evaluateSession.improvements.followUpMaterials')
   ]
 
   const handleImprovementChange = (improvement: string) => {
@@ -186,7 +199,7 @@ const EvaluateSessionMobile: React.FC = () => {
     if (!id || !session) return
 
     if (overallRating === 0) {
-      alert('Please provide an overall rating before submitting.')
+      alert(t('evaluateSession.alert.provideRating'))
       return
     }
 
@@ -216,11 +229,11 @@ const EvaluateSessionMobile: React.FC = () => {
           navigate('/student/evaluate')
         }, 2000)
       } else {
-        alert('Failed to submit evaluation: ' + (response.error || 'Unknown error'))
+        alert(t('evaluateSession.alert.submitFailed') + ' ' + (response.error || 'Unknown error'))
       }
     } catch (error: any) {
       console.error('Failed to submit evaluation:', error)
-      alert('Failed to submit evaluation. Please try again.')
+      alert(t('evaluateSession.alert.submitFailedRetry'))
     } finally {
       setSubmitting(false)
     }
@@ -251,7 +264,7 @@ const EvaluateSessionMobile: React.FC = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Loading session details...
+              {t('evaluateSession.loading')}
             </p>
           </div>
         </div>
@@ -265,13 +278,13 @@ const EvaluateSessionMobile: React.FC = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Session not found
+              {t('evaluateSession.sessionNotFound')}
             </p>
             <Button 
               onClick={() => navigate('/student/evaluate')}
               className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
             >
-              Back to Sessions
+              {t('evaluateSession.backToSessions')}
             </Button>
           </div>
         </div>
@@ -294,17 +307,17 @@ const EvaluateSessionMobile: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {existingEvaluation ? 'Your Evaluation' : 'Evaluate Session'}
+                  {existingEvaluation ? t('evaluateSession.yourEvaluation') : t('evaluateSession.title')}
                 </h1>
                 {existingEvaluation && (
                   <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-medium flex items-center">
                     <CheckCircleIcon className="w-3 h-3 mr-0.5" />
-                    Done
+                    {t('evaluateSession.done')}
                   </span>
                 )}
               </div>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Session #{id} • {existingEvaluation ? 'Review feedback' : 'Share your feedback'}
+                {t('evaluateSession.sessionNumber')}{id} • {existingEvaluation ? t('evaluateSession.reviewFeedback') : t('evaluateSession.shareFeedback')}
               </p>
             </div>
           </div>
@@ -338,7 +351,7 @@ const EvaluateSessionMobile: React.FC = () => {
           }}
         >
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Session Summary
+            {t('evaluateSession.sessionSummary')}
           </h3>
           <div className="flex items-center mb-4">
             <Avatar
@@ -364,20 +377,20 @@ const EvaluateSessionMobile: React.FC = () => {
           
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
+              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.date')}</span>
               <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{formatDate(session.startTime)}</span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Time:</span>
+              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.time')}</span>
               <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{formatTime(session.startTime, session.endTime)}</span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Topic:</span>
+              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.topic')}</span>
               <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.topic || session.subject}</span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Duration:</span>
-              <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.duration} minutes</span>
+              <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('evaluateSession.duration')}</span>
+              <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{session.duration} {t('evaluateSession.minutes')}</span>
             </div>
           </div>
         </Card>
@@ -392,7 +405,7 @@ const EvaluateSessionMobile: React.FC = () => {
           }}
         >
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Overall Session Rating
+            {t('evaluateSession.overallSessionRating')}
           </h3>
           <div className="flex items-center justify-center mb-4">
             <Rating
@@ -414,7 +427,7 @@ const EvaluateSessionMobile: React.FC = () => {
             />
           </div>
           <p className={`text-center text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            {overallRating > 0 ? `${overallRating}/5` : 'Rate this session'}
+            {overallRating > 0 ? `${overallRating}/5` : t('evaluateSession.rateThisSession')}
           </p>
         </Card>
 
@@ -428,14 +441,14 @@ const EvaluateSessionMobile: React.FC = () => {
           }}
         >
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Detailed Ratings
+            {t('evaluateSession.detailedRatings')}
           </h3>
           <div className="space-y-4">
             <div>
               <div className="flex items-center mb-2">
                 <Person className="w-4 h-4 text-blue-600 mr-2" />
                 <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Tutor Performance
+                  {t('evaluateSession.tutorPerformance')}
                 </span>
               </div>
               <Rating
@@ -460,7 +473,7 @@ const EvaluateSessionMobile: React.FC = () => {
               <div className="flex items-center mb-2">
                 <School className="w-4 h-4 text-blue-600 mr-2" />
                 <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Content Quality
+                  {t('evaluateSession.contentQuality')}
                 </span>
               </div>
               <Rating
@@ -485,7 +498,7 @@ const EvaluateSessionMobile: React.FC = () => {
               <div className="flex items-center mb-2">
                 <ThumbUpAltIcon className="w-4 h-4 text-blue-600 mr-2" />
                 <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  Communication
+                  {t('evaluateSession.communication')}
                 </span>
               </div>
               <Rating
@@ -515,7 +528,7 @@ const EvaluateSessionMobile: React.FC = () => {
                 className="w-4 h-4 text-blue-600 rounded mr-2"
               />
               <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Would you recommend this tutor?
+                {t('evaluateSession.wouldRecommend')}
               </span>
             </div>
           </div>
@@ -531,12 +544,12 @@ const EvaluateSessionMobile: React.FC = () => {
           }}
         >
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Additional Comments
+            {t('evaluateSession.additionalComments')}
           </h3>
           <textarea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            placeholder="Share your thoughts about the session..."
+            placeholder={t('evaluateSession.commentsPlaceholder')}
             rows={4}
             className={`w-full px-3 py-2 border rounded-lg ${
               theme === 'dark'
@@ -556,7 +569,7 @@ const EvaluateSessionMobile: React.FC = () => {
           }}
         >
           <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            What could be improved?
+            {t('evaluateSession.whatCouldBeImproved')}
           </h3>
           <div className="flex flex-wrap gap-2">
             {improvementOptions.map((option) => (
@@ -584,7 +597,7 @@ const EvaluateSessionMobile: React.FC = () => {
             className={`w-full flex items-center justify-between p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}
           >
             <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Need Help?
+              {t('evaluateSession.needHelp')}
             </h3>
             <div className={`transform transition-transform ${showHelp ? 'rotate-180' : ''}`}>
               <ArrowForwardIcon className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
@@ -600,7 +613,7 @@ const EvaluateSessionMobile: React.FC = () => {
                 >
                   <BarChartIcon className="w-6 h-6 text-blue-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Progress
+                    {t('evaluateSession.progress')}
                   </span>
                 </button>
                 <button 
@@ -609,7 +622,7 @@ const EvaluateSessionMobile: React.FC = () => {
                 >
                   <CheckCircleIcon className="w-6 h-6 text-green-600 mb-2" />
                   <span className={`text-xs font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Book Session
+                    {t('evaluateSession.bookAnotherSession')}
                   </span>
                 </button>
               </div>
@@ -632,7 +645,7 @@ const EvaluateSessionMobile: React.FC = () => {
             fontWeight: '500'
           }}
         >
-          {existingEvaluation ? 'Back to Sessions' : 'Submit Evaluation'}
+          {existingEvaluation ? t('evaluateSession.backToSessions') : t('evaluateSession.submitEvaluation')}
         </Button>
       </div>
 
@@ -668,7 +681,7 @@ const EvaluateSessionMobile: React.FC = () => {
                 {/* Quick Actions - Moved to top */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    QUICK ACTIONS
+                    {t('evaluateSession.quickActions')}
                   </h3>
                   <div className="space-y-2">
                     <button 
@@ -679,7 +692,17 @@ const EvaluateSessionMobile: React.FC = () => {
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors`}
                     >
                       <ArrowBackIcon className="mr-3 w-4 h-4" />
-                      Back to Dashboard
+                      {t('evaluateSession.backToDashboard')}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        changeLanguage(currentLang === 'vi' ? 'en' : 'vi')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <LanguageIcon className="mr-3 w-4 h-4" />
+                      {currentLang === 'vi' ? 'English' : 'Tiếng Việt'}
                     </button>
                   </div>
                 </div>
@@ -687,7 +710,7 @@ const EvaluateSessionMobile: React.FC = () => {
                 {/* Session Info */}
                 <div className="mb-8">
                   <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    SESSION INFO
+                    {t('evaluateSession.sessionInfo')}
                   </h3>
                   <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div className="flex items-center mb-3">
