@@ -3,6 +3,7 @@
  * Main server file for Tutor Support System APIs
  */
 
+import 'dotenv/config'; // Load .env file
 import express from 'express';
 import cors from 'cors';
 import { config } from './lib/config.js';
@@ -71,6 +72,9 @@ import { getCommentsHandler, createCommentHandler, deleteCommentHandler, likeCom
 // Import handlers - Conversations
 import { listConversationsHandler, createConversationHandler, getConversationHandler, deleteConversationHandler } from './routes/conversations/index.js';
 import { getMessagesHandler, sendMessageHandler } from './routes/conversations/[id]/messages.js';
+
+// Import handlers - Chatbot
+import { chatbotHandler } from './routes/chatbot/index.js';
 
 // Import handlers - Session Requests
 import { listSessionRequestsHandler, createSessionRequestHandler } from './routes/session-requests/index.js';
@@ -242,6 +246,10 @@ app.get('/api/conversations/:id', authenticate, getConversationHandler);
 app.delete('/api/conversations/:id', authenticate, deleteConversationHandler);
 app.get('/api/conversations/:id/messages', authenticate, getMessagesHandler);
 app.post('/api/conversations/:id/messages', authenticate, sendMessageHandler);
+
+// ===== CHATBOT ROUTES =====
+
+app.post('/api/chatbot', authenticate, chatbotHandler);
 
 // ===== PROGRESS ROUTES =====
 

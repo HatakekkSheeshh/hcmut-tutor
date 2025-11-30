@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -15,6 +15,7 @@ import {
   Support as SupportIcon
 } from '@mui/icons-material'
 import Card from '../../components/ui/Card'
+import api from '../../lib/api'
 
 interface Message {
   id: string
@@ -38,10 +39,16 @@ const ChatbotSupport: React.FC = () => {
   const [inputText, setInputText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
+
+  // Auto-scroll to bottom when new message is added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isTyping])
 
   const quickActions = [
     { text: 'Help with homework', icon: <School />, action: 'homework' },
@@ -71,20 +78,52 @@ const ChatbotSupport: React.FC = () => {
     }
 
     setMessages(prev => [...prev, userMessage])
+    const currentInput = inputText
     setInputText('')
     setIsTyping(true)
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      // Prepare conversation history (last 10 messages for context)
+      const conversationHistory = messages.slice(-10).map(msg => ({
+        sender: msg.sender,
+        text: msg.text
+      }))
+
+      // Call Gemini API
+      const result = await api.chatbot.sendMessage(currentInput, conversationHistory)
+      
+      if (result.success) {
+        const botResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          text: result.data.message,
+          sender: 'bot',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, botResponse])
+      } else {
+        // Fallback to local response if API fails
+        const botResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          text: generateBotResponse(currentInput),
+          sender: 'bot',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, botResponse])
+        console.error('Chatbot API error:', result.error)
+      }
+    } catch (error) {
+      console.error('Chatbot error:', error)
+      // Fallback to local response on error
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateBotResponse(inputText),
+        text: generateBotResponse(currentInput),
         sender: 'bot',
         timestamp: new Date()
       }
       setMessages(prev => [...prev, botResponse])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const generateBotResponse = (input: string): string => {
@@ -286,6 +325,7 @@ const ChatbotSupport: React.FC = () => {
                       </div>
                     </div>
                 )}
+                <div ref={messagesEndRef} />
                 </div>
 
               {/* Input */}

@@ -948,6 +948,17 @@ export const roomsAPI = {
 
 // ===== MANAGEMENT =====
 
+// ===== CHATBOT =====
+
+export const chatbotAPI = {
+  async sendMessage(message: string, conversationHistory: Array<{ sender: 'user' | 'bot', text: string }> = []) {
+    return fetchAPI('/chatbot', {
+      method: 'POST',
+      body: JSON.stringify({ message, conversationHistory })
+    });
+  }
+};
+
 export const managementAPI = {
   // Approvals
   approvals: {
@@ -1498,7 +1509,8 @@ export const api = {
   sessionRequests: sessionRequestsAPI,
   conversations: conversationsAPI,
   upload: uploadAPI,
-  management: managementAPI
+  management: managementAPI,
+  chatbot: chatbotAPI
 };
 
 export default api;
